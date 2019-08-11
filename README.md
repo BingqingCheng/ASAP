@@ -5,4 +5,4 @@ python 3
 
 Requirements:
 
-+ numpy scipy scikit-learn autograd pandas tqdm ase dscribe
++ numpy scipy scikit-learn tqdm ase dscribe
