@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.linalg as salg
 
-from ml_kernel_operations import *
+from .ml_kernel_operations import *
 
 """
 tools for doing kernal PCA on environmental similarity
