@@ -14,15 +14,7 @@ from dscribe.kernels import AverageKernel
 
 def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, matrix_plot):
 
-    # set parameters
-    fxyz = str(fxyz)
-    dictxyz = str(dictxyz)
-    soap_rcut = float(soap_rcut)
-    soap_g = float(soap_g)
-    soap_n = int(soap_n)
-    soap_l = int(soap_l)
-    soap_periodic = bool(soap_periodic)
-    matrix_plot = bool(matrix_plot)
+
     fframes = []; dictframes = []
 
     # read frames
