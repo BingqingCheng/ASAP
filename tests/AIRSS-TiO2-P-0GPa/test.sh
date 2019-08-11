@@ -1,0 +1,1 @@
+python3 ../../asap/gen_kmat.py -fxyz dict-newphases/newphases-pressure-0GPa-combined.xyz -fdict dict-newphases/newphases-pressure-0GPa-combined.xyz --prefix test --rcut 4 --n 6 --l 6 --g 0.5 --periodic True --plot True
