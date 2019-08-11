@@ -36,10 +36,16 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     global_species = np.unique(global_species)
     print("a total of", nframes,"frames, with elements: ", global_species)
 
-    # set up the soap descriptors
-    soap_desc = SOAP(species=global_species,
+    if (nframes > 1):
+        # set up the soap descriptors
+        soap_desc = SOAP(species=global_species,
                  rcut=soap_rcut, nmax=soap_n, lmax=soap_l, sigma=soap_g,
                  crossover=False, average=True,periodic=soap_periodic)
+    else:
+        # if only one frame we compute the kmat between the atomic environments within this frame
+        soap_desc = SOAP(species=global_species,
+                 rcut=soap_rcut, nmax=soap_n, lmax=soap_l, sigma=soap_g,
+                 crossover=False, average=False,periodic=soap_periodic)
 
     # compute soap finger prints
     fall = soap_desc.create(frames, n_jobs=8)
@@ -47,6 +53,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     # compute kmat
     fshape = np.shape(fall)
     re = AverageKernel(metric="linear")
+
     eva = re.create(fall.reshape((fshape[0], 1, fshape[1])))
 
     # save

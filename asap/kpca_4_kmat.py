@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import numpy as np
-from lib import kpca, kerneltorho
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from lib import kpca, kerneltorho
 
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 
