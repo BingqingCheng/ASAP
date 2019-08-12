@@ -1,15 +1,16 @@
 import numpy as np
 import scipy.linalg as salg
+import copy
 
 def normalizekernel(kernel):
     # first normalize the kernel matrix
-    nkernel = kernel.copy()
+    nkernel = copy.deepcopy(kernel)
     size = len(kernel)
     for i in range(size):
         nkernel[i,:] /= np.sqrt(kernel[i,i])
         nkernel[:,i] /= np.sqrt(kernel[i,i])
         nkernel[i,i] = 1.0
-    return nkernel
+    return nkernel.clip(max=1)
 
 def kerneltodis(kernel):
     # there can be many transformations between the k-matrix and the distance matrix
@@ -22,7 +23,16 @@ def kerneltodis(kernel):
         for j in range(i-1):
             dis[i,j] = dis[j,i] = np.sqrt(2.-2.*nk[i,j])
     
-    return dis
+    return dis.clip(min=0)
+
+
+def kerneltodis_linear(kernel):
+    # there can be many transformations between the k-matrix and the distance matrix
+    # Here we use d_ij = 1-k_ij
+    # (k_ij is a normalized symetric kernel)
+    nk = normalizekernel(kernel)
+    dis = 1.-nk
+    return dis.clip(min=0)
 
 def kerneltorho(kernel, delta):
     # we compute the "density" of the data from kernel matrix
