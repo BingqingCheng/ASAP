@@ -5,6 +5,7 @@ import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from lib import kpca, kerneltorho
+from lib import plot_styles
 
 def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
 
@@ -41,6 +42,8 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
     [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
 
     # make plot
+    plot_styles.set_nice_font()
+    """
     fig, ax = plt.subplots()
     pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=plotcolor[:],
                     cmap=cm.summer,vmin=plotcolormin, vmax=plotcolormax)
@@ -59,6 +62,29 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
     fig.set_size_inches(18.5, 10.5)
     plt.show()
     fig.savefig('KPCA_4_'+prefix+'.png')
+    """
+    plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
+                xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
+                clabel=colorlabel, label=None,
+                centers=None,
+                psize=20,
+                out_file='KPCA_4_'+prefix+'.png', 
+                title='KPCA for: '+prefix, 
+                show=False, cmap='summer',
+                remove_tick=False,
+                use_perc=False,
+                rasterized = True,
+                fontsize = 15,
+                vmax = plotcolormax,
+                vmin = plotcolormin)
+
+    if (ftags != 'none'):
+        for i in range(ndict):
+            plt.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
+            plt.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+
+    plt.show()
+
 ##########################################################################################
 ##########################################################################################
 
