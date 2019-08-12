@@ -9,16 +9,21 @@ from lib import kpca, kerneltorho
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 
     # if it has been computed before we can simply load it
-    eva = np.genfromtxt(fkmat, dtype=float)
+    if (fkmat != 'none'):
+        try:
+            eva = np.genfromtxt(fkmat, dtype=float)
+        except: raise ValueError('Cannot load the kernel matrix')
+    else:
+        raise ValueError('Please provide the kernel matrix, you can use gen_kmat.py to compute it')
     print("loaded",fkmat)
     if (ftags != 'none'): 
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # charecteristic difference in k_ij
-    delta = np.std(eva[:,:])
+    sigma_kij = np.std(eva[:,:])
     # Get local density
-    rho = kerneltorho(eva, delta)
+    rho = kerneltorho(eva, sigma_kij)
     [ rhomin, rhomax ] = [ np.min(rho),np.max(rho) ]
 
     # main thing
@@ -31,7 +36,7 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     fig, ax = plt.subplots()
     pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=rho[:],cmap=cm.cool,vmin=rhomin, vmax=rhomax)
     cbar = fig.colorbar(pcaplot, ax=ax)
-    cbar.ax.set_ylabel('local density of each data point (delta ='+"{:4.0e}".format(delta)+' )')
+    cbar.ax.set_ylabel('local density of each data point ($\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )')
 
     # project the known structures
     if (ftags != 'none'):
