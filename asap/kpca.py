@@ -84,6 +84,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
             plt.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
 
     plt.show()
+    fig.savefig('KPCA_4_'+prefix+'.png')
 
 ##########################################################################################
 ##########################################################################################
@@ -94,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('-colors', type=str, default='none', help='Properties for all samples (N floats) used to color the scatter plot')
-    parser.add_argument('--prefix', type=str, default='', help='Filename prefix')
+    parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')

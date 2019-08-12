@@ -7,6 +7,7 @@ from matplotlib import cm
 from lib import kpca, kerneltorho, kerneltodis
 from lib import get_cluster_size, get_cluster_properties
 from lib import DBCluster, sklearn_DB
+from lib import plot_styles
 
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 
@@ -53,6 +54,8 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     colorlabel = 'a total of' + str(n_clusters) + ' clusters'
 
     # make plot
+    plot_styles.set_nice_font()
+    """
     fig, ax = plt.subplots()
     pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=plotcolor[:],
                     cmap=cm.gnuplot,vmin=plotcolormin, vmax=plotcolormax)
@@ -77,6 +80,25 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     fig.set_size_inches(18.5, 10.5)
     plt.show()
     fig.savefig('Clustering_4_'+prefix+'.png')
+    """
+    fig, ax = plt.subplots()
+    plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
+                      show=False, savefile = None, fontsize =15, psize = 20, 
+                      title=None, w_label = True, figsize=None,
+                      dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True)
+
+    # project the known structures
+    if (ftags != 'none'):
+        for i in range(ndict):
+            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
+            ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+
+    plt.title('KPCA and clustering for: '+prefix)
+    plt.xlabel('Princple Axis '+str(pc1))
+    plt.ylabel('Princple Axis '+str(pc2))
+    plt.show()
+    fig.savefig('Clustering_4_'+prefix+'.png')
+
 ##########################################################################################
 ##########################################################################################
 
@@ -86,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
+    parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     args = parser.parse_args()

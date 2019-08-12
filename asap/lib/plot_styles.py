@@ -168,7 +168,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         idx_centers.append(all_idx[pos][np.argmin(np.linalg.norm(Xsub - Xmean, axis=1))])
 
     if outlier is True:
-        color_out = {-3 : '#ff0050', -2 : '#9eff49', -1 : '#89f9ff'}
+        color_out = {-3 : '#ff0050', -2 : '#9eff49', -1 : 'gray'}
         for yi in [-3, -2, -1]:
             pos = (y == yi)
             if np.count_nonzero(pos) > 0:

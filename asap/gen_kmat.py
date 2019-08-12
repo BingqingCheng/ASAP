@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
     parser.add_argument('-fdict', type=str, default='none', help='Location of xyz file that is used for a dictionary')
-    parser.add_argument('--prefix', type=str, default='', help='Filename prefix')
+    parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
