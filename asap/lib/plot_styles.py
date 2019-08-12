@@ -126,7 +126,7 @@ def plot_scatter_w_label(x, y, z, psize=20, label = None):
 
 def plot_cluster_w_label(X, y, Xcluster=None, 
                       show=True, savefile = None, fontsize =15, psize = 20, 
-                      title=None, w_label = True, figsize=None,
+                      title=None, w_label = True, w_size = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True):
     """Plots a 2D clustering plot given x,y coordinates and a label z for
     every data point

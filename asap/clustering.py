@@ -29,12 +29,12 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     # now we do the clustering
     # option 1: do on the projected coordinates
     #trainer = sklearn_DB('euclidean')
-    #do_clustering = DBCluster(sigma_kij, 5, trainer)
+    #do_clustering = DBCluster(sigma_kij, 5, trainer) # adjust the parameters here!
     #do_clustering.fit(proj)
     # option 2: do directly on kernel matrix.
     dmat = kerneltodis(eva)
     trainer = sklearn_DB('precomputed')
-    do_clustering = DBCluster(sigma_kij, 5, trainer)
+    do_clustering = DBCluster(0.003, 5, trainer) # adjust the parameters here!
     do_clustering.fit(dmat)
     #
     labels_db = do_clustering.get_cluster_labels()
@@ -56,7 +56,6 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     # make plot
     plot_styles.set_nice_font()
     """
-    fig, ax = plt.subplots()
     pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=plotcolor[:],
                     cmap=cm.gnuplot,vmin=plotcolormin, vmax=plotcolormax)
     cbar = fig.colorbar(pcaplot, ax=ax)
@@ -68,21 +67,9 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
             ax.plot(cluster_x[k],cluster_y[k], 'o', markerfacecolor='none',
                 markeredgecolor='gray', markersize=10.0*(np.log(cluster_size[k])))
 
-    # project the known structures
-    if (ftags != 'none'):
-        for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-
-    plt.title('KPCA and clustering for: '+prefix)
-    plt.xlabel('pc1')
-    plt.ylabel('pc2')
-    fig.set_size_inches(18.5, 10.5)
-    plt.show()
-    fig.savefig('Clustering_4_'+prefix+'.png')
     """
     fig, ax = plt.subplots()
-    plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
+    ax = plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
                       show=False, savefile = None, fontsize =15, psize = 20, 
                       title=None, w_label = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True)
