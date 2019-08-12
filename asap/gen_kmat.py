@@ -71,7 +71,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fxyz', type=str, required=True, default='none', help='Location of xyz file')
+    parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
     parser.add_argument('-fdict', type=str, default='none', help='Location of xyz file that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='', help='Filename prefix')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')

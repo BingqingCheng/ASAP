@@ -9,12 +9,10 @@ from lib import kpca, kerneltorho
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 
     # if it has been computed before we can simply load it
-    if (fkmat != 'none'):
-        try:
-            eva = np.genfromtxt(fkmat, dtype=float)
-        except: raise ValueError('Cannot load the kernel matrix')
-    else:
-        raise ValueError('Please provide the kernel matrix, you can use gen_kmat.py to compute it')
+    try:
+        eva = np.genfromtxt(fkmat, dtype=float)
+    except: raise ValueError('Cannot load the kernel matrix')
+
     print("loaded",fkmat)
     if (ftags != 'none'): 
         tags = np.loadtxt(ftags, dtype="str")
@@ -56,7 +54,7 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, default='none', help='Location of kernel matrix file')
+    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for each sample')
     parser.add_argument('--prefix', type=str, default='', help='Filename prefix')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
