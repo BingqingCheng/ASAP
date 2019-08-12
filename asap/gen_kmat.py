@@ -11,10 +11,12 @@ import argparse
 from ase.io import read
 from dscribe.descriptors import SOAP
 from dscribe.kernels import AverageKernel
+from lib import str2bool
 
 def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, matrix_plot):
 
-
+    soap_periodic=bool(soap_periodic)
+    print(soap_periodic)
     fframes = []; dictframes = []
 
     # read frames
@@ -33,6 +35,8 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     global_species = []
     for frame in frames:
         global_species.extend(frame.get_atomic_numbers())
+        if (soap_periodic == False): 
+            frame.set_pbc([False, False, False])
     global_species = np.unique(global_species)
     print("a total of", nframes,"frames, with elements: ", global_species)
 
@@ -78,8 +82,8 @@ if __name__ == '__main__':
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
-    parser.add_argument('--periodic', type=bool, default=True, help='Is the system periodic (True/False)?')
-    parser.add_argument('--plot', type=bool, default=False, help='Do you want to plot the kernel matrix (True/False)?')
+    parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True, help='Is the system periodic (True/False)?')
+    parser.add_argument('--plot', type=str2bool, nargs='?', const=True, default=False, help='Do you want to plot the kernel matrix (True/False)?')
     args = parser.parse_args()
 
     main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic, args.plot)
