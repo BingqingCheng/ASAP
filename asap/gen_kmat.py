@@ -66,6 +66,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     # plot
     if (matrix_plot):
         plt.matshow(eva)
+        plt.title('Kernel matrix: '+prefix)
         plt.show()
 
     
