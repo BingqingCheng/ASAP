@@ -31,7 +31,7 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     fig, ax = plt.subplots()
     pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=rho[:],cmap=cm.cool,vmin=rhomin, vmax=rhomax)
     cbar = fig.colorbar(pcaplot, ax=ax)
-    cbar.ax.set_ylabel('local density of each data point')
+    cbar.ax.set_ylabel('local density of each data point (delta ='+"{:4.0e}".format(delta)+' )')
 
     # project the known structures
     if (ftags != 'none'):
@@ -44,6 +44,7 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     plt.ylabel('pc2')
     fig.set_size_inches(18.5, 10.5)
     plt.show()
+    fig.savefig('KPCA_4_'+prefix+'.png')
 ##########################################################################################
 ##########################################################################################
 
