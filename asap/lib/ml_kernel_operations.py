@@ -39,7 +39,7 @@ def kerneltorho(kernel, delta):
     # delta is the charecteristic spread in similarity
 
     rho = np.zeros(len(kernel))
-    allrhofromdis = np.exp((np.asmatrix(kernel)-1.0)*delta)
+    allrhofromdis = np.exp((np.asmatrix(kernel)-1.0)/delta)
 
     for i in range(len(allrhofromdis)):
         rho[i] = np.sum(allrhofromdis[i])
