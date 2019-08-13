@@ -1,6 +1,8 @@
 from .ml_cluster_base import *
 from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
+#from .ml_density_estimation import KDE
+#from .ml_kpca import kpca
 
 """
 density based clustering algorithms
@@ -21,7 +23,7 @@ class DBCluster(ClusterBase):
     def fit(self,dmatrix,rho=None):
 
         '''fit the clustering model, assume input of NxN distance matrix or Nxm coordinates'''
-        self.labels = self.trainer.fit(dmatrix, rho = None)
+        self.labels = self.trainer.fit(dmatrix, rho)
         # Number of clusters in labels, ignoring noise if present.
         self.n_clusters = len(set(self.labels)) - (1 if -1 in self.labels else 0)
         self.n_noise = list(self.labels).count(-1)
@@ -91,23 +93,33 @@ class LAIO_DB(FitClusterBase):
 
     _pairwise = True
     
-    def __init__(self, deltamin):
+    def __init__(self, deltamin=-1, rhomin=-1):
         self.deltamin = deltamin
+        self.rhomin = rhomin
 
-    def fit(self,dmatrix,rcut, min_samples):
+    def fit(self, dmatrix, rho=None):
 
-        rho = self.estimate_rho(rcut,dmatrix)
-        delta,nneigh = self.estimate_delta(rho,dmatrix)
+        if rho is None:
+            raise ValueError('for fdb it is better to compute kernel density first')
+
+        delta,nneigh = self.estimate_delta(dmatrix, rho)
+        
+        # I'll think about this!!!
+        if (self.rhomin < 0): self.rhomin = 0.2*np.mean(rho)+0.8*np.min(rho)
+        if (self.deltamin < 0): self.deltamin = np.mean(delta)
 
         ###
         plt.scatter(rho,delta)
-        plt.plot([min(rho),max(rho)],[dlim,dlim],c='red')
+        plt.plot([min(rho),max(rho)],[self.deltamin,self.deltamin],c='red')
+        plt.plot([self.rhomin,self.rhomin],[min(delta),max(delta)],c='red')
+        plt.xlabel('rho')
+        plt.ylabel('delta')
         plt.show()
         ###
         nclust = 0
         cl = np.zeros(len(rho),dtype='int')-1
         for i in range(len(rho)):
-            if (rho[i] > min_samples and delta[i] > self.deltamin):
+            if (rho[i] > self.rhomin and delta[i] > self.deltamin):
                 nclust += 1
                 cl[i] = nclust
 
@@ -117,10 +129,9 @@ class LAIO_DB(FitClusterBase):
         for i in range(len(rho)):
             if cl[ordrho[i]]==-1:
                 cl[ordrho[i]]=cl[nneigh[ordrho[i]]]
-
         return cl
 
-    def estimate_delta(rho,dist):
+    def estimate_delta(self, dist, rho):
         delta = (rho*0.0).copy()
         nneigh = np.ones(len(delta),dtype='int')
         for i in range(len(rho)):
@@ -133,12 +144,8 @@ class LAIO_DB(FitClusterBase):
                 nneigh[i] = js[np.argmin(dist[i,js])]
         return delta, nneigh
 
-    def estimate_rho(dcut,dist):
-        ### Using a Gaussian Kernel, like in Laio's
-        rho = np.zeros(len(dist))
-        for i in range(len(dist)):
-            for j in range(len(dist)):
-                if(dist[i,j]<dcut): 
-                    rho[i]+= np.exp(-(dist[i,j]/dcut)*(dist[i,j]/dcut))
-        return rho
+    def pack(self):
+        '''return all the info'''
+        state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
+        return state
 
