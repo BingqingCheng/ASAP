@@ -1,5 +1,5 @@
 '''
-I adapt most of the suff from:
+I adapt some of the suff from:
 Copyright 2017 Alexandre Day
 '''
 
@@ -123,10 +123,113 @@ def plot_scatter_w_label(x, y, z, psize=20, label = None):
     plt.tight_layout()
     plt.show()
 
+######################################################
+
+def plot_cluster_w_size(X, y, c,
+                      xlabel=None, ylabel=None, clabel=None, title=None, 
+                      w_size = True, w_label = False,
+                      circle_size = 20, alpha=0.7, edgecolors=None,
+                      cmap='coolwarm', vmax = None,vmin = None, psize = 2, 
+                      show=True, savefile = None, fontsize =15, 
+                      figsize=None,rasterized = True, remove_tick=True,
+                      dpi=200, outlier=True):
+
+    """Plots a 2D clustering plot given x,y coordinates and a label z for
+    every data point
+
+    Parameters
+    ----------
+    X : array-like, shape=[n_samples,2]
+        Input points.
+    y : array-like, shape=[n_samples]
+        label for every point
+    c : array-like, shape=[n_samples]
+        color for every point
+    """
+    # get the cluster size and mean position
+    from .ml_cluster_tools import get_cluster_size, get_cluster_properties
+    y_unique_ = np.unique(y)
+    [ _, cluster_size ]  = get_cluster_size(y)
+    [ _, cluster_mx ]  = get_cluster_properties(y,X[:,0],'mean')
+    [ _, cluster_my ]  = get_cluster_properties(y,X[:,1],'mean')
+    # remove outliers
+    if outlier is True:
+        y_unique = y_unique_[y_unique_ > -1]
+    else:
+        y_unique = y_unique_
+
+    # start the plots
+    fig, ax = plt.subplots()
+
+    # first do a scatter plot for all samples
+    cset1 = ax.scatter(X[:,0], X[:,1],  c=c[:],
+            cmap=cmap, vmin=vmin, vmax=vmax, marker='o', s=psize,rasterized=rasterized)
+    cbar=fig.colorbar(cset1, ax=ax)
+    cbar.ax.set_ylabel(clabel)
+
+    # the noisy points
+    if outlier is True:
+        # Black used for noise.
+        col = [0, 0, 0, 1]
+        class_member_mask = ( y == -1 )
+        xy = X[class_member_mask]
+        ax.plot(xy[:,0], xy[:,1], 'x', markerfacecolor=tuple(col), alpha=alpha,
+             markeredgecolor='k', markersize=0.1*psize)
+
+    for k in y_unique:
+        if (cluster_size[k]>2): # we set a cutoff here
+            ax.plot(cluster_mx[k],cluster_my[k], 'o', markerfacecolor='none',
+                markeredgecolor='gray', markersize=10.0*(np.log(cluster_size[k])))
+
+    if w_label is True:
+        for k in y_unique:
+            # Position of each label.
+            txt = ax.annotate(str(k),xy=(cluster_mx[k],cluster_my[k]),
+            xytext=(0,0), textcoords='offset points',
+            fontsize=fontsize,horizontalalignment='center', verticalalignment='center'
+            )
+            txt.set_path_effects([
+                PathEffects.Stroke(linewidth=5, foreground='none'),
+                PathEffects.Normal()])
+
+
+    xmin,xmax = plt.xlim()
+    ymin,ymax = plt.ylim()
+    dx = xmax - xmin
+    dy = ymax - ymin
+    plt.xticks([])
+    plt.yticks([])
+    
+    if remove_tick:
+        plt.tick_params(labelbottom='off',labelleft='off')
+    
+    if xlabel is not None:
+        plt.xlabel(xlabel,fontsize=fontsize)
+    if ylabel is not None:
+        plt.ylabel(ylabel,fontsize=fontsize)
+    if title is not None:
+        plt.title(title,fontsize=fontsize)
+
+    plt.tight_layout()
+    if savefile is not None:
+        if dpi is None:
+            plt.savefig(savefile)
+        else:
+            plt.savefig(savefile,dpi=dpi)
+
+    if show is True:
+        plt.show()
+        plt.clf()
+        plt.close()
+
+    return fig, ax
+
+
+######################################################
 
 def plot_cluster_w_label(X, y, Xcluster=None, 
                       show=True, savefile = None, fontsize =15, psize = 20, 
-                      title=None, w_label = True, w_size = True, figsize=None,
+                      title=None, w_label = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True):
     """Plots a 2D clustering plot given x,y coordinates and a label z for
     every data point
