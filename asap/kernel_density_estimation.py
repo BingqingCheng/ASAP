@@ -13,15 +13,14 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
     try:
         eva = np.genfromtxt(fkmat, dtype=float)
     except: raise ValueError('Cannot load the kernel matrix')
-
     print("loaded",fkmat)
+    # load tags if any
     if (ftags != 'none'): 
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
-    # main thing
+    # doing a kpca
     proj = kpca(eva,kpca_d)
-
     # save the low D projection
     # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 

@@ -1,4 +1,5 @@
 from .ml_cluster_base import *
+from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 
 """
@@ -8,12 +9,7 @@ density based clustering algorithms
 class DBCluster(ClusterBase):
     _pairwise = True
     
-    def __init__(self,rcut, min_samples, trainer):
-        # the two important parameters of density-based clustering algorithms
-        # distance metric
-        self.rcut = rcut
-        # The number of samples in a neighborhood for a point to be considered as a core point.
-        self.min_samples = min_samples
+    def __init__(self, trainer):
         self.trainer = trainer
         # cluster labels
         self.labels = None
@@ -22,9 +18,10 @@ class DBCluster(ClusterBase):
         # number of noise points
         self.n_noise = None
     
-    def fit(self,dmatrix):
+    def fit(self,dmatrix,rho=None):
+
         '''fit the clustering model, assume input of NxN distance matrix or Nxm coordinates'''
-        self.labels = self.trainer.fit(dmatrix, self.rcut, self.min_samples)
+        self.labels = self.trainer.fit(dmatrix, rho = None)
         # Number of clusters in labels, ignoring noise if present.
         self.n_clusters = len(set(self.labels)) - (1 if -1 in self.labels else 0)
         self.n_noise = list(self.labels).count(-1)
@@ -41,33 +38,49 @@ class DBCluster(ClusterBase):
         return self.n_clusters
     def get_n_noise(self):
         return self.n_noise
-    def get_params(self,deep=True):
-        return dict(rcut=self.rcut,min_samples=self.min_samples,trainer=self.trainer)        
-    def set_params(self,params,deep=True):
-        self.rcut  = params['rcut']
-        self.min_samples  = params['min_samples']
-        self.trainer  = params['trainer']
-        self.labels = None
-        self.n_clusters = None
-        self.n_noise = None
     def pack(self):
         '''return all the info'''
-        state = dict(rcut=self.rcut, min_samples=self.min_samples, trainer=self.trainer,
+        state = dict(trainer=self.trainer, trainer_params=self.trainer.pack(),
                  labels=self.labels, n_clusters=self.n_clusters, n_noise=self.n_noise)
         return state
 
 
 class sklearn_DB(FitClusterBase):
 
-    from sklearn.cluster import DBSCAN
+    """
+    https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+    eps : float, optional
+        The maximum distance between two samples for one to be considered as in the neighborhood of the other. 
+        This is not a maximum bound on the distances of points within a cluster. 
+        This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
+
+    min_samples : int, optional
+        The number of samples (or total weight) in a neighborhood for a point to be considered as a core point. 
+        This includes the point itself.
+
+    metric : string, or callable
+        The metric to use when calculating distance between instances in a feature array. 
+        If metric is a string or callable, it must be one of the options allowed by sklearn.metrics.pairwise_distances for its metric parameter. 
+        If metric is “precomputed”, X is assumed to be a distance matrix and must be square. 
+        X may be a sparse matrix, in which case only “nonzero” elements may be considered neighbors for DBSCAN.
+    """
     _pairwise = True
 
-    def __init__(self, metrictype='precomputed'):
+    def __init__(self, eps=None, min_samples=None, metrictype='precomputed'):
         self.metric = metrictype # e.g. 'euclidean'
+        # distance metric
+        self.eps = eps
+        # The number of samples in a neighborhood for a point to be considered as a core point.
+        self.min_samples = min_samples
+        self.db = None
 
-    def fit(self, dmatrix, rcut, min_samples):
-        db = DBSCAN(eps=rcut, min_samples=min_samples,metric=self.metric).fit(dmatrix)
-        return db.labels_
+    def fit(self, dmatrix, rho = None):
+        self.db = DBSCAN(eps=self.eps, min_samples=self.min_samples,metric=self.metric).fit(dmatrix)
+        return self.db.labels_
+
+    def pack(self):
+        '''return all the info'''
+        return self.db.get_params
 
 
 class LAIO_DB(FitClusterBase):
