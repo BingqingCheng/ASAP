@@ -20,4 +20,5 @@ In the directory ./asap/ you can find a selection of python tools:
 * clustering.py: does clustering tasks based on the kernel matrix, does plottingas well.
 
 TODOs:
+* add a class of methods to compute kernel matrix from basis functions
 * add a dendrogram function
