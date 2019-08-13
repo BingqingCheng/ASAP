@@ -1,5 +1,4 @@
 from .ml_cluster_base import *
-from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 
 """
@@ -60,6 +59,7 @@ class DBCluster(ClusterBase):
 
 class sklearn_DB(FitClusterBase):
 
+    from sklearn.cluster import DBSCAN
     _pairwise = True
 
     def __init__(self, metrictype='precomputed'):

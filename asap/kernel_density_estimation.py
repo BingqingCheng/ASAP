@@ -23,7 +23,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
     proj = kpca(eva,kpca_d)
 
     # save the low D projection
-    # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f')
+    # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     density_model = KDE()        
     # fit density model to data
