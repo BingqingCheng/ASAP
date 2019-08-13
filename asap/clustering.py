@@ -4,12 +4,12 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from lib import kpca, kerneltorho, kerneltodis
+from lib import kpca, kerneltodis, KDE
 from lib import get_cluster_size, get_cluster_properties
-from lib import DBCluster, sklearn_DB
+from lib import DBCluster, sklearn_DB, LAIO_DB
 from lib import plot_styles
 
-def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
+def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, algorithm):
 
     # if it has been computed before we can simply load it
     try:
@@ -21,22 +21,38 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
-    # charecteristic difference in k_ij
-    sigma_kij = np.std(eva[:,:])
-    # do a low dimensional projection to visualize the data
+    # do a low dimensional projection of the kernel matrix
     proj = kpca(eva,kpca_d)
 
+    density_model = KDE()        
+    # fit density model to data
+    density_model.fit(proj)
+    # the charecteristic bandwidth of the data        
+    sigma_kij = density_model.bandwidth
+    rho = density_model.evaluate_density(proj)
+    meanrho = np.mean(rho)
+
     # now we do the clustering
-    # option 1: do on the projected coordinates
-    #trainer = sklearn_DB('euclidean')
-    #do_clustering = DBCluster(sigma_kij, 5, trainer) # adjust the parameters here!
-    #do_clustering.fit(proj)
-    # option 2: do directly on kernel matrix.
-    dmat = kerneltodis(eva)
-    trainer = sklearn_DB('precomputed')
-    do_clustering = DBCluster(0.003, 5, trainer) # adjust the parameters here!
-    do_clustering.fit(dmat)
-    #
+    if (algorithm == 'dbscan' or algorithm == 'DBSCAN'):
+        ''' option 1: do on the projected coordinates'''
+        #trainer = sklearn_DB(sigma_kij, 5, 'euclidean') # adjust the parameters here!
+        #do_clustering = DBCluster(trainer) 
+        #do_clustering.fit(proj)
+
+        ''' option 2: do directly on kernel matrix.'''
+        dmat = kerneltodis(eva)
+        trainer = sklearn_DB(sigma_kij, 5, 'precomputed') # adjust the parameters here!
+        do_clustering = DBCluster(trainer) 
+        do_clustering.fit(dmat)
+
+    elif (algorithm == 'fdb' or algorithm == 'FDB'):
+        dmat = kerneltodis(eva)
+        trainer = LAIO_DB(-1,-1)
+        do_clustering = DBCluster(trainer) # adjust the parameters here!
+        do_clustering.fit(dmat, rho)
+    else: raise ValueError('Please select from fdb or dbscan')
+
+    print(do_clustering.pack())
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
 
@@ -98,8 +114,9 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--algo', type=str, default='fdb', help='the algotithm for density-based clustering ([dbscan], [fdb])')
     args = parser.parse_args()
 
-    main(args.kmat, args.tags, args.prefix, args.d, args.pc1, args.pc2)
+    main(args.kmat, args.tags, args.prefix, args.d, args.pc1, args.pc2, args.algo)
 
 
