@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-python3 gen_kmat.py --fxyz *.xyz --dict *.xyz --prefix $prefix 
+python3 gen_soap_kmat.py --fxyz *.xyz --dict *.xyz --prefix $prefix 
 --rcut $rcut --n $nmax --l $lmax --g $g --periodic True/False --plot True/False
 """
 

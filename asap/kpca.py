@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from lib import kpca, kerneltorho
+from lib import kpca
 from lib import plot_styles
 
 def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
@@ -19,14 +19,11 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
-    # charecteristic difference in k_ij
-    sigma_kij = np.std(eva[:,:])
-
     # main thing
     proj = kpca(eva,kpca_d)
 
     # save
-    np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f')
+    np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     # color scheme
     if (fcolor != 'none'):
@@ -36,33 +33,15 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2):
         if (len(plotcolor) != len(eva)): 
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
-    else: # we use the local density as the color scheme
-        plotcolor = kerneltorho(eva, sigma_kij)
-        colorlabel = 'local density of each data point ($\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
+    else: # we use the index as the color scheme
+        plotcolor = np.arange(len(proj))
+        colorlabel = 'index of each data point'
     [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
 
     # make plot
     plot_styles.set_nice_font()
-    """
     fig, ax = plt.subplots()
-    pcaplot = ax.scatter(proj[:,pc1],proj[:,pc2],c=plotcolor[:],
-                    cmap=cm.summer,vmin=plotcolormin, vmax=plotcolormax)
-    cbar = fig.colorbar(pcaplot, ax=ax)
-    cbar.ax.set_ylabel('local density of each data point ($\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )')
 
-    # project the known structures
-    if (ftags != 'none'):
-        for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-
-    plt.title('KPCA for: '+prefix)
-    plt.xlabel('pc1')
-    plt.ylabel('pc2')
-    fig.set_size_inches(18.5, 10.5)
-    plt.show()
-    fig.savefig('KPCA_4_'+prefix+'.png')
-    """
     plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
                 xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
