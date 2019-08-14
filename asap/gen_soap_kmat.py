@@ -11,7 +11,7 @@ import argparse
 from ase.io import read
 from dscribe.descriptors import SOAP
 from dscribe.kernels import AverageKernel
-from lib import str2bool
+from asaplib.io import str2bool
 
 def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, matrix_plot):
 

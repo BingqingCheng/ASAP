@@ -4,8 +4,9 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from lib import kpca, KDE
-from lib import plot_styles
+from asaplib.pca import kpca 
+from asaplib.kde import KDE
+from asaplib.plot import plot_styles
 
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 

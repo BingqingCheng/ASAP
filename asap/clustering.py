@@ -4,10 +4,12 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from lib import kpca, kerneltodis, KDE
-from lib import get_cluster_size, get_cluster_properties
-from lib import DBCluster, sklearn_DB, LAIO_DB
-from lib import plot_styles
+from asaplib.pca import kpca
+from asaplib.kde import KDE
+from asaplib.kernel import kerneltodis
+from asaplib.cluster import get_cluster_size, get_cluster_properties
+from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
+from asaplib.plot import plot_styles
 
 def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm):
 
