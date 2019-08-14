@@ -1,5 +1,7 @@
 from .ml_cluster_base import *
 from sklearn.cluster import DBSCAN
+from sklearn.metrics import silhouette_score
+
 import matplotlib.pyplot as plt
 
 """
@@ -27,6 +29,12 @@ class DBCluster(ClusterBase):
         self.n_noise = list(self.labels).count(-1)
         print('Estimated number of clusters: %d' % self.n_clusters)
         print('Estimated number of noise points: %d' % self.n_noise)
+        
+        if (np.shape(dmatrix)[0] == np.shape(dmatrix)[1]):
+            silscore = silhouette_score(dmatrix, self.labels,metric="precomputed")
+        else:
+            silscore = silhouette_score(dmatrix, self.labels,metric="euclidean")
+        print("Silhouette Coefficient: %0.3f" %silscore )
 
     def get_cluster_labels(self,index=[]):
         '''return the label of the samples in the list of index'''
