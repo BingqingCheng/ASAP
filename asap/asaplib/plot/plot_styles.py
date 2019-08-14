@@ -125,7 +125,7 @@ def plot_scatter_w_label(x, y, z, psize=20, label = None):
 
 ######################################################
 
-def plot_cluster_w_size(X, y, c,
+def plot_cluster_w_size(X, y, c, s=None,
                       xlabel=None, ylabel=None, clabel=None, title=None, 
                       w_size = True, w_label = False,
                       circle_size = 20, alpha=0.7, edgecolors=None,
@@ -149,7 +149,6 @@ def plot_cluster_w_size(X, y, c,
     # get the cluster size and mean position
     from ..cluster import get_cluster_size, get_cluster_properties
     y_unique_ = np.unique(y)
-    [ _, cluster_size ]  = get_cluster_size(y)
     [ _, cluster_mx ]  = get_cluster_properties(y,X[:,0],'mean')
     [ _, cluster_my ]  = get_cluster_properties(y,X[:,1],'mean')
     # remove outliers
@@ -157,6 +156,13 @@ def plot_cluster_w_size(X, y, c,
         y_unique = y_unique_[y_unique_ > -1]
     else:
         y_unique = y_unique_
+    # set color
+    if s is None: # default is using log(frequency)
+        [ _, cluster_size ]  = get_cluster_size(y)
+        s={}
+        for k in y_unique: s[k] = np.log(cluster_size[k])
+    elif (len(s) != len(y_unique)):
+        raise ValueError('Length of the vector of cluster size is not the same as the number of clusters')
 
     # start the plots
     fig, ax = plt.subplots()
@@ -177,9 +183,8 @@ def plot_cluster_w_size(X, y, c,
              markeredgecolor='k', markersize=0.1*psize)
 
     for k in y_unique:
-        if (cluster_size[k]>2): # we set a cutoff here
-            ax.plot(cluster_mx[k],cluster_my[k], 'o', markerfacecolor='none',
-                markeredgecolor='gray', markersize=10.0*(np.log(cluster_size[k])))
+        ax.plot(cluster_mx[k],cluster_my[k], 'o', markerfacecolor='none',
+                markeredgecolor='gray', markersize=circle_size*s[k])
 
     if w_label is True:
         for k in y_unique:

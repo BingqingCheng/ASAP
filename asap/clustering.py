@@ -87,7 +87,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm):
     # make plot
     plot_styles.set_nice_font()
 
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho,
+    fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho, s=None,
                       clabel=colorlabel, title=None, 
                       w_size = True, w_label = True,
                       circle_size = 50, alpha=0.5, edgecolors=None,
