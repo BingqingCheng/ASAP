@@ -125,36 +125,6 @@ def plot_density_map(X, z,
 
     return fig, ax
 
-def plot_scatter_w_label(x, y, z, psize=20, label = None):
-    """Plots a 2D scatter plot given x,y coordinates and a label z for
-    every data point
-
-    Parameters
-    ----------
-    x,y : array-like, shape=[n_samples]
-        Input points.
-    z : array-like, shape=[n_samples]
-        label for every point
-
-    This plot style only looks nice when there're limited type of labels
-    """
-    unique_z=np.sort(np.unique(z.flatten()))
-    mycol = COLOR_PALETTE()
-
-    plt.subplots(figsize=(8,6))
-
-    for i, zval in enumerate(unique_z):
-        pos=(z.flatten()==zval)
-        if label is not None:
-            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], label=label[i], rasterized=True)
-        else:
-            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], rasterized=True)
-    
-    if label is not None:
-        plt.legend(loc='best',fontsize=12)
-
-    plt.tight_layout()
-    plt.show()
 
 ######################################################
 
@@ -355,6 +325,37 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         plt.close()
 
     return fig, ax
+
+def plot_scatter_w_label(x, y, z, psize=20, label = None):
+    """Plots a 2D scatter plot given x,y coordinates and a label z for
+    every data point
+
+    Parameters
+    ----------
+    x,y : array-like, shape=[n_samples]
+        Input points.
+    z : array-like, shape=[n_samples]
+        label for every point
+
+    This plot style only looks nice when there're limited type of labels
+    """
+    unique_z=np.sort(np.unique(z.flatten()))
+    mycol = COLOR_PALETTE()
+
+    plt.subplots(figsize=(8,6))
+
+    for i, zval in enumerate(unique_z):
+        pos=(z.flatten()==zval)
+        if label is not None:
+            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], label=label[i], rasterized=True)
+        else:
+            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], rasterized=True)
+    
+    if label is not None:
+        plt.legend(loc='best',fontsize=12)
+
+    plt.tight_layout()
+    plt.show()
 
 def plot_outlier_scatter(x, y, z, ax):
 
