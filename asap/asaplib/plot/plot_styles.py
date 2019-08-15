@@ -36,14 +36,14 @@ def add_subplot_axes(ax,rect,axisbg='w'):
     y = infig_position[1]
     width *= rect[2]
     height *= rect[3]
-    subax = fig.add_axes([x,y,width,height],axisbg=axisbg)
+    subax = fig.add_axes([x,y,width,height]) #,axisbg=axisbg)
     x_labelsize = subax.get_xticklabels()[0].get_size()
     y_labelsize = subax.get_yticklabels()[0].get_size()
     x_labelsize *= rect[2]**0.5
     y_labelsize *= rect[3]**0.5
     subax.xaxis.set_tick_params(labelsize=x_labelsize)
     subax.yaxis.set_tick_params(labelsize=y_labelsize)
-    return suba
+    return subax
     
 def plot_density_map(X, z,
                 xlabel=None, ylabel=None, clabel=None, label=None,
