@@ -40,9 +40,8 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
 
     # make plot
     plot_styles.set_nice_font()
-    fig, ax = plt.subplots()
     # density plot
-    plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
+    fig, ax = plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
                 xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
@@ -60,8 +59,8 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
     # project the known structures
     if (ftags != 'none'):
         for i in range(ndict):
-            plt.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            plt.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
+            ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
 
     plt.show()
     fig.savefig('kde_4_'+prefix+'.png')

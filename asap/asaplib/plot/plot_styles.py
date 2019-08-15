@@ -287,7 +287,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
     
     palette = COLOR_PALETTE(style=cp_style)
     idx_centers = []
-    ax = plt.subplot(111)
+    fig, ax = plt.subplots()
     all_idx = np.arange(len(X))
     
     if outlier is True:
@@ -354,7 +354,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         plt.clf()
         plt.close()
 
-    return ax
+    return fig, ax
 
 def plot_outlier_scatter(x, y, z, ax):
 

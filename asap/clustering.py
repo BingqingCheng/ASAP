@@ -90,7 +90,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm):
     fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho, s=None,
                       clabel=colorlabel, title=None, 
                       w_size = True, w_label = True,
-                      circle_size = 50, alpha=0.5, edgecolors=None,
+                      circle_size = 20, alpha=0.5, edgecolors=None,
                       cmap='summer', vmax = None,vmin = None, psize = 20, 
                       show=False, savefile = None, fontsize =15, 
                       figsize=None,rasterized = True, remove_tick=True,
