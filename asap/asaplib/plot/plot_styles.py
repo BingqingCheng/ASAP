@@ -14,6 +14,36 @@ def set_nice_font(size = 18, usetex=False):
     plt.rc('font', **font)
     if usetex is True:
         plt.rc('text', usetex=True)
+
+def add_subplot_axes(ax,rect,axisbg='w'):
+    """
+    e.g.
+    fig = plt.figure(figsize=(10,10))
+    ax = fig.add_subplot(111)
+    rect = [0.2,0.2,0.7,0.7]
+    ax1 = add_subplot_axes(ax,rect)
+    ax1.plot(x,np.sin(x))
+    plt.show()
+    """
+    fig = plt.gcf()
+    box = ax.get_position()
+    width = box.width
+    height = box.height
+    inax_position  = ax.transAxes.transform(rect[0:2])
+    transFigure = fig.transFigure.inverted()
+    infig_position = transFigure.transform(inax_position)    
+    x = infig_position[0]
+    y = infig_position[1]
+    width *= rect[2]
+    height *= rect[3]
+    subax = fig.add_axes([x,y,width,height],axisbg=axisbg)
+    x_labelsize = subax.get_xticklabels()[0].get_size()
+    y_labelsize = subax.get_yticklabels()[0].get_size()
+    x_labelsize *= rect[2]**0.5
+    y_labelsize *= rect[3]**0.5
+    subax.xaxis.set_tick_params(labelsize=x_labelsize)
+    subax.yaxis.set_tick_params(labelsize=y_labelsize)
+    return suba
     
 def plot_density_map(X, z,
                 xlabel=None, ylabel=None, clabel=None, label=None,
@@ -37,10 +67,11 @@ def plot_density_map(X, z,
     z : array-like, shape=[n_samples]
         Density at every point
 
-    Returns
-    -------
-    None
     """
+
+    # start the plots
+    fig, ax = plt.subplots()
+
     x, y = X[:,0], X[:,1]
     
     fontsize = fontsize
@@ -55,23 +86,23 @@ def plot_density_map(X, z,
         typical = argz[outlier_window:-outlier_window]
 
         # plot typical
-        plt.scatter(x[typical],y[typical],c=z[typical],cmap=cmap,s=psize, alpha=1.0,rasterized=rasterized)
-        cb=plt.colorbar()
+        axscatter = ax.scatter(x[typical],y[typical],c=z[typical],cmap=cmap,s=psize, alpha=1.0,rasterized=rasterized)
+        cb=fig.colorbar(axscatter)
         # plot bot outliers (black !)
-        plt.scatter(x[bot_outliers],y[bot_outliers],c='black',s=psize,alpha=1.0,rasterized=rasterized)
+        ax.scatter(x[bot_outliers],y[bot_outliers],c='black',s=psize,alpha=1.0,rasterized=rasterized)
         # plot top outliers (orange !)
-        plt.scatter(x[top_outliers],y[top_outliers],c='red',s=psize,alpha=1.0,rasterized=rasterized)
+        ax.scatter(x[top_outliers],y[top_outliers],c='red',s=psize,alpha=1.0,rasterized=rasterized)
 
     else:
         if label is not None:
-            plt.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized,label=label,vmax=vmax,vmin=vmin)
+            axscatter = ax.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized,label=label,vmax=vmax,vmin=vmin)
         else:
-            plt.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized, vmax=vmax,vmin=vmin)
+            axscatter = ax.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized, vmax=vmax,vmin=vmin)
     
-        cb=plt.colorbar()
+        cb=fig.colorbar(axscatter)
     
     if remove_tick:
-        plt.tick_params(labelbottom='off',labelleft='off')
+        fig.tick_params(labelbottom='off',labelleft='off')
     
     if xlabel is not None:
         plt.xlabel(xlabel,fontsize=fontsize)
@@ -85,12 +116,14 @@ def plot_density_map(X, z,
         plt.legend(loc='best')
         
     if centers is not None:
-        plt.scatter(centers[:,0],centers[:,1], c='lightgreen', marker='*',s=200, edgecolor='black',linewidths=0.5)
+        ax.scatter(centers[:,0],centers[:,1], c='lightgreen', marker='*',s=200, edgecolor='black',linewidths=0.5)
     
     if out_file is not None:
-        plt.savefig(out_file)
+        fig.savefig(out_file)
     if show:
         plt.show()
+
+    return fig, ax
 
 def plot_scatter_w_label(x, y, z, psize=20, label = None):
     """Plots a 2D scatter plot given x,y coordinates and a label z for
