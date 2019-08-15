@@ -102,7 +102,7 @@ def plot_density_map(X, z,
         cb=fig.colorbar(axscatter)
     
     if remove_tick:
-        fig.tick_params(labelbottom='off',labelleft='off')
+        ax.tick_params(labelbottom='off',labelleft='off')
     
     if xlabel is not None:
         plt.xlabel(xlabel,fontsize=fontsize)
