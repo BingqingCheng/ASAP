@@ -8,7 +8,7 @@ Requirements:
 + numpy scipy scikit-learn tqdm ase dscribe
 
 Add-Ons:
-+ spglib
++ spglib adjustText
 
 In the directory ./asap/ you can find a selection of python tools:
 * gen_soap_kmat.py: computes kernel matrix between different structures if multiple frames are provides, or the kernel matrix between atomic environments in a structure if only one frame is the input.
