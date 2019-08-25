@@ -7,12 +7,13 @@ from matplotlib import cm
 from asaplib.pca import kpca 
 from asaplib.kde import KDE
 from asaplib.plot import plot_styles
+from asaplib.io import str2bool
 
-def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
+def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        eva = np.genfromtxt(fkmat, dtype=float)
+        kNN = np.genfromtxt(fkmat, dtype=float)
     except: raise ValueError('Cannot load the kernel matrix')
     print("loaded",fkmat)
     # load tags if any
@@ -21,7 +22,7 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
         ndict = len(tags)
 
     # doing a kpca
-    proj = kpca(eva,kpca_d)
+    proj = kpca(kNN,kpca_d)
     # save the low D projection
     # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
@@ -56,11 +57,21 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2):
                 vmax = plotcolormax,
                 vmin = plotcolormin)
 
-    # project the known structures
+    fig.set_size_inches(18.5, 10.5)
     if (ftags != 'none'):
+        texts = []
         for i in range(ndict):
             ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+            texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
+                         ha='center', va='center', fontsize=15,color='red'))
+            #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+        if (adtext):
+            from adjustText import adjust_text
+            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
+                    expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+                   force_text=(0.03, 0.5), force_points=(0.01, 0.25),
+                   ax=ax, precision=0.01,
+                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
 
     plt.show()
     fig.savefig('kde_4_'+prefix+'.png')
@@ -77,8 +88,9 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
     args = parser.parse_args()
 
-    main(args.kmat, args.tags, args.prefix, args.d, args.pc1, args.pc2)
+    main(args.kmat, args.tags, args.prefix, args.d, args.pc1, args.pc2, args.adjusttext)
 
 

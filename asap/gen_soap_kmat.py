@@ -58,14 +58,14 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     fshape = np.shape(fall)
     re = AverageKernel(metric="linear")
 
-    eva = re.create(fall.reshape((fshape[0], 1, fshape[1])))
+    kNN = re.create(fall.reshape((fshape[0], 1, fshape[1])))
 
     # save
-    np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".kmat", eva, fmt='%4.8f')
+    np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".kmat", kNN, fmt='%4.8f')
 
     # plot
     if (matrix_plot):
-        plt.matshow(eva)
+        plt.matshow(kNN)
         plt.title('Kernel matrix: '+prefix)
         plt.show()
 

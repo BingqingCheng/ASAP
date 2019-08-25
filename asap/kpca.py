@@ -12,7 +12,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        eva = np.genfromtxt(fkmat, dtype=float)
+        kNN = np.genfromtxt(fkmat, dtype=float)
     except: raise ValueError('Cannot load the kernel matrix')
 
     print("loaded",fkmat)
@@ -21,7 +21,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
         ndict = len(tags)
 
     # main thing
-    proj = kpca(eva,kpca_d)
+    proj = kpca(kNN,kpca_d)
 
     # save
     np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
@@ -31,7 +31,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
         try:
             plotcolor = np.genfromtxt(fcolor, dtype=float)
         except: raise ValueError('Cannot load the vector of properties')
-        if (len(plotcolor) != len(eva)): 
+        if (len(plotcolor) != len(kNN)): 
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
     else: # we use the index as the color scheme
@@ -47,7 +47,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
                 xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
-                psize=500,
+                psize=100,
                 out_file='KPCA_4_'+prefix+'.png', 
                 title='KPCA for: '+prefix, 
                 show=False, cmap='summer',
@@ -72,7 +72,7 @@ def main(fkmat, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
             adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                   ax=ax, precision=0.001,
+                   ax=ax, precision=0.01,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
 
     plt.show()

@@ -19,7 +19,7 @@ def read_xyz(filedesc):
   names = np.zeros(natoms,np.dtype('|S6'))
   q = np.zeros((natoms,3),float)
   cell[:] = comment.split()[0:3]
-  print cell
+  print(cell)
   for i in range(natoms):
     line = filedesc.readline().split();
     names[i] = line[0]
