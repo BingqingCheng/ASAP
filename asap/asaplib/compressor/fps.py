@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm_notebook
 
 def fps(x, d=0, r=None):
     if d == 0 : d = len(x)
@@ -13,7 +12,7 @@ def fps(x, d=0, r=None):
         iy[0] = r
     dl = n2 + n2[iy[0]] - 2* np.dot(x, x[iy[0]])
     lmin = np.zeros(d)
-    for i in tqdm_notebook(range(1,d)):
+    for i in range(1,d):
         iy[i] = np.argmax(dl)
         lmin[i-1] = dl[iy[i]]
         nd = n2 + n2[iy[i]] - 2*np.dot(x,x[iy[i]])

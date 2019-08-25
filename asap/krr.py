@@ -36,7 +36,7 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
         print("the number of representative structure is too large, please select n < ", len(X_train))
     elif (n_sparse > 0):
         ifps, dfps = fps(X_train, n_sparse , 0)
-        print(ifps)
+        #print(ifps)
         kMM = X_train[:,ifps][ifps]
         kNM = X_train[:,ifps]
         kTM = X_test[:,ifps]
@@ -60,13 +60,8 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # compute the CV score for the dataset
     print("test score: ", get_score(y_pred_test,y_test))
 
-
-    fig, ax = plt.subplots()
-    #plot_styles.set_nice_font()
-    #plt.subplots(figsize=(8,6))
-
-    #plt.plot(y_train, y_pred)
-    l, = plt.plot(y_test, y_pred_test)
+    plt.plot(y_train, y_pred,'b.')
+    plt.plot(y_test, y_pred_test,'r.')
     plt.show()
 
 ##########################################################################################
