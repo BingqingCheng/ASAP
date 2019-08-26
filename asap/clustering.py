@@ -16,7 +16,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        eva = np.genfromtxt(fkmat, dtype=float)
+        kNN = np.genfromtxt(fkmat, dtype=float)
     except: raise ValueError('Cannot load the kernel matrix')
 
     print("loaded",fkmat)
@@ -25,7 +25,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         ndict = len(tags)
 
     # do a low dimensional projection of the kernel matrix
-    proj = kpca(eva,kpca_d)
+    proj = kpca(kNN,kpca_d)
 
     density_model = KDE()        
     # fit density model to data
@@ -44,13 +44,13 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         do_clustering.fit(proj)
 
         ''' option 2: do directly on kernel matrix.'''
-        #dmat = kerneltodis(eva)
+        #dmat = kerneltodis(kNN)
         #trainer = sklearn_DB(sigma_kij, 5, 'precomputed') # adjust the parameters here!
         #do_clustering = DBCluster(trainer) 
         #do_clustering.fit(dmat)
 
     elif (algorithm == 'fdb' or algorithm == 'FDB'):
-        dmat = kerneltodis(eva)
+        dmat = kerneltodis(kNN)
         trainer = LAIO_DB(-1,-1) # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(dmat, rho)
@@ -80,7 +80,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         try:
             plotcolor = np.genfromtxt(fcolor, dtype=float)
         except: raise ValueError('Cannot load the vector of properties')
-        if (len(plotcolor) != len(eva)): 
+        if (len(plotcolor) != len(kNN)): 
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
     [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]

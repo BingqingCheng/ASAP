@@ -22,3 +22,4 @@ def kernel_random_split(X,y,r=0.05):
     return X_train, X_test, y_train, y_test
 
 
+
