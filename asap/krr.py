@@ -60,9 +60,15 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # compute the CV score for the dataset
     print("test score: ", get_score(y_pred_test,y_test))
 
-    plt.plot(y_train, y_pred,'b.')
-    plt.plot(y_test, y_pred_test,'r.')
+    fig, ax = plt.subplots() 
+    ax.plot(y_train, y_pred,'b.',label='train')
+    ax.plot(y_test, y_pred_test,'r.',label='test')
+    ax.legend()
+    plt.title('Kernel ridge regression test for: '+fy)
+    plt.xlabel('actual y')
+    plt.ylabel('predicted y')
     plt.show()
+    fig.savefig('KRR_4_'+prefix+'.png')
 
 ##########################################################################################
 ##########################################################################################
