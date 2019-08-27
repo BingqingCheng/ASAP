@@ -45,13 +45,9 @@ def main(fxyz, prefix, verbose):
                                                       to_primitive=1,
                                                       no_idealize=1,
                                                       symprec=1e-2)
-        if (verbose): show_cell(lattice, positions, numbers)
+        if (verbose): show_cell(lattice, scaled_positions, numbers)
         # output
-        if np.sum(lattice) > 0:
-            pbc = [True, True, True]
-        else:
-            pbc = [False,False,False]
-        frtemp = atom(numbers=numbers,cell=lattice,scaled_positions=scaled_positions,pbc=pbc)
+        frtemp = atom(numbers=numbers,cell=lattice,scaled_positions=scaled_positions,pbc=frame.get_pbc())
         standardized_frames.append(frtemp)
 
     write(prefix+'-standardized.xyz',standardized_frames)

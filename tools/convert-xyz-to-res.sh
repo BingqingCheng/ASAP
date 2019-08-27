@@ -3,4 +3,4 @@
 xyzefile=$1
 prefix=${xyzefile%.*}
 
-cabal xyze res < ${xyzefile} > ${prefix}.res
+cabal xyz res < ${xyzefile} > ${prefix}.res
