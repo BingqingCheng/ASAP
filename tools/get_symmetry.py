@@ -41,17 +41,17 @@ def main(fxyz, prefix, verbose):
 
     for frame in frames:
         print(spglib.get_spacegroup(frame, symprec=1e-1)) #,spglib.get_symmetry(frame, symprec=1e-1))
-        lattice, positions, numbers = spglib.standardize_cell(frame,
+        lattice, scaled_positions, numbers = spglib.standardize_cell(frame,
                                                       to_primitive=1,
                                                       no_idealize=1,
-                                                      symprec=1e-1)
+                                                      symprec=1e-2)
         if (verbose): show_cell(lattice, positions, numbers)
         # output
         if np.sum(lattice) > 0:
             pbc = [True, True, True]
         else:
             pbc = [False,False,False]
-        frtemp = atom(numbers=numbers,cell=lattice,positions=positions,pbc=pbc)
+        frtemp = atom(numbers=numbers,cell=lattice,scaled_positions=scaled_positions,pbc=pbc)
         standardized_frames.append(frtemp)
 
     write(prefix+'-standardized.xyz',standardized_frames)
