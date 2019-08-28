@@ -39,7 +39,7 @@ def kernel_random_split(X,y,r=0.05):
 
     X_test = X[:,train_list][test_list]
     y_test = y[test_list]
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, y_train, y_test, train_list, test_list
 
 """
 adapt from Felix Musil ML_tools

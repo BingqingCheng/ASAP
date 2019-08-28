@@ -3,6 +3,7 @@
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
+from asaplib.plot import plot_styles
 #from copy import deepcopy
 from asaplib.fit import KRRSparse
 from asaplib.fit import get_score
@@ -27,7 +28,7 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
 
     # train test split
     if (test_ratio > 0 ):
-        K_train, K_test, y_train, y_test = kernel_random_split(K_all, y_all, test_ratio)
+        K_train, K_test, y_train, y_test, _, _ = kernel_random_split(K_all, y_all, test_ratio)
     else:
         K_train = K_test = K_all
         y_train = y_test = y_all
@@ -63,12 +64,13 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # compute the CV score for the dataset
     print("test score: ", get_score(y_pred_test,y_test))
 
+    plot_styles.set_nice_font()
     fig = plt.figure(figsize=(8*2.1, 8))
     ax = fig.add_subplot(121)
     ax.plot(y_train, y_pred,'b.',label='train')
     ax.plot(y_test, y_pred_test,'r.',label='test')
     ax.legend()
-    ax.set_title('Kernel ridge regression test for: '+fy)
+    ax.set_title('KRR for: '+fy)
     ax.set_xlabel('actual y')
     ax.set_ylabel('predicted y')
 
@@ -85,8 +87,10 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
         Ntrain = len(lctrain)
         lc_K_NM = K_NM[lctrain,:]
         lc_y_train = y_train[lctrain]
-        lc_K_test = K_NM[lctest,:]
-        lc_y_test = y_train[lctest]
+        #lc_K_test = K_NM[lctest,:]
+        lc_K_test = K_TM
+        #lc_y_test = y_train[lctest]
+        lc_y_test = y_test
         krr.fit(K_MM,lc_K_NM,lc_y_train)
         lc_y_pred = krr.predict(lc_K_test)
         scores[Ntrain].append(get_score(lc_y_pred,lc_y_test))
