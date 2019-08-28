@@ -7,66 +7,114 @@ import matplotlib.pyplot as plt
 from asaplib.fit import KRRSparse
 from asaplib.fit import get_score
 from asaplib.compressor import fps, kernel_random_split
+from asaplib.compressor import exponential_split, LCSplit,ShuffleSplit
 
 
 def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
 
     # if it has been computed before we can simply load it
     try:
-        k_all = np.genfromtxt(fkmat, dtype=float)
+        K_all = np.genfromtxt(fkmat, dtype=float)
     except: raise ValueError('Cannot load the kernel matrix')
     print("loaded",fkmat)
     try:
         y_all = np.genfromtxt(fy, dtype=float)
     except: raise ValueError('Cannot load the property vector')
-    if (len(y_all) != len(k_all)): 
+    if (len(y_all) != len(K_all)): 
         raise ValueError('Length of the vector of properties is not the same as number of samples')
     else:
-        n_sample = len(k_all)
+        n_sample = len(K_all)
 
     # train test split
     if (test_ratio > 0 ):
-        X_train, X_test, y_train, y_test = kernel_random_split(k_all, y_all, test_ratio)
+        K_train, K_test, y_train, y_test = kernel_random_split(K_all, y_all, test_ratio)
     else:
-        X_train = X_test = k_all
+        K_train = K_test = K_all
         y_train = y_test = y_all
+    n_train = len(K_train)
+    n_test = len(K_test)
 
     # sparsification
-    if (n_sparse >= len(X_train)):
-        print("the number of representative structure is too large, please select n < ", len(X_train))
+    if (n_sparse >= n_train):
+        print("the number of representative structure is too large, please select n < ", n_train)
     elif (n_sparse > 0):
-        ifps, dfps = fps(X_train, n_sparse , 0)
+        ifps, dfps = fps(K_train, n_sparse , 0)
         #print(ifps)
-        kMM = X_train[:,ifps][ifps]
-        kNM = X_train[:,ifps]
-        kTM = X_test[:,ifps]
+        K_MM = K_train[:,ifps][ifps]
+        K_NM = K_train[:,ifps]
+        K_TM = K_test[:,ifps]
     else:
         print("it's usually better to use some sparsification")
-        kMM = X_train
-        kNM = X_train
-        kTM = X_test
+        K_MM = K_train
+        K_NM = K_train
+        K_TM = K_test
         
-    delta = np.std(y_train)/(np.trace(kMM)/len(kMM))
+    delta = np.std(y_train)/(np.trace(K_MM)/len(K_MM))
     krr = KRRSparse(jitter, delta, sigma)
     # fit the model
-    krr.fit(kMM,kNM,y_train)
+    krr.fit(K_MM,K_NM,y_train)
 
     # get the predictions for train set
-    y_pred = krr.predict(kNM)
+    y_pred = krr.predict(K_NM)
     # compute the CV score for the dataset
     print("train score: ", get_score(y_pred,y_train))
     # get the predictions for test set
-    y_pred_test = krr.predict(kTM)
+    y_pred_test = krr.predict(K_TM)
     # compute the CV score for the dataset
     print("test score: ", get_score(y_pred_test,y_test))
 
-    fig, ax = plt.subplots() 
+    fig = plt.figure(figsize=(8*2.1, 8))
+    ax = fig.add_subplot(121)
     ax.plot(y_train, y_pred,'b.',label='train')
     ax.plot(y_test, y_pred_test,'r.',label='test')
     ax.legend()
-    plt.title('Kernel ridge regression test for: '+fy)
-    plt.xlabel('actual y')
-    plt.ylabel('predicted y')
+    ax.set_title('Kernel ridge regression test for: '+fy)
+    ax.set_xlabel('actual y')
+    ax.set_ylabel('predicted y')
+
+    # learning curve
+    # decide train sizes
+    lc_points = 10
+    train_sizes = exponential_split(n_sparse, n_train-n_test, lc_points)
+    print("Learning curves using train sizes: ", train_sizes)
+    lc_stats = 12*np.ones(lc_points, dtype=int)
+    lc = LCSplit(ShuffleSplit, n_repeats=lc_stats,train_sizes=train_sizes,test_size=n_test, random_state=10)
+
+    scores = {size:[] for size in train_sizes}
+    for lctrain,lctest in lc.split(y_train):
+        Ntrain = len(lctrain)
+        lc_K_NM = K_NM[lctrain,:]
+        lc_y_train = y_train[lctrain]
+        lc_K_test = K_NM[lctest,:]
+        lc_y_test = y_train[lctest]
+        krr.fit(K_MM,lc_K_NM,lc_y_train)
+        lc_y_pred = krr.predict(lc_K_test)
+        scores[Ntrain].append(get_score(lc_y_pred,lc_y_test))
+
+    sc_name = 'RMSE'
+    Ntrains = []
+    avg_scores = []
+    avg_scores_error = []
+    for Ntrain, score in scores.items():
+        avg = 0.
+        var = 0.
+        for sc in score:
+            avg += sc[sc_name]
+            var += sc[sc_name]**2.
+        avg /= len(score)
+        var /= len(score); var -= avg**2.
+        avg_scores.append(avg)
+        avg_scores_error.append(np.sqrt(var))
+        Ntrains.append(Ntrain)
+
+    ax2 = fig.add_subplot(122)
+    ax2.errorbar(Ntrains,avg_scores,yerr=avg_scores_error)
+    ax2.set_title('Learning curve')
+    ax2.set_xlabel('Number of training samples')
+    ax2.set_ylabel('Test {}'.format(sc_name))
+    ax2.set_xscale('log')
+    ax2.set_yscale('log')
+
     plt.show()
     fig.savefig('KRR_4_'+prefix+'.png')
 
