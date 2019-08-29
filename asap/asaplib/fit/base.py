@@ -7,7 +7,9 @@ class RegressorBase(BaseEstimator, RegressorMixin):
         pass
     def fit(self,X,y=None):
         return self
-    def transform(self,X,y=None):
+    def predict(self,X,y=None):
+        pass
+    def predict_error(self,X,y=None):
         pass
     def get_params(self,deep=True):
         pass
