@@ -34,14 +34,14 @@ def ooskpca(insqrk,inrectk,ndim=2):
     n = len(sqrk)
     recc = rectk - np.dot(np.ones((m,n)),sqrk)*1./n - np.dot(rectk,np.ones((n,n)))*1./n + 1./n**2 * np.dot(np.ones((m,n)),sqrk).dot(np.ones((n,n)))
 
-    print "  And now we build a projection "
+    print("  And now we build a projection ")
     evalo,evec = salg.eigh(k ,eigvals=(len(k)-ndim,len(k)-1) )
     evalo=np.flipud(evalo); evec=np.fliplr(evec)
     pvec = evec.copy()
     
     for i in xrange(ndim):
         pvec[:,i] *= 1./np.sqrt(evalo[i])
-    print "Done, super quick. "
+    print("Done, super quick. ")
     
     return np.dot(recc, pvec)
 
