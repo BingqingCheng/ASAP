@@ -26,7 +26,7 @@ def kpca(kernel, ndim=2):
 def ooskpca(insqrk,inrectk,ndim=2):
     ### CORRECTLY CENTERS THE TEST POINTS 
     ### CENTERS THE OOS WITH LM MEANS
-    print "Centering the data "
+    print("Centering the data ")
     sqrk = insqrk.copy()
     rectk = inrectk.copy()
     k = skenter(sqrk)
