@@ -26,3 +26,4 @@ In the directory ./asap/ you can find a selection of python tools:
 TODOs:
 * add a class of methods to compute kernel matrix from basis functions
 * add a dendrogram function
+
