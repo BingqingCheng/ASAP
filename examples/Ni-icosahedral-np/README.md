@@ -1,6 +1,8 @@
 # this is an example on a single frame of a nanoparticle. 
 # we use the ASAP tools to identify the difference in atomic environments of the atoms inside this nanoparticle.
 
+# It is assumed that you are in the ASAP/examples/Ni-icosahedral-np directory.
+
 # step 1
 ../../asap/gen_soap_kmat.py -fxyz Ni-icosa.xyz --prefix Ni-icosa --rcut 4 --n 6 --l 6 --g 0.5 --periodic True --plot True
 
