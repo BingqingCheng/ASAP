@@ -1,27 +1,25 @@
 #!/usr/bin/python3
 
-import numpy as np
 import argparse
-from ase import Atoms as atom
+
 from ase.io import read, write
 from ase.build import niggli_reduce,minimize_tilt
+
 
 def main(fxyz, prefix, stride):
 
     # read frames
-    if (fxyz != 'none'):
-        frames = read(fxyz,':')
+    if fxyz != 'none':
+        frames = read(fxyz, ':')
         nframes = len(frames)
-        print("read xyz file:", fxyz,", a total of",nframes,"frames")
+        print("read xyz file:", fxyz,", a total of", nframes, "frames")
 
-    for s in range(0,nframes,stride):
+    for s in range(0, nframes, stride):
         frame = frames[s]
         niggli_reduce(frame)
         minimize_tilt(frame, order=range(0, 3), fold_atoms=True)
-        write(prefix+'-'+str(s)+'.xyz',frame)
+        write(prefix+'-'+str(s)+'.xyz', frame)
 
-##########################################################################################
-##########################################################################################
 
 if __name__ == '__main__':
 
@@ -31,4 +29,4 @@ if __name__ == '__main__':
     parser.add_argument('--stride', type=int, default=1, help='output stride')
     args = parser.parse_args()
 
-    main(args.fxyz, args.prefix,args.stride)
+    main(args.fxyz, args.prefix, args.stride)

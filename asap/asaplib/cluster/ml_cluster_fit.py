@@ -1,12 +1,18 @@
+"""
+Something to describe this module
+"""
+
 from .ml_cluster_base import *
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 """
 density based clustering algorithms
 """
+
 
 class DBCluster(ClusterBase):
     _pairwise = True
@@ -20,7 +26,7 @@ class DBCluster(ClusterBase):
         # number of noise points
         self.n_noise = None
     
-    def fit(self,dmatrix,rho=None):
+    def fit(self, dmatrix, rho=None):
 
         '''fit the clustering model, assume input of NxN distance matrix or Nxm coordinates'''
         self.labels = self.trainer.fit(dmatrix, rho)
@@ -36,16 +42,19 @@ class DBCluster(ClusterBase):
             silscore = silhouette_score(dmatrix, self.labels,metric="euclidean")
         print("Silhouette Coefficient: %0.3f" %silscore )
 
-    def get_cluster_labels(self,index=[]):
+    def get_cluster_labels(self, index=[]):
         '''return the label of the samples in the list of index'''
-        if (len(index) == 0): 
+        if len(index) == 0:
             return self.labels
         else:
             return self.labels[index]
+
     def get_n_cluster(self):
         return self.n_clusters
+
     def get_n_noise(self):
         return self.n_noise
+
     def pack(self):
         '''return all the info'''
         state = dict(trainer=self.trainer, trainer_params=self.trainer.pack(),

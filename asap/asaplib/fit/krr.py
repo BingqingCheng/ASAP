@@ -1,31 +1,32 @@
-from .base import TrainerBase,RegressorBase
-from .base import np,sp
+from .base import RegressorBase
+from .base import np
 
 """
 adapted from Felix Musil's ml_tools
 """
 
+
 class KRR(RegressorBase):
     _pairwise = True
     
-    def __init__(self,jitter):
+    def __init__(self, jitter):
         # Weights of the krr model
         self.alpha = None
-        self.jitter = jitter # noise level^2
-        self.coninv = None # inverse of the covariance matrix
+        self.jitter = jitter  # noise level^2
+        self.coninv = None  # inverse of the covariance matrix
     
-    def fit(self,kernel,y):
+    def fit(self, kernel, y):
         '''Train the krr model with trainKernel and trainLabel.'''
 
         reg = np.eye(kernel.shape[0])*self.jitter
         self.coninv = np.linalg.inv(kernel+reg)
         self.alpha = np.linalg.solve(kernel+reg, y)
         
-    def predict(self,kernel):
+    def predict(self, kernel):
         '''kernel.shape is expected as (nPred,nTrain)'''
-        return np.dot(kernel,self.alpha.flatten()).reshape((-1))
+        return np.dot(kernel, self.alpha.flatten()).reshape((-1))
 
-    def predict_error(self,k,delta):
+    def predict_error(self, k, delta):
         '''
         k.shape is expected as (nPred, nTrain), delta is the variance of y
         '''

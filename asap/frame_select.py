@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 
-import sys
-import numpy as np
 import argparse
-from ase.io import read,write
+
+from ase.io import read, write
 from asaplib.compressor import fps
+import numpy as np
+
 
 def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
 
     # read frames
-    frames = read(fxyz,':')
+    frames = read(fxyz, ':')
     nframes = len(frames)
-    print("read xyz file:", fxyz,", a total of",nframes,"frames")
+    print("read xyz file:", fxyz, ", a total of", nframes, "frames")
 
-    if (fy != 'none'):
+    if fy != 'none':
         y_all = []
         try:
             y_all = np.genfromtxt(fy, dtype=float)
@@ -22,14 +23,14 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
                 for frame in frames:
                     y_all.append(frame.info[fy])
             except: raise ValueError('Cannot load the property vector')
-        if (len(y_all) != nframes): 
+        if len(y_all) != nframes:
             raise ValueError('Length of the vector of properties is not the same as number of samples')
 
-    if (algorithm == 'random' or algorithm == 'RANDOM'):
+    if algorithm == 'random' or algorithm == 'RANDOM':
         idx = np.asarray(range(nframes))
         sbs = np.random.choice(idx, nkeep, replace =False)
 
-    elif (algorithm == 'fps' or algorithm == 'FPS'):
+    elif algorithm == 'fps' or algorithm == 'FPS':
         try:
             kNN = np.genfromtxt(fkmat, dtype=float)
         except: raise ValueError('Cannot load the kernel matrix')
@@ -39,11 +40,9 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
     np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.index', sbs, fmt='%d')
     for i in sbs:
         write(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.xyz',frames[i], append=True)
-    if (fy != 'none'):    
+    if fy != 'none':
         np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'-'+fy, np.asarray(y_all)[sbs], fmt='%4.8f')
-    
-##########################################################################################
-##########################################################################################
+
 
 if __name__ == '__main__':
 
