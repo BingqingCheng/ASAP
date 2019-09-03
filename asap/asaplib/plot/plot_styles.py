@@ -9,13 +9,15 @@ import matplotlib.patheffects as PathEffects
 from .plot_colors import COLOR_PALETTE
 import math
 
-def set_nice_font(size = 18, usetex=False):
-    font = {'family' : 'serif', 'size'   : size}
+
+def set_nice_font(size=18, usetex=False):
+    font = {'family': 'serif', 'size': size}
     plt.rc('font', **font)
     if usetex is True:
         plt.rc('text', usetex=True)
 
-def add_subplot_axes(ax,rect,axisbg='w'):
+
+def add_subplot_axes(ax,rect, axisbg='w'):
     """
     e.g.
     fig = plt.figure(figsize=(10,10))
@@ -44,7 +46,8 @@ def add_subplot_axes(ax,rect,axisbg='w'):
     subax.xaxis.set_tick_params(labelsize=x_labelsize)
     subax.yaxis.set_tick_params(labelsize=y_labelsize)
     return subax
-    
+
+
 def plot_density_map(X, z,
                 xlabel=None, ylabel=None, clabel=None, label=None,
                 centers=None,
@@ -52,10 +55,10 @@ def plot_density_map(X, z,
                 out_file=None, title=None, show=True, cmap='coolwarm',
                 remove_tick=False,
                 use_perc=False,
-                rasterized = True,
-                fontsize = 15,
-                vmax = None,
-                vmin = None
+                rasterized=True,
+                fontsize=15,
+                vmax=None,
+                vmin=None
                 ):
     """Plots a 2D density map given x,y coordinates and an intensity z for
     every data point
@@ -72,7 +75,7 @@ def plot_density_map(X, z,
     # start the plots
     fig, ax = plt.subplots()
 
-    x, y = X[:,0], X[:,1]
+    x, y = X[:, 0], X[:, 1]
     
     fontsize = fontsize
 
@@ -86,23 +89,23 @@ def plot_density_map(X, z,
         typical = argz[outlier_window:-outlier_window]
 
         # plot typical
-        axscatter = ax.scatter(x[typical],y[typical],c=z[typical],cmap=cmap,s=psize, alpha=1.0,rasterized=rasterized)
+        axscatter = ax.scatter(x[typical], y[typical], c=z[typical],cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized)
         cb=fig.colorbar(axscatter)
         # plot bot outliers (black !)
-        ax.scatter(x[bot_outliers],y[bot_outliers],c='black',s=psize,alpha=1.0,rasterized=rasterized)
+        ax.scatter(x[bot_outliers], y[bot_outliers], c='black', s=psize, alpha=1.0, rasterized=rasterized)
         # plot top outliers (orange !)
-        ax.scatter(x[top_outliers],y[top_outliers],c='red',s=psize,alpha=1.0,rasterized=rasterized)
+        ax.scatter(x[top_outliers], y[top_outliers],c='red', s=psize, alpha=1.0, rasterized=rasterized)
 
     else:
         if label is not None:
-            axscatter = ax.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized,label=label,vmax=vmax,vmin=vmin)
+            axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, label=label, vmax=vmax, vmin=vmin)
         else:
-            axscatter = ax.scatter(x,y,c=z,cmap=cmap,s=psize,alpha=1.0,rasterized=rasterized, vmax=vmax,vmin=vmin)
+            axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, vmax=vmax, vmin=vmin)
     
         cb=fig.colorbar(axscatter)
     
     if remove_tick:
-        ax.tick_params(labelbottom='off',labelleft='off')
+        ax.tick_params(labelbottom='off', labelleft='off')
     
     if xlabel is not None:
         plt.xlabel(xlabel,fontsize=fontsize)
@@ -125,8 +128,6 @@ def plot_density_map(X, z,
 
     return fig, ax
 
-
-######################################################
 
 def plot_cluster_w_size(X, y, c, s=None,
                       xlabel=None, ylabel=None, clabel=None, title=None, 
@@ -152,19 +153,19 @@ def plot_cluster_w_size(X, y, c, s=None,
     # get the cluster size and mean position
     from ..cluster import get_cluster_size, get_cluster_properties
     y_unique_ = np.unique(y)
-    [ _, cluster_mx ]  = get_cluster_properties(y,X[:,0],'mean')
-    [ _, cluster_my ]  = get_cluster_properties(y,X[:,1],'mean')
+    [_, cluster_mx ] = get_cluster_properties(y,X[:, 0],'mean')
+    [_, cluster_my ] = get_cluster_properties(y,X[:, 1],'mean')
     # remove outliers
     if outlier is True:
         y_unique = y_unique_[y_unique_ > -1]
     else:
         y_unique = y_unique_
     # set color
-    if s is None: # default is using log(frequency)
-        [ _, cluster_size ]  = get_cluster_size(y)
-        s={}
+    if s is None:  # default is using log(frequency)
+        [_, cluster_size ]  = get_cluster_size(y)
+        s = {}
         for k in y_unique: s[k] = np.log(cluster_size[k])
-    elif (len(s) != len(y_unique)):
+    elif len(s) != len(y_unique):
         raise ValueError('Length of the vector of cluster size is not the same as the number of clusters')
 
     # start the plots
@@ -180,13 +181,13 @@ def plot_cluster_w_size(X, y, c, s=None,
     if outlier is True:
         # Black used for noise.
         col = [0, 0, 0, 1]
-        class_member_mask = ( y == -1 )
+        class_member_mask = (y == -1)
         xy = X[class_member_mask]
-        ax.plot(xy[:,0], xy[:,1], 'x', markerfacecolor=tuple(col), alpha=alpha,
+        ax.plot(xy[:, 0], xy[:, 1], 'x', markerfacecolor=tuple(col), alpha=alpha,
              markeredgecolor='k', markersize=0.1*psize)
 
     for k in y_unique:
-        ax.plot(cluster_mx[k],cluster_my[k], 'o', markerfacecolor='none',
+        ax.plot(cluster_mx[k], cluster_my[k], 'o', markerfacecolor='none',
                 markeredgecolor='gray', markersize=circle_size*s[k])
 
     if w_label is True:
@@ -194,12 +195,11 @@ def plot_cluster_w_size(X, y, c, s=None,
             # Position of each label.
             txt = ax.annotate(str(k),xy=(cluster_mx[k],cluster_my[k]),
             xytext=(0,0), textcoords='offset points',
-            fontsize=fontsize,horizontalalignment='center', verticalalignment='center'
+            fontsize=fontsize, horizontalalignment='center', verticalalignment='center'
             )
             txt.set_path_effects([
                 PathEffects.Stroke(linewidth=5, foreground='none'),
                 PathEffects.Normal()])
-
 
     xmin,xmax = plt.xlim()
     ymin,ymax = plt.ylim()
@@ -209,14 +209,14 @@ def plot_cluster_w_size(X, y, c, s=None,
     plt.yticks([])
     
     if remove_tick:
-        plt.tick_params(labelbottom='off',labelleft='off')
+        plt.tick_params(labelbottom='off', labelleft='off')
     
     if xlabel is not None:
-        plt.xlabel(xlabel,fontsize=fontsize)
+        plt.xlabel(xlabel, fontsize=fontsize)
     if ylabel is not None:
-        plt.ylabel(ylabel,fontsize=fontsize)
+        plt.ylabel(ylabel, fontsize=fontsize)
     if title is not None:
-        plt.title(title,fontsize=fontsize)
+        plt.title(title, fontsize=fontsize)
 
     plt.tight_layout()
     if savefile is not None:
@@ -233,10 +233,8 @@ def plot_cluster_w_size(X, y, c, s=None,
     return fig, ax
 
 
-######################################################
-
 def plot_cluster_w_label(X, y, Xcluster=None, 
-                      show=True, savefile = None, fontsize =15, psize = 20, 
+                      show=True, savefile = None, fontsize=15, psize=20,
                       title=None, w_label = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True):
     """Plots a 2D clustering plot given x,y coordinates and a label z for
@@ -267,9 +265,9 @@ def plot_cluster_w_label(X, y, Xcluster=None,
     n_center = len(y_unique)
 
     for i, yu in enumerate(y_unique):
-        pos=(y==yu)
+        pos=(y == yu)
         Xsub = X[pos]
-        plt.scatter(Xsub[:,0],Xsub[:,1],c=palette[i], s=psize, rasterized=True, alpha=alpha, edgecolors=edgecolors, label = yu)
+        plt.scatter(Xsub[:, 0], Xsub[:, 1], c=palette[i], s=psize, rasterized=True, alpha=alpha, edgecolors=edgecolors, label=yu)
         
         if Xcluster is not None:
             Xmean = Xcluster[i]
@@ -279,27 +277,25 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         idx_centers.append(all_idx[pos][np.argmin(np.linalg.norm(Xsub - Xmean, axis=1))])
 
     if outlier is True:
-        color_out = {-3 : '#ff0050', -2 : '#9eff49', -1 : 'gray'}
+        color_out = {-3: '#ff0050', -2: '#9eff49', -1: 'gray'}
         for yi in [-3, -2, -1]:
             pos = (y == yi)
             if np.count_nonzero(pos) > 0:
                 Xsub = X[pos]
-                plt.scatter(Xsub[:,0],Xsub[:,1],c=color_out[yi], s=psize, rasterized=True, alpha=alpha, marker="2",edgecolors=edgecolors, label = yi)
-            
+                plt.scatter(Xsub[:, 0], Xsub[:, 1],c=color_out[yi], s=psize, rasterized=True, alpha=alpha, marker="2", edgecolors=edgecolors, label = yi)
 
     if w_label is True:
         centers = X[idx_centers]
         for xy, i in zip(centers, y_unique) :
             # Position of each label.
             txt = ax.annotate(str(i),xy,
-            xytext=(0,0), textcoords='offset points',
+            xytext=(0, 0), textcoords='offset points',
             fontsize=fontsize,horizontalalignment='center', verticalalignment='center'
             )
             txt.set_path_effects([
                 PathEffects.Stroke(linewidth=5, foreground="w"),
                 PathEffects.Normal()])
-        
-    
+
     xmin,xmax = plt.xlim()
     ymin,ymax = plt.ylim()
     dx = xmax - xmin
@@ -317,7 +313,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         if dpi is None:
             plt.savefig(savefile)
         else:
-            plt.savefig(savefile,dpi=dpi)
+            plt.savefig(savefile, dpi=dpi)
 
     if show is True:
         plt.show()
@@ -325,6 +321,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
         plt.close()
 
     return fig, ax
+
 
 def plot_scatter_w_label(x, y, z, psize=20, label = None):
     """Plots a 2D scatter plot given x,y coordinates and a label z for
@@ -342,20 +339,21 @@ def plot_scatter_w_label(x, y, z, psize=20, label = None):
     unique_z=np.sort(np.unique(z.flatten()))
     mycol = COLOR_PALETTE()
 
-    plt.subplots(figsize=(8,6))
+    plt.subplots(figsize=(8, 6))
 
     for i, zval in enumerate(unique_z):
-        pos=(z.flatten()==zval)
+        pos = (z.flatten() == zval)
         if label is not None:
-            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], label=label[i], rasterized=True)
+            plt.scatter(x[pos], y[pos], s=psize,c=mycol[i], label=label[i], rasterized=True)
         else:
-            plt.scatter(x[pos],y[pos],s=psize,c=mycol[i], rasterized=True)
+            plt.scatter(x[pos], y[pos], s=psize,c=mycol[i], rasterized=True)
     
     if label is not None:
-        plt.legend(loc='best',fontsize=12)
+        plt.legend(loc='best', fontsize=12)
 
     plt.tight_layout()
     plt.show()
+
 
 def plot_outlier_scatter(x, y, z, ax):
 
@@ -382,7 +380,6 @@ def plot_outlier_scatter(x, y, z, ax):
     y_top = y[top]
     z_top = z[top]
 
-    ax.scatter(x_mid, y_mid, c = z_mid, cmap = cmap, s=6)
-    ax.scatter(x_bot, y_bot, c = "purple", s=4)
-    ax.scatter(x_top, y_top, c = "#00FF00",s=4)
-
+    ax.scatter(x_mid, y_mid, c=z_mid, cmap=cmap, s=6)
+    ax.scatter(x_bot, y_bot, c="purple", s=4)
+    ax.scatter(x_top, y_top, c="#00FF00", s=4)

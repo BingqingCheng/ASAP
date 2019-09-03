@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import numpy as np
 import argparse
+
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import kpca 
@@ -9,20 +10,22 @@ from asaplib.kde import KDE
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
+
 def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
         kNN = np.genfromtxt(fkmat, dtype=float)
-    except: raise ValueError('Cannot load the kernel matrix')
-    print("loaded",fkmat)
+    except:
+        raise ValueError('Cannot load the kernel matrix')
+    print("loaded", fkmat)
     # load tags if any
-    if (ftags != 'none'): 
+    if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # doing a kpca
-    proj = kpca(kNN,kpca_d)
+    proj = kpca(kNN, kpca_d)
     # save the low D projection
     # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
@@ -32,12 +35,12 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     # save the density
-    np.savetxt(prefix+"-kde.dat",np.transpose([np.arange(len(rho)),rho]), header='index kernel_density_estimation',fmt='%d %4.8f')
+    np.savetxt(prefix+"-kde.dat", np.transpose([np.arange(len(rho)), rho]), header='index kernel_density_estimation', fmt='%d %4.8f')
 
     # color scheme
     plotcolor = rho
     colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
-    [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
+    [plotcolormin, plotcolormax] = [np.min(plotcolor),np.max(plotcolor)]
 
     # make plot
     plot_styles.set_nice_font()
@@ -52,18 +55,18 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
                 show=False, cmap='summer',
                 remove_tick=False,
                 use_perc=False,
-                rasterized = True,
-                fontsize = 15,
-                vmax = plotcolormax,
-                vmin = plotcolormin)
+                rasterized=True,
+                fontsize=15,
+                vmax=plotcolormax,
+                vmin=plotcolormin)
 
     fig.set_size_inches(18.5, 10.5)
-    if (ftags != 'none'):
+    if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
-                         ha='center', va='center', fontsize=15,color='red'))
+            ax.scatter(proj[i,pc1],proj[i, pc2],marker='^',c='black')
+            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
+                         ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if (adtext):
             from adjustText import adjust_text
@@ -76,8 +79,6 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
     plt.show()
     fig.savefig('kde_4_'+prefix+'.png')
 
-##########################################################################################
-##########################################################################################
 
 if __name__ == '__main__':
 

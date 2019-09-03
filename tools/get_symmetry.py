@@ -36,7 +36,7 @@ def main(fxyz, prefix, verbose):
 
     # read frames
     if fxyz != 'none':
-        frames = read(fxyz,':')
+        frames = read(fxyz, ':')
         nframes = len(frames)
         print("read xyz file:", fxyz, ", a total of",nframes, "frames")
 
@@ -48,7 +48,8 @@ def main(fxyz, prefix, verbose):
                                                                 to_primitive=1,
                                                                 no_idealize=1,
                                                                 symprec=1e-2)
-        if verbose: show_cell(lattice, scaled_positions, numbers)
+        if verbose:
+            show_cell(lattice, scaled_positions, numbers)
         # output
         frtemp = atom(numbers=numbers, cell=lattice, scaled_positions=scaled_positions, pbc=frame.get_pbc())
         standardized_frames.append(frtemp)

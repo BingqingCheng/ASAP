@@ -1,6 +1,7 @@
 import numpy as np
 from collections import Counter
 
+
 def output_cluster(prefix, labels, dicttags, tags):
     ofile=open(("clustered-")+prefix+(".txt"),"w")
     # output
@@ -14,6 +15,7 @@ def output_cluster(prefix, labels, dicttags, tags):
     ofile.close()
     
     return 0 
+
 
 def output_cluster_sort(prefix, labels, dicttags, tags):
     # we sort the clusters as well
@@ -34,70 +36,75 @@ def output_cluster_sort(prefix, labels, dicttags, tags):
             ofile.write("%d %s\n" % (l,tags[i-ndict]))
     return 0        
 
+
 def get_cluster_size(labels):
 
     unique_labels = set(labels)
     count = Counter(labels)
     return unique_labels, count
 
+
 def most_frequent(List): 
     occurence_count = Counter(List) 
     return occurence_count.most_common(1)[0][0] 
+
 
 def array_handling(plist, attribute='mean'):
     """ available attributes:
         mean, sum, min, max, mode, all
     """
-    if (attribute == 'mean'):
+    if attribute == 'mean':
         return np.mean(plist)
-    elif (attribute == 'sum'):
+    elif attribute == 'sum':
         return np.sum(plist)
-    elif (attribute == 'min'):
+    elif attribute == 'min':
         return np.amin(plist)
-    elif (attribute == 'max'):
+    elif attribute == 'max':
         return np.amax(plist)
-    elif (attribute == 'mode'):
+    elif attribute == 'mode':
         return most_frequent(plist)
-    elif (attribute == 'all'):
+    elif attribute == 'all':
         return plist
     else:
         raise NameError('Attribute not found.')
 
-def get_cluster_properties(labels, properties,attribute='mean'):
+
+def get_cluster_properties(labels, properties, attribute='mean'):
 
     unique_labels = set(labels)
     
-    sortlabels = np.stack((range(len(labels)),labels), axis=-1)
-    sortlabels = sortlabels[sortlabels[:,1].argsort()]
-    propertiesdict = {-1:'noise'}         
+    sortlabels = np.stack((range(len(labels)), labels), axis=-1)
+    sortlabels = sortlabels[sortlabels[:, 1].argsort()]
+    propertiesdict = {-1: 'noise'}
         
     ol = -1
     n = 0
     plist = []
     for i, l in sortlabels:
-        if (l > ol and l >= 0):
-            propertiesdict[ol] = array_handling(plist,attribute)
+        if l > ol and l >= 0:
+            propertiesdict[ol] = array_handling(plist, attribute)
             plist = []
         plist.append(properties[i])
         ol = l
-    propertiesdict[ol] = array_handling(plist,attribute)
+    propertiesdict[ol] = array_handling(plist, attribute)
     
     return unique_labels, propertiesdict
+
 
 def get_cluster_weighted_avg_properties(labels, properties,weights):
     
     unique_labels = set(labels)
     
-    sortlabels = np.stack((range(len(labels)),labels), axis=-1)
-    sortlabels = sortlabels[sortlabels[:,1].argsort()]
-    propertiesdict = {-1:'noise'}         
+    sortlabels = np.stack((range(len(labels)), labels), axis=-1)
+    sortlabels = sortlabels[sortlabels[:, 1].argsort()]
+    propertiesdict = {-1: 'noise'}
         
     ol = -1
     n = 0
     plist = []
     wlist = []
     for i, l in sortlabels:
-        if (l > ol and l>= 0):
+        if l > ol and l>= 0:
             propertiesdict[ol] = np.mean(plist)/np.mean(wlist)
             plist = []
             wlist = []

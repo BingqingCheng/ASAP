@@ -10,6 +10,7 @@ from abc import ABCMeta, abstractmethod
 from sklearn.externals.six import with_metaclass
 import collections
 
+
 def exponential_split(xmin,xmax,n=5):
     # obtain integeters that are equally spaced in log space
     X = np.zeros(n,dtype=int)
@@ -19,6 +20,7 @@ def exponential_split(xmin,xmax,n=5):
     for i in range(1,n-1):
         X[i] = int(np.exp(lmin+dl*i))
     return X
+
 
 def kernel_random_split(X,y,r=0.05):
 
@@ -52,7 +54,7 @@ class KFold(_KFold):
         return params
 
 class ShuffleSplit(_ShuffleSplit):
-    def __init__(self,n_splits=10, test_size="default", train_size=None,random_state=None):
+    def __init__(self, n_splits=10, test_size="default", train_size=None,random_state=None):
         super(ShuffleSplit, self).__init__(n_splits, test_size,train_size, random_state)
     def get_params(self):
         params = dict(n_splits=self.n_splits,test_size=self.test_size,
@@ -60,7 +62,7 @@ class ShuffleSplit(_ShuffleSplit):
         return params
 
 class LCSplit(with_metaclass(ABCMeta)):
-    def __init__(self, cv, n_repeats=[10],train_sizes=[10],test_size="default", random_state=None, **cvargs):
+    def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size="default", random_state=None, **cvargs):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):
             raise ValueError("Number of repetitions or training set sizes must be an iterable.")
 
@@ -105,8 +107,8 @@ class LCSplit(with_metaclass(ABCMeta)):
 
         rng = check_random_state(self.random_state)
         
-        for n_repeat,train_size in zip(self.n_repeats,self.train_sizes):
-            cv = self.cv(random_state=rng, n_splits=n_repeat,test_size=self.test_size,train_size=train_size,
+        for n_repeat,train_size in zip(self.n_repeats, self.train_sizes):
+            cv = self.cv(random_state=rng, n_splits=n_repeat, test_size=self.test_size, train_size=train_size,
                              **self.cvargs)
             for train_index, test_index in cv.split(X, y, groups):
                 yield train_index, test_index
@@ -131,14 +133,8 @@ class LCSplit(with_metaclass(ABCMeta)):
         """
         rng = check_random_state(self.random_state)
         n_splits = 0
-        for n_repeat,train_size in zip(self.n_repeats,self.train_sizes):
-            cv = self.cv(random_state=rng, n_splits=n_repeat,test_size=self.test_size,train_size=train_size,
+        for n_repeat,train_size in zip(self.n_repeats, self.train_sizes):
+            cv = self.cv(random_state=rng, n_splits=n_repeat, test_size=self.test_size, train_size=train_size,
                              **self.cvargs)
             n_splits += cv.get_n_splits(X, y, groups)
         return n_splits
-    
-
-
-
-
-

@@ -94,12 +94,14 @@ class KRRSparse(RegressorBase):
     def pack(self):
         state = dict(weights=self.alpha,jitter=self.jitter,delta=self.delta,sigma=self.sigma)
         return state
+
     def unpack(self,state):
         self.alpha = state['weights']
         self.delta = state['delta']
         self.sigma = state['sigma']
         err_m = 'jitter are not consistent {} != {}'.format(self.jitter ,state['jitter'])
         assert self.jitter  == state['jitter'], err_m
+
     def loads(self,state):
         self.alpha = state['weights']
         self.jitter  = state['jitter']
@@ -138,33 +140,35 @@ class KRRFastCV(RegressorBase):
             self.error[test] = beta # beta = y_true - y_pred 
 
         del kernel
-        
+
     def predict(self,kernel=None):
-        '''kernel.shape is expected as (nPred,nTrain)'''
+        '''kernel.shape is expected as (nPred, nTrain)'''
         return self.y_pred
 
     def get_params(self,deep=True):
-        return dict(sigma=self.jitter ,cv=self.cv)
-        
-    def set_params(self,params,deep=True):
-        self.jitter  = params['jitter']
+        return dict(sigma=self.jitter, cv=self.cv)
+
+    def set_params(self, params, deep=True):
+        self.jitter = params['jitter']
         self.cv = params['cv']
         self.delta = params['delta']
         self.y_pred = None
 
     def pack(self):
-        state = dict(y_pred=self.y_pred,cv=self.cv.pack(),
-                     jitter=self.jitter,delta=self.delta )
+        state = dict(y_pred=self.y_pred, cv=self.cv.pack(),
+                     jitter=self.jitter, delta=self.delta)
         return state
+
     def unpack(self,state):
         self.y_pred = state['y_pred']
         self.cv.unpack(state['cv'])
         self.delta = state['delta']
 
-        err_m = 'jitter are not consistent {} != {}'.format(self.jitter ,state['jitter'])
-        assert self.jitter  == state['jitter'], err_m
+        err_m = 'jitter are not consistent {} != {}'.format(self.jitter, state['jitter'])
+        assert self.jitter == state['jitter'], err_m
+
     def loads(self,state):
         self.y_pred = state['y_pred']
         self.cv.loads(state['cv'])
-        self.jitter  = state['jitter']
+        self.jitter = state['jitter']
         self.delta = state['delta']

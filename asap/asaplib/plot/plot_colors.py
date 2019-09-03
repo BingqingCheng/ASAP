@@ -9,9 +9,10 @@ class COLOR_PALETTE:
     "#8CD0FF", "#3B9700", "#04F757", "#C8A1A1", "#1E6E00","#7900D7", "#A77500","#6367A9", "#A05837", "#6B002C", "#772600", "#D790FF", "#9B9700","#549E79",
     "#FFF69F", "#201625", "#72418F","#BC23FF","#99ADC0","#3A2465","#922329","#5B4534", "#FDE8DC", "#404E55", "#0089A3", "#CB7E98", "#A4E804", "#324E72", "#6A3A4C","#7A4900"]
         elif style ==2:
-            self.pal = ["#30a2da","#fc4f30","#e5ae38","#6d904f","#8b8b8b","#006FA6", "#A30059","#af8dc3","#922329","#1E6E00"]
+            self.pal = ["#30a2da", "#fc4f30", "#e5ae38", "#6d904f", "#8b8b8b", "#006FA6", "#A30059", "#af8dc3", "#922329", "#1E6E00"]
 
         self.n_color = len(self.pal)
-    def __getitem__(self, arg): # color cycler
+
+    def __getitem__(self, arg):  # color cycler
         assert arg > -1, "???"
         return self.pal[arg%self.n_color]

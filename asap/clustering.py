@@ -12,20 +12,22 @@ from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
+
 def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     # if it has been computed before we can simply load it
     try:
         kNN = np.genfromtxt(fkmat, dtype=float)
-    except: raise ValueError('Cannot load the kernel matrix')
+    except:
+        raise ValueError('Cannot load the kernel matrix')
 
     print("loaded",fkmat)
-    if (ftags != 'none'): 
+    if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # do a low dimensional projection of the kernel matrix
-    proj = kpca(kNN,kpca_d)
+    proj = kpca(kNN, kpca_d)
 
     density_model = KDE()        
     # fit density model to data
@@ -37,7 +39,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     algorithm = str(algorithm)
     # now we do the clustering
-    if (algorithm == 'dbscan' or algorithm == 'DBSCAN'):
+    if algorithm == 'dbscan' or algorithm == 'DBSCAN':
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean') # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
@@ -49,7 +51,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         #do_clustering = DBCluster(trainer) 
         #do_clustering.fit(dmat)
 
-    elif (algorithm == 'fdb' or algorithm == 'FDB'):
+    elif algorithm == 'fdb' or algorithm == 'FDB':
         dmat = kerneltodis(kNN)
         trainer = LAIO_DB(-1,-1) # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
@@ -70,17 +72,17 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     # color scheme
     fcolor = str(fcolor)
-    if (fcolor == 'rho'): # we use the local density as the color scheme
+    if fcolor == 'rho': # we use the local density as the color scheme
         plotcolor = rho
         colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
-    elif (fcolor == 'cluster'):
+    elif fcolor == 'cluster':
         plotcolor = labels_db
         colorlabel = 'a total of' + str(n_clusters) + ' clusters'
     else:
         try:
             plotcolor = np.genfromtxt(fcolor, dtype=float)
         except: raise ValueError('Cannot load the vector of properties')
-        if (len(plotcolor) != len(kNN)): 
+        if len(plotcolor) != len(kNN):
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
     [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
@@ -90,11 +92,11 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho, s=None,
                       clabel=colorlabel, title=None, 
-                      w_size = True, w_label = True,
-                      circle_size = 20, alpha=0.5, edgecolors=None,
-                      cmap='summer', vmax = None,vmin = None, psize = 20, 
-                      show=False, savefile = None, fontsize =15, 
-                      figsize=None,rasterized = True, remove_tick=True,
+                      w_size=True, w_label=True,
+                      circle_size=20, alpha=0.5, edgecolors=None,
+                      cmap='summer', vmax=None,vmin=None, psize=20,
+                      show=False, savefile=None, fontsize =15,
+                      figsize=None,rasterized=True, remove_tick=True,
                       dpi=200, outlier=True)
     """
     ax = plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
@@ -105,20 +107,20 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     fig.set_size_inches(18.5, 10.5)
 
     # project the known structures
-    if (ftags != 'none'):
+    if ftags != 'none':
         texts = []
         for i in range(ndict):
             ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
             texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
                          ha='center', va='center', fontsize=15,color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if (adtext):
+        if adtext:
             from adjustText import adjust_text
             adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
-                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
+                  arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
     plt.title('KPCA and clustering for: '+prefix)
     plt.xlabel('Princple Axis '+str(pc1))

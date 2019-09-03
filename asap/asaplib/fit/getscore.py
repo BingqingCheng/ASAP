@@ -25,7 +25,7 @@ def get_sup(ypred, y):
 
 
 def get_spearman(ypred, y):
-    corr,_ = spearmanr(ypred,y)
+    corr,_ = spearmanr(ypred, y)
     return corr
 
 score_func = dict(
@@ -37,8 +37,8 @@ score_func = dict(
 )
 
 
-def get_score(ypred,y):
+def get_score(ypred, y):
     scores = {}
     for k,func in score_func.items():
-        scores[k] = func(ypred,y)
+        scores[k] = func(ypred, y)
     return scores

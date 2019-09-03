@@ -84,7 +84,7 @@ class sklearn_DB(FitClusterBase):
     _pairwise = True
 
     def __init__(self, eps=None, min_samples=None, metrictype='precomputed'):
-        self.metric = metrictype # e.g. 'euclidean'
+        self.metric = metrictype  # e.g. 'euclidean'
         # distance metric
         self.eps = eps
         # The number of samples in a neighborhood for a point to be considered as a core point.
@@ -120,24 +120,26 @@ class LAIO_DB(FitClusterBase):
         if rho is None:
             raise ValueError('for fdb it is better to compute kernel density first')
 
-        delta,nneigh = self.estimate_delta(dmatrix, rho)
+        delta, nneigh = self.estimate_delta(dmatrix, rho)
         
         # I'll think about this!!!
-        if (self.rhomin < 0): self.rhomin = 0.2*np.mean(rho)+0.8*np.min(rho)
-        if (self.deltamin < 0): self.deltamin = np.mean(delta)
+        if self.rhomin < 0:
+            self.rhomin = 0.2*np.mean(rho)+0.8*np.min(rho)
+        if self.deltamin < 0:
+            self.deltamin = np.mean(delta)
 
         ###
-        plt.scatter(rho,delta)
-        plt.plot([min(rho),max(rho)],[self.deltamin,self.deltamin],c='red')
-        plt.plot([self.rhomin,self.rhomin],[min(delta),max(delta)],c='red')
+        plt.scatter(rho, delta)
+        plt.plot([min(rho), max(rho)], [self.deltamin, self.deltamin], c='red')
+        plt.plot([self.rhomin,self.rhomin], [min(delta),max(delta)], c='red')
         plt.xlabel('rho')
         plt.ylabel('delta')
         plt.show()
         ###
         nclust = 0
-        cl = np.zeros(len(rho),dtype='int')-1
+        cl = np.zeros(len(rho), dtype='int')-1
         for i in range(len(rho)):
-            if (rho[i] > self.rhomin and delta[i] > self.deltamin):
+            if rho[i] > self.rhomin and delta[i] > self.deltamin:
                 nclust += 1
                 cl[i] = nclust
 
@@ -145,25 +147,24 @@ class LAIO_DB(FitClusterBase):
         ordrho = np.argsort(rho)[::-1]
         rho_ord = rho[ordrho]
         for i in range(len(rho)):
-            if cl[ordrho[i]]==-1:
-                cl[ordrho[i]]=cl[nneigh[ordrho[i]]]
+            if cl[ordrho[i]] == -1:
+                cl[ordrho[i]] = cl[nneigh[ordrho[i]]]
         return cl
 
     def estimate_delta(self, dist, rho):
         delta = (rho*0.0).copy()
-        nneigh = np.ones(len(delta),dtype='int')
+        nneigh = np.ones(len(delta), dtype='int')
         for i in range(len(rho)):
-            js = np.where(rho>rho[i])[0]
-            if len(js)==0:
-                delta[i] = np.max(dist[i,:])
+            js = np.where(rho > rho[i])[0]
+            if len(js) == 0:
+                delta[i] = np.max(dist[i, :])
                 nneigh[i] = i
             else:
-                delta[i] = np.min(dist[i,js])
-                nneigh[i] = js[np.argmin(dist[i,js])]
+                delta[i] = np.min(dist[i, js])
+                nneigh[i] = js[np.argmin(dist[i, js])]
         return delta, nneigh
 
     def pack(self):
         '''return all the info'''
         state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
         return state
-
