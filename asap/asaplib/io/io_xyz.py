@@ -11,12 +11,13 @@ e.g.
      except: sys.exit(0)
 """
 
+
 def read_xyz(filedesc):
   natoms = int(filedesc.readline())
   comment = filedesc.readline()
 
   cell = np.zeros(3, float)
-  names = np.zeros(natoms,np.dtype('|S6'))
+  names = np.zeros(natoms, np.dtype('|S6'))
   q = np.zeros((natoms, 3), float)
   cell[:] = comment.split()[0:3]
   print(cell)
@@ -47,7 +48,7 @@ def write_ipixyz(outfile, cell, names, q):
 
     # write
     outfile.write("%d\n# CELL(abcABC):     %4.8f     %4.8f     %4.8f     %4.5f     %4.5f     %4.5f   cell{angstrom}  Traj: positions{angstrom}\n" % (natom,supercell[0],supercell[1],supercell[2],angles[0],angles[1],angles[2]))
-    for i,qi in enumerate(q):
+    for i, qi in enumerate(q):
         #print (names[i],q[i*3],q[i*3+1],q[i*3+2])
         outfile.write("%s     %4.8f     %4.8f     %4.8f\n" % (names[i], qi[0], qi[1], qi[2]))
     return 0

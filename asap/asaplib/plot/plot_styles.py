@@ -6,8 +6,8 @@ Copyright 2017 Alexandre Day
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.patheffects as PathEffects
+
 from .plot_colors import COLOR_PALETTE
-import math
 
 
 def set_nice_font(size=18, usetex=False):
@@ -79,7 +79,7 @@ def plot_density_map(X, z,
     
     fontsize = fontsize
 
-    if use_perc :
+    if use_perc:
         n_sample = len(x)
         outlier_window = int(0.05 * n_sample)
 
@@ -119,7 +119,7 @@ def plot_density_map(X, z,
         plt.legend(loc='best')
         
     if centers is not None:
-        ax.scatter(centers[:,0],centers[:,1], c='lightgreen', marker='*',s=200, edgecolor='black',linewidths=0.5)
+        ax.scatter(centers[:, 0],centers[:, 1], c='lightgreen', marker='*', s=200, edgecolor='black', linewidths=0.5)
     
     if out_file is not None:
         fig.savefig(out_file)
@@ -131,11 +131,11 @@ def plot_density_map(X, z,
 
 def plot_cluster_w_size(X, y, c, s=None,
                       xlabel=None, ylabel=None, clabel=None, title=None, 
-                      w_size = True, w_label = False,
-                      circle_size = 20, alpha=0.7, edgecolors=None,
-                      cmap='coolwarm', vmax = None,vmin = None, psize = 2, 
-                      show=True, savefile = None, fontsize =15, 
-                      figsize=None,rasterized = True, remove_tick=True,
+                      w_size=True, w_label=False,
+                      circle_size=20, alpha=0.7, edgecolors=None,
+                      cmap='coolwarm', vmax = None,vmin=None, psize=2,
+                      show=True, savefile = None, fontsize=15,
+                      figsize=None, rasterized=True, remove_tick=True,
                       dpi=200, outlier=True):
 
     """Plots a 2D clustering plot given x,y coordinates and a label z for
@@ -153,8 +153,8 @@ def plot_cluster_w_size(X, y, c, s=None,
     # get the cluster size and mean position
     from ..cluster import get_cluster_size, get_cluster_properties
     y_unique_ = np.unique(y)
-    [_, cluster_mx ] = get_cluster_properties(y,X[:, 0],'mean')
-    [_, cluster_my ] = get_cluster_properties(y,X[:, 1],'mean')
+    [_, cluster_mx] = get_cluster_properties(y,X[:, 0], 'mean')
+    [_, cluster_my] = get_cluster_properties(y,X[:, 1], 'mean')
     # remove outliers
     if outlier is True:
         y_unique = y_unique_[y_unique_ > -1]
@@ -162,9 +162,10 @@ def plot_cluster_w_size(X, y, c, s=None,
         y_unique = y_unique_
     # set color
     if s is None:  # default is using log(frequency)
-        [_, cluster_size ]  = get_cluster_size(y)
+        [_, cluster_size] = get_cluster_size(y)
         s = {}
-        for k in y_unique: s[k] = np.log(cluster_size[k])
+        for k in y_unique:
+            s[k] = np.log(cluster_size[k])
     elif len(s) != len(y_unique):
         raise ValueError('Length of the vector of cluster size is not the same as the number of clusters')
 
@@ -172,8 +173,8 @@ def plot_cluster_w_size(X, y, c, s=None,
     fig, ax = plt.subplots()
 
     # first do a scatter plot for all samples
-    cset1 = ax.scatter(X[:,0], X[:,1],  c=c[:],
-            cmap=cmap, vmin=vmin, vmax=vmax, marker='o', s=psize,rasterized=rasterized)
+    cset1 = ax.scatter(X[:, 0], X[:, 1],  c=c[:],
+            cmap=cmap, vmin=vmin, vmax=vmax, marker='o', s=psize, rasterized=rasterized)
     cbar=fig.colorbar(cset1, ax=ax)
     cbar.ax.set_ylabel(clabel)
 
@@ -193,8 +194,8 @@ def plot_cluster_w_size(X, y, c, s=None,
     if w_label is True:
         for k in y_unique:
             # Position of each label.
-            txt = ax.annotate(str(k),xy=(cluster_mx[k],cluster_my[k]),
-            xytext=(0,0), textcoords='offset points',
+            txt = ax.annotate(str(k),xy=(cluster_mx[k], cluster_my[k]),
+            xytext=(0, 0), textcoords='offset points',
             fontsize=fontsize, horizontalalignment='center', verticalalignment='center'
             )
             txt.set_path_effects([
@@ -223,7 +224,7 @@ def plot_cluster_w_size(X, y, c, s=None,
         if dpi is None:
             plt.savefig(savefile)
         else:
-            plt.savefig(savefile,dpi=dpi)
+            plt.savefig(savefile, dpi=dpi)
 
     if show is True:
         plt.show()
@@ -234,8 +235,8 @@ def plot_cluster_w_size(X, y, c, s=None,
 
 
 def plot_cluster_w_label(X, y, Xcluster=None, 
-                      show=True, savefile = None, fontsize=15, psize=20,
-                      title=None, w_label = True, figsize=None,
+                      show=True, savefile=None, fontsize=15, psize=20,
+                      title=None, w_label=True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True):
     """Plots a 2D clustering plot given x,y coordinates and a label z for
     every data point
@@ -323,7 +324,7 @@ def plot_cluster_w_label(X, y, Xcluster=None,
     return fig, ax
 
 
-def plot_scatter_w_label(x, y, z, psize=20, label = None):
+def plot_scatter_w_label(x, y, z, psize=20, label=None):
     """Plots a 2D scatter plot given x,y coordinates and a label z for
     every data point
 

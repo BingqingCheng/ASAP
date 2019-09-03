@@ -1,5 +1,5 @@
 
-from sklearn.base import BaseEstimator, RegressorMixin,TransformerMixin
+from sklearn.base import BaseEstimator, RegressorMixin
 
 
 class RegressorBase(BaseEstimator, RegressorMixin):
