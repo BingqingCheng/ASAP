@@ -14,10 +14,11 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
     # if it has been computed before we can simply load it
     try:
         kNN = np.genfromtxt(fkmat, dtype=float)
-    except: raise ValueError('Cannot load the kernel matrix')
+    except:
+        raise ValueError('Cannot load the kernel matrix')
 
     print("loaded",fkmat)
-    if (ftags != 'none'): 
+    if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
@@ -28,7 +29,7 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
     np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     # color scheme
-    if (fcolor != 'none'):
+    if fcolor != 'none':
         try:
             plotcolor = np.genfromtxt(fcolor, dtype=float)
         except:
@@ -73,12 +74,12 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
 
     fig.set_size_inches(18.5, 10.5)
 
-    if (ftags != 'none'):
+    if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
-                         ha='center', va='center', fontsize=15,color='red'))
+            ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
+            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
+                         ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if (adtext):
             from adjustText import adjust_text
@@ -91,8 +92,6 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
     plt.show()
     fig.savefig('KPCA_4_'+prefix+'-c-'+fcolor+'.png')
 
-##########################################################################################
-##########################################################################################
 
 if __name__ == '__main__':
 

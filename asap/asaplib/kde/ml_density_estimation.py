@@ -8,6 +8,7 @@ https://github.com/alexandreday/fast_density_clustering.git
 Copyright 2017 Alexandre Day
 '''
 
+
 class KDE():
     """Kernel density estimation (KDE) for accurate local density estimation.
     This is achieved by using maximum-likelihood estimation of the generative kernel density model
@@ -48,9 +49,9 @@ class KDE():
         Type of Kernel to use for density estimates. Other options are {'epanechnikov'|'linear','tophat'}.
     """
 
-    def __init__(self, nh_size='auto', bandwidth = None, test_ratio_size = 0.1,
-                xtol = 0.01, atol=0.000005, rtol=0.00005, extreme_dist = False, 
-                nn_dist = None, kernel = 'gaussian'):
+    def __init__(self, nh_size='auto', bandwidth=None, test_ratio_size=0.1,
+                xtol=0.01, atol=0.000005, rtol=0.00005, extreme_dist=False,
+                nn_dist=None, kernel='gaussian'):
                 
         self.bandwidth = bandwidth
         self.nh_size = nh_size
@@ -61,8 +62,7 @@ class KDE():
         self.extreme_dist = extreme_dist
         self.nn_dist = nn_dist
         self.kernel = kernel # epanechnikov other option
-    
-    
+
     def fit(self, X):
 
         """Fit kernel model to X"""
@@ -110,7 +110,7 @@ class KDE():
 
 
         if self.nn_dist is None:
-            nn = NearestNeighbors(n_neighbors = self.nh_size, algorithm='kd_tree')
+            nn = NearestNeighbors(n_neighbors=self.nh_size, algorithm='kd_tree')
             nn.fit(X_train)
             nn_dist, _ = nn.kneighbors(X_test, n_neighbors=self.nh_size, return_distance=True)
         else:
@@ -174,6 +174,7 @@ class KDE():
         #l_test = len(X_test)
         return -self.kde.score(X_test[:2000])#X_test[np.random.choice(np.arange(0, l_test), size=min([int(0.5*l_test), 1000]), replace=False)]) # this should be accurate enough !
 
+
 def round_float(x):
     """ Rounds a float to it's first significant digit
     """
@@ -185,7 +186,3 @@ def round_float(x):
                 a[i] = '1'
                 break
     return float("".join(a[:pos+1]))
-
-
-
-

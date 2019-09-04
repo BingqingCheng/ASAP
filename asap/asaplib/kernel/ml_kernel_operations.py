@@ -2,15 +2,17 @@ import numpy as np
 import scipy.linalg as salg
 import copy
 
+
 def normalizekernel(kernel):
     # first normalize the kernel matrix
     nkernel = copy.deepcopy(kernel)
     size = len(kernel)
     for i in range(size):
-        nkernel[i,:] /= np.sqrt(kernel[i,i])
-        nkernel[:,i] /= np.sqrt(kernel[i,i])
-        nkernel[i,i] = 1.0
+        nkernel[i, :] /= np.sqrt(kernel[i, i])
+        nkernel[:, i] /= np.sqrt(kernel[i, i])
+        nkernel[i, i] = 1.0
     return nkernel.clip(max=1)
+
 
 def kerneltodis(kernel):
     # there can be many transformations between the k-matrix and the distance matrix
@@ -18,10 +20,10 @@ def kerneltodis(kernel):
     # (k_ij is a normalized symetric kernel)
     nk = normalizekernel(kernel)
     size = len(kernel)
-    dis = np.zeros((size,size),dtype=np.float64)
+    dis = np.zeros((size,size), dtype=np.float64)
     for i in range(size):
         for j in range(i-1):
-            dis[i,j] = dis[j,i] = np.sqrt(2.-2.*nk[i,j])
+            dis[i,j] = dis[j, i] = np.sqrt(2.-2.*nk[i, j])
     
     return dis.clip(min=0)
 
@@ -33,6 +35,7 @@ def kerneltodis_linear(kernel):
     nk = normalizekernel(kernel)
     dis = 1.-nk
     return dis.clip(min=0)
+
 
 def kerneltorho(kernel, delta):
     # we compute the "density" of the data from kernel matrix
@@ -46,6 +49,7 @@ def kerneltorho(kernel, delta):
 
     return rho
 
+
 def distorho_quick(dis, delta):
     # we compute the "density" of the data from distance matrix
     # the distance matrix can be computed such as
@@ -58,5 +62,3 @@ def distorho_quick(dis, delta):
         rho[i] += np.sum(allrhofromdis[i])
 
     return rho
-
-

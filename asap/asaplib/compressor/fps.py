@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def fps(x, d=0, r=None):
     if d == 0 : d = len(x)
     n = len(x)
@@ -18,6 +19,7 @@ def fps(x, d=0, r=None):
         nd = n2 + n2[iy[i]] - 2*np.dot(x,x[iy[i]])
         dl = np.minimum(dl, nd)
     return iy, lmin
+
 
 def fast_fps(x, d=0, r = None):
     if d == 0 : d = len(x)

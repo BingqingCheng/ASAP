@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 
-import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-from asaplib.plot import plot_styles
-#from copy import deepcopy
-from asaplib.fit import KRRSparse
-from asaplib.fit import get_score
+
 from asaplib.compressor import fps, kernel_random_split
 from asaplib.compressor import exponential_split, LCSplit,ShuffleSplit
+from asaplib.fit import KRRSparse
+from asaplib.fit import get_score
+from asaplib.plot import plot_styles
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
@@ -16,18 +16,20 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # if it has been computed before we can simply load it
     try:
         K_all = np.genfromtxt(fkmat, dtype=float)
-    except: raise ValueError('Cannot load the kernel matrix')
-    print("loaded",fkmat)
+    except:
+        raise ValueError('Cannot load the kernel matrix')
+    print("loaded", fkmat)
     try:
         y_all = np.genfromtxt(fy, dtype=float)
-    except: raise ValueError('Cannot load the property vector')
-    if (len(y_all) != len(K_all)): 
+    except:
+        raise ValueError('Cannot load the property vector')
+    if len(y_all) != len(K_all):
         raise ValueError('Length of the vector of properties is not the same as number of samples')
     else:
         n_sample = len(K_all)
 
     # train test split
-    if (test_ratio > 0 ):
+    if test_ratio > 0 :
         K_train, K_test, y_train, y_test, _, _ = kernel_random_split(K_all, y_all, test_ratio)
     else:
         K_train = K_test = K_all
@@ -36,14 +38,13 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     n_test = len(K_test)
 
     # sparsification
-    if (n_sparse >= n_train):
+    if n_sparse >= n_train:
         print("the number of representative structure is too large, please select n < ", n_train)
-    elif (n_sparse > 0):
-        ifps, dfps = fps(K_train, n_sparse , 0)
-        #print(ifps)
-        K_MM = K_train[:,ifps][ifps]
-        K_NM = K_train[:,ifps]
-        K_TM = K_test[:,ifps]
+    elif n_sparse > 0:
+        ifps, dfps = fps(K_train, n_sparse, 0)
+        K_MM = K_train[:, ifps][ifps]
+        K_NM = K_train[:, ifps]
+        K_TM = K_test[:, ifps]
     else:
         print("it's usually better to use some sparsification")
         K_MM = K_train
@@ -58,11 +59,11 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # get the predictions for train set
     y_pred = krr.predict(K_NM)
     # compute the CV score for the dataset
-    print("train score: ", get_score(y_pred,y_train))
+    print("train score: ", get_score(y_pred, y_train))
     # get the predictions for test set
     y_pred_test = krr.predict(K_TM)
     # compute the CV score for the dataset
-    print("test score: ", get_score(y_pred_test,y_test))
+    print("test score: ", get_score(y_pred_test, y_test))
 
     plot_styles.set_nice_font()
     fig = plt.figure(figsize=(8*2.1, 8))
@@ -122,8 +123,6 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     plt.show()
     fig.savefig('KRR_4_'+prefix+'.png')
 
-##########################################################################################
-##########################################################################################
 
 if __name__ == '__main__':
 
