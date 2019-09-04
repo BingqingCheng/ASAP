@@ -1,6 +1,0 @@
-#
-gen_soap_kmat.py -fxyz dataset_1593_eVAng.xyz --prefix H2O --rcut 4.0 --n 4 --l 6 --g 0.3 --periodic True --plot True
-#
-kpca.py -kmat H2O-n4-l6-c4.0-g0.3.kmat -fxyz dataset_1593_eVAng.xyz -colors TotEnergy --prefix H2O
-#
-kpca.py -kmat H2O-n4-l6-c4.0-g0.3.kmat -fxyz dataset_1593_eVAng.xyz -colors volume --prefix H2O
