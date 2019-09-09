@@ -1,7 +1,11 @@
 #!/usr/bin/python3
+"""
+TODO: Module-level description
+"""
+
+import argparse
 
 import numpy as np
-import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import kpca

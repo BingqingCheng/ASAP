@@ -1,3 +1,7 @@
+"""
+TODO: Module-level description
+"""
+
 import numpy as np
 import scipy.linalg as salg
 import copy
@@ -20,10 +24,10 @@ def kerneltodis(kernel):
     # (k_ij is a normalized symetric kernel)
     nk = normalizekernel(kernel)
     size = len(kernel)
-    dis = np.zeros((size,size), dtype=np.float64)
+    dis = np.zeros((size, size), dtype=np.float64)
     for i in range(size):
         for j in range(i-1):
-            dis[i,j] = dis[j, i] = np.sqrt(2.-2.*nk[i, j])
+            dis[i, j] = dis[j, i] = np.sqrt(2.-2.*nk[i, j])
     
     return dis.clip(min=0)
 

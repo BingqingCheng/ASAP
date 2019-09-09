@@ -1,3 +1,7 @@
+"""
+TODO: Module-level description
+"""
+
 import numpy as np
 import math
 

@@ -1,4 +1,21 @@
+"""
+TODO: Module-level description
+"""
+
+import argparse
+
+
 def str2bool(v):
+    """
+
+    Parameters
+    ----------
+    v
+
+    Returns
+    -------
+
+    """
     if isinstance(v, bool):
        return v
     if v.lower() in ('yes', 'true', 't', 'y', '1'):

@@ -1,12 +1,12 @@
+"""
+I adapt the stuff from:
+https://github.com/alexandreday/fast_density_clustering.git
+Copyright 2017 Alexandre Day
+"""
+
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KernelDensity, NearestNeighbors
-
-'''
-I adapt the suff from:
-https://github.com/alexandreday/fast_density_clustering.git
-Copyright 2017 Alexandre Day
-'''
 
 
 class KDE():
