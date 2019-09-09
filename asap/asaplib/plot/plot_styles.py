@@ -76,7 +76,7 @@ def plot_density_map(X, z,
     fig, ax = plt.subplots()
 
     x, y = X[:, 0], X[:, 1]
-    
+    z = np.asarray(z) 
     fontsize = fontsize
 
     if use_perc:
@@ -87,14 +87,14 @@ def plot_density_map(X, z,
         bot_outliers = argz[:outlier_window]
         top_outliers = argz[-outlier_window:]
         typical = argz[outlier_window:-outlier_window]
-
+        #print(z[typical])
         # plot typical
         axscatter = ax.scatter(x[typical], y[typical], c=z[typical],cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized)
         cb=fig.colorbar(axscatter)
         # plot bot outliers (black !)
         ax.scatter(x[bot_outliers], y[bot_outliers], c='black', s=psize, alpha=1.0, rasterized=rasterized)
-        # plot top outliers (orange !)
-        ax.scatter(x[top_outliers], y[top_outliers],c='red', s=psize, alpha=1.0, rasterized=rasterized)
+        # plot top outliers (yellow !)
+        ax.scatter(x[top_outliers], y[top_outliers],c='yellow',s=psize,alpha=1.0,rasterized=rasterized,edgecolor='black')
 
     else:
         if label is not None:
