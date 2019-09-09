@@ -3,15 +3,15 @@ from collections import Counter
 
 
 def output_cluster(prefix, labels, dicttags, tags):
-    ofile=open(("clustered-")+prefix+(".txt"),"w")
+    ofile=open("clustered-"+prefix+".txt","w")
     # output
     ofile.write("#! tag cluster_id \n")
     ndict = len(dicttags)
     ndata = len(tags)
     for i in range(ndict):
-        ofile.write("%s %d\n" % (dicttags[i],labels[i]))
+        ofile.write("%s %d\n" % (dicttags[i], labels[i]))
     for i in range(ndata):
-        ofile.write("%s %d\n" % (tags[i],labels[i+ndict]))
+        ofile.write("%s %d\n" % (tags[i], labels[i+ndict]))
     ofile.close()
     
     return 0 

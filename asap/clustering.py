@@ -21,7 +21,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     except:
         raise ValueError('Cannot load the kernel matrix')
 
-    print("loaded",fkmat)
+    print("loaded", fkmat)
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
@@ -32,7 +32,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     density_model = KDE()        
     # fit density model to data
     density_model.fit(proj)
-    # the charecteristic bandwidth of the data        
+    # the characteristic bandwidth of the data
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     meanrho = np.mean(rho)
@@ -53,7 +53,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
         dmat = kerneltodis(kNN)
-        trainer = LAIO_DB(-1,-1) # adjust the parameters here!
+        trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(dmat, rho)
     else: raise ValueError('Please select from fdb or dbscan')
@@ -63,7 +63,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     n_clusters = do_clustering.get_n_cluster()
 
     # save
-    np.savetxt(prefix+"-cluster-label.dat",np.transpose([np.arange(len(labels_db)),labels_db]), header='index cluster_label',fmt='%d %d')
+    np.savetxt(prefix+"-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]), header='index cluster_label', fmt='%d %d')
     # properties of each cluster
     #[ unique_labels, cluster_size ]  = get_cluster_size(labels_db[:])
     # center of each cluster
@@ -85,12 +85,12 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         if len(plotcolor) != len(kNN):
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
-    [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
+    [plotcolormin, plotcolormax] = [np.min(plotcolor),np.max(plotcolor)]
 
     # make plot
     plot_styles.set_nice_font()
 
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho, s=None,
+    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
                       clabel=colorlabel, title=None, 
                       w_size=True, w_label=True,
                       circle_size=20, alpha=0.5, edgecolors=None,
@@ -110,13 +110,13 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
-                         ha='center', va='center', fontsize=15,color='red'))
+            ax.scatter(proj[i, pc1],proj[i, pc2],marker='^', c='black')
+            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
+                         ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
+            adjust_text(texts,on_basemap=True,  # only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
@@ -144,5 +144,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
-
-
