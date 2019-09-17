@@ -2,6 +2,9 @@
 Automatic Selection And Prediction tools for crystal structures
 
 
+<p align="right">
+  <img src="ASAP-logo.png" width="350" title="logo">
+</p>
 
 python 3
 
