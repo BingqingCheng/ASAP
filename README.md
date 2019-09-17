@@ -1,5 +1,5 @@
 # ASAP 
-<p align="right">
+<p align="left">
   <img src="ASAP-logo.png" width="200" title="logo">
 </p>
 Automatic Selection And Prediction tools for crystal structures
