@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="ASAP-logo.png" width="200" title="logo">
+  <img src="ASAP-logo.png" width="500" title="logo">
 </p>
 
 # ASAP 
