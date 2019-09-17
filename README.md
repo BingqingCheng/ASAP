@@ -1,6 +1,7 @@
-# ASAP <p align="right">
+<p align="right">
   <img src="ASAP-logo.png" width="200" title="logo">
 </p>
+# ASAP 
 Automatic Selection And Prediction tools for crystal structures
 
 python 3
