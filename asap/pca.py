@@ -67,8 +67,8 @@ def main(fmat, fxyz, ftags, fcolor, prefix, scale, pca_d, pc1, pc2, adtext):
                 clabel=colorlabel, label=None,
                 centers=None,
                 psize=30,
-                out_file='KPCA_4_'+prefix+'.png', 
-                title='KPCA for: '+prefix, 
+                out_file='PCA_4_'+prefix+'.png', 
+                title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
                 use_perc=False,
@@ -95,7 +95,7 @@ def main(fmat, fxyz, ftags, fcolor, prefix, scale, pca_d, pc1, pc2, adtext):
                   arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
 
     plt.show()
-    fig.savefig('KPCA_4_'+prefix+'-c-'+fcolor+'.png')
+    fig.savefig('PCA_4_'+prefix+'-c-'+fcolor+'.png')
 
 
 if __name__ == '__main__':
