@@ -4,29 +4,34 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from asaplib.pca import kpca
+from asaplib.pca import pca
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 from ase.io import read
 
-def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
+def main(fmat, fxyz, ftags, fcolor, prefix, scale, pca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        kNN = np.genfromtxt(fkmat, dtype=float)
+        desc = np.genfromtxt(fmat, dtype=float)
     except:
-        raise ValueError('Cannot load the kernel matrix')
+        raise ValueError('Cannot load the descriptor matrix')
 
-    print("loaded",fkmat)
+    print("loaded",fmat)
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
+    # scale & center
+    if (scale):
+        from sklearn.preprocessing import StandardScaler
+        desc = StandardScaler().fit_transform(desc) # normalizing the features
+
     # main thing
-    proj = kpca(kNN,kpca_d)
+    proj = pca(desc,pca_d)
 
     # save
-    np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+    np.savetxt(prefix+"-pca-d"+str(pca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     # color scheme
     if fcolor != 'none':
@@ -66,7 +71,7 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
                 title='KPCA for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=True,
+                use_perc=False,
                 rasterized = True,
                 fontsize = 15,
                 vmax = None,
@@ -96,11 +101,12 @@ def main(fkmat, fxyz, ftags, fcolor, prefix, kpca_d, pc1, pc2, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of descriptor matrix file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('-colors', type=str, default='none', help='Properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
+    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
@@ -108,6 +114,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.kmat, args.fxyz, args.tags, args.colors, args.prefix, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.fxyz, args.tags, args.colors, args.prefix, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
 
 
