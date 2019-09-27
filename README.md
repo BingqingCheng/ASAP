@@ -5,6 +5,7 @@
 # ASAP 
 Automatic Selection And Prediction tools for crystal structures
 
+#
 python 3
 
 Requirements:
@@ -18,12 +19,9 @@ One can use the following comments for installing the packages:
 
 pip3 install --upgrade pip
 
-python3 -m pip install --user somepackage
+python3 -m pip install --user somepackage    .or.    pip3 install --user somepackage
 
-or
-
-pip3 install --user somepackage
-
+#
 In the directory ./asap/ you can find a selection of python tools:
 * gen_soap_kmat.py: computes kernel matrix between different structures if multiple frames are provides, or the kernel matrix between atomic environments in a structure if only one frame is the input.
 
@@ -37,6 +35,7 @@ In the directory ./asap/ you can find a selection of python tools:
 
 * krr.py: quick kernel ridge regression, in order to test if there is enough signal in the data set.
 
+#
 TODOs:
 * add a class of methods to compute kernel matrix from basis functions
 * add a dendrogram function
