@@ -15,9 +15,13 @@ Add-Ons:
 + spglib adjustText
 
 One can use the following comments for installing the packages:
+
 pip3 install --upgrade pip
+
 python3 -m pip install --user somepackage
+
 or
+
 pip3 install --user somepackage
 
 In the directory ./asap/ you can find a selection of python tools:
