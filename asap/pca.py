@@ -9,7 +9,7 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 from ase.io import read
 
-def main(fmat, fxyz, ftags, fcolor, prefix, scale, pca_d, pc1, pc2, adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, scale, pca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
@@ -36,7 +36,7 @@ def main(fmat, fxyz, ftags, fcolor, prefix, scale, pca_d, pc1, pc2, adtext):
     # color scheme
     if fcolor != 'none':
         try:
-            plotcolor = np.genfromtxt(fcolor, dtype=float)
+            plotcolor = np.genfromtxt(fcolor, dtype=float)[:,colorscol]
         except:
             try: 
                 frames = read(fxyz,':')
@@ -104,7 +104,8 @@ if __name__ == '__main__':
     parser.add_argument('-fmat', type=str, required=True, help='Location of descriptor matrix file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
-    parser.add_argument('-colors', type=str, default='none', help='Properties for all samples (N floats) used to color the scatter plot')
+    parser.add_argument('-colors', type=str, default='none', help='Location of a file that contains properties for all samples (N floats) used to color the scatter plot')
+    parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
@@ -114,6 +115,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.colors, args.prefix, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
 
 
