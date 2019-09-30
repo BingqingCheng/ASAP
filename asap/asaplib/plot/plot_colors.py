@@ -1,3 +1,56 @@
+import os
+import numpy as np
+from ase.io import read
+
+def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0):
+
+    if (fcolor == None or fcolor == 'Index' or fcolor == 'index'): 
+        # we use the index as the color scheme
+        plotcolor = np.arange(n_samples)
+        fcolor = 'sample index'
+
+    elif os.path.isfile(fcolor):
+        # load the column=colorscol for color functions
+        try:
+            loadcolor = np.genfromtxt(fcolor, dtype=float)
+            if (colorscol > 0): 
+                plotcolor = loadcolor[:,colorscol]
+            else:
+                plotcolor = loadcolor
+            print('load file: '+fcolor+' for color schemes')
+            if (len(plotcolor) != n_samples): 
+                raise ValueError('Length of the vector of properties is not the same as number of samples')
+        except:
+            raise ValueError('Cannot load the '+str(colorscol)+'th column from the file '+fcolor)
+
+    elif os.path.isfile(fxyz):
+        # use the information given in the xyz file
+        try:
+            frames = read(fxyz,':')
+            print('load xyz file: '+fxyz+' for color schemes')
+            if (len(frames) != n_samples): 
+                raise ValueError('Length of the xyz trajectory is not the same as number of samples')
+        except: 
+            raise ValueError('Cannot load the xyz file')
+
+        plotcolor = []
+        try:
+            for frame in frames:
+                if(fcolor == 'volume' or fcolor == 'Volume'):
+                    plotcolor.append(frame.get_volume()/len(frame.get_positions()))
+                else:
+                    plotcolor.append(frame.info[fcolor]/len(frame.get_positions()))
+        except: 
+            raise ValueError('Cannot load the property vector from the xyz file')
+
+    else:
+        raise ValueError('Cannot set the color function')
+
+    colorlabel = 'use '+fcolor+' for coloring the data points'
+
+    return plotcolor, colorlabel
+
+
 class COLOR_PALETTE:
     def __init__(self, style=1):
         if style == 1:

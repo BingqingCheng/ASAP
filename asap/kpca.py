@@ -5,7 +5,7 @@ import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import kpca
-from asaplib.plot import plot_styles
+from asaplib.plot import *
 from asaplib.io import str2bool
 from ase.io import read
 
@@ -29,29 +29,7 @@ def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, kpca_d, pc1, pc2, adtext
     np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     # color scheme
-    if fcolor != 'none':
-        try:
-            plotcolor = np.genfromtxt(fcolor, dtype=float)[:,colorscol]
-        except:
-            try: 
-                frames = read(fxyz,':')
-            except: 
-                raise ValueError('Cannot load the xyz file')
-            plotcolor = []
-            try:
-                for frame in frames:
-                    if(fcolor == 'volume'):
-                        plotcolor.append(frame.get_volume()/len(frame.get_positions()))
-                    else:
-                        plotcolor.append(frame.info[fcolor]/len(frame.get_positions()))
-            except: 
-                raise ValueError('Cannot load the property vector')
-        if (len(plotcolor) != len(proj)): 
-            raise ValueError('Length of the vector of properties is not the same as number of samples')
-        colorlabel = 'use '+fcolor+' for coloring the data points'
-    else: # we use the index as the color scheme
-        plotcolor = np.arange(len(proj))
-        colorlabel = 'index of each data point'
+    plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
 
     # make plot
     plot_styles.set_nice_font()
