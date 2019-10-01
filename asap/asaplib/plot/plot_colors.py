@@ -13,7 +13,8 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0):
         # load the column=colorscol for color functions
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
-            if (colorscol > 0): 
+            print(np.shape(loadcolor))
+            if (colorscol > 0 or np.shape(loadcolor)[1]>0): 
                 plotcolor = loadcolor[:,colorscol]
             else:
                 plotcolor = loadcolor
