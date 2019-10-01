@@ -5,7 +5,7 @@ import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import pca
-from asaplib.plot import plot_styles
+from asaplib.plot import *
 from asaplib.io import str2bool
 from ase.io import read
 

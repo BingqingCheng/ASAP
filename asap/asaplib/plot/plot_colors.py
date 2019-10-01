@@ -4,7 +4,7 @@ from ase.io import read
 
 def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0):
 
-    if (fcolor == None or fcolor == 'Index' or fcolor == 'index'): 
+    if (fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index'): 
         # we use the index as the color scheme
         plotcolor = np.arange(n_samples)
         fcolor = 'sample index'
