@@ -36,7 +36,7 @@ def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, kpca_d, pc1, pc2, adtext
     #fig, ax = plt.subplots()
 
     fig, ax = plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
-                xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
+                xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
                 psize=30,
