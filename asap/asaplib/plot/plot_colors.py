@@ -14,7 +14,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0):
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
             print(np.shape(loadcolor))
-            if (colorscol > 0 or np.shape(loadcolor)[1]>0): 
+            if (colorscol > 0 or len(np.shape(loadcolor))>1): 
                 plotcolor = loadcolor[:,colorscol]
             else:
                 plotcolor = loadcolor
