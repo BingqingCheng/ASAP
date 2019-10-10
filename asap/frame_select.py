@@ -46,9 +46,12 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
         sbs, _ = fps(kNN, nkeep , 0)
 
     # save
-    np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.index', sbs, fmt='%d')
+    selection = np.zeros(nframes, dtype=int)
     for i in sbs:
         write(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.xyz',frames[i], append=True)
+        selection[i] = 1
+    np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.index', selection, fmt='%d')
+    #np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.index', sbs, fmt='%d')
     if fy != 'none':
         np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'-'+fy, np.asarray(y_all)[sbs], fmt='%4.8f')
 
