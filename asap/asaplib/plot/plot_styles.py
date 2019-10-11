@@ -149,7 +149,7 @@ def plot_connectivity_map(X, z, connect,
     z : array-like, shape=[n_samples]
         Density at every point
     connect : array-like, shape=[3, n_samples]. 
-              connectivity information. format for each line = [No.ts, No.min1, No,min2]
+              connectivity information. format for each line = [No.ts, No.min1, No.min2]
 
     """
 
@@ -165,24 +165,36 @@ def plot_connectivity_map(X, z, connect,
     if vmax is None:
         vmax = np.nanmax(z)
     dv = vmax - vmin
+    
+    beta = 8.
+    sizelist = psize*np.exp(-beta*(z-vmin)/dv)
+
+    nummin = np.nanmax(connect[[1,2],:])
+
+    nummin = np.nanmax(connect[[1,2],:])
+    print("number of minima: ", nummin)
 
     if label is not None:
-        axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, label=label, vmax=vmax, vmin=vmin)
+        axscatter = ax.scatter(x[:nummin], y[:nummin], c=z[:nummin], cmap=cmap, s=sizelist[:nummin], alpha=1.0, rasterized=rasterized, label=label, vmax=vmax, vmin=vmin)
+        ax.scatter(x[nummin:], y[nummin:], c=z[nummin:], cmap=cmap, s=sizelist[nummin:], alpha=0.5, rasterized=rasterized, label=label, vmax=vmax, vmin=vmin)
     else:
-        axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, vmax=vmax, vmin=vmin)
+        axscatter = ax.scatter(x[:nummin], y[:nummin], c=z[:nummin], cmap=cmap, s=sizelist[:nummin], alpha=1.0, rasterized=rasterized, vmax=vmax, vmin=vmin)
+        ax.scatter(x[nummin:], y[nummin:], c=z[nummin:], cmap=cmap, s=sizelist[nummin:], alpha=0.5, rasterized=rasterized, vmax=vmax, vmin=vmin)
     
     cb=fig.colorbar(axscatter)
 
     
-    for ts, min1, min2 in connect:
+    for ts, min1, min2 in connect[:]:
         min1 -= 1
         min2 -= 1
         ts -= 1
-        colornow = plt.get_cmap(cmap)((z[ts]+z[min1]+z[min2]-vmin*3.)/dv/3.)
-        ax.plot([x[min1], x[ts], x[min2]],[y[min1], y[ts], y[min2]],'--',c=colornow,alpha=0.5,lw=0.5)
-        ax.scatter(x[ts], y[ts], s=psize, facecolors='white', edgecolors=colornow)
-        #ax.plot(x[ts], y[ts],'o', markerfacecolor='white',markeredgecolor=colornow, markersize=psize)
-
+        barriernow = (z[ts]-vmin)/dv
+        colornow = plt.get_cmap(cmap)(barriernow)
+        lwnow = min(500*np.exp(-beta*barriernow),2)
+        #print(lwnow)
+        #ax.plot([x[min1], x[ts], x[min2]],[y[min1], y[ts], y[min2]],'--',c=colornow,alpha=0.5,lw=0.5)
+        ax.plot([x[min1], x[min2]],[y[min1], y[min2]],'--',c='gray',alpha=1.0-barriernow, lw=lwnow)
+    
     
     if remove_tick:
         ax.tick_params(labelbottom='off', labelleft='off')

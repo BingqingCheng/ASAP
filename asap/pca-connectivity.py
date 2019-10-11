@@ -51,7 +51,7 @@ def main(fmat, fxyz, fconnect, ftags, fcolor, colorscol, prefix, scale, pca_d, p
                 xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
-                psize=15,
+                psize=5000,
                 out_file='PCA_4_'+prefix+'.png', 
                 title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
