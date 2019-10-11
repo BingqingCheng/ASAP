@@ -188,12 +188,11 @@ def plot_connectivity_map(X, z, connect,
         min1 -= 1
         min2 -= 1
         ts -= 1
-        barriernow = (z[ts]-vmin)/dv
+        barriernow = (z[ts]+z[min1]+z[min2]-vmin*3.)/dv/3.
         colornow = plt.get_cmap(cmap)(barriernow)
-        lwnow = min(500*np.exp(-beta*barriernow),2)
-        #print(lwnow)
+        #lwnow = min(500*np.exp(-beta*barriernow),2)
         #ax.plot([x[min1], x[ts], x[min2]],[y[min1], y[ts], y[min2]],'--',c=colornow,alpha=0.5,lw=0.5)
-        ax.plot([x[min1], x[min2]],[y[min1], y[min2]],'--',c='gray',alpha=1.0-barriernow, lw=lwnow)
+        ax.plot([x[min1], x[min2]],[y[min1], y[min2]],'--',c=colornow,alpha=0.5, lw=1.0)
     
     
     if remove_tick:
