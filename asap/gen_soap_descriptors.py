@@ -69,15 +69,13 @@ def main(fxyz, dictxyz, prefix, output, soap_rcut, soap_g, soap_n, soap_l, soap_
     print("the shape of the soap descriptor matrix: ", fshape)
 
     # save
-    if output == 'mat':
+    if output == 'matrix':
         np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".desc",
                fall, fmt='%4.8f')
     elif output == 'xyz':
 
         if nframes > 1:
             for i, frame in enumerate(frames):
-                #frame.new_array('soap_desc', fall[i])
-                #print(frame.info)
                 frame.info['soap_desc'] = fall[i]
                 write(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".xyz",
                  frames[i], append=True)
@@ -97,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('-fdict', type=str, default='none', help='Location of xyz file '
                                                                  'that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [mat])')
+    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')

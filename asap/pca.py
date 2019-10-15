@@ -2,22 +2,61 @@
 
 import numpy as np
 import argparse
+import os
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import pca
 from asaplib.plot import *
 from asaplib.io import str2bool
-from ase.io import read
+from ase.io import read,write
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, scale, pca_d, pc1, pc2, adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1, pc2, adtext):
 
-    # if it has been computed before we can simply load it
-    try:
-        desc = np.genfromtxt(fmat, dtype=float)
-    except:
-        raise ValueError('Cannot load the descriptor matrix')
+    # if a descriptor matrix has been computed before we can simply load it
+    if os.path.isfile(fmat):
+        try:
+            desc = np.genfromtxt(fmat, dtype=float)
+            print("loaded the descriptor matrix from file: ", fmat)
+        except:
+            raise ValueError('Cannot load the descriptor matrix from file')
+    elif fxyz == 'none': raise ValueError('Please supply the xyz file and/or the descriptor matrix')
 
-    print("loaded",fmat)
+    # try to read the xyz file
+    if fxyz != 'none':
+        try:
+            frames = read(fxyz,':')
+            nframes = len(frames)
+            print('load xyz file: ',fxyz, ', a total of ', str(nframes), 'frames')
+        except: 
+            raise ValueError('Cannot load the xyz file')
+
+        # load from xyze file
+        if nframes > 1:
+            desc = []
+            ndesc = 0
+            for i, frame in enumerate(frames):
+                if fmat in frame.info:
+                     try:
+                         desc.append(frame.info[fmat])
+                         if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
+                         ndesc = len(frame.info[fmat])
+                     except:
+                         try: 
+                             desc.append(frame.info['soap_desc'])
+                             if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
+                             ndesc = len(frame.info[fmat])
+                         except:
+                             raise ValueError('Cannot combine the descriptor matrix from the xyz file')
+                else: raise ValueError('Cannot load the descriptor matrix from from frame'+str(i)+' of the xyz file')
+
+            desc = np.asmatrix(desc)
+            desc.reshape((ndesc,nframes))
+
+        else:
+            # only one frame
+            #frames[0].new_array('soap_desc', fall)
+            print(frames[0])
+
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
@@ -31,7 +70,20 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, scale, pca_d, pc1, pc2, a
     proj = pca(desc,pca_d)
 
     # save
-    np.savetxt(prefix+"-pca-d"+str(pca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+    if output == 'matrix':
+        np.savetxt(prefix+"-pca-d"+str(pca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+    elif output == 'xyz':
+        if nframes > 1:
+            for i, frame in enumerate(frames):
+                #frame.new_array('soap_desc', fall[i])
+                #print(frame.info)
+                frame.info['pca_coord'] = proj[i]
+                write(prefix+"-pca-d"+str(pca_d)+".xyz",
+                 frames[i], append=True)
+        else:
+            frames[0].new_array('pca_coord', proj)
+            write(prefix+"-pca-d"+str(pca_d)+".xyz",
+                 frames[0], append=False)
 
     # color scheme
     plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
@@ -79,12 +131,13 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, scale, pca_d, pc1, pc2, a
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True, help='Location of descriptor matrix file. You can use gen_descriptors.py to compute it.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('-colors', type=str, default='none', help='Location of a file that contains properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
+    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
@@ -93,6 +146,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
 
 
