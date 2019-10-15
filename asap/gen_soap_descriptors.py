@@ -3,12 +3,12 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read
+from ase.io import read,write
 from dscribe.descriptors import SOAP
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
+def main(fxyz, dictxyz, prefix, output, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
     """
 
     Generate the SOAP descriptors.
@@ -18,6 +18,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     fxyz: string giving location of xyz file
     dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
+    output: [xyz]: append the SOAP descriptors to extended xyz file; [mat] output as a standlone matrix
     soap_rcut: float giving the cutoff radius, default value is 3.0
     soap_g: float giving the atom width
     soap_n: int giving the maximum radial label
@@ -65,12 +66,28 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     fall = soap_desc.create(frames, n_jobs=8)
 
     fshape = np.shape(fall)
-    print(fshape)
-    #kNN = re.create(fall.reshape((fshape[0], 1, fshape[1])))
+    print("the shape of the soap descriptor matrix: ", fshape)
 
     # save
-    np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".desc",
+    if output == 'mat':
+        np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".desc",
                fall, fmt='%4.8f')
+    elif output == 'xyz':
+
+        if nframes > 1:
+            for i, frame in enumerate(frames):
+                #frame.new_array('soap_desc', fall[i])
+                #print(frame.info)
+                frame.info['soap_desc'] = fall[i]
+                write(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".xyz",
+                 frames[i], append=True)
+        else:
+            frames[0].new_array('soap_desc', fall)
+            write(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".xyz",
+                 frames[0], append=False)
+
+    else:
+        raise ValueError('Cannot find the output format')
 
 
 if __name__ == '__main__':
@@ -80,6 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('-fdict', type=str, default='none', help='Location of xyz file '
                                                                  'that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
+    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [mat])')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
@@ -88,4 +106,4 @@ if __name__ == '__main__':
                         help='Is the system periodic (True/False)?')
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.rcut, args.g, args.n, args.l, args.periodic)
