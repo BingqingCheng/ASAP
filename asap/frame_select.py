@@ -7,7 +7,7 @@ from asaplib.compressor import fps
 import numpy as np
 
 
-def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
+def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
 
     # read frames
     frames = read(fxyz, ':')
@@ -30,6 +30,8 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
                 for frame in frames:
                     if(fy == 'volume' or fy == 'Volume'):
                         y_all.append(frame.get_volume()/len(frame.get_positions()))
+                    elif(fy == 'size' or fy == 'Size'):
+                        y_all.append(len(frame.get_positions()))
                     else:
                         y_all.append(frame.info[fy]/len(frame.get_positions()))
             except: raise ValueError('Cannot load the property vector')
@@ -41,7 +43,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fkmat):
 
     elif algorithm == 'fps' or algorithm == 'FPS':
         try:
-            kNN = np.genfromtxt(fkmat, dtype=float)
+            kNN = np.genfromtxt(fmat, dtype=float)
         except: raise ValueError('Cannot load the kernel matrix')
         sbs, _ = fps(kNN, nkeep , 0)
 
@@ -60,11 +62,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
-    parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats) or tags in ase xyz file')
+    parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats) or name of the tags in ase xyz file')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--n', type=int, default=0, help='number of the representative samples to select')
     parser.add_argument('--algo', type=str, default='random', help='the algotithm for selecting frames ([random], [fps], [sort])')
-    parser.add_argument('-kmat', type=str, required=False, help='Location of kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-mat', type=str, required=False, help='Location of descriptor or kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
     args = parser.parse_args()
 
-    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.kmat)
+    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.mat)
