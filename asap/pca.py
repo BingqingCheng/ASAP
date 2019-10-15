@@ -54,8 +54,11 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
 
         else:
             # only one frame
-            #frames[0].new_array('soap_desc', fall)
-            print(frames[0])
+            try: 
+                desc = frames[0].get_array(fmat)
+            except: 
+                try: frames[0].get_array('soap_desc')
+                except: ValueError('Cannot read the descriptor matrix from single frame')
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -75,15 +78,11 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
     elif output == 'xyz':
         if nframes > 1:
             for i, frame in enumerate(frames):
-                #frame.new_array('soap_desc', fall[i])
-                #print(frame.info)
                 frame.info['pca_coord'] = proj[i]
-                write(prefix+"-pca-d"+str(pca_d)+".xyz",
-                 frames[i], append=True)
+                write(prefix+"-pca-d"+str(pca_d)+".xyz",frames[i], append=True)
         else:
             frames[0].new_array('pca_coord', proj)
-            write(prefix+"-pca-d"+str(pca_d)+".xyz",
-                 frames[0], append=False)
+            write(prefix+"-pca-d"+str(pca_d)+".xyz",frames[0], append=False)
 
     # color scheme
     plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
