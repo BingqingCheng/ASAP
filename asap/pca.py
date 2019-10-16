@@ -5,12 +5,14 @@ import argparse
 import os
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from asaplib.pca import pca
+from asaplib.pca import pca, pca_project
 from asaplib.plot import *
 from asaplib.io import str2bool
 from ase.io import read,write
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1, pc2, adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, scale, pca_d, pc1, pc2, adtext):
+
+    peratom = bool(peratom)
 
     # if a descriptor matrix has been computed before we can simply load it
     if os.path.isfile(fmat):
@@ -67,10 +69,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
     # scale & center
     if (scale):
         from sklearn.preprocessing import StandardScaler
-        desc = StandardScaler().fit_transform(desc) # normalizing the features
+        scaler = StandardScaler()
+        print(scaler.fit(desc))
+        desc = scaler.transform(desc) # normalizing the features
 
     # main thing
-    proj = pca(desc,pca_d)
+    proj, pvec = pca(desc,pca_d)
 
     # save
     if output == 'matrix':
@@ -79,7 +83,20 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
         if nframes > 1:
             for i, frame in enumerate(frames):
                 frame.info['pca_coord'] = proj[i]
-                write(prefix+"-pca-d"+str(pca_d)+".xyz",frames[i], append=True)
+                # !!! this is the bits for per_atom proj
+                if peratom:
+                    try: 
+                        desc_atomic = frame.get_array(fmat)
+                    except: 
+                        try: desc_atomic = frame.get_array('soap_desc')
+                        except: ValueError('Cannot read the descriptor per atom for frame '+str(i))
+                    desc_atomic = scaler.transform(desc_atomic) # normalizing the features
+                    #print(np.shape(desc_atomic),np.shape(pvec))
+                    proj_atomic = pca_project(desc_atomic, pvec)
+                    frame.new_array('pca_coord', proj_atomic)
+                # !!! this is the bits for per_atom proj
+                #print(frame)
+                write(prefix+"-pca-d"+str(pca_d)+".xyz",frame, append=True)
         else:
             frames[0].new_array('pca_coord', proj)
             write(prefix+"-pca-d"+str(pca_d)+".xyz",frames[0], append=False)
@@ -137,6 +154,8 @@ if __name__ == '__main__':
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
+                        help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
@@ -145,6 +164,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom, args.scale, args.d, args.pc1, args.pc2, args.adjusttext)
 
 
