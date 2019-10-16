@@ -8,7 +8,7 @@ from dscribe.descriptors import SOAP
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
+def main(fxyz, dictxyz, prefix, output, verbose, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
     """
 
     Generate the SOAP descriptors.
@@ -27,6 +27,7 @@ def main(fxyz, dictxyz, prefix, output, soap_rcut, soap_g, soap_n, soap_l, soap_
     """
 
     soap_periodic = bool(soap_periodic)
+    verbose = bool(verbose)
     fframes = []
     dictframes = []
 
@@ -73,12 +74,19 @@ def main(fxyz, dictxyz, prefix, output, soap_rcut, soap_g, soap_n, soap_l, soap_
         np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".desc",
                fall, fmt='%4.8f')
     elif output == 'xyz':
-
+        if verbose: # !!!!! this will be changed to avoid the double computation !!!!!!        
+            soap_desc_atomic = SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
+                         sigma=soap_g, crossover=False, average=False, periodic=soap_periodic)
         if nframes > 1:
             for i, frame in enumerate(frames):
                 frame.info['soap_desc'] = fall[i]
+                # will change!!!
+                if verbose:
+                    fnow = soap_desc_atomic.create(frame, n_jobs=8)
+                    frame.new_array('soap_desc', fnow)
+                #  will change
                 write(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".xyz",
-                 frames[i], append=True)
+                 frame, append=True)
         else:
             frames[0].new_array('soap_desc', fall)
             write(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".xyz",
@@ -96,6 +104,8 @@ if __name__ == '__main__':
                                                                  'that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--verbose', type=str2bool, nargs='?', const=True, default=False,
+                        help='Do you want to output per atom descriptors for multiple frames?')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
@@ -104,4 +114,4 @@ if __name__ == '__main__':
                         help='Is the system periodic (True/False)?')
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.rcut, args.g, args.n, args.l, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.verbose, args.rcut, args.g, args.n, args.l, args.periodic)
