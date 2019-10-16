@@ -37,11 +37,5 @@ def pca(desc, ndim=2):
     for i in range(ndim):
         pvec[:,i] *= 1./np.sqrt(eval[i])
     print("Done, super quick. ")
-    return np.dot(C_desc, pvec)
 
-    # eigendecomposition of covariance matrix
-    #values, vectors = salg.eig(V)
-    # project data
-    #proj = np.dot(C_desc.T,np.asmatrix(vectors)[:][0:ndim])
-    #print(np.shape(proj))
-    #return proj.T
+    return np.dot(C_desc, pvec)
