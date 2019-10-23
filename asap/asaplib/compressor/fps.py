@@ -6,27 +6,41 @@ import numpy as np
 
 
 def fps(x, d=0, r=None):
-    if d == 0 : d = len(x)
+    """
+
+    Parameters
+    ----------
+    x
+    d
+    r
+
+    Returns
+    -------
+
+    """
+    if d == 0:
+        d = len(x)
     n = len(x)
     iy = np.zeros(d, int)
     # faster evaluation of Euclidean distance
-    n2 = np.einsum("ai,ai->a",x,x)
+    n2 = np.einsum("ai,ai->a", x, x)
     if r is None:
         iy[0] = np.random.randint(0, n)
     else:
         iy[0] = r
-    dl = n2 + n2[iy[0]] - 2* np.dot(x, x[iy[0]])
+    dl = n2 + n2[iy[0]] - 2 * np.dot(x, x[iy[0]])
     lmin = np.zeros(d)
-    for i in range(1,d):
+    for i in range(1, d):
         iy[i] = np.argmax(dl)
         lmin[i-1] = dl[iy[i]]
-        nd = n2 + n2[iy[i]] - 2*np.dot(x,x[iy[i]])
+        nd = n2 + n2[iy[i]] - 2*np.dot(x, x[iy[i]])
         dl = np.minimum(dl, nd)
     return iy, lmin
 
 
-def fast_fps(x, d=0, r = None):
-    if d == 0 : d = len(x)
+def fast_fps(x, d=0, r=None):
+    if d == 0:
+        d = len(x)
     n = len(x)
     iy = np.zeros(d, int)
     # faster evaluation of Euclidean distance
