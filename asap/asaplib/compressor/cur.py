@@ -26,6 +26,19 @@ def cCURSelOrtho(cov, numSym, costs=1):
 
 def CURSelOrtho(cov, numSym, costs=1):
 
+    """
+
+    Parameters
+    ----------
+    cov
+    numSym
+    costs
+
+    Returns
+    -------
+
+    """
+
     ocov = cov.copy()
     rsel = np.zeros(numSym, int)
 
