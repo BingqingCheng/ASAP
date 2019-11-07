@@ -18,12 +18,9 @@ def pca(desc, ndim=2):
     ndim : number of the principle components to keep
     """
     
-    # calculate the mean of each column
-    M_desc = np.mean(desc.T, axis=1)
-    print("a total of ", np.shape(M_desc), "column")
+    print("a total of ", np.shape(desc), "column")
     # center columns by subtracting column means
-    C_desc = desc - M_desc
-    #print(np.shape(C_desc))
+    C_desc = centering(desc)
 
     # calculate covariance matrix of centered matrix
     V = np.cov(C_desc.T)
@@ -38,4 +35,15 @@ def pca(desc, ndim=2):
         pvec[:,i] *= 1./np.sqrt(eval[i])
     print("Done, super quick. ")
 
-    return np.dot(C_desc, pvec)
+    return pca_project(desc, pvec), pvec 
+
+def pca_project(desc, pvec):
+    return np.dot(desc, pvec)
+
+def centering(desc):
+    
+    # calculate the mean of each column
+    M_desc = np.mean(desc.T, axis=1)
+    # center columns by subtracting column means
+    C_desc = desc - M_desc
+    return C_desc
