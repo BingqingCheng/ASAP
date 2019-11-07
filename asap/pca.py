@@ -30,35 +30,35 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
         except: 
             raise ValueError('Cannot load the xyz file')
 
-        # load from xyze file
-        if nframes > 1:
-            desc = []
-            ndesc = 0
-            for i, frame in enumerate(frames):
-                if fmat in frame.info:
-                     try:
-                         desc.append(frame.info[fmat])
-                         if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
-                         ndesc = len(frame.info[fmat])
-                     except:
-                         try: 
-                             desc.append(frame.info['soap_desc'])
+        if not os.path.isfile(fmat):
+            # load from xyze file
+            if nframes > 1:
+                desc = []
+                ndesc = 0
+                for i, frame in enumerate(frames):
+                    if fmat in frame.info:
+                         try:
+                             desc.append(frame.info[fmat])
                              if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
                              ndesc = len(frame.info[fmat])
                          except:
-                             raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-                else: raise ValueError('Cannot load the descriptor matrix from from frame'+str(i)+' of the xyz file')
+                             try: 
+                                 desc.append(frame.info['soap_desc'])
+                                 if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
+                                 ndesc = len(frame.info[fmat])
+                             except:
+                                 raise ValueError('Cannot combine the descriptor matrix from the xyz file')
+                    else: raise ValueError('Cannot load the descriptor matrix from from frame'+str(i)+' of the xyz file')
 
-            desc = np.asmatrix(desc)
-            desc.reshape((ndesc,nframes))
-
-        else:
-            # only one frame
-            try: 
-                desc = frames[0].get_array(fmat)
-            except: 
-                try: frames[0].get_array('soap_desc')
-                except: ValueError('Cannot read the descriptor matrix from single frame')
+                desc = np.asmatrix(desc)
+                desc.reshape((ndesc,nframes))
+            else:
+                # only one frame
+                try: 
+                    desc = frames[0].get_array(fmat)
+                except: 
+                    try: frames[0].get_array('soap_desc')
+                    except: ValueError('Cannot read the descriptor matrix from single frame')
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -100,7 +100,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, scale, pca_d, pc1
                 title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=False,
+                use_perc=True,
                 rasterized = True,
                 fontsize = 15,
                 vmax = None,
