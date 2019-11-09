@@ -7,7 +7,7 @@ from matplotlib import cm
 from asaplib.pca import kpca
 from asaplib.plot import *
 from asaplib.io import str2bool
-from ase.io import read
+from ase.io import read,write
 
 def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
 
@@ -22,20 +22,29 @@ def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
+    # try to read the xyz file
+    if fxyz != 'none':
+        try:
+            frames = read(fxyz,':')
+            nframes = len(frames)
+            print('load xyz file: ',fxyz, ', a total of ', str(nframes), 'frames')
+        except:
+            raise ValueError('Cannot load the xyz file')
+
     # main thing
     proj = kpca(kNN,kpca_d)
 
     # save
     if output == 'matrix':
-        np.savetxt(prefix+"-kpca-d"+str(pca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+        np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
     elif output == 'xyz':
-        if nframes > 1:
+        if len(frames) > 1:
             for i, frame in enumerate(frames):
                 frame.info['kpca_coord'] = proj[i]
-                write(prefix+"-kpca-d"+str(pca_d)+".xyz",frames[i], append=True)
+                write(prefix+"-kpca-d"+str(kpca_d)+".xyz",frames[i], append=True)
         else:
             frames[0].new_array('kpca_coord', proj)
-            write(prefix+"-kpca-d"+str(pca_d)+".xyz",frames[0], append=False)
+            write(prefix+"-kpca-d"+str(kpca_d)+".xyz",frames[0], append=False)
 
     # color scheme
     plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
