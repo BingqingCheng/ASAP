@@ -32,6 +32,8 @@ In the directory ./asap/ you can find a selection of python tools:
 
 * frame_select.py: select a subset of the xyz frames based on random or farthest point sampling selection.
 
+* pca.py: does principle component analysis in the space of vectors of desciptors, and makes plots.
+
 * kpca.py: does principle component analysis on the kernel matrix and makes plots.
 
 * kernel_density_estimate.py: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
