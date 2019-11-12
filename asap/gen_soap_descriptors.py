@@ -57,6 +57,10 @@ def main(fxyz, dictxyz, prefix, output, peratom, soap_rcut, soap_g, soap_n, soap
     soap_desc_atomic = SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
                          sigma=soap_g, rbf="gto", crossover=False, average=False, periodic=soap_periodic)
 
+    # prepare for the output
+    if os.path.isfile(foutput+".xyz"): os.rename(foutput+".xyz","bck."+foutput+".xyz")
+    if os.path.isfile(foutput+".desc"): os.rename(foutput+".desc","bck."+foutput+".desc")
+
     for i, frame in enumerate(frames):
         fnow = soap_desc_atomic.create(frame, n_jobs=8)
 
@@ -68,7 +72,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, soap_rcut, soap_g, soap_n, soap
             with open(foutput+".desc", "ab") as f:
                 np.savetxt(f, frame.info[desc_name])
         elif output == 'xyz':
-            if os.path.isfile(foutput+".xyz"): os.rename(foutput+".xyz","bck."+foutput+".xyz")
             # output per-atom info
             if peratom:
                 frame.new_array(desc_name, fnow)
