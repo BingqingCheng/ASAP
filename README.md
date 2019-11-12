@@ -10,10 +10,12 @@ python 3
 
 Requirements:
 
-+ numpy scipy scikit-learn ase dscribe
++ numpy scipy scikit-learn ase dscribe 
 
 Add-Ons:
-+ spglib adjustText
++ (for finding symmetries of crystals) spglib 
++ (for annotation without overlaps) adjustText
++ (for clustering) first install python package "easycython", and then go to ./externallib/ and compile DBA by typying "bash compile.sh"
 
 One can use the following comments for installing the packages:
 
@@ -23,13 +25,16 @@ python3 -m pip install --user somepackage    .or.    pip3 install --user somepac
 
 #
 In the directory ./asap/ you can find a selection of python tools:
+
+* gen_soap_descriptors.py: generate soap descriptors for each frame and each atomic environment.
+
 * gen_soap_kmat.py: computes kernel matrix between different structures if multiple frames are provides, or the kernel matrix between atomic environments in a structure if only one frame is the input.
 
 * frame_select.py: select a subset of the xyz frames based on random or farthest point sampling selection.
 
 * kpca.py: does principle component analysis on the kernel matrix and makes plots.
 
-* kernel_density_estimate: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
+* kernel_density_estimate.py: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
 
 * clustering.py: does clustering tasks based on the kernel matrix, does plotting well.
 
