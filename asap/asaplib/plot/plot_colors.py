@@ -4,7 +4,7 @@ from ase.io import read
 
 def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom=False):
 
-    if os.path.isfile(fxyz):
+    if os.path.isfile(fxyz) and not os.path.isfile(fcolor):
         # use the information given in the xyz file
         try:
             frames = read(fxyz,':')
