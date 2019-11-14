@@ -109,7 +109,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             write(prefix+"-pca-d"+str(pca_d)+".xyz",frames[0], append=False)
 
     # color scheme
-    plotcolor, plotcolor_peratom, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
+    if plotatomic:
+        plotcolor, plotcolor_peratom, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
+    else:
+        plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
     # make plot
     plot_styles.set_nice_font()
