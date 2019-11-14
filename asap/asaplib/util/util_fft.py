@@ -112,6 +112,7 @@ def fftcrosscorr(x, y, dlen=10000):
     cxyomega[:, 1] /= (window*2-1)
     return cxyomega
 
+
 def rfftranform(x, dlen=10000):
     # input: a list of real signals {x} with timestep dt
     # output: x(omega)

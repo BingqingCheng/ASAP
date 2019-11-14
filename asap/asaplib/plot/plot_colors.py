@@ -2,6 +2,7 @@
 TODO: Module-level description
 """
 
+
 class COLOR_PALETTE:
     def __init__(self, style=1):
         if style == 1:

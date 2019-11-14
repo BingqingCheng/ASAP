@@ -1,5 +1,5 @@
 """
-I adapt the stuff from:
+I adapted the code from:
 https://github.com/alexandreday/fast_density_clustering.git
 Copyright 2017 Alexandre Day
 """
@@ -176,8 +176,7 @@ class KDE():
 
 
 def round_float(x):
-    """ Rounds a float to it's first significant digit
-    """
+    """ Rounds a float to it's first significant digit"""
     a = list(str(x))
     for i, e in enumerate(a):
         if e != '.':
