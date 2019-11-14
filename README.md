@@ -3,7 +3,7 @@
 </p>
 
 # ASAP 
-Automatic Selection And Prediction tools for crystal structures
+Automatic Selection And Prediction tools for materials and molecules
 
 #
 python 3
