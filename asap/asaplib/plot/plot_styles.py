@@ -48,7 +48,7 @@ def add_subplot_axes(ax,rect, axisbg='w'):
     return subax
 
 
-def plot_density_map(X, z,
+def plot_density_map(X, z, fig=None, ax=None,
                 xlabel=None, ylabel=None, clabel=None, label=None,
                 centers=None,
                 psize=20,
@@ -73,7 +73,7 @@ def plot_density_map(X, z,
     """
 
     # start the plots
-    fig, ax = plt.subplots()
+    if ax == None or fig == None: fig, ax = plt.subplots()
 
     x, y = X[:, 0], X[:, 1]
     z = np.asarray(z) 
@@ -90,7 +90,7 @@ def plot_density_map(X, z,
         #print(z[typical])
         # plot typical
         axscatter = ax.scatter(x[typical], y[typical], c=z[typical],cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized)
-        cb=fig.colorbar(axscatter)
+        if clabel is not None: cb = fig.colorbar(axscatter)
         # plot bot outliers (black !)
         ax.scatter(x[bot_outliers], y[bot_outliers], c='black', s=psize, alpha=1.0, rasterized=rasterized)
         # plot top outliers (yellow !)
@@ -102,7 +102,7 @@ def plot_density_map(X, z,
         else:
             axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, vmax=vmax, vmin=vmin)
     
-        cb=fig.colorbar(axscatter)
+        if clabel is not None: cb = fig.colorbar(axscatter)
     
     if remove_tick:
         ax.tick_params(labelbottom='off', labelleft='off')

@@ -2,6 +2,74 @@
 TODO: Module-level description
 """
 
+import os
+import numpy as np
+from ase.io import read
+
+def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom=False):
+
+    if os.path.isfile(fxyz):
+        # use the information given in the xyz file
+        try:
+            frames = read(fxyz,':')
+            print('load xyz file: '+fxyz+' for color schemes')
+            if (len(frames) != n_samples):
+                raise ValueError('Length of the xyz trajectory is not the same as number of samples')
+        except:
+            raise ValueError('Cannot load the xyz file')
+
+        plotcolor = []
+        plotcolor_atomic = []
+        try:
+            for index, frame in enumerate(frames):
+                natomsnow = len(frame.get_positions())
+                #print(natomsnow)
+                if (fcolor == 'volume' or fcolor == 'Volume'):
+                    use_color_scheme = frame.get_volume()/natomsnow
+                elif (fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index'):
+                    # we use the index as the color scheme
+                    use_color_scheme = index
+                    fcolor = 'index'
+                elif frame.has(fcolor):
+                    use_color_scheme = frame.info[fcolor]/natomsnow
+                else:
+                    raise ValueError('Cannot find the specified property from the xyz file')
+                plotcolor.append(use_color_scheme)
+                if peratom: plotcolor_atomic=np.append(plotcolor_atomic, use_color_scheme*np.ones(natomsnow))
+        except:
+            raise ValueError('Cannot load the property vector from the xyz file')
+
+    elif os.path.isfile(fcolor):
+        # load the column=colorscol for color functions
+        try:
+            loadcolor = np.genfromtxt(fcolor, dtype=float)
+            print(np.shape(loadcolor))
+            if (colorscol > 0 or len(np.shape(loadcolor))>1):
+                plotcolor = loadcolor[:,colorscol]
+            else:
+                plotcolor = loadcolor
+            print('load file: '+fcolor+' for color schemes')
+            if (len(plotcolor) != n_samples):
+                raise ValueError('Length of the vector of properties is not the same as number of samples')
+        except:
+            raise ValueError('Cannot load the '+str(colorscol)+'th column from the file '+fcolor)
+
+    elif fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
+        # we use the index as the color scheme
+        plotcolor = np.arange(n_samples)
+        fcolor = 'sample index'
+
+    else:
+        raise ValueError('Cannot set the color function')
+
+    colorlabel = 'use '+fcolor+' for coloring the data points'
+
+    if peratom:
+        print(np.shape(plotcolor_atomic))
+        return plotcolor, np.asarray( plotcolor_atomic), colorlabel
+    else:
+        return plotcolor, colorlabel
+
 
 class COLOR_PALETTE:
     def __init__(self, style=1):

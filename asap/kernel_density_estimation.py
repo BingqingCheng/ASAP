@@ -8,29 +8,23 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from asaplib.pca import kpca 
 from asaplib.kde import KDE
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
+def main(fkmat, ftags, prefix, dimension, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        kNN = np.genfromtxt(fkmat, dtype=float)
+        proj = np.genfromtxt(fkmat, dtype=float)[:,0:dimension]
     except:
-        raise ValueError('Cannot load the kernel matrix')
+        raise ValueError('Cannot load the coordinates')
     print("loaded", fkmat)
     # load tags if any
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
-
-    # doing a kpca
-    proj = kpca(kNN, kpca_d)
-    # save the low D projection
-    # np.savetxt(prefix+"-kpca-d"+str(kpca_d)+".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
 
     density_model = KDE()        
     # fit density model to data
@@ -53,11 +47,11 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
                 clabel=colorlabel, label=None,
                 centers=None,
                 psize=20,
-                out_file='KPCA_4_'+prefix+'.png', 
-                title='KPCA for: '+prefix, 
-                show=False, cmap='summer',
+                out_file='KDE_4_'+prefix+'.png', 
+                title='KDE for: '+prefix, 
+                show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=False,
+                use_perc=True,
                 rasterized=True,
                 fontsize=15,
                 vmax=plotcolormax,
@@ -86,10 +80,10 @@ def main(fkmat, ftags, prefix, kpca_d, pc1, pc2, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-kmat', type=str, required=True, help='Location of low dimensional coordinate file.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
+    parser.add_argument('--d', type=int, default=10, help='number of the first X dimensions to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
