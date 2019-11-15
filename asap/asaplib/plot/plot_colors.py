@@ -6,14 +6,15 @@ import os
 import numpy as np
 from ase.io import read
 
+
 def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom=False):
 
     if os.path.isfile(fxyz):
         # use the information given in the xyz file
         try:
-            frames = read(fxyz,':')
+            frames = read(fxyz, ':')
             print('load xyz file: '+fxyz+' for color schemes')
-            if (len(frames) != n_samples):
+            if len(frames) != n_samples:
                 raise ValueError('Length of the xyz trajectory is not the same as number of samples')
         except:
             raise ValueError('Cannot load the xyz file')
@@ -24,9 +25,9 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             for index, frame in enumerate(frames):
                 natomsnow = len(frame.get_positions())
                 #print(natomsnow)
-                if (fcolor == 'volume' or fcolor == 'Volume'):
+                if fcolor == 'volume' or fcolor == 'Volume':
                     use_color_scheme = frame.get_volume()/natomsnow
-                elif (fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index'):
+                elif fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
                     # we use the index as the color scheme
                     use_color_scheme = index
                     fcolor = 'index'
@@ -44,7 +45,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
             print(np.shape(loadcolor))
-            if (colorscol > 0 or len(np.shape(loadcolor))>1):
+            if colorscol > 0 or len(np.shape(loadcolor)) > 1:
                 plotcolor = loadcolor[:,colorscol]
             else:
                 plotcolor = loadcolor
