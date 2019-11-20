@@ -11,14 +11,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
+def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
 
     # if it has been computed before we can simply load it
     try:
-        K_all = np.genfromtxt(fkmat, dtype=float)
+        K_all = np.genfromtxt(fmat, dtype=float)
     except:
         raise ValueError('Cannot load the kernel matrix')
-    print("loaded", fkmat)
+    print("loaded", fmat)
     try:
         y_all = np.genfromtxt(fy, dtype=float)
     except:
@@ -127,7 +127,7 @@ def main(fkmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats)')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--test', type=float, default=0.0, help='the test ratio')
@@ -136,6 +136,6 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
     args = parser.parse_args()
 
-    main(args.kmat, args.y, args.prefix, args.test, args.jitter, args.n, args.sigma)
+    main(args.fmat, args.y, args.prefix, args.test, args.jitter, args.n, args.sigma)
 
 
