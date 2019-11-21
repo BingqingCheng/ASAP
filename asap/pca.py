@@ -3,9 +3,12 @@
 TODO: Module-level description
 """
 
-import numpy as np
 import argparse
-import sys,os
+import os
+import sys
+
+import numpy as np
+
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from asaplib.pca import pca, pca_project
@@ -13,7 +16,33 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 from ase.io import read,write
 
+
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, pca_d, pc1, pc2, plotatomic, adtext):
+
+    """
+
+    Parameters
+    ----------
+    fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
+    fxyz: Location of xyz file for reading the properties.
+    ftags: Location of tags for the first M samples. Plot the tags on the PCA map.
+    fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
+    colorscol: The column number of the properties used for the coloring. Starts from 0.
+    prefix: Filename prefix, default is ASAP
+    output: The format for output files ([xyz], [matrix]). Default is matrix
+    peratom: Whether to output per atom pca coordinates (True/False)
+    keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
+    scale: Scale the coordinates (True/False). Scaling highly recommanded.
+    pca_d: Number of the principle components to keep
+    pc1: Plot the projection along which principle axes
+    pc2: Plot the projection along which principle axes
+    plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
+    adtext: Whether to adjust the texts (True/False)
+
+    Returns
+    -------
+
+    """
 
     foutput = prefix+"-pca-d"+str(pca_d)
     peratom = bool(peratom)
@@ -24,20 +53,19 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # if a descriptor matrix has been computed before we can simply load it
 
-
     if output == 'xyz' and fxyz == 'none':
         raise ValueError('Need input xyz in order to output xyz')
 
     # try to read the xyz file
     if fxyz != 'none':
         try:
-            frames = read(fxyz,':')
+            frames = read(fxyz, ':')
             nframes = len(frames)
-            print('load xyz file: ',fxyz, ', a total of ', str(nframes), 'frames')
+            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
         except: 
             raise ValueError('Cannot load the xyz file')
 
-        # load from xyze file
+        # load from xyz file
         if nframes > 1:
             desc = []
             ndesc = 0
@@ -46,13 +74,14 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 if fmat in frame.info:
                      try:
                          desc.append(frame.info[fmat])
-                         if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
+                         if ndesc > 0 and len(frame.info[fmat]) != ndesc:
+                             raise ValueError('mismatch of number of descriptors between frames')
                          ndesc = len(frame.info[fmat])
                      except:
                          raise ValueError('Cannot combine the descriptor matrix from the xyz file')
 
             desc = np.asmatrix(desc)
-            desc.reshape((ndesc,nframes))
+            desc.reshape((ndesc, nframes))
         else:
             # only one frame
             total_natoms = len(frames[0].get_positions())
@@ -66,22 +95,24 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
-    if len(desc)==0: raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
+
+    if len(desc) == 0:
+        raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # scale & center
-    if (scale):
+    if scale:
         from sklearn.preprocessing import StandardScaler
         scaler = StandardScaler()
         print(scaler.fit(desc))
         desc = scaler.transform(desc) # normalizing the features
 
     # main thing
-    proj, pvec = pca(desc,pca_d)
-    proj_atomic_all = np.zeros((total_natoms,pca_d),dtype=float)
+    proj, pvec = pca(desc, pca_d)
+    proj_atomic_all = np.zeros((total_natoms, pca_d), dtype=float)
     print(total_natoms)
 
     # save
@@ -125,7 +156,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
     if plotatomic:
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[:,[pc1,pc2]], plotcolor_peratom, fig, ax,
+        fig, ax = plot_styles.plot_density_map(proj_atomic_all[:, [pc1, pc2]], plotcolor_peratom, fig, ax,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=None, label=None,
                 centers=None,
@@ -135,12 +166,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 show=False, cmap='gnuplot',
                 remove_tick=False,
                 use_perc=False,
-                rasterized = True,
-                fontsize = 15,
-                vmax = None,
-                vmin = None)
+                rasterized=True,
+                fontsize=15,
+                vmax=None,
+                vmin=None)
 
-    fig, ax = plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor, fig, ax,
+    fig, ax = plot_styles.plot_density_map(proj[:, [pc1, pc2]], plotcolor, fig, ax,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
@@ -150,27 +181,27 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 show=False, cmap='gnuplot',
                 remove_tick=False,
                 use_perc=True,
-                rasterized = True,
-                fontsize = 15,
-                vmax = None,
-                vmin = None)
+                rasterized=True,
+                fontsize=15,
+                vmax=None,
+                vmin=None)
 
     fig.set_size_inches(18.5, 10.5)
 
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
+            ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
+            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                          ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if (adtext):
+        if adtext:
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
+            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
-                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
+                  arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
     plt.show()
     fig.savefig('PCA_4_'+prefix+'-c-'+fcolor+'.png')
@@ -197,11 +228,9 @@ if __name__ == '__main__':
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False, help='Plot the PCA coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
 
-    if len(sys.argv)==1:
+    if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom, args.keepraw, args.scale, args.d, args.pc1, args.pc2, args.plotatomic, args.adjusttext)
-
-
