@@ -17,15 +17,15 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
+def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        kNN = np.genfromtxt(fkmat, dtype=float)
+        kNN = np.genfromtxt(fmat, dtype=float)
     except:
         raise ValueError('Cannot load the kernel matrix')
 
-    print("loaded", fkmat)
+    print("loaded", fmat)
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
@@ -89,7 +89,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         if len(plotcolor) != len(kNN):
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
-    [plotcolormin, plotcolormax] = [np.min(plotcolor),np.max(plotcolor)]
+    [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
 
     # make plot
     plot_styles.set_nice_font()
@@ -136,7 +136,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('-colors', type=str, default='cluster', help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
@@ -147,4 +147,4 @@ if __name__ == '__main__':
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
     args = parser.parse_args()
 
-    main(args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
+    main(args.fmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)

@@ -21,7 +21,7 @@ def main(fxyz, prefix, stride):
         frame = frames[s]
         niggli_reduce(frame)
         minimize_tilt(frame, order=range(0, 3), fold_atoms=True)
-        write(prefix+'-'+str(s)+'.xyz', frame)
+        write(prefix+'-'+str(s)+'.res', frame)
 
 
 if __name__ == '__main__':

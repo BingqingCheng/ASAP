@@ -12,16 +12,15 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 from ase.io import read,write
 
-
-def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        kNN = np.genfromtxt(fkmat, dtype=float)
+        kNN = np.genfromtxt(fmat, dtype=float)
     except:
         raise ValueError('Cannot load the kernel matrix')
 
-    print("loaded", fkmat)
+    print("loaded", fmat)
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
@@ -34,6 +33,9 @@ def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2
             print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
         except:
             raise ValueError('Cannot load the xyz file')
+
+    if output == 'xyz' and fxyz == 'none':
+        raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
     proj = kpca(kNN, kpca_d)
@@ -96,13 +98,13 @@ def main(fkmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('-colors', type=str, default='none', help='Location of a file that contains properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
@@ -110,6 +112,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.kmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.d, args.pc1, args.pc2, args.adjusttext)
 
 

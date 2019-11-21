@@ -13,14 +13,14 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fkmat, ftags, prefix, dimension, pc1, pc2, adtext):
+def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        proj = np.genfromtxt(fkmat, dtype=float)[:,0:dimension]
+        proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
     except:
         raise ValueError('Cannot load the coordinates')
-    print("loaded", fkmat)
+    print("loaded", fmat)
     # load tags if any
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -80,7 +80,7 @@ def main(fkmat, ftags, prefix, dimension, pc1, pc2, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-kmat', type=str, required=True, help='Location of low dimensional coordinate file.')
+    parser.add_argument('-fmat', type=str, required=True, help='Location of low dimensional coordinate file.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--d', type=int, default=10, help='number of the first X dimensions to keep')
@@ -89,6 +89,6 @@ if __name__ == '__main__':
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
     args = parser.parse_args()
 
-    main(args.kmat, args.tags, args.prefix, args.d, args.pc1, args.pc2, args.adjusttext)
+    main(args.fmat, args.tags, args.prefix, args.d, args.pc1, args.pc2, args.adjusttext)
 
 
