@@ -1,4 +1,5 @@
 """
+TODO: Module-level desription
 I adapted the code from:
 https://github.com/alexandreday/fast_density_clustering.git
 Copyright 2017 Alexandre Day
@@ -156,7 +157,7 @@ class KDE:
 
         # hmax is the upper bound, however, heuristically it appears to always be way above the actual bandwidth. hmax*0.2 seems much better but still conservative
         h_optimal, score_opt, _, niter = fminbound(self.log_likelihood_test_set, hmin, hmax*0.2, args, maxfun=100, xtol=self.xtol, full_output=True)
-        
+
         print("[kde] Found log-likelihood maximum in %i evaluations, h = %.5f" % (niter, h_optimal))
         
         if self.extreme_dist is False:  # These bounds should always be satisfied ...
