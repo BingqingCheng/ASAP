@@ -25,12 +25,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
 
     if (nkeep == 0): nkeep = nframes
 
-    if algorithm == 'random' or algorithm == 'RANDOM':
-        idx = np.asarray(range(nframes))
-        sbs = np.random.choice(idx, nkeep, replace =False)
-
-    elif algorithm == 'sortmax' or algorithm == 'sortmin':
-        if fy == 'none': raise ValueError('must suply the vector of properties for sorting')
+    if fy != 'none':
         y_all = []
         try:
             y_all = np.genfromtxt(fy, dtype=float)
@@ -46,6 +41,13 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
             except: raise ValueError('Cannot load the property vector')
         if len(y_all) != nframes:
             raise ValueError('Length of the vector of properties is not the same as number of samples')
+
+    if algorithm == 'random' or algorithm == 'RANDOM':
+        idx = np.asarray(range(nframes))
+        sbs = np.random.choice(idx, nkeep, replace =False)
+
+    elif algorithm == 'sortmax' or algorithm == 'sortmin':
+        if fy == 'none': raise ValueError('must suply the vector of properties for sorting')
         
         idx = np.asarray(range(nframes))
         if algorithm == 'sortmax': 
