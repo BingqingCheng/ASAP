@@ -20,6 +20,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     total_natoms = 0
 
     # if a descriptor matrix has been computed before we can simply load it
+<<<<<<< HEAD
     if os.path.isfile(fmat):
         try:
             desc = np.load(fmat) #np.genfromtxt(fmat, dtype=float)
@@ -27,6 +28,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
     elif fxyz == 'none': raise ValueError('Please supply the xyz file and/or the descriptor matrix')
+=======
+
+
+    if output == 'xyz' and fxyz == 'none':
+        raise ValueError('Need input xyz in order to output xyz')
+>>>>>>> 245009b53d38521566ec95f804e01c460bfa3ca7
 
     # try to read the xyz file
     if fxyz != 'none':
@@ -50,7 +57,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                          ndesc = len(frame.info[fmat])
                      except:
                          raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-                else: raise ValueError('Cannot load the descriptor matrix from from frame No. '+str(i)+' of the xyz file')
 
             desc = np.asmatrix(desc)
             desc.reshape((ndesc,nframes))
@@ -60,6 +66,14 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             try: 
                 desc = frames[0].get_array(fmat)
             except: ValueError('Cannot read the descriptor matrix from single frame')
+
+    if os.path.isfile(fmat):
+        try:
+            desc = np.genfromtxt(fmat, dtype=float)
+            print("loaded the descriptor matrix from file: ", fmat)
+        except:
+            raise ValueError('Cannot load the descriptor matrix from file')
+    if len(desc)==0: raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -178,7 +192,7 @@ if __name__ == '__main__':
     parser.add_argument('-colors', type=str, default='none', help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,

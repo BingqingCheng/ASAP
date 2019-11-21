@@ -26,7 +26,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
                     # we use the index as the color scheme
                     use_color_scheme = index
                     fcolor = 'index'
-                elif frame.has(fcolor):
+                elif fcolor in frame.info:
                     use_color_scheme = frame.info[fcolor]/natomsnow
                 else:
                     raise ValueError('Cannot find the specified property from the xyz file')
