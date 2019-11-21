@@ -20,20 +20,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     total_natoms = 0
 
     # if a descriptor matrix has been computed before we can simply load it
-<<<<<<< HEAD
-    if os.path.isfile(fmat):
-        try:
-            desc = np.load(fmat) #np.genfromtxt(fmat, dtype=float)
-            print("loaded the descriptor matrix from file: ", fmat)
-        except:
-            raise ValueError('Cannot load the descriptor matrix from file')
-    elif fxyz == 'none': raise ValueError('Please supply the xyz file and/or the descriptor matrix')
-=======
-
 
     if output == 'xyz' and fxyz == 'none':
         raise ValueError('Need input xyz in order to output xyz')
->>>>>>> 245009b53d38521566ec95f804e01c460bfa3ca7
 
     # try to read the xyz file
     if fxyz != 'none':

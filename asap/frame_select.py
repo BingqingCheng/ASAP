@@ -9,6 +9,15 @@ import numpy as np
 
 def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
 
+    """
+
+    Select frames from the supplied xyz file using one of the algorithm:
+    ----------
+    random: random selection
+    fps: farthest point sampling selection. Need to supply a kermal matrix or descriptor matrix using -fmat
+    sortmin/sortmax: select the frames with the largest/smallest value. Need to supply the vector of properties using -fy
+    """
+
     # read frames
     frames = read(fxyz, ':')
     nframes = len(frames)
@@ -20,7 +29,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
         idx = np.asarray(range(nframes))
         sbs = np.random.choice(idx, nkeep, replace =False)
 
-    elif algorithm == 'sort' or algorithm == 'SORT':
+    elif algorithm == 'sortmax' or algorithm == 'sortmin':
         if fy == 'none': raise ValueError('must suply the vector of properties for sorting')
         y_all = []
         try:
@@ -39,7 +48,10 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         
         idx = np.asarray(range(nframes))
-        sbs = [x for _,x in sorted(zip(y_all,idx))][0:nkeep]
+        if algorithm == 'sortmax': 
+            sbs = [x for _,x in sorted(zip(y_all,idx))][:nkeep]
+        elif algorithm == 'sortmin': 
+            sbs = [x for _,x in sorted(zip(y_all,idx))][nkeep:]
 
     elif algorithm == 'fps' or algorithm == 'FPS':
         try:
@@ -65,8 +77,8 @@ if __name__ == '__main__':
     parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats) or name of the tags in ase xyz file')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--n', type=int, default=0, help='number of the representative samples to select')
-    parser.add_argument('--algo', type=str, default='random', help='the algotithm for selecting frames ([random], [fps], [sort])')
-    parser.add_argument('-mat', type=str, required=False, help='Location of descriptor or kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
+    parser.add_argument('--algo', type=str, default='random', help='the algotithm for selecting frames ([random], [fps], [sortmax], [sortmin])')
+    parser.add_argument('-fmat', type=str, required=False, help='Location of descriptor or kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
     args = parser.parse_args()
 
-    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.mat)
+    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.fmat)
