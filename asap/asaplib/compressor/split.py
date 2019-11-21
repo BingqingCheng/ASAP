@@ -41,6 +41,10 @@ def kernel_random_split(X,y,r=0.05):
 
     X_test = X[:,train_list][test_list]
     y_test = y[test_list]
+
+    if (len(X_test)<1):
+        raise ValueError("No test set selected. Increase sample size and/or test ratio.")
+
     return X_train, X_test, y_train, y_test, train_list, test_list
 
 """

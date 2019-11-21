@@ -22,7 +22,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # if a descriptor matrix has been computed before we can simply load it
     if os.path.isfile(fmat):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.load(fmat) #np.genfromtxt(fmat, dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')

@@ -122,7 +122,7 @@ def main(fkmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
                    ax=ax, precision=0.01,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
-    plt.title('KPCA and clustering for: '+prefix)
+    plt.title('PCA and clustering for: '+prefix)
     plt.xlabel('Princple Axis '+str(pc1))
     plt.ylabel('Princple Axis '+str(pc2))
     plt.show()
@@ -143,6 +143,6 @@ if __name__ == '__main__':
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
     args = parser.parse_args()
 
-    main(args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
+    main(args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.plot, args.adjusttext)
 
 

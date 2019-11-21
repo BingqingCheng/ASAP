@@ -48,7 +48,7 @@ def main(fkmat, ftags, prefix, dimension, pc1, pc2, adtext):
                 title='KDE for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=True,
+                use_perc=False,
                 rasterized=True,
                 fontsize=15,
                 vmax=plotcolormax,
