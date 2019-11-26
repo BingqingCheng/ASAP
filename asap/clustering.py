@@ -55,6 +55,8 @@ def main(fmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
         #do_clustering.fit(dmat)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
+        kNN = np.dot(proj,proj.T)
+        print(np.shape(kNN))
         dmat = kerneltodis(kNN)
         trainer = LAIO_DB(-1,-1) # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
