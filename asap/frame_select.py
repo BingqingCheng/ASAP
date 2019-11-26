@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
-
+import os
 from ase.io import read, write
 from asaplib.compressor import fps
 import numpy as np
@@ -56,10 +56,27 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
             sbs = [x for _,x in sorted(zip(y_all,idx))][nkeep:]
 
     elif algorithm == 'fps' or algorithm == 'FPS':
-        try:
-            kNN = np.genfromtxt(fmat, dtype=float)
-        except: raise ValueError('Cannot load the kernel matrix')
-        sbs, _ = fps(kNN, nkeep , 0)
+        desc = []; ndesc = 0
+        for i, frame in enumerate(frames):
+            if fmat in frame.info:
+                 try:
+                     desc.append(frame.info[fmat])
+                     if ( ndesc > 0 and len(frame.info[fmat]) != ndesc): raise ValueError('mismatch of number of descriptors between frames')
+                     ndesc = len(frame.info[fmat])
+                 except:
+                     raise ValueError('Cannot combine the descriptor matrix from the xyz file')
+        if (np.shape(desc)[1] != nframes):
+            desc = np.asmatrix(desc)
+            #print(np.shape(desc))
+            desc.reshape((ndesc, nframes))
+
+        if os.path.isfile(fmat):
+            try:
+                desc = np.genfromtxt(fmat, dtype=float)
+            except: raise ValueError('Cannot load the kernel matrix')
+        print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
+        sbs, dmax_remain = fps(desc, nkeep , 0)
+        np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.error', dmax_remain, fmt='%4.8f', header='the maximum remaining distance in FPS')
 
     # save
     selection = np.zeros(nframes, dtype=int)
