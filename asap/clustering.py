@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from asaplib.pca import kpca
+from asaplib.pca import pca
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import get_cluster_size, get_cluster_properties
@@ -13,25 +13,28 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
+def main(fmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        kNN = np.genfromtxt(fmat, dtype=float)
+        proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
     except:
-        raise ValueError('Cannot load the kernel matrix')
+        raise ValueError('Cannot load the coordinates')
 
-    print("loaded",fmat)
+    print("loaded",fmat, "with shape", np.shape(proj))
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # do a low dimensional projection of the kernel matrix
-    proj = kpca(kNN, kpca_d)
+    #proj = pca(kNN, kpca_d)
 
     density_model = KDE()        
     # fit density model to data
-    density_model.fit(proj)
+    try:
+        density_model.fit(proj)
+    except:
+        raise RuntimeError('KDE did not work. Try smaller d.')  
     # the charecteristic bandwidth of the data        
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
@@ -94,7 +97,7 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
                       clabel=colorlabel, title=None, 
                       w_size=True, w_label=True,
                       circle_size=20, alpha=0.5, edgecolors=None,
-                      cmap='summer', vmax=None,vmin=None, psize=20,
+                      cmap='gnuplot', vmax=None,vmin=None, psize=20,
                       show=False, savefile=None, fontsize =15,
                       figsize=None,rasterized=True, remove_tick=True,
                       dpi=200, outlier=True)
