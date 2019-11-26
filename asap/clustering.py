@@ -45,7 +45,7 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
     # now we do the clustering
     if algorithm == 'dbscan' or algorithm == 'DBSCAN':
         ''' option 1: do on the projected coordinates'''
-        trainer = sklearn_DB(sigma_kij, 5, 'euclidean') # adjust the parameters here!
+        trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(proj)
 
@@ -60,7 +60,8 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(dmat, rho)
-    else: raise ValueError('Please select from fdb or dbscan')
+    else:
+        raise ValueError('Please select from fdb or dbscan')
 
     print(do_clustering.pack())
     labels_db = do_clustering.get_cluster_labels()

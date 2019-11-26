@@ -1,12 +1,12 @@
-import numpy as np
-import scipy.linalg as salg
-
 """
 tools for doing PCA
 e.g.
 eva = np.genfromtxt(prefix+".desc")
 proj = pca(eva,6)
 """
+
+import numpy as np
+import scipy.linalg as salg
 
 
 def pca(desc, ndim=2):
@@ -27,8 +27,9 @@ def pca(desc, ndim=2):
     print("computing covariance matrix with shape:", np.shape(V))
 
     print("  And now we build a projection ")
-    eval, evec = salg.eigh(V ,eigvals=(len(V)-ndim,len(V)-1) )
-    eval=np.flipud(eval); evec=np.fliplr(evec)
+    eval, evec = salg.eigh(V, eigvals=(len(V)-ndim, len(V)-1))
+    eval = np.flipud(eval)
+    evec = np.fliplr(evec)
 
     pvec = evec.copy()
     for i in range(ndim):
@@ -37,8 +38,10 @@ def pca(desc, ndim=2):
 
     return pca_project(desc, pvec), pvec 
 
+
 def pca_project(desc, pvec):
     return np.dot(desc, pvec)
+
 
 def centering(desc):
     

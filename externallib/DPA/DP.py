@@ -10,7 +10,7 @@ from sklearn.neighbors import NearestNeighbors
 
 class Density_Peaks_clustering:
     """
-
+    Clustering by fast search and find of density peaks, Rodriguez and Laio (2014).
     """
     def __init__(self, distances=None, indices=None, dens_type="eps", dc=None, percent=2.0):
 
@@ -21,8 +21,10 @@ class Density_Peaks_clustering:
         distances
         indices
         dens_type
-        dc: The cutoff distance
-        percent
+        dc: The cutoff distance beyond which data points don't contribute to the local density computation of another
+        datapoint.
+        percent: Criterion for choosing dc, typically chosen such that the average number of neighbours is 1-2% of the
+        total number of points in the dataset.
         """
 
         self.distances = distances
@@ -42,7 +44,21 @@ class Density_Peaks_clustering:
 
     def get_dc(self, data):
 
-        Nele = data.shape[0]
+        """
+        Compute the cutoff distance given the data.
+
+        Parameters
+        ----------
+        data: The dataset
+
+        Returns
+        -------
+
+        self.dc, the cutoff distance
+
+        """
+
+        Nele = data.shape[0]  # The number of data points
         n_neigh = int(self.percent/100.*Nele)
         n_neigh_comp = int(4.*self.percent/100.*Nele)
         neigh = NearestNeighbors(n_neighbors=n_neigh_comp).fit(data)
@@ -73,29 +89,29 @@ class Density_Peaks_clustering:
         if self.dc == None:
             self.get_dc(data)
         else:
-            n_neigh=int(self.percent/100.*Nele)
-            n_neigh_comp=int(10.*self.percent/100.*Nele)
+            n_neigh = int(self.percent/100.*Nele)
+            n_neigh_comp = int(10.*self.percent/100.*Nele)
             neigh = NearestNeighbors(n_neighbors=n_neigh_comp).fit(data)
             self.distances, self.indices = neigh.kneighbors(data)
-            if self.dc>np.min(self.distances[:, n_neigh_comp - 1]):
-                print("dc too big for being included within the",10.*self.percent,"%  of data, consider use a small dc or augment the percent parameter")
+            if self.dc > np.min(self.distances[:, n_neigh_comp - 1]):
+                print("dc too big for being included within the", 10.*self.percent, "%  of data, consider use a small dc or augment the percent parameter")
 
         for i in range(Nele):
             a = self.distances[i, :]
             self.dens[i] = len(a[(a <= self.dc)])
         if self.dens_type == 'exp':
             for i in range(Nele):
-                a=self.distances[i, :]/self.dc
+                a = self.distances[i, :]/self.dc
                 self.dens[i] = np.sum(np.exp(-a**2))
-        self.delta=np.zeros(data.shape[0])
-        self.ref=np.zeros(data.shape[0], dtype='int')
+        self.delta = np.zeros(data.shape[0])
+        self.ref = np.zeros(data.shape[0], dtype='int')
         tt = np.arange(data.shape[0])
         imax = []
         for i in range(data.shape[0]):
             ll = tt[((self.dens > self.dens[i]) & (tt != i))]
             dd = data[((self.dens > self.dens[i]) & (tt != i))]
             if dd.shape[0] > 0:
-                ds=np.transpose(sp.spatial.distance.cdist([np.transpose(data[i, :])], dd))
+                ds = np.transpose(sp.spatial.distance.cdist([np.transpose(data[i, :])], dd))
                 j = np.argmin(ds)
                 self.ref[i] = ll[j]
                 self.delta[i] = ds[j]
@@ -107,12 +123,12 @@ class Density_Peaks_clustering:
     def get_assignation(self, data):
         ordered = np.argsort(-self.dens)
         self.cluster = np.zeros(data.shape[0], dtype='int')
-        tt=np.arange(data.shape[0])
+        tt = np.arange(data.shape[0])
         center_label = np.zeros(data.shape[0], dtype='int')
         ncluster = -1
         for i in range(data.shape[0]):
             j = ordered[i]
-            if (self.dens[j]>self.dens_cut) & (self.delta[j] > self.delta_cut):
+            if (self.dens[j] > self.dens_cut) & (self.delta[j] > self.delta_cut):
                 ncluster = ncluster + 1
                 self.cluster[j] = ncluster
                 center_label[j] = ncluster
