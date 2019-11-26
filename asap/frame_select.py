@@ -65,10 +65,10 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
                      ndesc = len(frame.info[fmat])
                  except:
                      raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-        if (np.shape(desc)[1] != nframes):
-            desc = np.asmatrix(desc)
+        #if (np.shape(desc)[1] != nframes):
+            #desc = np.asmatrix(desc)
             #print(np.shape(desc))
-            desc.reshape((ndesc, nframes))
+            #desc.reshape((ndesc, nframes))
 
         if os.path.isfile(fmat):
             try:
