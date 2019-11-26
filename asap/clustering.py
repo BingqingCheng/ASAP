@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import numpy as np
-import argparse
+import sys, argparse
 import matplotlib.pyplot as plt
 from matplotlib import cm
-from asaplib.pca import pca
+from asaplib.pca import kpca
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import get_cluster_size, get_cluster_properties
@@ -13,21 +13,32 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
+def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
-    # if it has been computed before we can simply load it
-    try:
-        proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
-    except:
-        raise ValueError('Cannot load the coordinates')
+    if fmat == 'none' and kmat == 'none':
+        raise ValueError('Must provide either the kernal matrix or the low D coordinates')
 
-    print("loaded",fmat, "with shape", np.shape(proj))
+    if fmat != 'none':
+        try:
+            proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
+        except:
+            raise ValueError('Cannot load the coordinates')
+        print("loaded coordinates ", fmat, "with shape", np.shape(proj))
+
+    if kmat != 'none':
+        try:
+            kNN = np.genfromtxt(kmat, dtype=float)
+        except:
+            raise ValueError('Cannot load the coordinates')
+        print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
+
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # do a low dimensional projection of the kernel matrix
-    #proj = pca(kNN, kpca_d)
+    if kmat != 'none':
+        proj = kpca(kNN, dimension)
 
     density_model = KDE()        
     # fit density model to data
@@ -55,8 +66,9 @@ def main(fmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
         #do_clustering.fit(dmat)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
-        kNN = np.dot(proj,proj.T)
-        print(np.shape(kNN))
+        if kmat == 'none': 
+            kNN = np.dot(proj, proj.T)
+            print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
         trainer = LAIO_DB(-1,-1) # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
@@ -137,7 +149,8 @@ def main(fmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, default='none', help='Location of the low D projection of the data.')
+    parser.add_argument('-kmat', type=str, default='none', help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('-colors', type=str, default='cluster', help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
@@ -146,7 +159,11 @@ if __name__ == '__main__':
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--algo', type=str, default='fdb', help='the algotithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
+
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
+    main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
 

@@ -13,4 +13,4 @@ kpca.py -fmat H2O-n4-l6-c4.0-g0.3.kmat -fxyz dataset_1593_eVAng.xyz --prefix H2O
 ../../asap/kernel_density_estimation.py -fmat H2O-kpca-d10.coord --pc1 0 --pc2 1 --d 6
 
 * step 4
-../../asap/clustering.py -fmat H2O-n4-l6-c4.0-g0.3.kmat
+../../asap/clustering.py -kmat H2O-n4-l6-c4.0-g0.3.kmat
