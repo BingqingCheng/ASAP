@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Module implementing the "Fast Search and Find of Density Peaks" clustering algorithm of Rodriguez and Laio (2014).
 """
 
 import numpy as np

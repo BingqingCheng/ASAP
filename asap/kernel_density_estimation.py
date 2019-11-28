@@ -8,6 +8,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
+
 from asaplib.kde import KDE
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
@@ -17,7 +18,7 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
 
     # if it has been computed before we can simply load it
     try:
-        proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
+        proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
     except:
         raise ValueError('Cannot load the coordinates')
     print("loaded", fmat)
@@ -31,7 +32,7 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
     try:
         density_model.fit(proj)
     except:
-        raise RuntimeError('KDE did not work. Try smaller d.')   
+        raise RuntimeError('KDE did not work. Try smaller dimension.')
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     # save the density
