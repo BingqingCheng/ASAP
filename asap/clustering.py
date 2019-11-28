@@ -51,8 +51,8 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     try:
         density_model.fit(proj)
     except:
-        raise RuntimeError('KDE did not work. Try smaller d.')
-    # the charecteristic bandwidth of the data
+        raise RuntimeError('KDE did not work. Try smaller dimension.')
+    # the characteristic bandwidth of the data
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     meanrho = np.mean(rho)
