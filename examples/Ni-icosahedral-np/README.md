@@ -10,7 +10,7 @@ It is assumed that you are in the ASAP/examples/Ni-icosahedral-np directory.
 ../../asap/kpca.py -fmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa --d 10 --pc1 0 --pc2 1
 
 * step 2.2
-../../asap/kernel_density_estimation.py -fmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa --pc1 0 --pc2 1
+../../asap/kernel_density_estimation.py -fmat Ni-icosa-kpca-d10.coord --prefix Ni-icosa --pc1 0 --pc2 1
 
 * step 3
 ../../asap/clustering.py -kmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa
