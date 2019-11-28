@@ -22,7 +22,7 @@ from asaplib.io import str2bool
 def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
     if fmat == 'none' and kmat == 'none':
-        raise ValueError('Must provide either the kernal matrix or the low D coordinates')
+        raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
     if fmat != 'none':
         try:
@@ -33,7 +33,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
 
     if kmat != 'none':
         try:
-            kNN = np.genfromtxt(kmat, dtype=float)
+            kNN = np.genfromtxt(kmat, dtype=float)  # This is a kernel matrix?
         except:
             raise ValueError('Cannot load the coordinates')
         print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
