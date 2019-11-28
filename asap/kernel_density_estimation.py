@@ -16,6 +16,23 @@ from asaplib.io import str2bool
 
 def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
 
+    """
+
+    Parameters
+    ----------
+    fmat: Location of low-dimensional coordinate file.
+    ftags: Location of tags for the first M samples.
+    prefix: Filename prefix.
+    dimension: Number of the first X dimensions to keep
+    pc1: First principle axis (int)
+    pc2: Second principle axis (int)
+    adtext: Boolean giving whether to adjust text or not.
+
+    Returns
+    -------
+
+    """
+
     # if it has been computed before we can simply load it
     try:
         proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
@@ -41,12 +58,12 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
     # color scheme
     plotcolor = rho
     colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
-    [plotcolormin, plotcolormax] = [np.min(plotcolor),np.max(plotcolor)]
+    [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
 
     # make plot
     plot_styles.set_nice_font()
     # density plot
-    fig, ax = plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
+    fig, ax = plot_styles.plot_density_map(proj[:, [pc1,pc2]], plotcolor,
                 xlabel='Princple Axis '+str(pc1), ylabel='Princple Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
@@ -65,17 +82,17 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i, pc2],marker='^',c='black')
+            ax.scatter(proj[i,pc1],proj[i, pc2], marker='^',c='black')
             texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                          ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if (adtext):
+        if adtext:
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
-                    expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                   force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                   ax=ax, precision=0.01,
-                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
+            adjust_text(texts,on_basemap=True,  # only_move={'points':'', 'text':'x'},
+                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
+                        ax=ax, precision=0.01,
+                        arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
 
     plt.show()
     fig.savefig('kde_4_'+prefix+'.png')
