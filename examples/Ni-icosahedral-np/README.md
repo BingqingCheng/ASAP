@@ -13,4 +13,4 @@ It is assumed that you are in the ASAP/examples/Ni-icosahedral-np directory.
 ../../asap/kernel_density_estimation.py -fmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa --pc1 0 --pc2 1
 
 * step 3
-../../asap/clustering.py -fmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa
+../../asap/clustering.py -kmat Ni-icosa-n6-l6-c4.0-g0.5.kmat --prefix Ni-icosa

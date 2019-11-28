@@ -51,8 +51,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     adtext = bool(adtext)
     total_natoms = 0
 
-    # if a descriptor matrix has been computed before we can simply load it
-
     if output == 'xyz' and fxyz == 'none':
         raise ValueError('Need input xyz in order to output xyz')
 
@@ -65,10 +63,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         except: 
             raise ValueError('Cannot load the xyz file')
 
+        desc = []
+        ndesc = 0
         # load from xyz file
         if nframes > 1:
-            desc = []
-            ndesc = 0
             for i, frame in enumerate(frames):
                 total_natoms += len(frame.get_positions())
                 if fmat in frame.info:
@@ -79,25 +77,26 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                          ndesc = len(frame.info[fmat])
                      except:
                          raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-
-            desc = np.asmatrix(desc)
-            desc.reshape((ndesc, nframes))
+            if np.shape(desc)[1] != nframes:
+                desc = np.asmatrix(desc)
+                #print(np.shape(desc))
+                desc.reshape((ndesc, nframes))
         else:
             # only one frame
             total_natoms = len(frames[0].get_positions())
             try: 
                 desc = frames[0].get_array(fmat)
             except: ValueError('Cannot read the descriptor matrix from single frame')
-
+    # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
             desc = np.genfromtxt(fmat, dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
-
     if len(desc) == 0:
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
+    print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -113,7 +112,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # main thing
     proj, pvec = pca(desc, pca_d)
     proj_atomic_all = np.zeros((total_natoms, pca_d), dtype=float)
-    print(total_natoms)
+    #print(total_natoms)
 
     # save
     if output == 'matrix':

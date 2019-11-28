@@ -28,7 +28,10 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
 
     density_model = KDE()        
     # fit density model to data
-    density_model.fit(proj)        
+    try:
+        density_model.fit(proj)
+    except:
+        raise RuntimeError('KDE did not work. Try smaller d.')   
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     # save the density
@@ -51,7 +54,7 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
                 title='KDE for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=True,
+                use_perc=False,
                 rasterized=True,
                 fontsize=15,
                 vmax=plotcolormax,

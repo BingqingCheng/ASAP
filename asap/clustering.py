@@ -4,10 +4,12 @@ TODO: Module-level description
 """
 
 import argparse
+import sys
 
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import numpy as np
+
 from asaplib.pca import kpca
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
@@ -17,26 +19,40 @@ from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
+def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
-    # if it has been computed before we can simply load it
-    try:
-        kNN = np.genfromtxt(fmat, dtype=float)
-    except:
-        raise ValueError('Cannot load the kernel matrix')
+    if fmat == 'none' and kmat == 'none':
+        raise ValueError('Must provide either the kernal matrix or the low D coordinates')
 
-    print("loaded", fmat)
+    if fmat != 'none':
+        try:
+            proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
+        except:
+            raise ValueError('Cannot load the coordinates')
+        print("loaded coordinates ", fmat, "with shape", np.shape(proj))
+
+    if kmat != 'none':
+        try:
+            kNN = np.genfromtxt(kmat, dtype=float)
+        except:
+            raise ValueError('Cannot load the coordinates')
+        print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
+
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
     # do a low dimensional projection of the kernel matrix
-    proj = kpca(kNN, kpca_d)
+    if kmat != 'none':
+        proj = kpca(kNN, dimension)
 
     density_model = KDE()        
     # fit density model to data
-    density_model.fit(proj)
-    # the characteristic bandwidth of the data
+    try:
+        density_model.fit(proj)
+    except:
+        raise RuntimeError('KDE did not work. Try smaller d.')
+    # the charecteristic bandwidth of the data
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     meanrho = np.mean(rho)
@@ -56,6 +72,9 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
         #do_clustering.fit(dmat)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
+        if kmat == 'none':
+            kNN = np.dot(proj, proj.T)
+            print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
         trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
@@ -99,7 +118,7 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
                       clabel=colorlabel, title=None, 
                       w_size=True, w_label=True,
                       circle_size=20, alpha=0.5, edgecolors=None,
-                      cmap='summer', vmax=None,vmin=None, psize=20,
+                      cmap='gnuplot', vmax=None,vmin=None, psize=20,
                       show=False, savefile=None, fontsize =15,
                       figsize=None,rasterized=True, remove_tick=True,
                       dpi=200, outlier=True)
@@ -127,7 +146,7 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
                    ax=ax, precision=0.01,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
-    plt.title('KPCA and clustering for: '+prefix)
+    plt.title('PCA and clustering for: '+prefix)
     plt.xlabel('Princple Axis '+str(pc1))
     plt.ylabel('Princple Axis '+str(pc2))
     plt.show()
@@ -137,15 +156,21 @@ def main(fmat, ftags, prefix, fcolor, kpca_d, pc1, pc2, algorithm, adtext):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', type=str, default='none', help='Location of the low D projection of the data.')
+    parser.add_argument('-kmat', type=str, default='none', help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('-colors', type=str, default='cluster', help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
-    parser.add_argument('--algo', type=str, default='fdb', help='the algotithm for density-based clustering ([dbscan], [fdb])')
+    parser.add_argument('--algo', type=str, default='fdb', help='the algorithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
+
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
+    main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
+

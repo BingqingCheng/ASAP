@@ -12,5 +12,5 @@ we use asap tools to do some analysis and clustering tasks
 ../../asap/kernel_density_estimation.py -fmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2
 
 * step 3
-../../asap/clustering.py -fmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2
+../../asap/clustering.py -kmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2
 
