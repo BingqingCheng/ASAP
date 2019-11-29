@@ -116,6 +116,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     else:
         plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
+    print(np.shape(plotcolor),np.shape(plotcolor_peratom))
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
@@ -180,7 +181,7 @@ if __name__ == '__main__':
     parser.add_argument('-colors', type=str, default='none', help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,
