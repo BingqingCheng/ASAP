@@ -32,11 +32,11 @@ def main(fmat, ftags, prefix, dimension, pc1, pc2, adtext):
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     # save the density
-    np.savetxt(prefix+"-kde.dat", np.transpose([np.arange(len(rho)), rho]), header='index kernel_density_estimation', fmt='%d %4.8f')
+    np.savetxt(prefix+"-kde.dat", np.transpose([np.arange(len(rho)), rho]), header='index log_of_kernel_density_estimation', fmt='%d %4.8f')
 
     # color scheme
     plotcolor = rho
-    colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
+    colorlabel = 'Log of densities for every point (bandwith $\sigma(k_{ij})$ ='+"{:4.0e}".format(sigma_kij)+' )'
     [plotcolormin, plotcolormax] = [np.min(plotcolor),np.max(plotcolor)]
 
     # make plot
