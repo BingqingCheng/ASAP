@@ -116,7 +116,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     else:
         plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
-    print(np.shape(plotcolor),np.shape(plotcolor_peratom))
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
