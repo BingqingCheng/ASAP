@@ -54,6 +54,17 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             print('load file: '+fcolor+' for color schemes')
             if (len(plotcolor) != n_samples): 
                 raise ValueError('Length of the vector of properties is not the same as number of samples')
+
+            if peratom: 
+                plotcolor_atomic = []
+                try:
+                    frames = read(fxyz,':')
+                    print('load xyz file: '+fxyz+' so that we know the number of atoms in each frame')
+                except:
+                    raise ValueError('Cannot load the xyz file')
+                for index,frame in enumerate(frames):
+                    natomsnow = len(frame.get_positions())
+                    plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index]*np.ones(natomsnow))
         except:
             raise ValueError('Cannot load the '+str(colorscol)+'th column from the file '+fcolor)
 
@@ -69,7 +80,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
 
     if peratom:
         print(np.shape(plotcolor_atomic))
-        return plotcolor, np.asarray( plotcolor_atomic), colorlabel
+        return plotcolor, np.asarray(plotcolor_atomic), colorlabel
     else:
         return plotcolor, colorlabel
 
