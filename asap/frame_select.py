@@ -11,7 +11,8 @@ from asaplib.compressor import fps
 import numpy as np
 
 
-def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
+def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
+
     """
     Select frames from the supplied xyz file (fxyz) using one of the following algorithms:
 
@@ -29,10 +30,8 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
     algorithm: 'the algorithm for selecting frames ([random], [fps], [sort])')
     fmat: Location of descriptor or kernel matrix file. Needed if you select [fps].
     You can use gen_kmat.py to compute it.
-
-    Returns
-    -------
-
+    reweight: select samples according to the re-weighted distribution exp(-f/\lambda),
+              where exp(-f) is the kernel density estimation of the original samples.
     """
 
     # read frames
@@ -70,10 +69,10 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
             raise ValueError('must supply the vector of properties for sorting')
 
         idx = np.asarray(range(nframes))
-        if algorithm == 'sortmax':
-            sbs = [x for _, x in sorted(zip(y_all, idx))][:nkeep]
-        elif algorithm == 'sortmin':
-            sbs = [x for _, x in sorted(zip(y_all, idx))][nkeep:]
+        if algorithm == 'sortmax': 
+            sbs = [x for _,x in sorted(zip(y_all,idx))][:nkeep]
+        elif algorithm == 'sortmin': 
+            sbs = [x for _,x in sorted(zip(y_all,idx))][nkeep:]
 
     elif algorithm == 'fps' or algorithm == 'FPS':
         desc = []
@@ -100,6 +99,26 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat):
         sbs, dmax_remain = fps(desc, nkeep , 0)
         np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.error', dmax_remain, fmt='%4.8f', header='the maximum remaining distance in FPS')
 
+    elif algorithm == 'reweight':
+        if os.path.isfile(fkde):
+            try:
+                logkde = np.genfromtxt(fkde, dtype=float)[:,1]
+            except: raise IOError('Cannot load the (log of) kernel density for each sample')
+            if len(logkde) != nframes: raise ValueError('mismatch of number of frames and kernel densities')
+        else: raise ValueError('must suply the (log of) kernel density for each sample')
+
+        new_kde = np.zeros(nframes)
+        for i in range(nframes):
+            new_kde[i] = np.exp(logkde[i]/reweight_lambda) / np.exp(logkde[i])
+        # compute the normalization factor so we expect to select n samples in the end
+        normalization = nkeep / np.sum(new_kde)
+        new_kde *= normalization
+        sbs = []
+        randomchoice =  np.random.rand(nframes)
+        for i in range(nframes):
+            if randomchoice[i] < new_kde[i]:
+                sbs.append(i)
+        algorithm = algorithm + "-lambda-"+str(reweight_lambda)
     # save
     selection = np.zeros(nframes, dtype=int)
     for i in sbs:
@@ -118,8 +137,10 @@ if __name__ == '__main__':
     parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats) or name of the tags in ase xyz file')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--n', type=int, default=0, help='number of the representative samples to select')
-    parser.add_argument('--algo', type=str, default='random', help='the algorithm for selecting frames ([random], [fps], [sortmax], [sortmin])')
+    parser.add_argument('--algo', type=str, default='random', help='the algorithm for selecting frames ([random], [fps], [sortmax], [sortmin],[reweight])')
     parser.add_argument('-fmat', type=str, required=False, help='Location of descriptor or kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fkde', type=str, required=False, help='Location of the (log of) kernel density for each sample. Needed if you select [reweight]. You can use kernel_density_estimation.py to compute it.')
+    parser.add_argument('--reweight_lambda', type=float, default=1, help='select samples according to the re-weighted distribution exp(-\lambda*f)')
     args = parser.parse_args()
 
-    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.fmat)
+    main(args.fxyz, args.y, args.prefix, args.n, args.algo, args.fmat, args.fkde, args.reweight_lambda)

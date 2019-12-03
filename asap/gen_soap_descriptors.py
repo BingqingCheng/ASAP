@@ -70,7 +70,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, soap_rcut, soap_g, soap_n, soap
         # save
         if output == 'matrix':
             with open(foutput+".desc", "ab") as f:
-                np.savetxt(f, frame.info[desc_name])
+                np.savetxt(f, frame.info[desc_name][None])
         elif output == 'xyz':
             # output per-atom info
             if peratom:
