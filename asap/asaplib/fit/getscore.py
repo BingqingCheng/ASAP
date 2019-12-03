@@ -1,8 +1,23 @@
+"""
+TODO: Module-level description
+"""
+
 import numpy as np
 from scipy.stats import spearmanr
 
 
 def get_r2(y_pred, y_true):
+    """
+
+    Parameters
+    ----------
+    y_pred
+    y_true
+
+    Returns
+    -------
+
+    """
     weight = 1
     sample_weight = None
     numerator = (weight * (y_true - y_pred) ** 2).sum(axis=0, dtype=np.float64)
@@ -13,20 +28,65 @@ def get_r2(y_pred, y_true):
 
 
 def get_mae(ypred, y):
+    """
+
+    Parameters
+    ----------
+    ypred
+    y
+
+    Returns
+    -------
+
+    """
     return np.mean(np.abs(ypred-y))
 
 
 def get_rmse(ypred, y):
+    """
+
+    Parameters
+    ----------
+    ypred
+    y
+
+    Returns
+    -------
+
+    """
     return np.sqrt(np.mean((ypred-y)**2))
 
 
 def get_sup(ypred, y):
+    """
+
+    Parameters
+    ----------
+    ypred
+    y
+
+    Returns
+    -------
+
+    """
     return np.amax(np.abs((ypred-y)))
 
 
 def get_spearman(ypred, y):
-    corr,_ = spearmanr(ypred, y)
+    """
+
+    Parameters
+    ----------
+    ypred
+    y
+
+    Returns
+    -------
+
+    """
+    corr, _ = spearmanr(ypred, y)
     return corr
+
 
 score_func = dict(
     MAE=get_mae,
@@ -39,6 +99,6 @@ score_func = dict(
 
 def get_score(ypred, y):
     scores = {}
-    for k,func in score_func.items():
+    for k, func in score_func.items():
         scores[k] = func(ypred, y)
     return scores

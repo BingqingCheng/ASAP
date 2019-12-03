@@ -1,17 +1,21 @@
+"""
+TODO: Module-level description
+"""
+
 import numpy as np
 from collections import Counter
 
 
 def output_cluster(prefix, labels, dicttags, tags):
-    ofile=open(("clustered-")+prefix+(".txt"),"w")
+    ofile=open("clustered-"+prefix+".txt","w")
     # output
     ofile.write("#! tag cluster_id \n")
     ndict = len(dicttags)
     ndata = len(tags)
     for i in range(ndict):
-        ofile.write("%s %d\n" % (dicttags[i],labels[i]))
+        ofile.write("%s %d\n" % (dicttags[i], labels[i]))
     for i in range(ndata):
-        ofile.write("%s %d\n" % (tags[i],labels[i+ndict]))
+        ofile.write("%s %d\n" % (tags[i], labels[i+ndict]))
     ofile.close()
     
     return 0 
@@ -19,21 +23,21 @@ def output_cluster(prefix, labels, dicttags, tags):
 
 def output_cluster_sort(prefix, labels, dicttags, tags):
     # we sort the clusters as well
-    ofile=open(("sorted-clustered-")+prefix+(".txt"),"w")
+    ofile=open("sorted-clustered-"+prefix+".txt", "w")
     # output
     ofile.write("#! tag cluster_id \n")
     ndict = len(dicttags)
     ndata = len(tags)
     
     sortlabels=np.stack((range(len(labels)),labels), axis=-1)
-    sortlabels=sortlabels[sortlabels[:,1].argsort()]
+    sortlabels=sortlabels[sortlabels[:, 1].argsort()]
     
-    for i,l in sortlabels:
+    for i, l in sortlabels:
     #print i,l
-        if (l>=0 and i < ndict): 
-            ofile.write("%d %s\n" % (l,dicttags[i])) 
-        elif (l>=0):
-            ofile.write("%d %s\n" % (l,tags[i-ndict]))
+        if l >= 0 and i < ndict:
+            ofile.write("%d %s\n" % (l, dicttags[i]))
+        elif l >= 0:
+            ofile.write("%d %s\n" % (l, tags[i-ndict]))
     return 0        
 
 
@@ -104,7 +108,7 @@ def get_cluster_weighted_avg_properties(labels, properties,weights):
     plist = []
     wlist = []
     for i, l in sortlabels:
-        if l > ol and l>= 0:
+        if l > ol and l >= 0:
             propertiesdict[ol] = np.mean(plist)/np.mean(wlist)
             plist = []
             wlist = []
@@ -114,4 +118,3 @@ def get_cluster_weighted_avg_properties(labels, properties,weights):
     propertiesdict[ol] = np.mean(plist)/np.mean(wlist)
     
     return unique_labels, propertiesdict
-

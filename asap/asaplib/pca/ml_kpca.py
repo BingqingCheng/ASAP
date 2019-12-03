@@ -1,12 +1,12 @@
-import numpy as np
-import scipy.linalg as salg
-
 """
 tools for doing kernal PCA on environmental similarity
 e.g.
 eva = np.genfromtxt(prefix+".k",skip_header=1)
 proj = kpca(eva,6)
 """
+
+import numpy as np
+import scipy.linalg as salg
 
 
 def kpca(kernel, ndim=2):
@@ -25,7 +25,7 @@ def kpca(kernel, ndim=2):
     return np.dot(k, pvec)
 
 
-def ooskpca(insqrk,inrectk,ndim=2):
+def ooskpca(insqrk, inrectk, ndim=2):
     ### CORRECTLY CENTERS THE TEST POINTS 
     ### CENTERS THE OOS WITH LM MEANS
     print("Centering the data ")
@@ -38,7 +38,8 @@ def ooskpca(insqrk,inrectk,ndim=2):
 
     print("  And now we build a projection ")
     evalo,evec = salg.eigh(k, eigvals=(len(k)-ndim,len(k)-1) )
-    evalo=np.flipud(evalo); evec = np.fliplr(evec)
+    evalo=np.flipud(evalo)
+    evec = np.fliplr(evec)
     pvec = evec.copy()
     
     for i in xrange(ndim):

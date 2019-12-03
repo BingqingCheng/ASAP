@@ -1,15 +1,16 @@
+"""
+TODO: Module-level desription
+I adapted the code from:
+https://github.com/alexandreday/fast_density_clustering.git
+Copyright 2017 Alexandre Day
+"""
+
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KernelDensity, NearestNeighbors
 
-'''
-I adapt the suff from:
-https://github.com/alexandreday/fast_density_clustering.git
-Copyright 2017 Alexandre Day
-'''
 
-
-class KDE():
+class KDE:
     """Kernel density estimation (KDE) for accurate local density estimation.
     This is achieved by using maximum-likelihood estimation of the generative kernel density model
     which is regularized using cross-validation.
@@ -108,7 +109,6 @@ class KDE():
         bandwidth estimate, minimum possible value : tuple, shape(2)
         """
 
-
         if self.nn_dist is None:
             nn = NearestNeighbors(n_neighbors=self.nh_size, algorithm='kd_tree')
             nn.fit(X_train)
@@ -120,7 +120,7 @@ class KDE():
 
         # Computation of minimum bound
         # This can be computed by taking the limit h -> 0 and making a saddle-point approx.
-        mean_nn2_dist = np.mean(nn_dist[:,1]*nn_dist[:,1])
+        mean_nn2_dist = np.mean(nn_dist[:, 1]*nn_dist[:, 1])
         h_min = np.sqrt(mean_nn2_dist/dim)
         
         idx_1 = np.random.choice(np.arange(len(X_train)), size=min([1000, len(X_train)]), replace=False)
@@ -138,29 +138,29 @@ class KDE():
         """Performs maximum likelihood estimation on a test set of the density model fitted on a training set
         """
         from scipy.optimize import fminbound
-        X_train, X_test = train_test_split(X, test_size = self.test_ratio_size)
+        X_train, X_test = train_test_split(X, test_size=self.test_ratio_size)
         args = (X_test,)
 
         hest, hmin, hmax = self.bandwidth_estimate(X_train, X_test)
 
-        print("[kde] Minimum bound = %.4f \t Rough estimate of h = %.4f \t Maximum bound = %.4f"%(hmin, hest, hmax))
+        print("[kde] Minimum bound = %.4f \t Rough estimate of h = %.4f \t Maximum bound = %.4f" % (hmin, hest, hmax))
 
         # We are trying to find reasonable tight bounds (hmin, 4.0*hest) to bracket the error function minima
         # Would be nice to have some hard accurate bounds
         self.xtol = round_float(hmin)
 
-        print('[kde] Bandwidth tolerance (xtol) set to precision of minimum bound : %.5f '%(self.xtol))
+        print('[kde] Bandwidth tolerance (xtol) set to precision of minimum bound : %.5f '%self.xtol)
         
-        self.kde = KernelDensity(algorithm='kd_tree', atol=self.atol, rtol=self.rtol,leaf_size=40, kernel=self.kernel)
+        self.kde = KernelDensity(algorithm='kd_tree', atol=self.atol, rtol=self.rtol, leaf_size=40, kernel=self.kernel)
 
         self.kde.fit(X_train)
 
-        # hmax is the upper bound, however, heuristically it appears to always be way above the actual bandwidth. hmax*0.2 seems much better but still convservative
+        # hmax is the upper bound, however, heuristically it appears to always be way above the actual bandwidth. hmax*0.2 seems much better but still conservative
         h_optimal, score_opt, _, niter = fminbound(self.log_likelihood_test_set, hmin, hmax*0.2, args, maxfun=100, xtol=self.xtol, full_output=True)
+
+        print("[kde] Found log-likelihood maximum in %i evaluations, h = %.5f" % (niter, h_optimal))
         
-        print("[kde] Found log-likelihood maximum in %i evaluations, h = %.5f"%(niter, h_optimal))
-        
-        if self.extreme_dist is False: # These bounds should always be satisfied ...
+        if self.extreme_dist is False:  # These bounds should always be satisfied ...
             assert abs(h_optimal - hmax) > 1e-4, "Upper boundary reached for bandwidth"
             assert abs(h_optimal - hmin) > 1e-4, "Lower boundary reached for bandwidth"
 
@@ -172,12 +172,11 @@ class KDE():
         """
         self.kde.bandwidth = bandwidth
         #l_test = len(X_test)
-        return -self.kde.score(X_test[:2000])#X_test[np.random.choice(np.arange(0, l_test), size=min([int(0.5*l_test), 1000]), replace=False)]) # this should be accurate enough !
+        return -self.kde.score(X_test[:2000])  #X_test[np.random.choice(np.arange(0, l_test), size=min([int(0.5*l_test), 1000]), replace=False)]) # this should be accurate enough !
 
 
 def round_float(x):
-    """ Rounds a float to it's first significant digit
-    """
+    """Rounds a float to it's first significant digit"""
     a = list(str(x))
     for i, e in enumerate(a):
         if e != '.':

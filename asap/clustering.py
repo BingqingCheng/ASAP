@@ -1,9 +1,15 @@
 #!/usr/bin/python3
+"""
+TODO: Module-level description
+"""
 
-import numpy as np
-import sys, argparse
+import argparse
+import sys
+
 import matplotlib.pyplot as plt
 from matplotlib import cm
+import numpy as np
+
 from asaplib.pca import kpca
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
@@ -16,11 +22,11 @@ from asaplib.io import str2bool
 def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
     if fmat == 'none' and kmat == 'none':
-        raise ValueError('Must provide either the kernal matrix or the low D coordinates')
+        raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
     if fmat != 'none':
         try:
-            proj = np.genfromtxt(fmat, dtype=float)[:,0:dimension]
+            proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
         except:
             raise ValueError('Cannot load the coordinates')
         print("loaded coordinates ", fmat, "with shape", np.shape(proj))
@@ -45,8 +51,8 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     try:
         density_model.fit(proj)
     except:
-        raise RuntimeError('KDE did not work. Try smaller d.')  
-    # the charecteristic bandwidth of the data        
+        raise RuntimeError('KDE did not work. Try smaller dimension.')
+    # the characteristic bandwidth of the data
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     meanrho = np.mean(rho)
@@ -55,7 +61,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     # now we do the clustering
     if algorithm == 'dbscan' or algorithm == 'DBSCAN':
         ''' option 1: do on the projected coordinates'''
-        trainer = sklearn_DB(sigma_kij, 5, 'euclidean') # adjust the parameters here!
+        trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(proj)
 
@@ -66,21 +72,22 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
         #do_clustering.fit(dmat)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
-        if kmat == 'none': 
+        if kmat == 'none':
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
-        trainer = LAIO_DB(-1,-1) # adjust the parameters here!
+        trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
         do_clustering = DBCluster(trainer) 
         do_clustering.fit(dmat, rho)
-    else: raise ValueError('Please select from fdb or dbscan')
+    else:
+        raise ValueError('Please select from fdb or dbscan')
 
     print(do_clustering.pack())
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
 
     # save
-    np.savetxt(prefix+"-cluster-label.dat",np.transpose([np.arange(len(labels_db)),labels_db]), header='index cluster_label',fmt='%d %d')
+    np.savetxt(prefix+"-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]), header='index cluster_label', fmt='%d %d')
     # properties of each cluster
     #[ unique_labels, cluster_size ]  = get_cluster_size(labels_db[:])
     # center of each cluster
@@ -102,12 +109,12 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
         if len(plotcolor) != len(kNN):
             raise ValueError('Length of the vector of properties is not the same as number of samples')
         colorlabel = 'use '+fcolor+' for coloring the data points'
-    [ plotcolormin, plotcolormax ] = [ np.min(plotcolor),np.max(plotcolor) ]
+    [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
 
     # make plot
     plot_styles.set_nice_font()
 
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:,[pc1,pc2]], labels_db, rho, s=None,
+    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
                       clabel=colorlabel, title=None, 
                       w_size=True, w_label=True,
                       circle_size=20, alpha=0.5, edgecolors=None,
@@ -127,13 +134,13 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i,pc1],proj[i,pc2],marker='^',c='black')
-            texts.append(ax.text(proj[i,pc1],proj[i,pc2], tags[i],
-                         ha='center', va='center', fontsize=15,color='red'))
+            ax.scatter(proj[i, pc1],proj[i, pc2],marker='^', c='black')
+            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
+                         ha='center', va='center', fontsize=15, color='red'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
+            adjust_text(texts,on_basemap=True,  # only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
@@ -157,7 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
-    parser.add_argument('--algo', type=str, default='fdb', help='the algotithm for density-based clustering ([dbscan], [fdb])')
+    parser.add_argument('--algo', type=str, default='fdb', help='the algorithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False, help='Do you want to adjust the texts (True/False)?')
 
     if len(sys.argv)==1:

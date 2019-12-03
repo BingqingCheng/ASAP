@@ -1,10 +1,11 @@
+"""
+CUR matrix decomposition is a low-rank matrix decomposition algorithm that is explicitly expressed in a small number of actual columns and/or actual rows of data matrix.
+"""
+
 import numpy as np
 import scipy.linalg as salg
 import scipy.sparse.linalg as spalg
 
-"""
-CUR matrix decomposition is a low-rank matrix decomposition algorithm that is explicitly expressed in a small number of actual columns and/or actual rows of data matrix.
-"""
 
 def cCURSelOrtho(cov, numSym, costs=1):
     """ Apply (deterministic) CUR selection of numSymm rows & columns of the
@@ -22,7 +23,21 @@ def cCURSelOrtho(cov, numSym, costs=1):
 
     return sel, ocov
 
+
 def CURSelOrtho(cov, numSym, costs=1):
+
+    """
+
+    Parameters
+    ----------
+    cov
+    numSym
+    costs
+
+    Returns
+    -------
+
+    """
 
     ocov = cov.copy()
     rsel = np.zeros(numSym, int)

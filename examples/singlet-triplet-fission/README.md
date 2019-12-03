@@ -4,7 +4,7 @@ https://github.com/SMTG-UCL/singlet-fission-screening
 #
 
 * step 0: select a subset
-../../asap/frame_select.py -fxyz all.xyz -y tda_triplet -n 1000 --algo random
+../../asap/frame_select.py -fxyz all.xyz -y tda_triplet --n 1000 --algo random
 
 * step 1: generate the kernel matrix
 ../../asap/gen_soap_kmat.py -fxyz ASAP-random-n-1000.xyz --rcut 2.5 --n 4 --l 6 --g 0.4 --periodic False --plot True

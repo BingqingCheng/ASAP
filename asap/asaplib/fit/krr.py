@@ -1,9 +1,10 @@
-from .base import RegressorBase
-import numpy as np
-
 """
 adapted from Felix Musil's ml_tools
 """
+
+from .base import RegressorBase
+
+import numpy as np
 
 
 class KRR(RegressorBase):
@@ -56,6 +57,7 @@ class KRR(RegressorBase):
         self.alpha = state['weights']
         self.jitter = state['jitter']
 
+
 class KRRSparse(RegressorBase):
     _pairwise = True
     
@@ -66,7 +68,7 @@ class KRRSparse(RegressorBase):
         self.delta = delta  # variance of the prior
         self.sigma = sigma  # noise
     
-    def fit(self, kMM, kNM,y):
+    def fit(self, kMM, kNM, y):
         '''N train structures, M sparsified representative structures '''
         '''kMM: the kernel matrix of the representative structures with shape (M,M)'''
         '''kNM: the kernel matrix between the representative and the train structures with shape (N,M)'''
@@ -74,8 +76,8 @@ class KRRSparse(RegressorBase):
         #if (kMM.shape[0] != kMM.shape[1]):# or kMM.shape[0] != kNM.shape[1] or kNM.shape[0] != y.shape[0]):
             #raise ValueError('Shape of the kernel matrix is not consistent!')        
 
-        sparseK = kMM * self.delta * self.sigma**2 +  np.dot(kNM.T,kNM)*self.delta**2
-        sparseY = np.dot(kNM.T,y)
+        sparseK = kMM * self.delta * self.sigma**2 + np.dot(kNM.T, kNM)*self.delta**2
+        sparseY = np.dot(kNM.T, y)
         reg = np.eye(kMM.shape[0])*self.jitter
         
         self.alpha = np.linalg.solve(sparseK+reg, sparseY)
