@@ -20,8 +20,8 @@ def normalizekernel(kernel):
 
 def kerneltodis(kernel):
     # there can be many transformations between the k-matrix and the distance matrix
-    # Here we use d_ij = sqrt(2-2*k_ij) 
-    # (k_ij is a normalized symetric kernel)
+    # Here we use d_ij = sqrt(2 - 2*k_ij)
+    # (k_ij is a normalized symmetric kernel)
     nk = normalizekernel(kernel)
     size = len(kernel)
     dis = np.zeros((size, size), dtype=np.float64)

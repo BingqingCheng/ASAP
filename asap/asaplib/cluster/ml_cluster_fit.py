@@ -118,6 +118,18 @@ class LAIO_DB(FitClusterBase):
 
     def fit(self, dmatrix, rho=None):
 
+        """
+
+        Parameters
+        ----------
+        dmatrix: The distance matrix
+        rho: The log densities of the points
+
+        Returns
+        -------
+
+        """
+
         if rho is None:
             raise ValueError('for fdb it is better to compute kernel density first')
 

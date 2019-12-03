@@ -33,7 +33,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
 
     if kmat != 'none':
         try:
-            kNN = np.genfromtxt(kmat, dtype=float)  # This is a kernel matrix?
+            kNN = np.genfromtxt(kmat, dtype=float)
         except:
             raise ValueError('Cannot load the coordinates')
         print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
