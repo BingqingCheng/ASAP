@@ -29,7 +29,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
-    output: The format for output files ([xyz], [matrix]). Default is matrix
+    output: The format for output files ([xyz], [matrix]). Default is xyz.
     peratom: Whether to output per atom pca coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
@@ -87,6 +87,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             try: 
                 desc = frames[0].get_array(fmat)
             except: ValueError('Cannot read the descriptor matrix from single frame')
+    else:
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+        output = 'matrix'
+
     # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
