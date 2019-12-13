@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
-    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the SOAP featurescoordinates (True/False).')
+    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=False, help='Scale the SOAP features (True/False).')
 
     parser.add_argument('--plot', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to plot the kernel matrix (True/False)?')
