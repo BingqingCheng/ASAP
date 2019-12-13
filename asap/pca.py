@@ -49,6 +49,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     keepraw = bool(keepraw)
     plotatomic = bool(plotatomic)
     adtext = bool(adtext)
+    scale = bool(scale)
     total_natoms = 0
 
     if output == 'xyz' and fxyz == 'none':

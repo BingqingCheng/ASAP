@@ -15,7 +15,7 @@ from dscribe.kernels import AverageKernel
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, matrix_plot):
+def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, scale, matrix_plot):
     """
 
     Generate the distance matrix using SOAP descriptors.
@@ -35,6 +35,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
                  is to be generated
     """
 
+    scale = bool(scale)
     soap_periodic = bool(soap_periodic)
     fframes = []
     dictframes = []
@@ -75,6 +76,14 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     soap_dict = soap_desc.create(dictframes, n_jobs=8)
     soap_all = soap_desc.create(frames, n_jobs=8)
 
+    # scale & center
+    if scale:
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        print(scaler.fit(soap_all))
+        soap_dict = scaler.transform(soap_dict) 
+        soap_all = scaler.transform(soap_all) # normalizing the features
+
     # compute the distances of the structures to the references given in the dictionary
     dMN = cdist(soap_dict, soap_all, 'euclidean')
     print("shape of the distance matrix: ", np.shape(dMN))
@@ -102,8 +111,10 @@ if __name__ == '__main__':
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the SOAP featurescoordinates (True/False).')
+
     parser.add_argument('--plot', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to plot the kernel matrix (True/False)?')
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic, args.plot)
+    main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic, args.scale,args.plot)
