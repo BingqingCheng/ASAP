@@ -104,7 +104,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")
+        tags = np.loadtxt(ftags, dtype="str")[:,0]
         ndict = len(tags)
 
     # scale & center
