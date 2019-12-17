@@ -64,7 +64,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")
+        tags = np.loadtxt(ftags, dtype="str")[:,0]
         ndict = len(tags)
 
     # scale & center
@@ -139,32 +139,32 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
-                psize=50,
+                psize=2,
                 out_file='PCA_4_'+prefix+'.png', 
                 title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=True,
-                rasterized = True,
+                use_perc=False,
+                rasterized = False,
                 fontsize = 15,
                 vmax = None,
                 vmin = None)
 
-    fig.set_size_inches(18.5, 10.5)
+    fig.set_size_inches(160.5, 80.5)
 
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
+            #ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
             texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
-                         ha='center', va='center', fontsize=15, color='red'))
+                         ha='center', va='top', fontsize=8,color='black'))
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if (adtext):
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,# only_move={'points':'', 'text':'x'},
+            adjust_text(texts,on_basemap=True, only_move={'points':'', 'text':'y'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                   ax=ax, precision=0.01,
+                   ax=ax, precision=0.05,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
 
     plt.show()
