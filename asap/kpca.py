@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+TODO: Module-level description
+"""
 
 import numpy as np
 import argparse
@@ -17,7 +20,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
     except:
         raise ValueError('Cannot load the kernel matrix')
 
-    print("loaded",fmat)
+    print("loaded", fmat)
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:,0]
         ndict = len(tags)
@@ -25,9 +28,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
     # try to read the xyz file
     if fxyz != 'none':
         try:
-            frames = read(fxyz,':')
+            frames = read(fxyz, ':')
             nframes = len(frames)
-            print('load xyz file: ',fxyz, ', a total of ', str(nframes), 'frames')
+            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
         except:
             raise ValueError('Cannot load the xyz file')
 
@@ -35,7 +38,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
-    proj = kpca(kNN,kpca_d)
+    proj = kpca(kNN, kpca_d)
 
     # save
     if output == 'matrix':
@@ -44,10 +47,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         if len(frames) > 1:
             for i, frame in enumerate(frames):
                 frame.info['kpca_coord'] = proj[i]
-                write(prefix+"-kpca-d"+str(kpca_d)+".xyz",frames[i], append=True)
+                write(prefix+"-kpca-d"+str(kpca_d)+".xyz", frames[i], append=True)
         else:
             frames[0].new_array('kpca_coord', proj)
-            write(prefix+"-kpca-d"+str(kpca_d)+".xyz",frames[0], append=False)
+            write(prefix+"-kpca-d"+str(kpca_d)+".xyz", frames[0], append=False)
 
     # color scheme
     plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
@@ -56,7 +59,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
     plot_styles.set_nice_font()
     #fig, ax = plt.subplots()
 
-    fig, ax = plot_styles.plot_density_map(proj[:,[pc1,pc2]], plotcolor,
+    fig, ax = plot_styles.plot_density_map(proj[:, [pc1, pc2]], plotcolor,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
@@ -66,10 +69,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
                 show=False, cmap='gnuplot',
                 remove_tick=False,
                 use_perc=True,
-                rasterized = True,
-                fontsize = 15,
-                vmax = None,
-                vmin = None)
+                rasterized=True,
+                fontsize=15,
+                vmax=None,
+                vmin=None)
 
     fig.set_size_inches(18.5, 10.5)
 
@@ -110,5 +113,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.d, args.pc1, args.pc2, args.adjusttext)
-
-
