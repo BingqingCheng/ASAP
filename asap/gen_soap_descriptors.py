@@ -71,6 +71,9 @@ def main(fxyz, dictxyz, prefix, output, peratom, soap_rcut, soap_g, soap_n, soap
         if output == 'matrix':
             with open(foutput+".desc", "ab") as f:
                 np.savetxt(f, frame.info[desc_name][None])
+            if peratom:
+                with open(foutput+".atomic-desc", "ab") as fatomic:
+                    np.savetxt(fatomic, fnow)
         elif output == 'xyz':
             # output per-atom info
             if peratom:
