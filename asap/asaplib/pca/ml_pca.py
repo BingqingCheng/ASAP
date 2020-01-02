@@ -23,11 +23,11 @@ def pca(desc, ndim=2):
     C_desc = centering(desc)
 
     # calculate covariance matrix of centered matrix
-    V = np.cov(C_desc.T)
-    print("computing covariance matrix with shape:", np.shape(V))
+    COV = np.cov(C_desc.T)
+    print("computing covariance matrix with shape:", np.shape(COV))
 
     print("  And now we build a projection ")
-    eval, evec = salg.eigh(V, eigvals=(len(V)-ndim, len(V)-1))
+    eval, evec = salg.eigh(COV, eigvals=(len(COV)-ndim, len(COV)-1))
     eval = np.flipud(eval)
     evec = np.fliplr(evec)
 
