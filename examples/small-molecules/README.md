@@ -1,4 +1,4 @@
-A data set of small molecules, with bandgaps
+A data set of small molecules selected from QM7b data set, with band gaps. 
 
 #
 * step 1: use two sets of SOAP descriptors & print out atomic soap
