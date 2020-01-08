@@ -18,7 +18,7 @@ class Density_Peaks_clustering:
 
         Parameters
         ----------
-        distances
+        distances: Matrix of distances between data points of dimension NxN where N is the number of data points.
         indices
         dens_type
         dc: The cutoff distance beyond which data points don't contribute to the local density computation of another
@@ -32,8 +32,8 @@ class Density_Peaks_clustering:
         self.dens_type = dens_type
         self.dc = dc
         self.percent = percent
-        self.dens = None
-        self.delta = None
+        self.dens = None  # numpy array of the densities of the data points
+        self.delta = None  # numpy array of the distances to the nearest cluster centre
         self.ref = None
         self.decision_graph = None
         self.delta_cut = None
@@ -97,9 +97,9 @@ class Density_Peaks_clustering:
                 print("dc too big for being included within the", 10.*self.percent, "%  of data, consider use a small dc or augment the percent parameter")
 
         for i in range(Nele):
-            a = self.distances[i, :]
-            self.dens[i] = len(a[(a <= self.dc)])
-        if self.dens_type == 'exp':
+            a = self.distances[i, :]  # a are the distances relative to data points i
+            self.dens[i] = len(a[(a <= self.dc)])  # The density of i is the number of points at a distance smaller than the cutoff
+        if self.dens_type == 'exp':  # Density is no longer number but exponential
             for i in range(Nele):
                 a = self.distances[i, :]/self.dc
                 self.dens[i] = np.sum(np.exp(-a**2))
