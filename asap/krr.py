@@ -32,7 +32,7 @@ def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     Returns
     -------
 
-    Learning curve.
+    Fitting outcome & Learning curve.
 
     """
 
@@ -151,12 +151,12 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-fmat', type=str, required=True, help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
-    parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats)')
+    parser.add_argument('-fy', type=str, default='none', help='Location of the list of properties (N floats)')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--test', type=float, default=0.0, help='the test ratio')
+    parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
     parser.add_argument('--jitter', type=float, default=1e-10, help='regularizer that improves the stablity of matrix inversion')
     parser.add_argument('--n', type=int, default=-1, help='number of the representative samples')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
     args = parser.parse_args()
 
-    main(args.fmat, args.y, args.prefix, args.test, args.jitter, args.n, args.sigma)
+    main(args.fmat, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma)

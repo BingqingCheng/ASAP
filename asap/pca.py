@@ -29,7 +29,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
-    output: The format for output files ([xyz], [matrix]). Default is matrix
+    output: The format for output files ([xyz], [matrix]). Default is xyz.
     peratom: Whether to output per atom pca coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
@@ -49,6 +49,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     keepraw = bool(keepraw)
     plotatomic = bool(plotatomic)
     adtext = bool(adtext)
+    scale = bool(scale)
     total_natoms = 0
 
     if output == 'xyz' and fxyz == 'none':
@@ -77,7 +78,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                          ndesc = len(frame.info[fmat])
                      except:
                          raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-            if np.shape(desc)[1] != nframes:
+            if desc != [] and np.shape(desc)[1] != nframes:
                 desc = np.asmatrix(desc)
                 #print(np.shape(desc))
                 desc.reshape((ndesc, nframes))
@@ -87,6 +88,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             try: 
                 desc = frames[0].get_array(fmat)
             except: ValueError('Cannot read the descriptor matrix from single frame')
+    else:
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+        output = 'matrix'
+
     # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
@@ -99,7 +104,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")
+        tags = np.loadtxt(ftags, dtype="str")[:,0]
         ndict = len(tags)
 
     # scale & center
@@ -174,7 +179,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
-                psize=50,
+                psize=2,
                 out_file='PCA_4_'+prefix+'.png', 
                 title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
@@ -185,22 +190,36 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 vmax=None,
                 vmin=None)
 
-    fig.set_size_inches(18.5, 10.5)
+    fig.set_size_inches(160.5, 80.5)
 
     if ftags != 'none':
         texts = []
         for i in range(ndict):
+<<<<<<< HEAD
+            #ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
+            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
+                         ha='center', va='top', fontsize=8,color='black'))
+=======
             ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
             texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                          ha='center', va='center', fontsize=15, color='red'))
+>>>>>>> 6e2e625b80266e25a9b90fa4565d67a0fc1d1346
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text
+<<<<<<< HEAD
+            adjust_text(texts,on_basemap=True, only_move={'points':'', 'text':'y'},
+                    expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+                   force_text=(0.03, 0.5), force_points=(0.01, 0.25),
+                   ax=ax, precision=0.05,
+                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
+=======
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
+>>>>>>> 6e2e625b80266e25a9b90fa4565d67a0fc1d1346
 
     plt.show()
     fig.savefig('PCA_4_'+prefix+'-c-'+fcolor+'.png')
@@ -215,7 +234,7 @@ if __name__ == '__main__':
     parser.add_argument('-colors', type=str, default='none', help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0, help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,
