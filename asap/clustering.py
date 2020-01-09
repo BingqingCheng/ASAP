@@ -173,4 +173,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
-
