@@ -4,7 +4,7 @@ we use the ASAP tools to identify the difference in atomic environments of the a
 
 #
 * step 1
-../../asap/gen_soap_descriptors.py -fxyz lj-nucleus.xyz --rcut 4 --n 4 --l 6 --g 0.2 --periodic True
+../../asap/gen_soap_descriptors.py -fxyz lj-nucleus.xyz --rcut 4 --n 4 --l 6 --g 0.2 --periodic True --output matrix
 
 * step 2
-../../asap/pca.py -fmat ASAP-n4-l6-c4.0-g0.2.desc -colors FCCUBIC.list
+../../asap/pca.py -fmat ASAP-n4-l6-c4.0-g0.2.atomic-desc -colors FCCUBIC.list --prefix lj-nucleus-atomic-orderparameter

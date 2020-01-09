@@ -55,6 +55,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if output == 'xyz' and fxyz == 'none':
         raise ValueError('Need input xyz in order to output xyz')
 
+    desc = []; ndesc = 0
     # try to read the xyz file
     if fxyz != 'none':
         try:
@@ -64,8 +65,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         except: 
             raise ValueError('Cannot load the xyz file')
 
-        desc = []
-        ndesc = 0
         # load from xyz file
         if nframes > 1:
             for i, frame in enumerate(frames):
@@ -104,7 +103,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")[:,0]
+        tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
     # scale & center
@@ -164,7 +163,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=None, label=None,
                 centers=None,
-                psize=2,
+                psize=4,
                 out_file=None, 
                 title=None, 
                 show=False, cmap='gnuplot',
@@ -179,12 +178,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                 xlabel='Principal Axis '+str(pc1), ylabel='Principal Axis '+str(pc2), 
                 clabel=colorlabel, label=None,
                 centers=None,
-                psize=2,
+                psize=200,
                 out_file='PCA_4_'+prefix+'.png', 
                 title='PCA for: '+prefix, 
                 show=False, cmap='gnuplot',
                 remove_tick=False,
-                use_perc=True,
+                use_perc=False,
                 rasterized=True,
                 fontsize=15,
                 vmax=None,
@@ -195,31 +194,16 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-<<<<<<< HEAD
-            #ax.scatter(proj[i, pc1],proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1],proj[i, pc2], tags[i],
-                         ha='center', va='top', fontsize=8,color='black'))
-=======
             ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
             texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                         ha='center', va='center', fontsize=15, color='red'))
->>>>>>> 6e2e625b80266e25a9b90fa4565d67a0fc1d1346
-            #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
+                         ha='center', va='center', fontsize=10, color='red'))
         if adtext:
             from adjustText import adjust_text
-<<<<<<< HEAD
-            adjust_text(texts,on_basemap=True, only_move={'points':'', 'text':'y'},
-                    expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                   force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                   ax=ax, precision=0.05,
-                  arrowprops=dict(arrowstyle="-", color='black', lw=1,alpha=0.8))
-=======
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
                     expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
                    force_text=(0.03, 0.5), force_points=(0.01, 0.25),
                    ax=ax, precision=0.01,
                   arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
->>>>>>> 6e2e625b80266e25a9b90fa4565d67a0fc1d1346
 
     plt.show()
     fig.savefig('PCA_4_'+prefix+'-c-'+fcolor+'.png')

@@ -92,7 +92,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fmultisoap, soap_rcut, soap_g, 
         if output == 'matrix':
             with open(foutput+".desc", "ab") as f:
                 np.savetxt(f, frame.info[desc_name][None])
-            if peratom:
+            if peratom or nframes ==1 :
                 with open(foutput+".atomic-desc", "ab") as fatomic:
                     np.savetxt(fatomic, fnow)
         elif output == 'xyz':
@@ -125,7 +125,6 @@ if __name__ == '__main__':
     if len(sys.argv)==1:
         parser.print_help(sys.stderr)
         sys.exit(1)
-    args = parser.parse_args()
     args = parser.parse_args()
 
     main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.multisoap, args.rcut, args.g, args.n, args.l, args.periodic)
