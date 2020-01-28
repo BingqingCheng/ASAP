@@ -7,7 +7,7 @@ import argparse
 import os
 
 from ase.io import read, write
-from asaplib.compressor import fps
+from asaplib.compressor import fps, CUR_deterministic
 import numpy as np
 
 
@@ -74,7 +74,8 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
         elif algorithm == 'sortmin': 
             sbs = [x for _,x in sorted(zip(y_all,idx))][nkeep:]
 
-    elif algorithm == 'fps' or algorithm == 'FPS':
+    elif algorithm == 'fps' or algorithm == 'FPS' or algorithm == 'cur' or algorithm == 'CUR':
+        # for both algo we read in the descriptor matrix
         desc = []
         ndesc = 0
         for i, frame in enumerate(frames):
@@ -86,18 +87,28 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
                      ndesc = len(frame.info[fmat])
                  except:
                      raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-        #if (np.shape(desc)[1] != nframes):
-            #desc = np.asmatrix(desc)
-            #print(np.shape(desc))
-            #desc.reshape((ndesc, nframes))
+
 
         if os.path.isfile(fmat):
             try:
                 desc = np.genfromtxt(fmat, dtype=float)
             except: raise ValueError('Cannot load the kernel matrix')
         print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
-        sbs, dmax_remain = fps(desc, nkeep , 0)
-        np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.error', dmax_remain, fmt='%4.8f', header='the maximum remaining distance in FPS')
+
+        #if (np.shape(desc)[1] != nframes):
+        #    desc = np.asmatrix(desc)            
+        #    print(np.shape(desc))
+        #    desc.reshape((ndesc, nframes))
+
+
+        # FPS
+        if algorithm == 'fps' or algorithm == 'FPS':
+            sbs, dmax_remain = fps(desc, nkeep , 0)
+            np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.error', dmax_remain, fmt='%4.8f', header='the maximum remaining distance in FPS')
+        # CUR decomposition
+        if algorithm == 'cur' or algorithm == 'CUR':
+            sbs, rcov_error = CUR_deterministic(np.dot(desc.T,desc), nkeep)
+            np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.error', rcov_error, fmt='%4.8f', header='the remaining error of the covariance matrix')
 
     elif algorithm == 'reweight':
         if os.path.isfile(fkde):
@@ -137,7 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('-y', type=str, default='none', help='Location of the list of properties (N floats) or name of the tags in ase xyz file')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--n', type=int, default=0, help='number of the representative samples to select')
-    parser.add_argument('--algo', type=str, default='random', help='the algorithm for selecting frames ([random], [fps], [sortmax], [sortmin],[reweight])')
+    parser.add_argument('--algo', type=str, default='random', help='the algorithm for selecting frames ([random], [fps], [cur], [sortmax], [sortmin],[reweight])')
     parser.add_argument('-fmat', type=str, required=False, help='Location of descriptor or kernel matrix file. Needed if you select [fps]. You can use gen_kmat.py to compute it.')
     parser.add_argument('-fkde', type=str, required=False, help='Location of the (log of) kernel density for each sample. Needed if you select [reweight]. You can use kernel_density_estimation.py to compute it.')
     parser.add_argument('--reweight_lambda', type=float, default=1, help='select samples according to the re-weighted distribution exp(-\lambda*f)')

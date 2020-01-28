@@ -7,7 +7,7 @@ import scipy.linalg as salg
 import scipy.sparse.linalg as spalg
 
 
-def CUR_deterministic(X, n_col, costs=1):
+def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
 
     """
     Given rank k, find the best column and rows
@@ -17,6 +17,7 @@ def CUR_deterministic(X, n_col, costs=1):
     ----------
     X: input a covariance matrix 
     n_col: number of column to keep
+    error_estimate: compute the remaining error of the CUR
     costs: a list of costs associated with each column
 
     Returns
@@ -26,11 +27,13 @@ def CUR_deterministic(X, n_col, costs=1):
 
     RX = X.copy()
     rsel = np.zeros(n_col, dtype=int)
-
+    rerror = np.zeros(n_col, dtype=float)
+    
     for i in range(n_col):
         rval, RX = CUR_deterministic_step(RX, n_col-i, costs)
         rsel[i] = rval
-    return rsel
+        if error_estimate: rerror[i] = np.sum(np.abs(RX))
+    return rsel, rerror
 
 
 def CUR_deterministic_step(cov, k, costs=1):
