@@ -42,7 +42,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
                         if fcolor == 'Pressure' or fcolor == 'pressure' or fcolor == 'Temperature' or fcolor == 'temperature':
                             use_color_scheme = frame.info[fcolor]
                         else:
-                        use_color_scheme = frame.info[fcolor]/natomsnow
+                            use_color_scheme = frame.info[fcolor]/natomsnow
                     else:
                         raise ValueError('Cannot find the specified property from the xyz file')
                     plotcolor.append(use_color_scheme)
