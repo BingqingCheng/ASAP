@@ -212,9 +212,9 @@ class LAIO_DB(FitClusterBase):
 
         Parameters
         ----------
-        distances: Matrix of distances between data points and their neighbours of dimension Nxn_neigh_comp where N is
+        distances: Matrix of distances between data points and their neighbours of dimension N x n_neigh_comp where N is
         the number of data points and n_neigh_comp is the number of neighbours to consider.
-        indices: The indices in the data matrix of the neighours for all of the data points.
+        indices: The indices in the data matrix of the neighbours for all of the data points.
         dens_type: The type of density to compute (can be exponential)
         dc: The cutoff distance beyond which data points don't contribute to the local density computation of another
         datapoint.
@@ -244,7 +244,7 @@ class LAIO_DB(FitClusterBase):
 
         Parameters
         ----------
-        data: The dataset of dimension mxn where m is the number of data points and n is the number of features.
+        data: The dataset of dimension m x n where m is the number of data points and n is the number of features.
 
         Returns
         -------
@@ -321,6 +321,15 @@ class LAIO_DB(FitClusterBase):
                 imax.append(i)
         self.delta[imax] = np.max(self.delta)*1.05
 
+        # We plot the decision graph
+
+        plt.scatter(self.dens, self.delta)
+        plt.plot([min(self.dens), max(self.dens)], [self.delta_cut, self.delta_cut], c='red')
+        plt.plot([self.dens_cut, self.dens_cut], [min(self.delta), max(self.delta)], c='red')
+        plt.xlabel('rho')
+        plt.ylabel('delta')
+        plt.show()
+
     def get_assignation(self, data):
         """
 
@@ -355,20 +364,20 @@ class LAIO_DB(FitClusterBase):
                 if self.cluster[i] != self.cluster[j]:
                     bord[i] = 1
         halo_cutoff = np.zeros(ncluster + 1)
-        for i in range(ncluster + 1):
-            dd = self.dens[((bord == 1) & (self.cluster == i))]
-            halo_cutoff[i] = np.max(dd)
-        self.halo[tt[(self.dens < halo_cutoff[self.cluster])]] =- 1
+        #for i in range(ncluster + 1):
+            #dd = self.dens[((bord == 1) & (self.cluster == i))]
+            #halo_cutoff[i] = np.max(dd)
+        #self.halo[tt[(self.dens < halo_cutoff[self.cluster])]] =- 1
 
         return center_label
 
     def fit(self, data, rho=None):
         """
-        Compute the center labels.
+        Compute the center labels (assignment).
 
         Parameters
         ----------
-        data: data matrix of shpae (Nele, Nele)
+        data: data matrix of shape (Nele, Nele)
         rho: densities, default is None since the DP.py module computes the densities itself.
 
         Returns: center_label: numpy array of shape (Nele,) giving the index of the cluster centre for each data point
@@ -381,3 +390,8 @@ class LAIO_DB(FitClusterBase):
         center_label = self.get_assignation(data)
 
         return center_label
+
+    def pack(self):
+        '''return all the info'''
+        state = dict(deltamin=self.delta_cut, rhomin=self.dens_cut)
+        return state

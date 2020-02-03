@@ -76,9 +76,11 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
-        trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
+        #trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
+        trainer = LAIO_DB()
         do_clustering = DBCluster(trainer) 
-        do_clustering.fit(dmat, rho)
+        #do_clustering.fit(dmat, rho)
+        do_clustering.fit(proj)
     else:
         raise ValueError('Please select from fdb or dbscan')
 
