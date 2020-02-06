@@ -88,7 +88,6 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
                  except:
                      raise ValueError('Cannot combine the descriptor matrix from the xyz file')
 
-
         if os.path.isfile(fmat):
             try:
                 desc = np.genfromtxt(fmat, dtype=float)
