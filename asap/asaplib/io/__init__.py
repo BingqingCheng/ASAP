@@ -1,2 +1,2 @@
 from .io_parse import *
-from .io_xyz import *
+from .io_cell import *
