@@ -13,6 +13,12 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BingqingCheng/ASAP",
     packages=setuptools.find_packages(),
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.6',
     scripts=['scripts/krr.py',
              'scripts/kernel_density_estimation.py',
              'scripts/frame_select.py',
@@ -23,10 +29,4 @@ setuptools.setup(
              'scripts/pca_minimal.py',
              'scripts/kpca.py',
              'scripts/clustering.py'],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires='>=3.6',
 )
