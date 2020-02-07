@@ -69,13 +69,14 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
-    if len(desc) == 0:
+    if len(desc)==0:
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
     print("loaded", fmat, " with shape", np.shape(desc))
     # load tags if any
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
+
 
     proj = np.asmatrix(desc)[:, 0:dimension]
     density_model = KDE()
