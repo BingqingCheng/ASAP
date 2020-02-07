@@ -21,6 +21,26 @@ from asaplib.io import str2bool
 
 def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
 
+    """
+
+    Parameters
+    ----------
+    fmat
+    kmat
+    ftags
+    prefix
+    fcolor
+    dimension
+    pc1
+    pc2
+    algorithm
+    adtext
+
+    Returns
+    -------
+
+    """
+
     if fmat == 'none' and kmat == 'none':
         raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
@@ -76,9 +96,11 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
-        trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
+        #trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
+        trainer = LAIO_DB()
         do_clustering = DBCluster(trainer) 
-        do_clustering.fit(dmat, rho)
+        #do_clustering.fit(dmat, rho)
+        do_clustering.fit(proj)
     else:
         raise ValueError('Please select from fdb or dbscan')
 
@@ -115,13 +137,13 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     plot_styles.set_nice_font()
 
     fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
-                      clabel=colorlabel, title=None, 
-                      w_size=True, w_label=True,
-                      circle_size=20, alpha=0.5, edgecolors=None,
-                      cmap='gnuplot', vmax=None,vmin=None, psize=20,
-                      show=False, savefile=None, fontsize =15,
-                      figsize=None,rasterized=True, remove_tick=True,
-                      dpi=200, outlier=True)
+                                              clabel=colorlabel, title=None,
+                                              w_size=True, w_label=True,
+                                              circle_size=20, alpha=0.5, edgecolors=None,
+                                              cmap='gnuplot', vmax=None, vmin=None, psize=20,
+                                              show=False, savefile=None, fontsize=15,
+                                              figsize=None,rasterized=True, remove_tick=True,
+                                              dpi=200, outlier=True)
     """
     ax = plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
                       show=False, savefile = None, fontsize =15, psize = 20, 
@@ -140,11 +162,11 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
             #ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text
-            adjust_text(texts,on_basemap=True,  # only_move={'points':'', 'text':'x'},
-                    expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                   force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                   ax=ax, precision=0.01,
-                  arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
+            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
+                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
+                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
+                        ax=ax, precision=0.01,
+                        arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
     plt.title('PCA and clustering for: '+prefix)
     plt.xlabel('Princple Axis '+str(pc1))
@@ -173,4 +195,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo, args.adjusttext)
-

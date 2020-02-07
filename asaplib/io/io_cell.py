@@ -1,9 +1,62 @@
 """
-Functions for converting between different simulation cell formats
+TODO: Module-level description
 """
 
 import math
 import numpy as np
+
+zmap = {"H": 1,"He": 2,"Li": 3,"Be": 4,"B": 5,"C": 6,"N": 7,"O": 8,"F": 9,"Ne": 10,"Na": 11,"Mg": 12,"Al": 13,"Si": 14,"P": 15,"S": 16,"Cl": 17,"Ar": 18,"K": 19,"Ca": 20,"Sc": 21,"Ti": 22,"V": 23,"Cr": 24,"Mn": 25,"Fe": 26, "Ni": 28,"Ga": 31, "As":33}
+
+"""
+e.g.
+   while True:
+     try:
+       [ na, cell, names, pos] = read_frame(ixyz)
+     except: sys.exit(0)
+"""
+
+
+def read_xyz(filedesc):
+  natoms = int(filedesc.readline())
+  comment = filedesc.readline()
+
+  cell = np.zeros(3, float)
+  names = np.zeros(natoms, np.dtype('|S6'))
+  q = np.zeros((natoms, 3), float)
+  cell[:] = comment.split()[0:3]
+  print(cell)
+  for i in range(natoms):
+    line = filedesc.readline().split()
+    names[i] = line[0]
+    q[i] = line[1:4]
+    #print q[i]
+  return [natoms, cell, names, q]
+
+
+def write_ipixyz(outfile, cell, names, q):
+    # output
+    # compute the angles
+    # mode is 'abcABC', then 'cell' takes an array of 6 floats
+    # the first three being the length of the sides of the system parallelopiped, and the last three being the angles (in degrees) between those sides.
+    # Angle A corresponds to the angle between sides b and c, and so on for B and C.
+    supercell = np.zeros(3, float)
+    angles = np.zeros(3, float)
+    natom = len(q)
+
+    for i in range(3):
+        supercell[i] = np.linalg.norm(cell[i, :])
+
+    angles[0] = np.arccos(np.dot(cell[1],cell[2])/supercell[1]/supercell[2])/math.pi*180.
+    angles[1] = np.arccos(np.dot(cell[0],cell[2])/supercell[0]/supercell[2])/math.pi*180.
+    angles[2] = np.arccos(np.dot(cell[0],cell[1])/supercell[0]/supercell[1])/math.pi*180.
+
+    # write
+    outfile.write("%d\n# CELL(abcABC):     %4.8f     %4.8f     %4.8f     %4.5f     %4.5f     %4.5f   cell{angstrom}  Traj: positions{angstrom}\n" % (natom,supercell[0],supercell[1],supercell[2],angles[0],angles[1],angles[2]))
+    for i, qi in enumerate(q):
+        #print (names[i],q[i*3],q[i*3+1],q[i*3+2])
+        outfile.write("%s     %4.8f     %4.8f     %4.8f\n" % (names[i], qi[0], qi[1], qi[2]))
+    return 0
+
 
 def pbcdist(q1, q2, h, ih): 
       s = np.dot(ih, q1-q2)
