@@ -1,10 +1,22 @@
 #!python3
+"""
+Minimal implementation of PCA projection with SOAP vectors.
+
+by Tamas K. Stenczel, partly based on pca.py
+
+Originally written for the projection viewer: https://github.com/chkunkel/projection_viewer
+and its integration with ABCD: https://github.com/libatoms/abcd
+
+Takes an xyz file with SOAP vectors saved into arrays or info, computes the kernel matrix and projects,
+saving the coordinates into a the info or arrays of the xyz file.
+"""
 
 import argparse
 import sys
 
-import numpy as np
 import ase.io
+import numpy as np
+
 from asaplib.io import str2bool
 from asaplib.pca import pca
 
