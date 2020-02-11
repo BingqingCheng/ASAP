@@ -17,7 +17,7 @@ def pca(desc, ndim=2):
         Input points.
     ndim : number of the principle components to keep
     """
-    
+
     print("a total of ", np.shape(desc), "column")
     # center columns by subtracting column means
     C_desc = centering(desc)
@@ -27,16 +27,16 @@ def pca(desc, ndim=2):
     print("computing covariance matrix with shape:", np.shape(COV))
 
     print("  And now we build a projection ")
-    eval, evec = salg.eigh(COV, eigvals=(len(COV)-ndim, len(COV)-1))
+    eval, evec = salg.eigh(COV, eigvals=(len(COV) - ndim, len(COV) - 1))
     eval = np.flipud(eval)
     evec = np.fliplr(evec)
 
     pvec = evec.copy()
     for i in range(ndim):
-        pvec[:,i] *= 1./np.sqrt(eval[i])
+        pvec[:, i] *= 1. / np.sqrt(eval[i])
     print("Done, super quick. ")
 
-    return pca_project(desc, pvec), pvec 
+    return pca_project(desc, pvec), pvec
 
 
 def pca_project(desc, pvec):
@@ -44,7 +44,6 @@ def pca_project(desc, pvec):
 
 
 def centering(desc):
-    
     # calculate the mean of each column
     M_desc = np.mean(desc.T, axis=1)
     # center columns by subtracting column means

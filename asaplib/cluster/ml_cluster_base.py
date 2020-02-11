@@ -9,6 +9,7 @@ class ClusterBase(ClusterMixin):
     """
     Data structure to perform clustering and store data associated with the clustering output.
     """
+
     def __init__(self):
         pass
 

@@ -2,18 +2,14 @@
 TODO: Module-level description
 """
 
-from abc import ABCMeta, abstractmethod
 import collections
+from abc import ABCMeta
 
 import numpy as np
-import scipy as sp
+from sklearn.externals.six import with_metaclass
 from sklearn.model_selection._split import KFold as _KFold
 from sklearn.model_selection._split import ShuffleSplit as _ShuffleSplit
-from sklearn.model_selection._split import (_BaseKFold,
-        BaseCrossValidator,_validate_shuffle_split,BaseShuffleSplit)
-from sklearn.utils.validation import _num_samples
 from sklearn.utils import check_random_state
-from sklearn.externals.six import with_metaclass
 
 
 def exponential_split(xmin, xmax, n=5):
@@ -32,11 +28,11 @@ def exponential_split(xmin, xmax, n=5):
 
     X = np.zeros(n, dtype=int)
     [lmin, lmax] = [np.log(xmin), np.log(xmax)]
-    dl = (lmax-lmin)/(n-1.)
+    dl = (lmax - lmin) / (n - 1.)
     X[0] = xmin
     X[-1] = xmax
-    for i in range(1, n-1):
-        X[i] = int(np.exp(lmin+dl*i))
+    for i in range(1, n - 1):
+        X[i] = int(np.exp(lmin + dl * i))
     return X
 
 
@@ -88,16 +84,17 @@ class KFold(_KFold):
         super(KFold, self).__init__(n_splits, shuffle, random_state)
 
     def get_params(self):
-        params = dict(n_splits=self.n_splits,shuffle=self.shuffle,random_state=self.random_state)
+        params = dict(n_splits=self.n_splits, shuffle=self.shuffle, random_state=self.random_state)
         return params
 
 
 class ShuffleSplit(_ShuffleSplit):
-    def __init__(self, n_splits=10, test_size="default", train_size=None,random_state=None):
-        super(ShuffleSplit, self).__init__(n_splits, test_size,train_size, random_state)
+    def __init__(self, n_splits=10, test_size="default", train_size=None, random_state=None):
+        super(ShuffleSplit, self).__init__(n_splits, test_size, train_size, random_state)
+
     def get_params(self):
-        params = dict(n_splits=self.n_splits,test_size=self.test_size,
-                    train_size=self.train_size,random_state=self.random_state)
+        params = dict(n_splits=self.n_splits, test_size=self.test_size,
+                      train_size=self.train_size, random_state=self.random_state)
         return params
 
 
@@ -106,7 +103,7 @@ class LCSplit(with_metaclass(ABCMeta)):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):
             raise ValueError("Number of repetitions or training set sizes must be an iterable.")
 
-        if len(n_repeats) != len(train_sizes) :
+        if len(n_repeats) != len(train_sizes):
             raise ValueError("Number of repetitions must be equal to length of training set sizes.")
 
         if any(key in cvargs for key in ('random_state', 'shuffle')):
@@ -119,10 +116,10 @@ class LCSplit(with_metaclass(ABCMeta)):
         self.cvargs = cvargs
         self.test_size = test_size
         self.n_splits = np.sum(n_repeats)
-    
+
     def get_params(self):
-        params = dict(cv=self.cv.get_params(), n_repeats=self.n_repeats,train_sizes=self.train_sizes,
-                     test_size=self.test_size, random_state=self.random_state, cvargs=self.cvargs)
+        params = dict(cv=self.cv.get_params(), n_repeats=self.n_repeats, train_sizes=self.train_sizes,
+                      test_size=self.test_size, random_state=self.random_state, cvargs=self.cvargs)
         return params
 
     def split(self, X, y=None, groups=None):
@@ -146,13 +143,13 @@ class LCSplit(with_metaclass(ABCMeta)):
         """
 
         rng = check_random_state(self.random_state)
-        
+
         for n_repeat, train_size in zip(self.n_repeats, self.train_sizes):
             cv = self.cv(random_state=rng, n_splits=n_repeat, test_size=self.test_size, train_size=train_size,
                          **self.cvargs)
             for train_index, test_index in cv.split(X, y, groups):
                 yield train_index, test_index
-                
+
     def get_n_splits(self, X=None, y=None, groups=None):
         """Returns the number of splitting iterations in the cross-validator
         Parameters
@@ -173,7 +170,7 @@ class LCSplit(with_metaclass(ABCMeta)):
         """
         rng = check_random_state(self.random_state)
         n_splits = 0
-        for n_repeat,train_size in zip(self.n_repeats, self.train_sizes):
+        for n_repeat, train_size in zip(self.n_repeats, self.train_sizes):
             cv = self.cv(random_state=rng, n_splits=n_repeat, test_size=self.test_size, train_size=train_size,
                          **self.cvargs)
             n_splits += cv.get_n_splits(X, y, groups)

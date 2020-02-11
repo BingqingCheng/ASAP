@@ -2,7 +2,6 @@
 TODO: Module-level description
 """
 
-
 from sklearn.base import BaseEstimator, RegressorMixin
 
 
@@ -10,6 +9,7 @@ class RegressorBase(BaseEstimator, RegressorMixin):
     """
     TODO: class-level docstring
     """
+
     def __init__(self):
         pass
 

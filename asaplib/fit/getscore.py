@@ -39,7 +39,7 @@ def get_mae(ypred, y):
     -------
 
     """
-    return np.mean(np.abs(ypred-y))
+    return np.mean(np.abs(ypred - y))
 
 
 def get_rmse(ypred, y):
@@ -54,7 +54,7 @@ def get_rmse(ypred, y):
     -------
 
     """
-    return np.sqrt(np.mean((ypred-y)**2))
+    return np.sqrt(np.mean((ypred - y) ** 2))
 
 
 def get_sup(ypred, y):
@@ -69,7 +69,7 @@ def get_sup(ypred, y):
     -------
 
     """
-    return np.amax(np.abs((ypred-y)))
+    return np.amax(np.abs((ypred - y)))
 
 
 def get_spearman(ypred, y):

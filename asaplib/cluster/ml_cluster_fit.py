@@ -2,12 +2,12 @@
 Density-based clustering algorithms
 """
 
-from .ml_cluster_base import ClusterBase, FitClusterBase
+import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score
 
-import matplotlib.pyplot as plt
-import numpy as np
+from .ml_cluster_base import ClusterBase, FitClusterBase
 
 
 class DBCluster(ClusterBase):
@@ -40,7 +40,7 @@ class DBCluster(ClusterBase):
             silscore = silhouette_score(dmatrix, self.labels, metric="precomputed")
         else:
             silscore = silhouette_score(dmatrix, self.labels, metric="euclidean")
-        print("Silhouette Coefficient: %0.3f" %silscore)
+        print("Silhouette Coefficient: %0.3f" % silscore)
 
     def get_cluster_labels(self, index=[]):
         """return the label of the samples in the list of index"""
@@ -63,7 +63,6 @@ class DBCluster(ClusterBase):
 
 
 class sklearn_DB(FitClusterBase):
-
     """
     https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
     eps : float, optional
@@ -154,7 +153,7 @@ class LAIO_DB(FitClusterBase):
 
         # if there's no input values for rhomin and deltamin, we use simple heuristics
         if self.rhomin < 0:
-            self.rhomin = 0.2*np.mean(rho)+0.8*np.min(rho)
+            self.rhomin = 0.2 * np.mean(rho) + 0.8 * np.min(rho)
         if self.deltamin < 0:
             self.deltamin = np.mean(delta)
 
@@ -172,7 +171,7 @@ class LAIO_DB(FitClusterBase):
         ###
 
         nclust = 0
-        cl = np.zeros(len(rho), dtype='int')-1
+        cl = np.zeros(len(rho), dtype='int') - 1
         for i in range(len(rho)):
             # we select cluster centers {cl} with rho({c}) > rhomin && delta({c}) > delta_min
             if rho[i] > self.rhomin and delta[i] > self.deltamin:
@@ -188,25 +187,28 @@ class LAIO_DB(FitClusterBase):
         return cl
 
     def estimate_delta(self, dist, rho):
-    ''' For each data point i, compute the distance (delta_i) between i and j, 
-       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
-    '''
-        delta = (rho*0.0).copy()
-        nneigh = np.ones(len(delta), dtype='int')
-        for i in range(len(rho)):
-            # for data i, find all points that have higher density
-            js = np.where(rho > rho[i])[0]
-            if len(js) == 0:
-                # if there's no j's that have higher density than i, we set delta_i to be a large distance
-                delta[i] = np.max(dist[i, :])
-                nneigh[i] = i
-            else:
-                # find the nearest j that has higher density then i
-                delta[i] = np.min(dist[i, js])
-                nneigh[i] = js[np.argmin(dist[i, js])]
-        return delta, nneigh
 
-    def pack(self):
-        '''return all the info'''
-        state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
-        return state
+        ''' For each data point i, compute the distance (delta_i) between i and j,
+           j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
+        '''
+
+    delta = (rho * 0.0).copy()
+    nneigh = np.ones(len(delta), dtype='int')
+    for i in range(len(rho)):
+        # for data i, find all points that have higher density
+        js = np.where(rho > rho[i])[0]
+        if len(js) == 0:
+            # if there's no j's that have higher density than i, we set delta_i to be a large distance
+            delta[i] = np.max(dist[i, :])
+            nneigh[i] = i
+        else:
+            # find the nearest j that has higher density then i
+            delta[i] = np.min(dist[i, js])
+            nneigh[i] = js[np.argmin(dist[i, js])]
+    return delta, nneigh
+
+
+def pack(self):
+    '''return all the info'''
+    state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
+    return state

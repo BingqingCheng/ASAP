@@ -2,9 +2,9 @@
 TODO: Module-level description
 """
 
-import numpy as np
-import scipy.linalg as salg
 import copy
+
+import numpy as np
 
 
 def normalizekernel(kernel):
@@ -26,9 +26,9 @@ def kerneltodis(kernel):
     size = len(kernel)
     dis = np.zeros((size, size), dtype=np.float64)
     for i in range(size):
-        for j in range(i-1):
-            dis[i, j] = dis[j, i] = np.sqrt(2.-2.*nk[i, j])
-    
+        for j in range(i - 1):
+            dis[i, j] = dis[j, i] = np.sqrt(2. - 2. * nk[i, j])
+
     return dis.clip(min=0)
 
 
@@ -37,7 +37,7 @@ def kerneltodis_linear(kernel):
     # Here we use d_ij = 1-k_ij
     # (k_ij is a normalized symetric kernel)
     nk = normalizekernel(kernel)
-    dis = 1.-nk
+    dis = 1. - nk
     return dis.clip(min=0)
 
 
@@ -46,7 +46,7 @@ def kerneltorho(kernel, delta):
     # delta is the charecteristic spread in similarity
 
     rho = np.zeros(len(kernel))
-    allrhofromdis = np.exp((np.asmatrix(kernel)-1.0)/delta)
+    allrhofromdis = np.exp((np.asmatrix(kernel) - 1.0) / delta)
 
     for i in range(len(allrhofromdis)):
         rho[i] = np.sum(allrhofromdis[i])
@@ -60,7 +60,7 @@ def distorho_quick(dis, delta):
     # dis = kerneltodis(kernel)
     # delta is the charecteristic distance
     rho = np.zeros(len(dis))
-    allrhofromdis = np.exp(dis*(-1./delta))
+    allrhofromdis = np.exp(dis * (-1. / delta))
 
     for i in range(len(allrhofromdis)):
         rho[i] += np.sum(allrhofromdis[i])

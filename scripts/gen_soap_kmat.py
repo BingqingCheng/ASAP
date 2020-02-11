@@ -11,6 +11,7 @@ import numpy as np
 from ase.io import read
 from dscribe.descriptors import SOAP
 from dscribe.kernels import AverageKernel
+
 from asaplib.io import str2bool
 
 
@@ -79,18 +80,17 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     kNN = re.create(fall.reshape((fshape[0], 1, fshape[1])))
 
     # save
-    np.savetxt(prefix+"-n"+str(soap_n)+"-l"+str(soap_l)+"-c"+str(soap_rcut)+"-g"+str(soap_g)+".kmat",
+    np.savetxt(prefix + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g) + ".kmat",
                kNN, fmt='%4.8f')
 
     # plot
     if matrix_plot:
         plt.matshow(kNN)
-        plt.title('Kernel matrix: '+prefix)
+        plt.title('Kernel matrix: ' + prefix)
         plt.show()
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
     parser.add_argument('-fdict', type=str, default='none', help='Location of xyz file '

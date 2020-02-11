@@ -3,13 +3,15 @@ Functions for converting between different simulation cell formats
 """
 
 import math
+
 import numpy as np
 
-def pbcdist(q1, q2, h, ih): 
-      s = np.dot(ih, q1-q2)
-      for i in range(3):
-          s[i] -= round(s[i])
-      return np.dot(h, s)
+
+def pbcdist(q1, q2, h, ih):
+    s = np.dot(ih, q1 - q2)
+    for i in range(3):
+        s[i] -= round(s[i])
+    return np.dot(h, s)
 
 
 def h2abc(h):
@@ -28,8 +30,8 @@ def h2abc(h):
     """
 
     a = float(h[0, 0])
-    b = math.sqrt(h[0, 1]**2 + h[1, 1]**2)
-    c = math.sqrt(h[0, 2]**2 + h[1, 2]**2 + h[2, 2]**2)
+    b = math.sqrt(h[0, 1] ** 2 + h[1, 1] ** 2)
+    c = math.sqrt(h[0, 2] ** 2 + h[1, 2] ** 2 + h[2, 2] ** 2)
     gamma = math.acos(h[0, 1] / b)
     beta = math.acos(h[0, 2] / c)
     alpha = math.acos(np.dot(h[:, 1], h[:, 2]) / (b * c))
@@ -104,5 +106,5 @@ def abc2h(a, b, c, alpha, beta, gamma):
     h[0, 2] = c * math.cos(beta)
     h[1, 1] = b * math.sin(gamma)
     h[1, 2] = (b * c * math.cos(alpha) - h[0, 1] * h[0, 2]) / h[1, 1]
-    h[2, 2] = math.sqrt(c**2 - h[0, 2]**2 - h[1, 2]**2)
+    h[2, 2] = math.sqrt(c ** 2 - h[0, 2] ** 2 - h[1, 2] ** 2)
     return h

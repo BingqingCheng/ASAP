@@ -3,12 +3,10 @@ CUR matrix decomposition is a low-rank matrix decomposition algorithm that is ex
 """
 
 import numpy as np
-import scipy.linalg as salg
 import scipy.sparse.linalg as spalg
 
 
 def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
-
     """
     Given rank k, find the best column and rows
     X = C U R
@@ -28,9 +26,9 @@ def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
     RX = X.copy()
     rsel = np.zeros(n_col, dtype=int)
     rerror = np.zeros(n_col, dtype=float)
-    
+
     for i in range(n_col):
-        rval, RX = CUR_deterministic_step(RX, n_col-i, costs)
+        rval, RX = CUR_deterministic_step(RX, n_col - i, costs)
         rsel[i] = rval
         if error_estimate: rerror[i] = np.sum(np.abs(RX))
     return rsel, rerror
@@ -42,13 +40,13 @@ def CUR_deterministic_step(cov, k, costs=1):
 
     evc, evec = spalg.eigs(cov, k)
     # compute the weights and select the one with maximum weight
-    weights = np.sum(np.square(evec),axis=1)/costs
+    weights = np.sum(np.square(evec), axis=1) / costs
     sel = np.argmax(weights)
     vsel = cov[sel].copy()
-    vsel *= 1.0/np.sqrt(np.dot(vsel,vsel))
+    vsel *= 1.0 / np.sqrt(np.dot(vsel, vsel))
     rcov = cov.copy()
     for i in range(len(rcov)):
         # Diagonalize the covariance matrix wrt the chosen column
-        rcov[i] -= vsel * np.dot(cov[i],vsel)
+        rcov[i] -= vsel * np.dot(cov[i], vsel)
 
     return sel, rcov

@@ -4,19 +4,21 @@ TODO: Module-level description
 """
 
 import argparse
+import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sys,os
+from ase.io import read
 from sklearn.model_selection import train_test_split
+
 from asaplib.fit import RidgeRegression
 from asaplib.fit import get_score
-from asaplib.plot import plot_styles
 from asaplib.io import str2bool
-from ase.io import read
+from asaplib.plot import plot_styles
+
 
 def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
-
     """
 
     Parameters
@@ -46,7 +48,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
             frames = read(fxyz, ':')
             nframes = len(frames)
             print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except: 
+        except:
             raise ValueError('Cannot load the xyz file')
 
         desc = []
@@ -55,22 +57,23 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
         if nframes > 1:
             for i, frame in enumerate(frames):
                 if fmat in frame.info:
-                     try:
-                         desc.append(frame.info[fmat])
-                         if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                             raise ValueError('mismatch of number of descriptors between frames')
-                         ndesc = len(frame.info[fmat])
-                     except:
-                         raise ValueError('Cannot combine the descriptor matrix from the xyz file')
+                    try:
+                        desc.append(frame.info[fmat])
+                        if ndesc > 0 and len(frame.info[fmat]) != ndesc:
+                            raise ValueError('mismatch of number of descriptors between frames')
+                        ndesc = len(frame.info[fmat])
+                    except:
+                        raise ValueError('Cannot combine the descriptor matrix from the xyz file')
             if desc != [] and np.shape(desc)[1] != nframes:
                 desc = np.asmatrix(desc)
-                #print(np.shape(desc))
+                # print(np.shape(desc))
                 desc.reshape((ndesc, nframes))
         else:
             # only one frame
-            try: 
+            try:
                 desc = frames[0].get_array(fmat)
-            except: ValueError('Cannot read the descriptor matrix from single frame')
+            except:
+                ValueError('Cannot read the descriptor matrix from single frame')
     else:
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
@@ -94,11 +97,11 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
         try:
             for frame in frames:
                 if fy == 'volume' or fy == 'Volume':
-                    y_all.append(frame.get_volume()/len(frame.get_positions()))
+                    y_all.append(frame.get_volume() / len(frame.get_positions()))
                 elif fy == 'size' or fy == 'Size':
                     y_all.append(len(frame.get_positions()))
                 else:
-                    y_all.append(frame.info[fy]/len(frame.get_positions()))
+                    y_all.append(frame.info[fy] / len(frame.get_positions()))
         except:
             raise ValueError('Cannot load the property vector')
     if len(y_all) != nframes:
@@ -109,10 +112,10 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
         from sklearn.preprocessing import StandardScaler
         scaler = StandardScaler()
         print(scaler.fit(desc))
-        desc = scaler.transform(desc) # normalizing the features
+        desc = scaler.transform(desc)  # normalizing the features
     # add bias
-    desc_bias = np.ones((np.shape(desc)[0],np.shape(desc)[1]+1))
-    desc_bias[:,1:] = desc
+    desc_bias = np.ones((np.shape(desc)[0], np.shape(desc)[1] + 1))
+    desc_bias[:, 1:] = desc
     print(np.shape(desc_bias))
     # train test split
     if test_ratio > 0:
@@ -124,7 +127,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
     n_test = len(X_test)
 
     # TODO: add sparsification
-        
+
     rr = RidgeRegression(jitter)
     # fit the model
     rr.fit(X_train, y_train)
@@ -139,31 +142,34 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma):
     print("test score: ", get_score(y_pred_test, y_test))
 
     plot_styles.set_nice_font()
-    fig = plt.figure(figsize=(8*2.1, 8))
+    fig = plt.figure(figsize=(8 * 2.1, 8))
     ax = fig.add_subplot(121)
     ax.plot(y_train, y_pred, 'b.', label='train')
     ax.plot(y_test, y_pred_test, 'r.', label='test')
     ax.legend()
-    ax.set_title('Ridge regression for: '+fy)
+    ax.set_title('Ridge regression for: ' + fy)
     ax.set_xlabel('actual y')
     ax.set_ylabel('predicted y')
 
     # TODO: add learning curve
 
     plt.show()
-    fig.savefig('RR_4_'+prefix+'.png')
+    fig.savefig('RR_4_' + prefix + '.png')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='ASAP_desc', help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
+    parser.add_argument('-fmat', type=str, default='ASAP_desc',
+                        help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-fy', type=str, default='none', help='Location of the list of properties (N floats)')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True, help='Scale the coordinates (True/False). Scaling highly recommanded.')
+    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
+                        help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
-    parser.add_argument('--jitter', type=float, default=1e-10, help='regularizer that improves the stablity of matrix inversion')
+    parser.add_argument('--jitter', type=float, default=1e-10,
+                        help='regularizer that improves the stablity of matrix inversion')
     parser.add_argument('--n', type=int, default=-1, help='number of the representative samples')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
 
