@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="ASAP2", # Replace with your own username
-    version="0.0.12",
+    name="asaplib",
+    version="0.0.1",
     author="Bingqing Cheng",
     author_email="tonicbq@gmail.com",
     description="Automatic Selection And Prediction tools for materials and molecules",
@@ -19,8 +19,14 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    scripts=['asap/gen_soap_descriptors.py', 'asap/frame_select.py', 'asap/clustering.py',
-             'asap/gen_soap_kmat.py', 'asap/kernel_density_estimation.py', 'asap/kpca.py',
-             'asap/krr.py', 'asap/pca.py', 'asap/ridge_regression.py'
-             ],
+    scripts=['scripts/krr.py',
+             'scripts/kernel_density_estimation.py',
+             'scripts/frame_select.py',
+             'scripts/gen_soap_kmat.py',
+             'scripts/pca.py',
+             'scripts/ridge_regression.py',
+             'scripts/gen_soap_descriptors.py',
+             'scripts/pca_minimal.py',
+             'scripts/kpca.py',
+             'scripts/clustering.py'],
 )
