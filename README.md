@@ -41,7 +41,7 @@ In the directory ./scripts/ you can find a selection of python tools:
 
 * kernel_density_estimate.py: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
 
-* clustering.py: does clustering tasks based on the kernel matrix, does plotting well.
+* clustering.py: does clustering tasks based on the kernel matrix, does plotting as well.
 
 * ridge_regression.py: quick ridge regression, with train/test split and optional learning curve.
 
