@@ -13,3 +13,6 @@ kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors ener
 
 * step 3
 kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors volume --prefix W-GAP-train-set
+
+* step 4
+krr.py -fxyz subset-random-n-1000.xyz -fy energy -fmat W-n4-l6-c5.0-g0.5.kmat --lcpoints 10 --test 0.05 --n 100
