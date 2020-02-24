@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+Performing kernel ridge regression (with optional learning curve)
 """
 
 import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+from ase.io import read
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.compressor import fps, kernel_random_split
 from asaplib.fit import KRRSparse
@@ -15,7 +15,7 @@ from asaplib.fit import get_score
 from asaplib.plot import plot_styles
 
 
-def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
+def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points, lc_repeats):
     """
 
     Parameters
@@ -27,6 +27,8 @@ def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     jitter: jitter level, default is 1e-10
     n_sparse: number of representative samples
     sigma: noise level in kernel ridge regression
+    lc_points : number of points on the learning curve
+    lc_repeats : number of sub-sampling when compute the learning curve
 
     Returns
     -------
@@ -41,10 +43,33 @@ def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     except OSError:
         raise Exception('fmat file could not be loaded. Please check the filename')
     print("loaded", fmat)
+
+
+    # read in the properties to be predicted
+    y_all = []
     try:
         y_all = np.genfromtxt(fy, dtype=float)
-    except OSError:
-        raise Exception('property vector file could not be loaded. Please check the filename')
+    except:
+        try:
+            # try to read the xyz file
+            if fxyz != 'none':
+                try:
+                    frames = read(fxyz, ':')
+                    nframes = len(frames)
+                    print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
+                except:
+                    raise ValueError('Cannot load the xyz file')
+            for frame in frames:
+                if fy == 'volume' or fy == 'Volume':
+                    y_all.append(frame.get_volume() / len(frame.get_positions()))
+                elif fy == 'size' or fy == 'Size':
+                    y_all.append(len(frame.get_positions()))
+                else:
+                    y_all.append(frame.info[fy] / len(frame.get_positions()))
+            y_all = np.array(y_all)
+        except OSError:
+            raise Exception('property vector file could not be loaded. Please check the filename')
+
     if len(y_all) != len(K_all):
         raise ValueError('Length of the vector of properties is not the same as number of samples')
     else:
@@ -87,9 +112,53 @@ def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     # compute the CV score for the dataset
     print("test score: ", get_score(y_pred_test, y_test))
 
+    # learning curve
+    # decide train sizes
+    if lc_points > 1:
+        train_sizes = exponential_split(n_sparse, n_train - n_test, lc_points)
+        print("Learning curves using train sizes: ", train_sizes)
+        lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
+        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
+
+        scores = {size: [] for size in train_sizes}
+        for lctrain, lctest in lc.split(y_train):
+            Ntrain = len(lctrain)
+            lc_K_NM = K_NM[lctrain, :]
+            lc_y_train = y_train[lctrain]
+            # lc_K_test = K_NM[lctest,:]
+            lc_K_test = K_TM
+            # lc_y_test = y_train[lctest]
+            lc_y_test = y_test
+            krr.fit(K_MM, lc_K_NM, lc_y_train)
+            lc_y_pred = krr.predict(lc_K_test)
+            scores[Ntrain].append(get_score(lc_y_pred, lc_y_test))
+
+        sc_name = 'RMSE'
+        Ntrains = []
+        avg_scores = []
+        avg_scores_error = []
+        for Ntrain, score in scores.items():
+            avg = 0.
+            var = 0.
+            for sc in score:
+                avg += sc[sc_name]
+                var += sc[sc_name] ** 2.
+            avg /= len(score)
+            var /= len(score);
+            var -= avg ** 2.
+            avg_scores.append(avg)
+            avg_scores_error.append(np.sqrt(var))
+            Ntrains.append(Ntrain)
+
+
     plot_styles.set_nice_font()
-    fig = plt.figure(figsize=(8 * 2.1, 8))
-    ax = fig.add_subplot(121)
+    
+    if lc_points > 1:
+        fig = plt.figure(figsize=(8 * 2.1, 8))
+        ax = fig.add_subplot(121)
+    else:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111)
     ax.plot(y_train, y_pred, 'b.', label='train')
     ax.plot(y_test, y_pred_test, 'r.', label='test')
     ax.legend()
@@ -97,51 +166,14 @@ def main(fmat, fy, prefix, test_ratio, jitter, n_sparse, sigma):
     ax.set_xlabel('actual y')
     ax.set_ylabel('predicted y')
 
-    # learning curve
-    # decide train sizes
-    lc_points = 10
-    train_sizes = exponential_split(n_sparse, n_train - n_test, lc_points)
-    print("Learning curves using train sizes: ", train_sizes)
-    lc_stats = 12 * np.ones(lc_points, dtype=int)
-    lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
-
-    scores = {size: [] for size in train_sizes}
-    for lctrain, lctest in lc.split(y_train):
-        Ntrain = len(lctrain)
-        lc_K_NM = K_NM[lctrain, :]
-        lc_y_train = y_train[lctrain]
-        # lc_K_test = K_NM[lctest,:]
-        lc_K_test = K_TM
-        # lc_y_test = y_train[lctest]
-        lc_y_test = y_test
-        krr.fit(K_MM, lc_K_NM, lc_y_train)
-        lc_y_pred = krr.predict(lc_K_test)
-        scores[Ntrain].append(get_score(lc_y_pred, lc_y_test))
-
-    sc_name = 'RMSE'
-    Ntrains = []
-    avg_scores = []
-    avg_scores_error = []
-    for Ntrain, score in scores.items():
-        avg = 0.
-        var = 0.
-        for sc in score:
-            avg += sc[sc_name]
-            var += sc[sc_name] ** 2.
-        avg /= len(score)
-        var /= len(score);
-        var -= avg ** 2.
-        avg_scores.append(avg)
-        avg_scores_error.append(np.sqrt(var))
-        Ntrains.append(Ntrain)
-
-    ax2 = fig.add_subplot(122)
-    ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error)
-    ax2.set_title('Learning curve')
-    ax2.set_xlabel('Number of training samples')
-    ax2.set_ylabel('Test {}'.format(sc_name))
-    ax2.set_xscale('log')
-    ax2.set_yscale('log')
+    if lc_points > 1:
+        ax2 = fig.add_subplot(122)
+        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error)
+        ax2.set_title('Learning curve')
+        ax2.set_xlabel('Number of training samples')
+        ax2.set_ylabel('Test {}'.format(sc_name))
+        ax2.set_xscale('log')
+        ax2.set_yscale('log')
 
     plt.show()
     fig.savefig('KRR_4_' + prefix + '.png')
@@ -151,6 +183,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-fmat', type=str, required=True,
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-fy', type=str, default='none', help='Location of the list of properties (N floats)')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
@@ -158,6 +191,8 @@ if __name__ == '__main__':
                         help='regularizer that improves the stablity of matrix inversion')
     parser.add_argument('--n', type=int, default=-1, help='number of the representative samples')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
+    parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
+    parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
     args = parser.parse_args()
 
-    main(args.fmat, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma)
+    main(args.fmat, args.fxyz, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma, args.lcpoints, args.lcrepeats)
