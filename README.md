@@ -9,6 +9,7 @@ Automatic Selection And Prediction tools for materials and molecules
 python 3
 
 Installation:
+
 python3 setup.py install --user
 
 Requirements:
@@ -18,7 +19,6 @@ Requirements:
 Add-Ons:
 + (for finding symmetries of crystals) spglib 
 + (for annotation without overlaps) adjustText
-+ (for clustering) first install python package "easycython", and then go to ./externallib/ and compile DBA by typying "bash compile.sh"
 
 One can use the following comments for installing the packages:
 
@@ -27,7 +27,7 @@ pip3 install --upgrade pip
 python3 -m pip install --user somepackage    .or.    pip3 install --user somepackage
 
 #
-In the directory ./asap/ you can find a selection of python tools:
+In the directory ./scripts/ you can find a selection of python tools:
 
 * gen_soap_descriptors.py: generate soap descriptors for each frame and each atomic environment.
 
@@ -43,7 +43,9 @@ In the directory ./asap/ you can find a selection of python tools:
 
 * clustering.py: does clustering tasks based on the kernel matrix, does plotting well.
 
-* krr.py: quick kernel ridge regression, in order to test if there is enough signal in the data set.
+* ridge_regression.py: quick ridge regression, with train/test split and optional learning curve.
+
+* krr.py: quick kernel ridge regression, with train/test split, sparsification and optional learning curve.
 
 #
 TODOs:
