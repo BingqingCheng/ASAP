@@ -8,6 +8,9 @@ Automatic Selection And Prediction tools for materials and molecules
 #
 python 3
 
+Installation:
+python3 setup.py install --user
+
 Requirements:
 
 + numpy scipy scikit-learn ase dscribe 
@@ -45,4 +48,3 @@ In the directory ./asap/ you can find a selection of python tools:
 #
 TODOs:
 * add a class of methods to compute kernel matrix from basis functions
-* add a dendrogram function
