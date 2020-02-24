@@ -1,4 +1,4 @@
-#!python3
+#! /usr/bin/env python
 """
 Minimal implementation of PCA projection with SOAP vectors.
 
