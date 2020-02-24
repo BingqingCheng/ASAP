@@ -8,6 +8,7 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 from ase.io import read
+
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.compressor import fps, kernel_random_split
 from asaplib.fit import KRRSparse
@@ -193,6 +194,10 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
     parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
     parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma, args.lcpoints, args.lcrepeats)
