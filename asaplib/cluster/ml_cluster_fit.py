@@ -364,3 +364,8 @@ class LAIO_DB(FitClusterBase):
         center_label = self.get_assignation(data)
 
         return center_label
+
+    def pack(self):
+        '''return all the info'''
+        state = dict(deltamin=self.dc, rhomin=self.dens_cut)
+        return state
