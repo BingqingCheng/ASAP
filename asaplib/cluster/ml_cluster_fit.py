@@ -208,7 +208,7 @@ class LAIO_DB(FitClusterBase):
         return delta, nneigh
 
 
-def pack(self):
-    '''return all the info'''
-    state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
-    return state
+    def pack(self):
+        '''return all the info'''
+        state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
+        return state
