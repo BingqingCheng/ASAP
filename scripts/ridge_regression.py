@@ -18,7 +18,7 @@ from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
-def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma, lc_points, lc_repeats):
+def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc_repeats):
     """
 
     Parameters
@@ -30,7 +30,6 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma, lc_
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
     test_ratio: train/test ratio
     jitter: jitter level, default is 1e-10
-    n_sparse: number of representative samples
     sigma: noise level in kernel ridge regression
     lc_points : number of points on the learning curve
     lc_repeats : number of sub-sampling when compute the learning curve
@@ -148,7 +147,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, n_sparse, sigma, lc_
     # learning curve
     # decide train sizes
     if lc_points > 1:
-        train_sizes = exponential_split(n_sparse, n_train - n_test, lc_points)
+        train_sizes = exponential_split(20, n_train - n_test, lc_points)
         print("Learning curves using train sizes: ", train_sizes)
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
         lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
@@ -222,7 +221,6 @@ if __name__ == '__main__':
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
     parser.add_argument('--jitter', type=float, default=1e-10,
                         help='regularizer that improves the stablity of matrix inversion')
-    parser.add_argument('--n', type=int, default=-1, help='number of the representative samples')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
     parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
     parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
@@ -232,4 +230,4 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.fy, args.prefix, args.scale, args.test, args.jitter, args.n, args.sigma, args.lcpoints, args.lcrepeats)
+    main(args.fmat, args.fxyz, args.fy, args.prefix, args.scale, args.test, args.jitter, args.sigma, args.lcpoints, args.lcrepeats)
