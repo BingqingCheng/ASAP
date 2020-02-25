@@ -192,20 +192,20 @@ class LAIO_DB(FitClusterBase):
            j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
         '''
 
-    delta = (rho * 0.0).copy()
-    nneigh = np.ones(len(delta), dtype='int')
-    for i in range(len(rho)):
-        # for data i, find all points that have higher density
-        js = np.where(rho > rho[i])[0]
-        if len(js) == 0:
-            # if there's no j's that have higher density than i, we set delta_i to be a large distance
-            delta[i] = np.max(dist[i, :])
-            nneigh[i] = i
-        else:
-            # find the nearest j that has higher density then i
-            delta[i] = np.min(dist[i, js])
-            nneigh[i] = js[np.argmin(dist[i, js])]
-    return delta, nneigh
+        delta = (rho * 0.0).copy()
+        nneigh = np.ones(len(delta), dtype='int')
+        for i in range(len(rho)):
+            # for data i, find all points that have higher density
+            js = np.where(rho > rho[i])[0]
+            if len(js) == 0:
+                # if there's no j's that have higher density than i, we set delta_i to be a large distance
+                delta[i] = np.max(dist[i, :])
+                nneigh[i] = i
+            else:
+                # find the nearest j that has higher density then i
+                delta[i] = np.min(dist[i, js])
+                nneigh[i] = js[np.argmin(dist[i, js])]
+        return delta, nneigh
 
 
 def pack(self):
