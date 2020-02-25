@@ -18,6 +18,7 @@ from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
+
 def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc_repeats):
     """
 
