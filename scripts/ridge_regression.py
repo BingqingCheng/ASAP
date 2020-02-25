@@ -180,6 +180,9 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc
             avg_scores_error.append(np.sqrt(var))
             Ntrains.append(Ntrain)
 
+        # output learning curve
+        np.savetxt("RR_learning_curve.dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+
     plot_styles.set_nice_font()
     
     if lc_points > 1:
