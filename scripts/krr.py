@@ -4,7 +4,7 @@ Performing kernel ridge regression (with optional learning curve)
 """
 
 import argparse
-
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from ase.io import read
