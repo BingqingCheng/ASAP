@@ -86,11 +86,13 @@ def main(fxyz, dictxyz, prefix, output, peratom, fmultisoap, soap_rcut, soap_g, 
 
     for i, frame in enumerate(frames):
         fnow = soap_desc_atomic[0].create(frame, n_jobs=8)
-        # print(np.shape(fnow))
+
+        
         for soap_desc_atomic_now in soap_desc_atomic[1:]:
             fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
-            # print(np.shape(fnow))
+
         # average over all atomic environments inside the system
+
         frame.info[desc_name] = fnow.mean(axis=0)
 
         # save

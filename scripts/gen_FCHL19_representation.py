@@ -15,15 +15,38 @@ def repr_wrapper(frame, elements, is_periodic = False,
                                         three_body_weight=13.4):
     '''
    Periodic systems not implemented for FCHL19.
-   
+    :frame: ase Atoms class
+    :param elements: list of unique nuclear charges (atom types)
+    :type elements: numpy array
+    :is_periodic: Boolean determining Whether the system is periodic.
+    :type Boolean:
+    :param nRs2: Number of gaussian basis functions in the two-body terms
+    :type nRs2: integer
+    :param nRs3: Number of gaussian basis functions in the three-body radial part
+    :type nRs3: integer
+    :param nFourier: Order of Fourier expansion
+    :type nFourier: integer
+    :param eta2: Precision in the gaussian basis functions in the two-body terms
+    :type eta2: float
+    :param eta3: Precision in the gaussian basis functions in the three-body radial part
+    :type eta3: float
+    :param zeta: Precision parameter of basis functions in the three-body angular part
+    :type zeta: float
+    :param two_body_decay: exponential decay for the two body function
+    :type two_body_decay: float
+    :param three_body_decay: exponential decay for the three body function
+    :type three_body_decay: float
+    :param three_body_weight: relative weight of the three body function
+    :type three_body_weight: float
    '''
+
     if is_periodic:
          raise NotImplementedError( 'Periodic system not implemented!')
-         
+
     nuclear_charges,coordinates = frame.get_atomic_numbers(),frame.get_positions()
     rep = generate_fchl_acsf(nuclear_charges, coordinates, elements,
                                         nRs2=nRs2, nRs3=nRs3, nFourier=nFourier,
-                                        eta2=eta2, eta3=eta3, zeta=zeta, 
+                                        eta2=eta2, eta3=eta3, zeta=zeta,
                                         rcut=rcut, acut=acut,
                                         two_body_decay=two_body_decay, three_body_decay=three_body_decay,
                                         three_body_weight=three_body_weight,
@@ -47,7 +70,10 @@ def main(fxyz = False, fdict = False, prefix= False , output= False , peratom= F
 
 
     """
-    Generate the FCHL19 representation.
+    Generate the FCHL19 representation (https://doi.org/10.1063/1.5126701).
+    Requires the developer version of the QML package, see
+    https://www.qmlcode.org/installation.html for installation instructions.
+
 
     Parameters
     ----------
@@ -55,6 +81,27 @@ def main(fxyz = False, fdict = False, prefix= False , output= False , peratom= F
     fdictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
     output: [xyz]: append the FCHL19 representation to extended xyz file; [mat] output as a standlone matrix
+
+    :param nRs2: Number of gaussian basis functions in the two-body terms
+    :type nRs2: integer
+    :param nRs3: Number of gaussian basis functions in the three-body radial part
+    :type nRs3: integer
+    :param nFourier: Order of Fourier expansion
+    :type nFourier: integer
+    :param eta2: Precision in the gaussian basis functions in the two-body terms
+    :type eta2: float
+    :param eta3: Precision in the gaussian basis functions in the three-body radial part
+    :type eta3: float
+    :param zeta: Precision parameter of basis functions in the three-body angular part
+    :type zeta: float
+    :param two_body_decay: exponential decay for the two body function
+    :type two_body_decay: float
+    :param three_body_decay: exponential decay for the three body function
+    :type three_body_decay: float
+    :param three_body_weight: relative weight of the three body function
+    :type three_body_weight: float
+    :is_periodic: Boolean determining Whether the system is periodic.
+    :type Boolean:
     """
 
 

@@ -12,6 +12,8 @@ Requirements:
 
 + numpy scipy scikit-learn ase dscribe 
 
++ The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
+
 Add-Ons:
 + (for finding symmetries of crystals) spglib 
 + (for annotation without overlaps) adjustText
@@ -25,6 +27,8 @@ python3 -m pip install --user somepackage    .or.    pip3 install --user somepac
 
 #
 In the directory ./asap/ you can find a selection of python tools:
+
+* gen_FCHL19_rep.py: generate FCHL representation for each frame and each atomic environment.
 
 * gen_soap_descriptors.py: generate soap descriptors for each frame and each atomic environment.
 

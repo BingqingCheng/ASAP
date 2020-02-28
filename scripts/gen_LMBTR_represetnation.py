@@ -2,34 +2,33 @@
 import argparse
 import os
 import sys
+import json
+
 
 import numpy as np
 from ase.io import read, write
-from dscribe.descriptors import SOAP
+from dscribe.descriptors import LMBTR
 
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, peratom, fmultisoap, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
+def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic):
     """
 
-    Generate the SOAP descriptors.
+    Generate the LMBTR Representation.
 
     Parameters
     ----------
     fxyz: string giving location of xyz file
     dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
-    output: [xyz]: append the SOAP descriptors to extended xyz file; [mat] output as a standlone matrix
-    fmultisoap: use multiple sets of SOAP descriptors using parameters specified in fmultisoap file (json format)
-    soap_rcut: float giving the cutoff radius, default value is 3.0
-    soap_g: float giving the atom width
-    soap_n: int giving the maximum radial label
-    soap_l: int giving the maximum angular label. Must be less than or equal to 9
-    soap_periodic: string (True or False) indicating whether the system is periodic
+    output: [xyz]: append the representations to extended xyz file; [mat] output as a standlone matrix
+    input_path': string Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)
+    periodic: string (True or False) indicating whether the system is periodic
     """
-    soap_periodic = bool(soap_periodic)
-    peratom = bool(peratom)
+
+    periodic = bool(periodic)
+    per_atom = bool(per_atom)
     fframes = []
     dictframes = []
 
@@ -50,61 +49,45 @@ def main(fxyz, dictxyz, prefix, output, peratom, fmultisoap, soap_rcut, soap_g, 
     global_species = []
     for frame in frames:
         global_species.extend(frame.get_atomic_numbers())
-        if not soap_periodic:
+        if not periodic:
             frame.set_pbc([False, False, False])
     global_species = np.unique(global_species)
     print("a total of", nframes, "frames, with elements: ", global_species)
-
-    if fmultisoap == 'none':
-        soap_desc_atomic = [SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
-                                 sigma=soap_g, rbf="gto", crossover=False, average=False, periodic=soap_periodic)]
-        foutput = prefix + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
-        desc_name = "SOAP" + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
-    else:
-        import json
+    if config_path:
         try:
-            with open(fmultisoap, 'r') as soapfile:
-                soap_js = json.load(soapfile)
-        except:
-            raise IOError('Cannot load the json file for soap parameters')
-        soap_desc_atomic = []
-        for element in soap_js.keys():
-            soap_param = soap_js[element]
-            [species_now, cutoff_now, g_now, n_now, l_now] = [soap_param['species'], soap_param['cutoff'],
-                                                              soap_param['atom_gaussian_width'], soap_param['n'],
-                                                              soap_param['l']]
-            soap_desc_atomic.append(SOAP(species=species_now, rcut=cutoff_now, nmax=n_now, lmax=l_now,
-                                         sigma=g_now, rbf="gto", crossover=False, average=False,
-                                         periodic=soap_periodic))
+            with open(config_path, 'r') as config_file:
+                config = json.load(config_file)
+        except Exception:
+            raise IOError('Cannot load the json file for parameters')
+    
+    if config_path:    rep_atomic = LMBTR(species = global_species, periodic = periodic, flatten=True,**config)
+    else:    rep_atomic = LMBTR(species = global_species, flatten=True, periodic = periodic)
+    if config_path:
+        foutput = prefix + '-' + config_path
+        desc_name = "LMBTR"+ '-' + config_path
+    else: 
+        foutput = prefix
+        desc_name = "LMBTR" 
 
-        foutput = prefix + "-multisoap" + '-' + fmultisoap
-        desc_name = "MULTISOAP" + '-' + fmultisoap
 
     # prepare for the output
     if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
     if os.path.isfile(foutput + ".desc"): os.rename(foutput + ".desc", "bck." + foutput + ".desc")
 
     for i, frame in enumerate(frames):
-        fnow = soap_desc_atomic[0].create(frame, n_jobs=8)
-        # print(np.shape(fnow))
-        for soap_desc_atomic_now in soap_desc_atomic[1:]:
-            fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
-            # print(np.shape(fnow))
-        # average over all atomic environments inside the system
-        print(fnow.shape,fnow.mean(axis=0).shape)                              
-        
+        fnow = rep_atomic.create(frame)
         frame.info[desc_name] = fnow.mean(axis=0)
 
         # save
         if output == 'matrix':
             with open(foutput + ".desc", "ab") as f:
                 np.savetxt(f, frame.info[desc_name][None])
-            if peratom or nframes == 1:
+            if per_atom or nframes == 1:
                 with open(foutput + ".atomic-desc", "ab") as fatomic:
                     np.savetxt(fatomic, fnow)
         elif output == 'xyz':
             # output per-atom info
-            if peratom:
+            if per_atom:
                 frame.new_array(desc_name, fnow)
             # write xyze
             write(foutput + ".xyz", frame, append=True)
@@ -120,15 +103,11 @@ if __name__ == '__main__':
                                                                  'that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
-    parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
+    parser.add_argument('--per_atom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
-    parser.add_argument('-multisoap', type=str, default='none',
-                        help='Use multiple SOAP, and specify the parameter using a json file.')
-    parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
-    parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
-    parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
-    parser.add_argument('--g', type=float, default=0.5, help='Atom width')
-    parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
+    
+    parser.add_argument('--input_path', type=str, default=False, help='Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
+    parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
 
     if len(sys.argv) == 1:
@@ -136,5 +115,4 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.multisoap, args.rcut, args.g, args.n,
-         args.l, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.input_path, args.periodic)
