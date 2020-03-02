@@ -151,6 +151,8 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
             avg_scores_error.append(np.sqrt(var))
             Ntrains.append(Ntrain)
 
+        # output learning curve
+        np.savetxt("KRR_learning_curve.dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
     

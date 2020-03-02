@@ -13,7 +13,7 @@ from .ml_cluster_base import ClusterBase, FitClusterBase
 
 class DBCluster(ClusterBase):
     """
-    TODO: Make class-level docstring
+    Performing clustering using density based clustering algorithm
     """
     _pairwise = True
 
@@ -41,7 +41,7 @@ class DBCluster(ClusterBase):
             silscore = silhouette_score(dmatrix, self.labels, metric="precomputed")
         else:
             silscore = silhouette_score(dmatrix, self.labels, metric="euclidean")
-        print("Silhouette Coefficient: %0.3f" %silscore)
+        print("Silhouette Coefficient: %0.3f" % silscore)
 
     def get_cluster_labels(self, index=[]):
         """return the label of the samples in the list of index"""
@@ -71,9 +71,11 @@ class sklearn_DB(FitClusterBase):
         The maximum distance between two samples for one to be considered as in the neighborhood of the other.
         This is not a maximum bound on the distances of points within a cluster.
         This is the most important DBSCAN parameter to choose appropriately for your dataset and distance function.
+
     min_samples : int, optional
         The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.
         This includes the point itself.
+
     metric : string, or callable
         The metric to use when calculating distance between instances in a feature array.
         If metric is a string or callable, it must be one of the options allowed by sklearn.metrics.pairwise_distances for its metric parameter.
@@ -109,9 +111,27 @@ class sklearn_DB(FitClusterBase):
 #     $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density
 #     """
 #
+#    A summary of laio clustering algorithm:
+#    1. First do a kernel density estimation (rho_i) for each data point i
+#    2. For each data point i, compute the distance (delta_i) between i and j,
+#       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
+#    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)
+#    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:
+#       i) rho({cl}) > rhomin
+#       ii) delta({cl}) > delta_min
+#       one needs to set the two parameters rhomin and delta_min.
+#    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.
+# one needs to set two parameters:
+#
 #     _pairwise = True
 #
 #     def __init__(self, deltamin=-1, rhomin=-1):
+#         """
+#         :param deltamin: the lower bound on the distance between two cluster centres
+#         :param rhomin: The lower bound in kernel density, if the density of a cluster is lower
+#                        than this threshold, this "cluster" will be discarded as noise
+#         """
+#
 #         self.deltamin = deltamin
 #         self.rhomin = rhomin
 #
@@ -132,13 +152,18 @@ class sklearn_DB(FitClusterBase):
 #         if rho is None:
 #             raise ValueError('for fdb it is better to compute kernel density first')
 #
+#
 #         delta, nneigh = self.estimate_delta(dmatrix, rho)
 #
-#         # I'll think about this!!! Criterion for deciding which data points act as cluster centres
+#         #  if there's no input values for rhomin and deltamin, we use simple heuristics
 #         if self.rhomin < 0:
 #             self.rhomin = 0.2*np.mean(rho) + 0.8*np.min(rho)
 #         if self.deltamin < 0:
 #             self.deltamin = np.mean(delta)
+#
+#         #here we make the decision graph
+#         #x axis (rho) is the kernel density for each data point
+#         #y axis (delta) is the distance to the nearest higher density points
 #
 #         plt.scatter(rho, delta)
 #         plt.plot([min(rho), max(rho)], [self.deltamin, self.deltamin], c='red')
@@ -164,6 +189,8 @@ class sklearn_DB(FitClusterBase):
 #
 #     def estimate_delta(self, dist, rho):
 #         """
+#         For each data point i, compute the distance (delta_i) between i and j,
+#         j is the closest data point that has a density higher then i, i.e. rho(j) > rho(i).
 #
 #         Parameters
 #         ----------
@@ -178,11 +205,14 @@ class sklearn_DB(FitClusterBase):
 #         delta = (rho*0.0).copy()
 #         nneigh = np.ones(len(delta), dtype='int')
 #         for i in range(len(rho)):
+#             #  for data i, find all points that have higher density
 #             js = np.where(rho > rho[i])[0]
+#             #  if there's no j's that have higher density than i, we set delta_i to be a large distance
 #             if len(js) == 0:
 #                 delta[i] = np.max(dist[i, :])
 #                 nneigh[i] = i
 #             else:
+#                 # find the nearest j that has higher density then i
 #                 delta[i] = np.min(dist[i, js])
 #                 nneigh[i] = js[np.argmin(dist[i, js])]
 #         return delta, nneigh
