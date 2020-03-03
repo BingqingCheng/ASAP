@@ -27,10 +27,10 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
     fy: Path to the list of properties (N floats) or name of the tags in ase xyz file
     prefix: Filename prefix, default is ASAP
     nkeep: The number of representative samples to select
-    algorithm: 'the algorithm for selecting frames ([random], [fps], [sort])')
+    algorithm: 'the algorithm for selecting frames ([random], [fps], [sort], [reweight])')
     fmat: Location of descriptor or kernel matrix file. Needed if you select [fps].
     You can use gen_kmat.py to compute it.
-    reweight: select samples according to the re-weighted distribution exp(-f/\lambda),
+    reweight_lambda: select samples according to the re-weighted distribution exp(-f/\lambda),
               where exp(-f) is the kernel density estimation of the original samples.
     """
 
