@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+Python script for performing ridge regression. 
+(with optional learning curve)
 """
 
 import argparse
@@ -18,7 +19,7 @@ from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
-def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc_repeats):
+def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats):
     """
 
     Parameters
@@ -29,8 +30,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc
     prefix: filename prefix for learning curve figure
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
     test_ratio: train/test ratio
-    jitter: jitter level, default is 1e-10
-    sigma: noise level in kernel ridge regression
+    sigma: noise level in kernel ridge regression, default is 0.1% of the standard deviation of the data.
     lc_points : number of points on the learning curve
     lc_repeats : number of sub-sampling when compute the learning curve
 
@@ -131,18 +131,32 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, jitter, sigma, lc_points, lc
 
     # TODO: add sparsification
 
-    rr = RidgeRegression(jitter)
+
+    # if sigma is not set...
+    if sigma < 0:
+        sigma = 0.001 * np.std(y_train)
+
+    rr = RidgeRegression(sigma)
     # fit the model
     rr.fit(X_train, y_train)
 
+    fit_error = {}
     # get the predictions for train set
     y_pred = rr.predict(X_train)
     # compute the CV score for the dataset
-    print("train score: ", get_score(y_pred, y_train))
+    train_error = get_score(y_pred, y_train)
+    print("train score: ", train_error)
+    fit_error['train_error'] = train_error
     # get the predictions for test set
     y_pred_test = rr.predict(X_test)
     # compute the CV score for the dataset
-    print("test score: ", get_score(y_pred_test, y_test))
+    test_error = get_score(y_pred_test, y_test)
+    print("test score: ", test_error)
+    fit_error['test_error'] = test_error
+    # dump to file
+    import json
+    with open('RR_train_test_errors.json', 'w') as fp:
+        json.dump(fit_error, fp)
 
     # learning curve
     # decide train sizes
@@ -222,9 +236,7 @@ if __name__ == '__main__':
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
                         help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
-    parser.add_argument('--jitter', type=float, default=1e-10,
-                        help='regularizer that improves the stablity of matrix inversion')
-    parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
+    parser.add_argument('--sigma', type=float, default=-1, help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.')
     parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
     parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
 
@@ -233,4 +245,4 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.fy, args.prefix, args.scale, args.test, args.jitter, args.sigma, args.lcpoints, args.lcrepeats)
+    main(args.fmat, args.fxyz, args.fy, args.prefix, args.scale, args.test, args.sigma, args.lcpoints, args.lcrepeats)
