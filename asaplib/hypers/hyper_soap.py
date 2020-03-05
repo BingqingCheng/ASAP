@@ -41,6 +41,7 @@ def gen_default_soap_hyperparameters(Zs, soap_n=6, soap_l=6, multisoap=2, sharpn
     """
 
     # check if the element is in the look up table
+    #print(type(Zs))
     for Z in Zs:
         if str(Z) not in uni_length_scales:
             raise RuntimeError("key Z {} not present in length_scales table".format(Z))
