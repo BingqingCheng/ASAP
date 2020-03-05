@@ -122,8 +122,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
-    parser.add_argument('-multisoap', type=str, default='none',
-                        help='Use multiple SOAP, and specify the parameter using a json file.')
+    parser.add_argument('-param_path', type=str, default='none',
+                        help='Specify the hyper parameters using a json file.')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
@@ -136,5 +136,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.multisoap, args.rcut, args.g, args.n,
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.param_path, args.rcut, args.g, args.n,
          args.l, args.periodic)

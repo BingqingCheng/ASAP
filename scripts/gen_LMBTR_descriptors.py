@@ -23,7 +23,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic):
     dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
     output: [xyz]: append the representations to extended xyz file; [mat] output as a standlone matrix
-    input_path': string Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)
+    param_path': string Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)
     periodic: string (True or False) indicating whether the system is periodic
     """
 
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--per_atom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
     
-    parser.add_argument('--input_path', type=str, default=False, help='Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
+    parser.add_argument('-param_path', type=str, default=False, help='Specify the hyper parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
 
@@ -115,4 +115,4 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.input_path, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.param_path, args.periodic)
