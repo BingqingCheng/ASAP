@@ -3,8 +3,6 @@ import argparse
 import os
 import sys
 import json
-
-
 import numpy as np
 from ase.io import read, write
 from dscribe.descriptors import ACSF
@@ -12,10 +10,10 @@ from dscribe.descriptors import ACSF
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, per_atom, r_cut , config_path , periodic):
+def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic):
     """
 
-    Generate the ASCF Representation.
+    Generate the ACSF Representation. Currently only implemented for finite system in DSCRIBE.
 
     Parameters
     ----------
@@ -23,7 +21,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut , config_path , periodic
     dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
     output: [xyz]: append the representations to extended xyz file; [mat] output as a standlone matrix
-    rcut: float giving the cutoff radius, default value is 3.0
+    rcut: float giving the cutoff radius, default value is 4.0
     param_path': string Specify the Gn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)
     periodic: string (True or False) indicating whether the system is periodic
     """
@@ -54,21 +52,52 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut , config_path , periodic
             frame.set_pbc([False, False, False])
     global_species = np.unique(global_species)
     print("a total of", nframes, "frames, with elements: ", global_species)
-    if config_path:
+
+    if periodic:
+        print("Warning: currently DScribe only supports ACSF for finite systems")
+
+    # template for an ACSF descriptor
+    acsf_dict = {'species': global_species,
+    'rcut': r_cut,
+    'g2_params': None,
+    'g3_params': None,
+    'g4_params': None,
+    'g5_params': None} #,
+    #'periodic': periodic, 'sparse': False}
+    # currenly Dscribe only supports ASCF for finite system!
+
+    # Setting up the ACSF descriptor
+    if os.path.isfile(facsf_param):
+        # load file
         try:
-            with open(config_path, 'r') as config_file:
-                config = json.load(config_file)
-                for k,v in config.items():
-                    if isinstance(v, list): 
-                        config[k] = np.asarray(v)
-                        
-        except Exception:
-            raise IOError('Cannot load the json file for parameters')
-    if config_path: rep_atomic = ACSF(rcut = r_cut,species = global_species,**config)
-    else:    rep_atomic = ACSF(rcut = r_cut,species = global_species)
-    if config_path:
-        foutput = prefix + "-rcut" + str(r_cut) + '-' + config_path
-        desc_name = "ACSF" + "-rcut" + str(r_cut) + '-' + config_path
+            with open(facsf_param, 'r') as facsffile:
+                acsf_param = json.load(facsffile)
+            #print(acsf_param)
+        except:
+            raise IOError('Cannot load the json file for ACSF parameters')
+        # fill in the values
+        for k,v in acsf_param.items():
+            if k in acsf_dict.keys():
+                if isinstance(v, list): 
+                    acsf_dict[k] = np.asarray(v)
+                else:
+                    acsf_dict[k] = v
+            else:
+                print("Warning: unknown key ", k)
+    elif facsf_param == 'smart' or facsf_param == 'SMART' or facsf_param == 'Smart':
+        # TODO: add default selection 
+        pass
+    else:
+        print("use very basic selections for ACSF")
+        acsf_dict['g2_params']= [[1, 1], [1, 2], [1, 3]]
+        acsf_dict['g4_params']: [[1, 1, 1], [1, 2, 1], [1, 1, -1], [1, 2, -1]]
+
+    # set it up
+    rep_atomic = ACSF(**acsf_dict)
+
+    if facsf_param != 'none':
+        foutput = prefix + "-rcut" + str(r_cut) + '-' + facsf_param
+        desc_name = "ACSF" + "-rcut" + str(r_cut) + '-' + facsf_param
     else: 
         foutput = prefix + "-rcut" + str(r_cut)
         desc_name = "ACSF" + "-rcut" + str(r_cut)
@@ -111,8 +140,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--per_atom', type=str2bool, nargs='?', const=True, default=True,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
-    parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
-    parser.add_argument('-param_path', type=str, default=False, help='Specify the Gn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)')
+    parser.add_argument('--rcut', type=float, default=4.0, help='Cutoff radius')
+    parser.add_argument('-param_path', type=str, default='none',help='Specify the atom centered symmetry function parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
 
