@@ -23,7 +23,7 @@ setuptools.setup(
              'scripts/gen_universal_soap_hypers.py',
              'scripts/gen_soap_descriptors.py',
              'scripts/gen_soap_kmat.py',
-             'scripts/gen_ASCF_descriptors.py',
+             'scripts/gen_ACSF_descriptors.py',
              'scripts/gen_CM_descriptors.py',
              'scripts/gen_LMBTR_descriptors.py',
              'scripts/pca.py',
