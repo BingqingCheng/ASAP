@@ -71,7 +71,7 @@ def main(Zs, soap_n, soap_l, length_scales, multisoap, sharpness, scalerange, ve
     # first soap cutoff is just the rcut_max
     r_cut = rcut_max
     g_width = r_cut/8.0/sharpness
-    hypers['soap'+str(num_soap)] = { 'cutoff' : float(round_sigfigs(r_cut,2)), 'n' : soap_n, 'l' : soap_l, 'atom_gaussian_width' : float(round_sigfigs(g_width,2)) } 
+    hypers['soap'+str(num_soap)] = { 'species': Zs, 'cutoff' : float(round_sigfigs(r_cut,2)), 'n' : soap_n, 'l' : soap_l, 'atom_gaussian_width' : float(round_sigfigs(g_width,2)) } 
 
     if multisoap >= 2:
         # ratio between subsequent rcut values
@@ -80,7 +80,7 @@ def main(Zs, soap_n, soap_l, length_scales, multisoap, sharpness, scalerange, ve
             num_soap += 1
             r_cut /= rcut_ratio
             g_width = r_cut/8.0/sharpness
-            hypers['soap'+str(num_soap)] = { 'cutoff' : float(round_sigfigs(r_cut,2)), 'n' : soap_n, 'l' : soap_l, 'atom_gaussian_width' : float(round_sigfigs(g_width,2)) } 
+            hypers['soap'+str(num_soap)] = { "species": Zs, 'cutoff' : float(round_sigfigs(r_cut,2)), 'n' : soap_n, 'l' : soap_l, 'atom_gaussian_width' : float(round_sigfigs(g_width,2)) } 
 
     # output
     if outfile == 'none':
@@ -99,12 +99,13 @@ if __name__ == '__main__':
     parser.add_argument("--multisoap", type=float, help="How many set of SOAP descriptors do you want to use?", default=2)
     parser.add_argument("--sharpness", type=float, help="sharpness factor for atom_gaussian_width, scaled to heuristic for GAP", default=1.0)
     parser.add_argument("--range", type=float, help="the range of the SOAP cutoffs, scaled to heuristic for GAP", default=1.0)
-    parser.add_argument("--length_scales_file", help="JSON file with length scales", default="../data/auto_length_scales.json")
+    parser.add_argument("-length_scales_file", help="path to the JSON file with length scales, you can find one in ASAP/data/", default="auto_length_scales.json")
     parser.add_argument("--verbose", type=str2bool, nargs='?', const=True, default=False, help="more descriptions of what has been done")
     parser.add_argument("--output", type=str, default='none', help="name of the output file")
 
     args = parser.parse_args()
 
+    #print("loading length scales from: ", args.length_scales_file)
     length_scales = json.load(open(args.length_scales_file))
 
     main(args.Zs, args.n, args.l, length_scales, args.multisoap, args.sharpness, args.range, args.verbose, args.output)
