@@ -69,7 +69,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         elif fsoap_param == 'smart' or fsoap_param == 'Smart' or fsoap_param == 'SMART':
             soap_js = gen_default_soap_hyperparameters(list(global_species))
             print(soap_js)
-            with open('smart-SOAP', 'w') as jd:
+            with open('smart-soap-parameters', 'w') as jd:
                 json.dump(soap_js, jd, cls=NpEncoder)
 
         # make descriptors
