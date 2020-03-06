@@ -128,7 +128,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     fit_error['test_error'] = test_error
     # dump to file
     import json
-    with open('KRR_train_test_errors.json', 'w') as fp:
+    with open('KRR_train_test_errors_4' + prefix + '.json', 'w') as fp:
         json.dump(fit_error, fp)
 
     # learning curve
@@ -170,7 +170,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("KRR_learning_curve.dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("KRR_learning_curve_4" + prefix + ".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
     
@@ -189,7 +189,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
 
     if lc_points > 1 and n_sparse > 0:
         ax2 = fig.add_subplot(122)
-        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error)
+        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error, linestyle='', uplims=True, lolims=True)
         ax2.set_title('Learning curve')
         ax2.set_xlabel('Number of training samples')
         ax2.set_ylabel('Test {}'.format(sc_name))
