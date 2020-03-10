@@ -12,7 +12,7 @@ def repr_wrapper(frame, elements, is_periodic = False,
                                         nFourier=1, eta2=0.32, eta3=2.7,
                                         zeta=np.pi, rcut=8.0, acut=8.0,
                                         two_body_decay=1.8, three_body_decay=0.57,
-                                        three_body_weight=13.4):
+                                        three_body_weight=13.4, stride=1):
     '''
    Periodic systems not implemented for FCHL19.
     :frame: ase Atoms class
@@ -102,6 +102,7 @@ def main(fxyz = False, fdict = False, prefix= False , output= False , peratom= F
     :type three_body_weight: float
     :is_periodic: Boolean determining Whether the system is periodic.
     :type Boolean:
+    stride: compute descriptor each X frames
     """
 
 
@@ -114,7 +115,7 @@ def main(fxyz = False, fdict = False, prefix= False , output= False , peratom= F
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, ':')
+        fframes = read(fxyz, slice(0,None,stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -198,6 +199,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)

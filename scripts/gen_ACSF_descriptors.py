@@ -10,7 +10,7 @@ from dscribe.descriptors import ACSF
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic):
+def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, stride):
     """
 
     Generate the ACSF Representation. Currently only implemented for finite system in DSCRIBE.
@@ -24,6 +24,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic):
     rcut: float giving the cutoff radius, default value is 4.0
     param_path': string Specify the Gn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)
     periodic: string (True or False) indicating whether the system is periodic
+    stride: compute descriptor each X frames
     """
 
     periodic = bool(periodic)
@@ -33,7 +34,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic):
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, ':')
+        fframes = read(fxyz, slice(0,None,stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -144,10 +145,11 @@ if __name__ == '__main__':
     parser.add_argument('-param_path', type=str, default='none',help='Specify the atom centered symmetry function parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.rcut, args.param_path, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.rcut, args.param_path, args.periodic, args.stride)

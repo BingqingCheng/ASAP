@@ -12,7 +12,7 @@ from dscribe.descriptors import LMBTR
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic):
+def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic, stride):
     """
 
     Generate the LMBTR Representation.
@@ -25,6 +25,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic):
     output: [xyz]: append the representations to extended xyz file; [mat] output as a standlone matrix
     param_path': string Specify the Kn parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)
     periodic: string (True or False) indicating whether the system is periodic
+    stride: compute descriptor each X frames
     """
 
     periodic = bool(periodic)
@@ -34,7 +35,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic):
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, ':')
+        fframes = read(fxyz, slice(0,None,stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -109,10 +110,11 @@ if __name__ == '__main__':
     parser.add_argument('-param_path', type=str, default=False, help='Specify the hyper parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.param_path, args.periodic)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.param_path, args.periodic, args.stride)
