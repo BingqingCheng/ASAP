@@ -10,7 +10,7 @@ from dscribe.descriptors import CoulombMatrix
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, max_atoms):
+def main(fxyz, dictxyz, prefix, output, max_atoms, stride):
     """
 
     Generate the SOAP descriptors.
@@ -22,6 +22,7 @@ def main(fxyz, dictxyz, prefix, output, max_atoms):
     prefix: string giving the filename prefix
     output: [xyz]: append the representations to extended xyz file; [mat] output as a standlone matrix
     max_atoms: int: Max number of atoms in the Coulomb Matrix
+    stride: compute descriptor each X frames
     """
 
 
@@ -31,7 +32,7 @@ def main(fxyz, dictxyz, prefix, output, max_atoms):
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, ':')
+        fframes = read(fxyz, slice(0,None,stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -86,10 +87,11 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--max_atoms', type=int, default=30,
                         help='Max number of atoms in the Coulomb Matrix')
+    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.max_atoms)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.max_atoms, args.stride)

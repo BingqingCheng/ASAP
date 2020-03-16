@@ -119,7 +119,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # save
     if output == 'matrix':
         np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-    elif output == 'xyz':
+    elif output == 'xyz' or peratom or plotatomic:
         if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
         if nframes > 1:
             atom_index = 0
@@ -143,10 +143,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                     frame.info[fmat] = None
                     frame.set_array(fmat, None)
 
-                write(foutput + ".xyz", frame, append=True)
+                if output == 'xyz': write(foutput + ".xyz", frame, append=True)
         else:
             frames[0].new_array('pca_coord', proj)
-            write(prefix + "-pca-d" + str(pca_d) + ".xyz", frames[0], append=False)
+            if output == 'xyz': write(prefix + "-pca-d" + str(pca_d) + ".xyz", frames[0], append=False)
 
     # color scheme
     if plotatomic:
@@ -163,7 +163,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                                clabel=None, label=None,
                                                centers=None,
-                                               psize=4,
+                                               psize=20,
                                                out_file=None,
                                                title=None,
                                                show=False, cmap='gnuplot',

@@ -10,7 +10,7 @@ from dscribe.descriptors import SOAP
 from asaplib.io import str2bool, NpEncoder
 from asaplib.hypers import gen_default_soap_hyperparameters
 
-def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic):
+def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
     """
 
     Generate the SOAP descriptors.
@@ -27,6 +27,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_n: int giving the maximum radial label
     soap_l: int giving the maximum angular label. Must be less than or equal to 9
     soap_periodic: string (True or False) indicating whether the system is periodic
+    stride: compute descriptor each X frames
     """
     soap_periodic = bool(soap_periodic)
     peratom = bool(peratom)
@@ -35,7 +36,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, ':')
+        fframes = read(fxyz, slice(0,None,stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -69,7 +70,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         elif fsoap_param == 'smart' or fsoap_param == 'Smart' or fsoap_param == 'SMART':
             soap_js = gen_default_soap_hyperparameters(list(global_species))
             print(soap_js)
-            with open('smart-SOAP', 'w') as jd:
+            with open('smart-soap-parameters', 'w') as jd:
                 json.dump(soap_js, jd, cls=NpEncoder)
 
         # make descriptors
@@ -142,6 +143,7 @@ if __name__ == '__main__':
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -149,4 +151,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.param_path, args.rcut, args.g, args.n,
-         args.l, args.periodic)
+         args.l, args.periodic, args.stride)

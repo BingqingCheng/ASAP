@@ -155,7 +155,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     fit_error['test_error'] = test_error
     # dump to file
     import json
-    with open('RR_train_test_errors.json', 'w') as fp:
+    with open("RR_train_test_errors_4_"+prefix+".json", 'w') as fp:
         json.dump(fit_error, fp)
 
     # learning curve
@@ -195,7 +195,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("RR_learning_curve.dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("RR_learning_curve_4_"+prefix+".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
     
@@ -214,7 +214,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     if lc_points > 1:
         ax2 = fig.add_subplot(122)
-        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error)
+        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error, linestyle='', uplims=True, lolims=True)
         ax2.set_title('Learning curve')
         ax2.set_xlabel('Number of training samples')
         ax2.set_ylabel('Test {}'.format(sc_name))
