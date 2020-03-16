@@ -158,7 +158,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
     if plotatomic:
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[:, [pc1, pc2]], plotcolor_peratom, fig, ax,
+        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
+        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
                                                xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                                clabel=None, label=None,
                                                centers=None,
@@ -173,7 +174,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                vmax=None,
                                                vmin=None)
 
-    fig, ax = plot_styles.plot_density_map(proj[:, [pc1, pc2]], plotcolor, fig, ax,
+        fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
                                            centers=None,
