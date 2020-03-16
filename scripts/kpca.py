@@ -21,7 +21,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
 
     print("loaded", fmat)
     if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")[:, 0]
+        tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
     # try to read the xyz file
