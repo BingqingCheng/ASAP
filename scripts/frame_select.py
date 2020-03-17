@@ -107,7 +107,10 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
                        header='the maximum remaining distance in FPS')
         # CUR decomposition
         if algorithm == 'cur' or algorithm == 'CUR':
-            sbs, rcov_error = CUR_deterministic(np.dot(desc.T, desc), nkeep)
+            desc = np.asmatrix(desc)
+            cov = np.dot(desc, desc.T)
+            print("shape of the covariance matrix:", np.shape(cov))
+            sbs, rcov_error = CUR_deterministic(cov, nkeep)
             np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.error', rcov_error, fmt='%4.8f',
                        header='the remaining error of the covariance matrix')
 

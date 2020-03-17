@@ -30,7 +30,8 @@ def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
     for i in range(n_col):
         rval, RX = CUR_deterministic_step(RX, n_col - i, costs)
         rsel[i] = rval
-        if error_estimate: rerror[i] = np.sum(np.abs(RX))
+        if error_estimate: 
+            rerror[i] = np.sum(np.abs(RX))
     return rsel, rerror
 
 
@@ -42,11 +43,11 @@ def CUR_deterministic_step(cov, k, costs=1):
     # compute the weights and select the one with maximum weight
     weights = np.sum(np.square(evec), axis=1) / costs
     sel = np.argmax(weights)
-    vsel = cov[sel].copy()
-    vsel *= 1.0 / np.sqrt(np.dot(vsel, vsel))
+    vsel = cov[sel] / np.linalg.norm(cov[sel])
     rcov = cov.copy()
+    print("selected: ", sel)
     for i in range(len(rcov)):
         # Diagonalize the covariance matrix wrt the chosen column
-        rcov[i] -= vsel * np.dot(cov[i], vsel)
+        rcov[i] -= vsel * np.dot(cov[i].A1, vsel.A1)
 
     return sel, rcov
