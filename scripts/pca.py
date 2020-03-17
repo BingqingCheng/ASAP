@@ -119,7 +119,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # save
     if output == 'matrix':
         np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-    elif output == 'xyz' or peratom or plotatomic:
+    if output == 'xyz' or peratom or plotatomic:
         if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
         if nframes > 1:
             atom_index = 0
