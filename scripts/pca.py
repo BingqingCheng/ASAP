@@ -174,7 +174,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                vmax=None,
                                                vmin=None)
 
-        fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
+    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
                                            centers=None,
