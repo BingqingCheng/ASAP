@@ -152,7 +152,6 @@ class sklearn_DB(FitClusterBase):
 #         if rho is None:
 #             raise ValueError('for fdb it is better to compute kernel density first')
 #
-#
 #         delta, nneigh = self.estimate_delta(dmatrix, rho)
 #
 #         #  if there's no input values for rhomin and deltamin, we use simple heuristics
@@ -226,23 +225,29 @@ class sklearn_DB(FitClusterBase):
 class LAIO_DB(FitClusterBase):
     """
     Clustering by fast search and find of density peaks, Rodriguez and Laio (2014).
+
     https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
+
     $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$
     $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$
     """
-    def __init__(self, distances=None, indices=None, dens_type="eps", dc=None, percent=2.0):
+    def __init__(self, distances=None, indices=None, dens_type=None, dc=None, percent=2.0):
 
         """
         Parameters
         ----------
-        distances: Matrix of distances between data points and their neighbours of dimension Nxn_neigh_comp where N is
-        the number of data points and n_neigh_comp is the number of neighbours to consider.
-        indices: The indices in the data matrix of the neighours for all of the data points.
-        dens_type: The type of density to compute (can be exponential)
-        dc: The cutoff distance beyond which data points don't contribute to the local density computation of another
-        datapoint.
-        percent: Criterion for choosing dc, int from 0-100, typically chosen such that the average number of neighbours is 1-2% of the
-        total number of points in the dataset.
+        distances: numpy array of distances between data points and their neighbours of shape (Nele, n_neigh_comp)
+        where Nele is the number of data points and n_neigh_comp is the number of neighbours to consider.
+
+        indices: numpy array of shape (Nele, n_neigh_comp) where row i gives the indices of the neighbours for data point i
+
+        dens_type: The type of density to compute. Can be 'exp' (exponential) or None (linear)
+
+        dc: float giving the cutoff distance beyond which data points don't contribute to the local density computation
+        of another datapoint.
+
+        percent: Criterion for choosing dc, int from 0-100, typically chosen such that the average number of neighbours
+        is 1-2% of the total number of points in the dataset. Default is 2%.
         """
 
         self.distances = distances
@@ -250,42 +255,73 @@ class LAIO_DB(FitClusterBase):
         self.dens_type = dens_type
         self.dc = dc
         self.percent = percent
-        self.dens = None  # numpy array of the densities of the data points
-        self.delta = None  # numpy array of the distances to the nearest cluster centre
-        self.ref = None  # numpy array of the indices of the cluster centres for each data point
+
+        # numpy array of shape (Nele,) where the densities of the data points expressed in terms of the number of data
+        # points within the cutoff distance
+        self.dens = None
+
+        # numpy array of shape (Nele,) of the distances to the nearest cluster centre where a cluster centre is defined
+        # as the nearest data point to i possessing a higher local density.
+        self.delta = None
+
+        # numpy array of shape (Nele,) where the ith entry gives the index of the cluster centre for data point i.
+        self.ref = None
+
+        # Unused currently
         self.decision_graph = None
-        self.delta_cut = None  # distance criterion for definining a cluster
-        self.dens_cut = None  # density criterion for defining a cluster
-        self.cluster = None
-        self.centers = None
-        self.halo = None
+
+        # Clusters must lie at a distance greater than self.delta_cut (float) apart to be designated as independent
+        # clusters
+        self.delta_cut = None
+
+        # If a "cluster" has a density smaller than self.dens_cut (float) it is discarded as noise
+        self.dens_cut = None
+
+
+        self.cluster = None  # numpy array of shape (N_data, )
+        self.centers = None  # numpy array of cluster centers of shape(num_centers, )
+        self.halo = None  # numpy array of halo points of shape (N_data, )
 
     def get_dc(self, data):
-
         """
         Compute the cutoff distance given the data.
+
         Parameters
         ----------
-        data: The dataset of dimension mxn where m is the number of data points and n is the number of features.
+        data: The data array of shape (Nele, proj_dim) where N is the number of data points and proj_dim is the number of
+        projected components of the kernel matrix.
+
         Returns
         -------
         self.dc, the cutoff distance
         """
 
-        Nele = data.shape[0]  # The number of data points
+        Nele = data.shape[0]
+
+        # The number of neighbours to consider is dictated by the percent parameter provided (default is 2% of the
+        # total data points.
         n_neigh = int(self.percent/100.*Nele)
+
+        # Compute with 4 times the recommended percentage of neighbours in order that we may re-estimate the percent
+        # value supplied (rper) based on the data.
         n_neigh_comp = int(4.*self.percent/100.*Nele)
         neigh = NearestNeighbors(n_neighbors=n_neigh_comp).fit(data)
-        self.distances, self.indices = neigh.kneighbors(data)  # Distance matrix and indices are 4 times the length. Distance matrix shape is (Nele, n_neigh_comp)
-        dc = np.average(self.distances[:, n_neigh])  # The cutoff distance is the average distance (averaged over all data points) of the "0.02*Nele"th neighbour
-        dens = np.zeros(data.shape[0])  # Store the local densities of the data points in an array of shape (Nele,)
+        self.distances, self.indices = neigh.kneighbors(data)
+
+        # The cutoff distance dc is the average distance (averaged over all data points) of the "0.02*Nele"th neighbour
+        dc = np.average(self.distances[:, n_neigh])
+
+        # To store the local densities of each data point
+        dens = np.zeros(data.shape[0])
         tt = 1.0
         factor = 1.0
+
+        # We update dc based on a re-estimated percentage rper. Stop when rper is close to self.percent
         while tt > 0.05:
             dc = dc*factor
             for i in range(Nele):
-                a = self.distances[i, :]  # for a data point x_i, a gives the distances to all the n_neigh_comp neighbours.
-                dens[i] = len(a[(a <= dc)])  # we count the number of data points within the cutoff distance from x_i
+                a = self.distances[i, :]
+                dens[i] = len(a[(a <= dc)])
             rper = 100.*np.average(dens)/Nele
             tt = rper/self.percent - 1.
             if tt > 0.:
@@ -298,33 +334,37 @@ class LAIO_DB(FitClusterBase):
     def get_decision_graph(self, data):
 
         Nele = data.shape[0]
-        self.dens = np.zeros(Nele)  # shape = (Nele,)
+        self.dens = np.zeros(Nele)
 
         if self.dc == None:
             self.get_dc(data)
+
         else:  # check compatibility between the provided cutoff distance and the provided distance matrix
             n_neigh_comp = int(10.*self.percent/100.*Nele)
             neigh = NearestNeighbors(n_neighbors=n_neigh_comp).fit(data)
             self.distances, self.indices = neigh.kneighbors(data)
             if self.dc > np.min(self.distances[:, n_neigh_comp - 1]):
-                print("dc too big for being included within the", 10.*self.percent, "%  of data, consider using a small dc or augment the percent parameter")
+                print("dc too big for being included within the", 10.*self.percent, "%  of data, consider using a "
+                                                                                    "small dc or augment the percent "
+                                                                                    "parameter")
 
         for i in range(Nele):
-            a = self.distances[i, :]  # a are the distances of the n_neigh_comp neighbours relative to data points i
-            self.dens[i] = len(a[(a <= self.dc)])  # The density of i is the number of points at a distance smaller than the cutoff
+            a = self.distances[i, :]
+            self.dens[i] = len(a[(a <= self.dc)])
 
         if self.dens_type == 'exp':  # Density is no longer number but exponential
             for i in range(Nele):
                 a = self.distances[i, :]/self.dc  # distances expressed as a fraction of the cutoff distance
                 self.dens[i] = np.sum(np.exp(-a**2))
 
-        # may need to re-think these criterion based on the type of density chosen
+        # The densities computed by this class or not log densities. Log densities are returned by the KDE class.
 
-        self.dens_cut = 0.2 * np.mean(np.log(self.dens)) + 0.8 * np.min(np.log(self.dens))
+        # self.dens_cut = 0.2 * np.mean(np.log(self.dens)) + 0.8 * np.min(np.log(self.dens))
+        self.dens_cut = 0.2 * np.mean(self.dens) + 0.8 * np.min(self.dens)
         self.delta_cut = np.mean(self.distances)
 
-        self.delta = np.zeros(data.shape[0])  # shape = (Nele,)
-        self.ref = np.zeros(data.shape[0], dtype='int')  # shape = (Nele,)
+        self.delta = np.zeros(data.shape[0])
+        self.ref = np.zeros(data.shape[0], dtype='int')
         tt = np.arange(data.shape[0])  # array from 0-Nele
         imax = []
         for i in range(data.shape[0]):
@@ -344,14 +384,15 @@ class LAIO_DB(FitClusterBase):
         """
         Parameters
         ----------
-        data: data matrix
+        data: numpy array of shape (Nele, proj_dim) where proj_dim gives the number of dimensions the kernel matrix is
+              projected to
         Returns: center label: numpy array of shape (Nele,) giving the cluster label for a each data point.
         -------
         """
         ordered = np.argsort(-self.dens)  # in descending order of density
-        self.cluster = np.zeros(data.shape[0], dtype='int')
+        self.cluster = np.zeros(data.shape[0], dtype='int') # gives the cluster each data point belongs to e.g. if there are 5 clusters will be array like [0, 0, 0, 1, 2, 3, 4, 1]
         tt = np.arange(data.shape[0])
-        center_label = np.zeros(data.shape[0], dtype='int')
+        center_label = np.zeros(data.shape[0], dtype='int')  # numpy array of shape (Nele, ) giving the index of the cluster to which each data point is assigned - something weird happening with -1
         ncluster = -1
         for i in range(data.shape[0]):
             j = ordered[i]
@@ -372,6 +413,7 @@ class LAIO_DB(FitClusterBase):
                     bord[i] = 1
         halo_cutoff = np.zeros(ncluster + 1)
         for i in range(ncluster + 1):
+            i += 1
             dd = self.dens[((bord == 1) & (self.cluster == i))]
             halo_cutoff[i] = np.max(dd)
         self.halo[tt[(self.dens < halo_cutoff[self.cluster])]] =- 1
@@ -381,9 +423,11 @@ class LAIO_DB(FitClusterBase):
     def fit(self, data, rho=None):
         """
         Compute the center labels.
+
         Parameters
         ----------
-        data: data matrix of shpae (Nele, Nele)
+        data: numpy array of shape (Nele, proj_dim) where proj_dim is the number of components the kernel matrix has been
+              projected to.
         rho: densities, default is None since the DP.py module computes the densities itself.
         Returns: center_label: numpy array of shape (Nele,) giving the index of the cluster centre for each data point
         -------
