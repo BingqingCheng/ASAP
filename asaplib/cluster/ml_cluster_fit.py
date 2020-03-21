@@ -262,10 +262,10 @@ class LAIO_DB(FitClusterBase):
 
         # numpy array of shape (Nele,) of the distances to the nearest cluster centre where a cluster centre is defined
         # as the nearest data point to i possessing a higher local density.
-        self.delta = None
+        self.delta_to_cluster = None
 
         # numpy array of shape (Nele,) where the ith entry gives the index of the cluster centre for data point i.
-        self.ref = None
+        self.ref_cluster = None
 
         # Unused currently
         self.decision_graph = None
@@ -277,10 +277,9 @@ class LAIO_DB(FitClusterBase):
         # If a "cluster" has a density smaller than self.dens_cut (float) it is discarded as noise
         self.dens_cut = None
 
-
-        self.cluster = None  # numpy array of shape (N_data, )
+        self.cluster = None  # numpy array of shape (N_ele, )
         self.centers = None  # numpy array of cluster centers of shape(num_centers, )
-        self.halo = None  # numpy array of halo points of shape (N_data, )
+        self.halo = None  # numpy array of halo points of shape (N_ele, )
 
     def get_dc(self, data):
         """
@@ -332,6 +331,17 @@ class LAIO_DB(FitClusterBase):
         self.dc = dc
 
     def get_decision_graph(self, data):
+        """
+        Method currently doesn't produce the decision graph.
+
+        Parameters
+        ----------
+        data: numpy array of shape (Nele, proj_dim).
+
+        Returns
+        -------
+
+        """
 
         Nele = data.shape[0]
         self.dens = np.zeros(Nele)
@@ -363,22 +373,24 @@ class LAIO_DB(FitClusterBase):
         self.dens_cut = 0.2 * np.mean(self.dens) + 0.8 * np.min(self.dens)
         self.delta_cut = np.mean(self.distances)
 
-        self.delta = np.zeros(data.shape[0])
-        self.ref = np.zeros(data.shape[0], dtype='int')
+        self.delta_to_cluster = np.zeros(data.shape[0])
+        self.ref_cluster = np.zeros(data.shape[0], dtype='int')
         tt = np.arange(data.shape[0])  # array from 0-Nele
-        imax = []
+        imax = []  # holds index of data point with highest local density
         for i in range(data.shape[0]):
             ll = tt[((self.dens > self.dens[i]) & (tt != i))]  # indices of data points with higher local density than x_i
             dd = data[((self.dens > self.dens[i]) & (tt != i))]  # data points with higher local density than x_i
             if dd.shape[0] > 0:  # If there is a data point with higher local density than x_i
                 ds = np.transpose(sp.spatial.distance.cdist([np.transpose(data[i, :])], dd))
                 j = np.argmin(ds)
-                self.ref[i] = ll[j]  # cluster centre for data point x_i
-                self.delta[i] = ds[j]  # distance to cluster centre for data point x_i
+                self.ref_cluster[i] = ll[j]  # cluster centre for data point x_i
+                self.delta_to_cluster[i] = ds[j]  # distance to cluster centre for data point x_i
             else:
-                self.delta[i] =- 100.
+                self.delta_to_cluster[i] = -100.
                 imax.append(i)
-        self.delta[imax] = np.max(self.delta)*1.05
+        self.delta_to_cluster[imax] = np.max(self.delta_to_cluster)*1.05
+
+        # Plot density on y-axis and delta_to_cluster (point of higher density) on the x-axis
 
     def get_assignation(self, data):
         """
