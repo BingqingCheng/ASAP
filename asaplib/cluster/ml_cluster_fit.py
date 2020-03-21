@@ -408,12 +408,12 @@ class LAIO_DB(FitClusterBase):
         ncluster = -1
         for i in range(data.shape[0]):
             j = ordered[i]
-            if (self.dens[j] > self.dens_cut) & (self.delta[j] > self.delta_cut):
+            if (self.dens[j] > self.dens_cut) & (self.delta_to_cluster[j] > self.delta_cut):
                 ncluster = ncluster + 1
                 self.cluster[j] = ncluster
                 center_label[j] = ncluster
             else:
-                self.cluster[j] = self.cluster[self.ref[j]]
+                self.cluster[j] = self.cluster[self.ref_cluster[j]]
                 center_label[j] = -1
         self.centers = tt[(center_label != -1)]
         bord = np.zeros(data.shape[0], dtype='int')
