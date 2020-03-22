@@ -260,12 +260,13 @@ class LAIO_DB(FitClusterBase):
         # points within the cutoff distance
         self.dens = None
 
-        # numpy array of shape (Nele,) of the distances to the nearest cluster centre where a cluster centre is defined
-        # as the nearest data point to i possessing a higher local density.
-        self.delta_to_cluster = None
+        # numpy array of shape (Nele,) of the distances to the nearest data point to i
+        # possessing a higher local density.
+        self.delta_to_neigh = None
 
-        # numpy array of shape (Nele,) where the ith entry gives the index of the cluster centre for data point i.
-        self.ref_cluster = None
+        # numpy array of shape (Nele,) where the ith entry gives the index of the nearest neighbour with
+        # higher density than data point i.
+        self.ref_neigh = None
 
         # Unused currently
         self.decision_graph = None
@@ -277,8 +278,14 @@ class LAIO_DB(FitClusterBase):
         # If a "cluster" has a density smaller than self.dens_cut (float) it is discarded as noise
         self.dens_cut = None
 
-        self.cluster = None  # numpy array of shape (N_ele, )
-        self.centers = None  # numpy array of cluster centers of shape(num_centers, )
+        # numpy array of shape (Nele, ) giving the cluster (int from 0 to N) each data point belongs to.
+        # Clusters are labelled by density. Cluster 0 has the highest density and cluster N has the smallest density.
+        self.cluster = None
+
+        # numpy array of shape (N,) giving the indices of the N cluster centres.
+        self.center_indices = None
+
+
         self.halo = None  # numpy array of halo points of shape (N_ele, )
 
     def get_dc(self, data):
@@ -373,23 +380,25 @@ class LAIO_DB(FitClusterBase):
         self.dens_cut = 0.2 * np.mean(self.dens) + 0.8 * np.min(self.dens)
         self.delta_cut = np.mean(self.distances)
 
-        self.delta_to_cluster = np.zeros(data.shape[0])
-        self.ref_cluster = np.zeros(data.shape[0], dtype='int')
-        tt = np.arange(data.shape[0])  # array from 0-Nele
+        self.delta_to_neigh = np.zeros(data.shape[0])
+        self.ref_neigh = np.zeros(data.shape[0], dtype='int')
+        indices = np.arange(data.shape[0])
         imax = []  # holds index of data point with highest local density
-        for i in range(data.shape[0]):
-            ll = tt[((self.dens > self.dens[i]) & (tt != i))]  # indices of data points with higher local density than x_i
-            dd = data[((self.dens > self.dens[i]) & (tt != i))]  # data points with higher local density than x_i
-            if dd.shape[0] > 0:  # If there is a data point with higher local density than x_i
-                ds = np.transpose(sp.spatial.distance.cdist([np.transpose(data[i, :])], dd))
-                j = np.argmin(ds)
-                self.ref_cluster[i] = ll[j]  # cluster centre for data point x_i
-                self.delta_to_cluster[i] = ds[j]  # distance to cluster centre for data point x_i
-            else:
-                self.delta_to_cluster[i] = -100.
-                imax.append(i)
-        self.delta_to_cluster[imax] = np.max(self.delta_to_cluster)*1.05
 
+        for i in range(data.shape[0]):
+            higher_dens_indices = indices[((self.dens > self.dens[i]) & (indices != i))]
+            higher_dens_data = data[((self.dens > self.dens[i]) & (indices != i))]
+            if higher_dens_data.shape[0] > 0:
+                ds = np.transpose(sp.spatial.distance.cdist([np.transpose(data[i, :])], higher_dens_data))
+                j = np.argmin(ds)
+                self.ref_neigh[i] = higher_dens_indices[j]
+                self.delta_to_neigh[i] = ds[j]
+            else:
+                self.delta_to_neigh[i] = -100.
+                imax.append(i)
+        self.delta_to_neigh[imax] = np.max(self.delta_to_neigh)*1.05
+
+        # TODO
         # Plot density on y-axis and delta_to_cluster (point of higher density) on the x-axis
 
     def get_assignation(self, data):
@@ -398,37 +407,40 @@ class LAIO_DB(FitClusterBase):
         ----------
         data: numpy array of shape (Nele, proj_dim) where proj_dim gives the number of dimensions the kernel matrix is
               projected to
-        Returns: center label: numpy array of shape (Nele,) giving the cluster label for a each data point.
+        Returns: center label: numpy array of shape (Nele,). A data point is labelled -1 if it is not a cluster centre.
+                 If the data point is a cluster centre it is given an integer {0,...,N} where 0 is the label of
+                 the highest density cluster and N is the label of the lowest density cluster.
         -------
         """
-        ordered = np.argsort(-self.dens)  # in descending order of density
-        self.cluster = np.zeros(data.shape[0], dtype='int') # gives the cluster each data point belongs to e.g. if there are 5 clusters will be array like [0, 0, 0, 1, 2, 3, 4, 1]
-        tt = np.arange(data.shape[0])
+        ordered_by_dens = np.argsort(-self.dens)  # data points in descending order of density
+        self.cluster = np.zeros(data.shape[0], dtype='int')
+        indices = np.arange(data.shape[0])
         center_label = np.zeros(data.shape[0], dtype='int')  # numpy array of shape (Nele, ) giving the index of the cluster to which each data point is assigned - something weird happening with -1
         ncluster = -1
-        for i in range(data.shape[0]):
-            j = ordered[i]
-            if (self.dens[j] > self.dens_cut) & (self.delta_to_cluster[j] > self.delta_cut):
+        for i in range(data.shape[0]):  # trick to iterate through the ordered_by_dens array
+            j = ordered_by_dens[i]
+            if (self.dens[j] > self.dens_cut) & (self.delta_to_neigh[j] > self.delta_cut):
                 ncluster = ncluster + 1
                 self.cluster[j] = ncluster
                 center_label[j] = ncluster
             else:
-                self.cluster[j] = self.cluster[self.ref_cluster[j]]
+                # the assigned cluster is the cluster the closest neighbour of higher density belongs to
+                self.cluster[j] = self.cluster[self.ref_neigh[j]]
                 center_label[j] = -1
-        self.centers = tt[(center_label != -1)]
+        self.center_indices = indices[(center_label != -1)]
         bord = np.zeros(data.shape[0], dtype='int')
         self.halo = np.copy(self.cluster)
 
         for i in range(data.shape[0]):
             for j in self.indices[i, :][(self.distances[i, :] <= self.dc)]:
                 if self.cluster[i] != self.cluster[j]:
-                    bord[i] = 1
+                    bord[i] = 1  # 1 if data point i has a neighbour that has been assigned a different cluster centre.
         halo_cutoff = np.zeros(ncluster + 1)
         for i in range(ncluster + 1):
             i += 1
             dd = self.dens[((bord == 1) & (self.cluster == i))]
             halo_cutoff[i] = np.max(dd)
-        self.halo[tt[(self.dens < halo_cutoff[self.cluster])]] =- 1
+        self.halo[indices[(self.dens < halo_cutoff[self.cluster])]] =- 1
 
         return center_label
 
@@ -452,6 +464,9 @@ class LAIO_DB(FitClusterBase):
         return center_label
 
     def pack(self):
-        '''return all the info'''
+        """
+        Return dictionary containing the cutoff distance, self.dc, for data points to contribute to the local density
+        of another data point as well as self.dens_cut, the density threshold for defining a cluster.
+        """
         state = dict(deltamin=self.dc, rhomin=self.dens_cut)
         return state
