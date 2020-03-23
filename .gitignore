@@ -127,3 +127,6 @@ dmypy.json
 
 # Pycharm
 .idea/
+
+# generated images
+*.png

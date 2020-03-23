@@ -285,8 +285,9 @@ class LAIO_DB(FitClusterBase):
         # numpy array of shape (N,) giving the indices of the N cluster centres.
         self.center_indices = None
 
-
-        self.halo = None  # numpy array of halo points of shape (N_ele, )
+        # numpy array of shape (Nele,) where halo points are designated as -1 and otherwise are assigned to their
+        # respective cluster centres
+        self.halo = None
 
     def get_dc(self, data):
         """
@@ -415,7 +416,7 @@ class LAIO_DB(FitClusterBase):
         ordered_by_dens = np.argsort(-self.dens)  # data points in descending order of density
         self.cluster = np.zeros(data.shape[0], dtype='int')
         indices = np.arange(data.shape[0])
-        center_label = np.zeros(data.shape[0], dtype='int')  # numpy array of shape (Nele, ) giving the index of the cluster to which each data point is assigned - something weird happening with -1
+        center_label = np.zeros(data.shape[0], dtype='int')
         ncluster = -1
         for i in range(data.shape[0]):  # trick to iterate through the ordered_by_dens array
             j = ordered_by_dens[i]
@@ -428,19 +429,25 @@ class LAIO_DB(FitClusterBase):
                 self.cluster[j] = self.cluster[self.ref_neigh[j]]
                 center_label[j] = -1
         self.center_indices = indices[(center_label != -1)]
-        bord = np.zeros(data.shape[0], dtype='int')
+        # border points is a binary array, 1 if data point has a neighbour that has been assigned a different cluster
+        # centre and 0 otherwise.
+        border_points = np.zeros(data.shape[0], dtype='int')
         self.halo = np.copy(self.cluster)
 
         for i in range(data.shape[0]):
             for j in self.indices[i, :][(self.distances[i, :] <= self.dc)]:
                 if self.cluster[i] != self.cluster[j]:
-                    bord[i] = 1  # 1 if data point i has a neighbour that has been assigned a different cluster centre.
+                    border_points[i] = 1
         halo_cutoff = np.zeros(ncluster + 1)
         for i in range(ncluster + 1):
+            # Extract the densities of a cluster's border points
+            dens_of_border_points = self.dens[((border_points == 1) & (self.cluster == i))]
+            if len(dens_of_border_points) == 0:  # if a cluster has no border points then it has no halo points.
+                halo_cutoff[i] = 0
+            else:
+                halo_cutoff[i] = np.max(dens_of_border_points)
             i += 1
-            dd = self.dens[((bord == 1) & (self.cluster == i))]
-            halo_cutoff[i] = np.max(dd)
-        self.halo[indices[(self.dens < halo_cutoff[self.cluster])]] =- 1
+        self.halo[indices[(self.dens < halo_cutoff[self.cluster])]] = -1
 
         return center_label
 
