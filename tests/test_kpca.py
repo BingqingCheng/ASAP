@@ -3,7 +3,7 @@ import numpy as np
 from dscribe.descriptors import SOAP
 from pytest import approx, raises, fail
 
-from asaplib.pca.ml_kpca import KernelPCA
+from asaplib.pca import KernelPCA
 
 
 def assert_array_almost_equal(first, second, tol=1e-7):
