@@ -134,7 +134,16 @@ class TestKPCA(object):
     def test_centering(self):
         center_new = KernelPCA.center_square(self.K_tr)[2]
         center_old = self.fixcenter(self.K_tr)
+        self.assert_kernels_not_changed()
         assert_array_almost_equal(center_new, center_old, tol=1e-5)
+
+        # check the method used for the projections
+        k = KernelPCA(4)
+        k.fit(self.K_tr)
+        # copy needed, because the class is doing that elsewhere
+        # noinspection PyProtectedMember
+        center_method_for_tests = k._center_test_kmat(self.K_tr.copy())
+        assert_array_almost_equal(center_method_for_tests, center_old, tol=1e-5)
 
     def test_fit_and_transform(self):
         # init & fit
