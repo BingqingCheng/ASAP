@@ -54,7 +54,6 @@ class KernelPCA:
         """
         colmean = np.mean(kernel, axis=1)
         mean = np.mean(colmean)
-        # centered_kernel = kernel - colmean - np.reshape(colmean, (len(colmean), 1)) + mean
         centered_kernel = kernel - colmean - np.atleast_2d(colmean).T + mean
         return colmean, mean, centered_kernel
 
