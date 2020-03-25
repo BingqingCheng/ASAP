@@ -101,6 +101,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
     fig, ax = plot_styles.plot_density_map(np.asarray(proj[:, [pc1, pc2]]), plotcolor,
                                            xlabel='Princple Axis ' + str(pc1), ylabel='Princple Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
+                                           xaxis=True, yaxis=True,
                                            centers=None,
                                            psize=20,
                                            out_file='KDE_4_' + prefix + '.png',
@@ -117,8 +118,9 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
+            if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
+                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
+                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                                  ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
