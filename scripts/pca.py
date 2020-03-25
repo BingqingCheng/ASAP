@@ -196,8 +196,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
+            if tags[i] is not None:
+                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
+                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                                  ha='center', va='center', fontsize=10, color='red'))
         if adtext:
             from adjustText import adjust_text
