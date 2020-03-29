@@ -8,7 +8,7 @@ import argparse
 from ase.io import write
 
 from asaplib.io import str2bool
-from asaplib.pca import kpca
+from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
 
@@ -37,7 +37,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
-    proj = kpca(kNN, kpca_d)
+    proj = KernelPCA(kpca_d).fit_transform(kNN)
 
     # save
     if output == 'matrix':
