@@ -150,9 +150,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # color scheme
     if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
     else:
-        plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
     # make plot
     plot_styles.set_nice_font()
@@ -172,8 +172,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                use_perc=False,
                                                rasterized=True,
                                                fontsize=15,
-                                               vmax=None,
-                                               vmin=None)
+                                               vmax=colorscale[1],
+                                               vmin=colorscale[0])
 
     fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
@@ -181,15 +181,15 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            xaxis=True, yaxis=True,
                                            centers=None,
                                            psize=200,
-                                           out_file='PCA_4_' + prefix + '.png',
+                                           out_file=None,
                                            title='PCA for: ' + prefix,
                                            show=False, cmap='gnuplot',
                                            remove_tick=False,
                                            use_perc=False,
                                            rasterized=True,
                                            fontsize=15,
-                                           vmax=None,
-                                           vmin=None)
+                                           vmax=colorscale[1],
+                                           vmin=colorscale[0])
 
     fig.set_size_inches(160.5, 80.5)
 
@@ -209,7 +209,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                         arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
     plt.show()
-    fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '.png')
+    if plotatomic:
+        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
+    else:
+        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '.png')
 
 
 if __name__ == '__main__':

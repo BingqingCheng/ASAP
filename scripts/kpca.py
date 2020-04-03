@@ -53,7 +53,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
             write(prefix + "-kpca-d" + str(kpca_d) + ".xyz", frames[0], append=False)
 
     # color scheme
-    plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
+    plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj))
 
     # make plot
     plot_styles.set_nice_font()
@@ -72,8 +72,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
                                            use_perc=True,
                                            rasterized=True,
                                            fontsize=15,
-                                           vmax=None,
-                                           vmin=None)
+                                           vmax=colorscale[1],
+                                           vmin=colorscale[0])
 
     fig.set_size_inches(18.5, 10.5)
 
