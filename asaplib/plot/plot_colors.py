@@ -17,10 +17,14 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
         except:
             raise ValueError('Cannot load the xyz file')
 
+
         if len(frames) == 1:
-            print('Only one frame so set the color function to the index of atoms')
-            fcolor = 'index'
-            plotcolor = np.arange(len(frames[0].get_positions()))
+            try:
+                plotcolor = frames[0].get_array(fcolor)
+            except:
+                 print('Only one frame so set the color function to the index of atoms')
+                 fcolor = 'index'
+                 plotcolor = np.arange(n_samples)
 
         elif len(frames) != n_samples:
             raise ValueError('Length of the xyz trajectory is not the same as number of samples')
@@ -62,6 +66,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             except:
                 raise ValueError('Cannot load the property vector from the xyz file')
 
+
     elif os.path.isfile(fcolor):
         # load the column=colorscol for color functions
         try:
@@ -99,7 +104,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
     colorlabel = 'use ' + fcolor + ' for coloring the data points'
 
     if peratom:
-        #print(np.shape(plotcolor_atomic))
+        print(np.shape(plotcolor_atomic))
         colorscale = [ np.amin(plotcolor_atomic), np.amax(plotcolor_atomic) ]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     else:
