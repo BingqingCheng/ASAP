@@ -10,9 +10,9 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read
 from sklearn.model_selection import train_test_split
 
+from asaplib.data import ASAPXYZ
 from asaplib.fit import RidgeRegression
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.fit import get_score
@@ -45,40 +45,8 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     # try to read the xyz file
     if fxyz != 'none':
-        try:
-            frames = read(fxyz, ':')
-            nframes = len(frames)
-            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except:
-            raise ValueError('Cannot load the xyz file')
-
-        desc = []
-        ndesc = 0
-        # load from xyz file
-        if nframes > 1:
-            for i, frame in enumerate(frames):
-                if fmat in frame.info:
-                    try:
-                        desc.append(frame.info[fmat])
-                        if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                            raise ValueError('mismatch of number of descriptors between frames')
-                        ndesc = len(frame.info[fmat])
-                    except:
-                        raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-            if desc != [] and np.shape(desc)[1] != nframes:
-                desc = np.asmatrix(desc)
-                # print(np.shape(desc))
-                desc.reshape((ndesc, nframes))
-        else:
-            # only one frame
-            try:
-                desc = frames[0].get_array(fmat)
-            except:
-                ValueError('Cannot read the descriptor matrix from single frame')
-    else:
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-        output = 'matrix'
-
+        asapxyz = ASAPXYZ(fxyz)
+        desc, _ = asapxyz.get_descriptors(fmat)
     # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
@@ -95,19 +63,9 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     try:
         y_all = np.genfromtxt(fy, dtype=float)
     except:
-        try:
-            for frame in frames:
-                if fy == 'volume' or fy == 'Volume':
-                    y_all.append(frame.get_volume() / len(frame.get_positions()))
-                elif fy == 'size' or fy == 'Size':
-                    y_all.append(len(frame.get_positions()))
-                else:
-                    y_all.append(frame.info[fy] / len(frame.get_positions()))
-            y_all = np.array(y_all)
-        except:
-            raise ValueError('Cannot load the property vector')
+        y_all = asapxyz.get_property(fy)
 
-    if len(y_all) != nframes:
+    if len(y_all) != len(desc):
         raise ValueError('Length of the vector of properties is not the same as number of samples')
 
     # scale & center

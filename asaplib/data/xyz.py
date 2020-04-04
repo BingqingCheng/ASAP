@@ -71,7 +71,7 @@ class ASAPXYZ:
         # load from xyz file
         if self.nframes > 1:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-            desc = np.row_stack([a.info[desc_name] for a in frames])
+            desc = np.row_stack([a.info[desc_name] for a in self.frames])
             print("Use descriptor matrix with shape: ", np.shape(desc))
             # for the atomic descriptors
             if use_atomic_desc:    
@@ -85,6 +85,31 @@ class ASAPXYZ:
                 ValueError('Cannot read the descriptor matrix from single frame')
 
         return desc, atomic_desc
+
+    def get_property(self, y_key=None):
+        """ extract the descriptor array from each frame
+
+        Parameters
+        ----------
+        y_name: string_like, the name of the property in the extended xyz file
+
+        Returns
+        -------
+        y_all: array [N_samples]
+        """
+        y_all = []
+        try:
+            for frame in self.frames:
+                if y_key == 'volume' or y_key == 'Volume':
+                    y_all.append(frame.get_volume() / len(frame.get_positions()))
+                elif y_key == 'size' or y_key == 'Size':
+                    y_all.append(len(frame.get_positions()))
+                else:
+                    y_all.append(frame.info[y_key] / len(frame.get_positions()))
+            y_all = np.array(y_all)
+        except:
+            raise ValueError('Cannot load the property vector')
+        return y_all
 
     def set_descriptors(self, desc=None, desc_name=None):
         """ write the descriptor array to the atom object
@@ -134,16 +159,16 @@ class ASAPXYZ:
         """
         remove the desciptors
         """
-        for i, frame in enumerate(self.frames):
+        for frame in self.frames:
             if desc_name in frame.info:
-                frame.info[desc_name] = None
+                del frame.info[desc_name]
 
     def remove_atomic_descriptors(self, desc_name=None):
         """
         remove the desciptors
         """
-        for i, frame in enumerate(self.frames):
-            frame.set_array(desc_name, None)
+        for frame in self.frames:
+            del frame.arrays[desc_name]
 
     def write(self, filename):
         write(str(filename) + ".xyz", self.frames)
