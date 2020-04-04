@@ -67,55 +67,22 @@ class ASAPXYZ:
         """
         desc = []
         atomic_desc = []
-        ndesc = 0
-        atom_index = 0
-        [ found_desc, found_atomic_desc ] = [ False, False ]
 
         # load from xyz file
         if self.nframes > 1:
-            for i, frame in enumerate(self.frames):
-                if desc_name in frame.info:
-                    try:
-                        desc.append(frame.info[desc_name])
-                        # make sure that each frame has a descriptor vector of the same length
-                        if ndesc > 0 and len(frame.info[desc_name]) != ndesc:
-                            raise ValueError('mismatch of number of descriptors between frames')
-                        ndesc = len(frame.info[desc_name])
-                        found_desc = True
-                        #print("Found descriptor matrix from the xyz file")
-                    except:
-                        raise ValueError('The descriptor vectors of different frames are not of equal length')
-                # for the atomic descriptors
-                if use_atomic_desc:                    
-                    try:
-                        atomic_desc_now = frame.get_array(desc_name)
-                        ndesc = np.shape(atomic_desc_now)[1]
-                        if i == 0: 
-                            atomic_desc = np.zeros((self.total_natoms, ndesc), dtype=float)
-                            found_atomic_desc = True
-                        if ndesc > 0 and np.shape(atomic_desc_now)[1] != ndesc:
-                            raise ValueError('mismatch of number of descriptors between atoms')
-                        natomnow = self.natom_list[i]
-                        atomic_desc[atom_index:atom_index + natomnow, :] = atomic_desc_now
-                        atom_index += natomnow                      
-                        #print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
-                    except:
-                        raise IOError('Cannot find the atomic descriptors from the xyz file')
+            # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
+            desc = np.row_stack([a.info[desc_name] for a in frames])
+            print("Use descriptor matrix with shape: ", np.shape(desc))
+            # for the atomic descriptors
+            if use_atomic_desc:    
+                atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
+                print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
         else:
             # only one frame
             try:
-                desc = self.frames[0].get_array(fmat)
+                desc = self.frames[0].get_array(desc_name)
             except:
                 ValueError('Cannot read the descriptor matrix from single frame')
-
-        if found_desc:
-            #desc = np.asmatrix(desc)
-            #desc.reshape((ndesc, self.nframes))
-            print("Use descriptor matrix with shape: ", np.shape(desc))
-        if found_atomic_desc:
-            #atomic_desc = np.asmatrix(atomic_desc)
-            #atomic_desc.reshape((ndesc, self.total_natoms))
-            print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
 
         return desc, atomic_desc
 
