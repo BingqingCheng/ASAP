@@ -5,15 +5,16 @@ TODO: Module-level description
 
 import argparse
 
-from ase.io import write
-
+from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
-    # if it has been computed before we can simply load it
+
+    foutput = prefix + "-kpca-d" + str(kpca_d)
+    # load the kernel matrix
     try:
         kNN = np.genfromtxt(fmat, dtype=float)
     except:
@@ -26,15 +27,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
 
     # try to read the xyz file
     if fxyz != 'none':
-        try:
-            frames = read(fxyz, ':')
-            nframes = len(frames)
-            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except:
-            raise ValueError('Cannot load the xyz file')
-
-    if output == 'xyz' and fxyz == 'none':
-        raise ValueError('Need input xyz in order to output xyz')
+        asapxyz = ASAPXYZ(fxyz)
+    elif output == 'xyz':
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+        output = 'matrix'
 
     # main thing
     proj = KernelPCA(kpca_d).fit_transform(kNN)
@@ -44,13 +40,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         np.savetxt(prefix + "-kpca-d" + str(kpca_d) + ".coord", proj, fmt='%4.8f',
                    header='low D coordinates of samples')
     elif output == 'xyz':
-        if len(frames) > 1:
-            for i, frame in enumerate(frames):
-                frame.info['kpca_coord'] = proj[i]
-                write(prefix + "-kpca-d" + str(kpca_d) + ".xyz", frames[i], append=True)
-        else:
-            frames[0].new_array('kpca_coord', proj)
-            write(prefix + "-kpca-d" + str(kpca_d) + ".xyz", frames[0], append=False)
+        if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
+        asapxyz.set_descriptors(proj, 'kpca_coord')
+        asapxyz.write(foutput)
 
     # color scheme
     plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj))
