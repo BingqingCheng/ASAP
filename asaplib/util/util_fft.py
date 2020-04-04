@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Functions for performing Fast Fourier transforms
 """
 
 import numpy as np
