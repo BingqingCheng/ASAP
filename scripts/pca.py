@@ -7,7 +7,6 @@ import argparse
 import sys
 
 from asaplib.data import ASAPXYZ
-
 from asaplib.io import str2bool
 from asaplib.pca import PCA
 from asaplib.plot import *
@@ -74,7 +73,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # the main thing
     pca = PCA(pca_d, scale)
     proj = pca.fit_transform(desc)
-    if peratom or plotatomic:
+    if use_atomic_desc:
         proj_atomic_all = pca.transform(desc_atomic)
 
     # save
