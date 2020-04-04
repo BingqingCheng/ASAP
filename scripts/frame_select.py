@@ -7,7 +7,7 @@ import argparse
 import os
 
 import numpy as np
-from ase.io import read, write
+from asaplib.data import ASAPXYZ
 
 from asaplib.compressor import fps, CUR_deterministic
 
@@ -20,6 +20,9 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
     2. fps: farthest point sampling selection. Need to supply a kernel matrix or descriptor matrix using -fmat
     3. sortmin/sortmax: select the frames with the largest/smallest value. Need to supply the vector of properties using
        -fy
+    4. CUR decomposition
+    5. Reweight according to the re-weighted distribution exp(-f/\lambda),
+       where exp(-f) is the precomputed kernel density estimation of the original samples.
 
     Parameters
     ----------
@@ -34,10 +37,9 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
               where exp(-f) is the kernel density estimation of the original samples.
     """
 
-    # read frames
-    frames = read(fxyz, ':')
-    nframes = len(frames)
-    print("read xyz file:", fxyz, ", a total of", nframes, "frames")
+    # read the xyz file
+    asapxyz = ASAPXYZ(fxyz)
+    nframes = asapxyz.get_num_frames()
 
     if nkeep == 0:
         nkeep = nframes
@@ -47,16 +49,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
         try:
             y_all = np.genfromtxt(fy, dtype=float)
         except:
-            try:
-                for frame in frames:
-                    if fy == 'volume' or fy == 'Volume':
-                        y_all.append(frame.get_volume() / len(frame.get_positions()))
-                    elif fy == 'size' or fy == 'Size':
-                        y_all.append(len(frame.get_positions()))
-                    else:
-                        y_all.append(frame.info[fy] / len(frame.get_positions()))
-            except:
-                raise ValueError('Cannot load the property vector')
+            y_all = asapxyz.get_property(fy)
         if len(y_all) != nframes:
             raise ValueError('Length of the vector of properties is not the same as number of samples')
 
@@ -76,18 +69,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
 
     elif algorithm == 'fps' or algorithm == 'FPS' or algorithm == 'cur' or algorithm == 'CUR':
         # for both algo we read in the descriptor matrix
-        desc = []
-        ndesc = 0
-        for i, frame in enumerate(frames):
-            if fmat in frame.info:
-                try:
-                    desc.append(frame.info[fmat])
-                    if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                        raise ValueError('mismatch of number of descriptors between frames')
-                    ndesc = len(frame.info[fmat])
-                except:
-                    raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-
+        desc, _ = asapxyz.get_descriptors(fmat)
         if os.path.isfile(fmat):
             try:
                 desc = np.genfromtxt(fmat, dtype=float)
@@ -95,20 +77,17 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
                 raise ValueError('Cannot load the kernel matrix')
         print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
-        # if (np.shape(desc)[1] != nframes):
-        #    desc = np.asmatrix(desc)            
-        #    print(np.shape(desc))
-        #    desc.reshape((ndesc, nframes))
-
         # FPS
         if algorithm == 'fps' or algorithm == 'FPS':
             sbs, dmax_remain = fps(desc, nkeep, 0)
+            print("Making farthest point sampling selection")
             np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.error', dmax_remain, fmt='%4.8f',
                        header='the maximum remaining distance in FPS')
         # CUR decomposition
         if algorithm == 'cur' or algorithm == 'CUR':
             desc = np.asmatrix(desc)
             cov = np.dot(desc, desc.T)
+            print("Making CUR selection")
             print("shape of the covariance matrix:", np.shape(cov))
             sbs, rcov_error = CUR_deterministic(cov, nkeep)
             np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.error', rcov_error, fmt='%4.8f',
@@ -139,13 +118,11 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
     # save
     selection = np.zeros(nframes, dtype=int)
     for i in sbs:
-        write(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.xyz', frames[i], append=True)
         selection[i] = 1
     np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.index', selection, fmt='%d')
-    # np.savetxt(prefix+"-"+algorithm+"-n-"+str(nkeep)+'.index', sbs, fmt='%d')
     if fy != 'none':
         np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '-' + fy, np.asarray(y_all)[sbs], fmt='%4.8f')
-
+    asapxyz.write(prefix + "-" + algorithm + "-n-" + str(nkeep), sbs)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

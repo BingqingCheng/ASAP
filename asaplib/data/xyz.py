@@ -46,6 +46,9 @@ class ASAPXYZ:
     def get_xyz(self):
         return self.frames
 
+    def get_num_frames(self):
+        return self.nframes
+
     def get_total_natoms(self):
         return self.total_natoms
 
@@ -170,6 +173,19 @@ class ASAPXYZ:
         for frame in self.frames:
             del frame.arrays[desc_name]
 
-    def write(self, filename):
-        write(str(filename) + ".xyz", self.frames)
+    def write(self, filename, sbs=[]):
+        """
+        write the selected frames or all the frames to a xyz file
+
+        Parameters
+        ----------
+        sbs: array, integer
+        """
+        if len(sbs) > 0:
+            for i in sbs:
+                write(str(filename) + ".xyz", self.frames[i], append=True)
+        else:
+            write(str(filename) + ".xyz", self.frames)
+
+        
 
