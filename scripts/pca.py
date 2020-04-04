@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+script for making PCA map based on precomputed design matrix
 """
 
 import argparse
@@ -9,7 +9,7 @@ import sys
 from ase.io import write
 
 from asaplib.io import str2bool
-from asaplib.pca import pca, pca_project
+from asaplib.pca import PCA
 from asaplib.plot import *
 
 
@@ -104,17 +104,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
-    # scale & center
-    if scale:
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        print(scaler.fit(desc))
-        desc = scaler.transform(desc)  # normalizing the features
+    # the main thing
+    pca = PCA(pca_d, scale)
+    proj = pca.fit_transform(desc)
 
-    # main thing
-    proj, pvec = pca(desc, pca_d)
-    proj_atomic_all = np.zeros((total_natoms, pca_d), dtype=float)
-    # print(total_natoms)
+    if peratom or plotatomic:
+        proj_atomic_all = np.zeros((total_natoms, pca_d), dtype=float)
 
     # save
     if output == 'matrix':
@@ -131,8 +126,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                         desc_atomic = frame.get_array(fmat)
                     except:
                         ValueError('Cannot read the descriptor per atom for frame ' + str(i))
-                    desc_atomic = scaler.transform(desc_atomic)  # normalizing the features
-                    proj_atomic = pca_project(desc_atomic, pvec)
+                    proj_atomic = pca.transform(desc_atomic)
                     if peratom: frame.new_array('pca_coord', proj_atomic)
                     if plotatomic:
                         natomnow = len(frame.get_positions())
