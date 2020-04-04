@@ -71,7 +71,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
         # load the column=colorscol for color functions
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
-            print(np.shape(loadcolor))
+            #print(np.shape(loadcolor))
             if colorscol > 0 or len(np.shape(loadcolor)) > 1:
                 plotcolor = loadcolor[:, colorscol]
             else:
@@ -104,7 +104,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
     colorlabel = 'use ' + fcolor + ' for coloring the data points'
 
     if peratom:
-        print(np.shape(plotcolor_atomic))
+        #print(np.shape(plotcolor_atomic))
         colorscale = [ np.amin(plotcolor_atomic), np.amax(plotcolor_atomic) ]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     else:

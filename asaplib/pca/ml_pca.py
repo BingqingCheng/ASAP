@@ -67,7 +67,7 @@ class PCA:
         if self._fitted:
             raise RuntimeError('PCA already fitted before, please reinitialise the object!')
 
-        print("a total of ", np.shape(desc), "column")
+        print("Start PCA for a design matrix with shape ", np.shape(desc))
 
         # scale and center
         if self.scalecenter:
