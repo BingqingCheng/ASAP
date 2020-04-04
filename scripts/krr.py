@@ -8,8 +8,8 @@ import argparse
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read
 
+from asaplib.data import ASAPXYZ
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.compressor import fps, kernel_random_split
 from asaplib.fit import KRRSparse
@@ -55,20 +55,8 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         try:
             # try to read the xyz file
             if fxyz != 'none':
-                try:
-                    frames = read(fxyz, ':')
-                    nframes = len(frames)
-                    print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-                except:
-                    raise ValueError('Cannot load the xyz file')
-            for frame in frames:
-                if fy == 'volume' or fy == 'Volume':
-                    y_all.append(frame.get_volume() / len(frame.get_positions()))
-                elif fy == 'size' or fy == 'Size':
-                    y_all.append(len(frame.get_positions()))
-                else:
-                    y_all.append(frame.info[fy] / len(frame.get_positions()))
-            y_all = np.array(y_all)
+                asapxyz = ASAPXYZ(fxyz)
+                y_all = asapxyz.get_property(fy)
         except OSError:
             raise Exception('property vector file could not be loaded. Please check the filename')
 
