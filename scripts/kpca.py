@@ -8,7 +8,7 @@ import argparse
 from ase.io import write
 
 from asaplib.io import str2bool
-from asaplib.pca import kpca
+from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
 
@@ -39,7 +39,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
-    proj = kpca(kNN, kpca_d)
+    proj = KernelPCA(kpca_d).fit_transform(kNN)
 
     # save
     if output == 'matrix':
@@ -55,7 +55,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
             write(prefix + "-kpca-d" + str(kpca_d) + ".xyz", frames[0], append=False)
 
     # color scheme
-    plotcolor, colorlabel = set_color_function(fcolor, fxyz, colorscol, len(proj))
+    plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj))
 
     # make plot
     plot_styles.set_nice_font()
@@ -64,25 +64,27 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
     fig, ax = plot_styles.plot_density_map(proj[:, [pc1, pc2]], plotcolor,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
+                                           xaxis=True, yaxis=True,
                                            centers=None,
                                            psize=30,
-                                           out_file='KPCA_4_' + prefix + '.png',
+                                           out_file=None,
                                            title='KPCA for: ' + prefix,
                                            show=False, cmap='gnuplot',
                                            remove_tick=False,
                                            use_perc=True,
                                            rasterized=True,
                                            fontsize=15,
-                                           vmax=None,
-                                           vmin=None)
+                                           vmax=colorscale[1],
+                                           vmin=colorscale[0])
 
     fig.set_size_inches(18.5, 10.5)
 
     if ftags != 'none':
         texts = []
         for i in range(ndict):
-            ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
+            if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
+                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
+                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                                  ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if (adtext):

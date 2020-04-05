@@ -9,58 +9,201 @@ import numpy as np
 import scipy.linalg as salg
 
 
-def kpca(kernel, ndim=2):
-    print(" - Centering the data ")
-    k = fixcenter(kernel)
+class KernelPCA:
+    def __init__(self, ndim=2):
+        """KernelPCA with precomputed kernel for now only
 
-    print("  And now we build a projection ")
-    eval, evec = salg.eigh(k, eigvals=(len(k) - ndim, len(k) - 1))
-    eval = np.flipud(eval);
-    evec = np.fliplr(evec)
+        Parameters
+        ----------
+        ndim : int, default=2
+            number of dimensions to project to
+        """
 
-    pvec = evec.copy()
-    for i in range(ndim):
-        pvec[:, i] *= 1. / np.sqrt(eval[i])
-    print("Done, super quick. ")
-    return np.dot(k, pvec)
+        # essential
+        self.ndim = ndim
 
+        # kernel and projection related properties
+        self.vectors = None
+        self.colmean = None
+        self.mean = None
+        self.center_kmat = None
+        self._lambdas = None
+        self._alphas = None
+        self._m = None
 
-def ooskpca(insqrk, inrectk, ndim=2):
-    ### CORRECTLY CENTERS THE TEST POINTS 
-    ### CENTERS THE OOS WITH LM MEANS
-    print("Centering the data ")
-    sqrk = insqrk.copy()
-    rectk = inrectk.copy()
-    k = skenter(sqrk)
-    m = len(rectk)
-    n = len(sqrk)
-    recc = rectk - np.dot(np.ones((m, n)), sqrk) * 1. / n - np.dot(rectk,
-                                                                   np.ones((n, n))) * 1. / n + 1. / n ** 2 * np.dot(
-        np.ones((m, n)), sqrk).dot(np.ones((n, n)))
+        # state properties
+        self._fitted = False
 
-    print("  And now we build a projection ")
-    evalo, evec = salg.eigh(k, eigvals=(len(k) - ndim, len(k) - 1))
-    evalo = np.flipud(evalo)
-    evec = np.fliplr(evec)
-    pvec = evec.copy()
+    @staticmethod
+    def center_square(kernel):
+        """Centering of a kernel matrix, with additional centering info
 
-    for i in xrange(ndim):
-        pvec[:, i] *= 1. / np.sqrt(evalo[i])
-    print("Done, super quick. ")
+        Parameters
+        ----------
+        kernel : array-like, (shape=MxM)
+            Kernel matrix
 
-    return np.dot(recc, pvec)
+        Returns
+        -------
+        colmean : ndarray, (shape=M)
+            mean of columns from kernel matrix
+        mean : float
+            mean of the entire kernel matrix
+        centered_kernel : ndarray, (shape=MxM)
+            kernel centered in feature space
+        """
+        colmean = np.mean(kernel, axis=1)
+        mean = np.mean(colmean)
+        centered_kernel = kernel - colmean - np.atleast_2d(colmean).T + mean
+        return colmean, mean, centered_kernel
 
+    def _center_test_kmat(self, ktest):
+        """Centers a kernel matrix for projection
 
-def fixcenter(kernel):
-    cernel = kernel.copy()
-    cols = np.mean(cernel, axis=0)
-    # print "numcol ", cols.shape
-    rows = np.mean(cernel, axis=1)
-    # print "numrows", rows.shape
-    mean = np.mean(cols)
-    for i in range(len(rows)):
-        cernel[i, :] -= cols
-    for j in range(len(cols)):
-        cernel[:, j] -= rows
-    cernel += mean
-    return cernel
+        Parameters
+        ----------
+        ktest : array_like, shape=(L,M)
+            kernel matricx for the points to project to the lower dimensions
+            Overwritten!!!
+
+        Returns
+        -------
+        ktest :
+            centered kernel matrix
+
+        """
+        test_colmean = np.atleast_2d(np.mean(ktest, axis=1)).T
+        ktest += self.mean - self.colmean - test_colmean
+        return ktest
+
+    def fit(self, kmat):
+        """Fit kernel PCA on the precomputed kernel matrix
+
+        Notes
+        -----
+        - Keeps the kernel matrix intact
+        - can be done only once on a given object, need to reinitialise if trying to run again
+
+        Parameters
+        ----------
+        kmat : numpy.ndarray, shape=(M,M)
+            kerenl matrix between the observations
+            needs to be square and real, symmetric
+
+        Returns
+        -------
+        """
+        if self._fitted:
+            raise RuntimeError('Kernel already fitted before, please reinitialise the object!')
+
+        # check the shape and symmetry of the kernel matrix
+        self._check_kmat(kmat, square=True)
+
+        # save kmat and center
+        self._m = len(kmat)
+        self.colmean, self.mean, self.center_kmat = self.center_square(kmat)
+
+        # calculation, ordering in descending order and scale by sqrt(lambda)
+        self._lambdas, self._alphas = salg.eigh(self.center_kmat, eigvals=(self._m - self.ndim, self._m - 1))
+        self._lambdas = np.flipud(self._lambdas)
+        self._alphas = np.fliplr(self._alphas) / np.sqrt(self._lambdas)
+
+        # the model is fitted then
+        self._fitted = True
+
+    def fit_transform(self, kmat, copy=True):
+        """Fit kernel PCA on the precomputed kernel matrix & project to lower dimensions
+
+        Notes
+        -----
+        - Keeps the kernel matrix intact
+        - can be done only once on a given object, need to reinitialise if trying to run again
+
+        Parameters
+        ----------
+        kmat : numpy.ndarray, shape=(M,M)
+            kerenl matrix between the observations
+            needs to be square and real, symmetric
+        copy : bool, optional, default=True
+            copy the kernel matrix or overwrite it, passed to self.transform()
+            nb. the kernel matrix will be left centered if this is False
+
+        Returns
+        -------
+
+        """
+        self.fit(kmat)
+        return self.transform(self.center_kmat, iscentered=True, copy=copy)
+
+    def transform(self, ktest, iscentered=False, copy=True):
+        """Transforms to the lower dimensions
+
+        Parameters
+        ----------
+        ktest : array_like, shape=(L,M)
+            kernel matrix of the test vectors with the training vectors
+        iscentered : bool, optional, default=False
+            if the kernel is centered already, mainly used for the fit_transform function
+        copy : bool, optional, default=True
+            copy the kernel matrix or overwrite it
+            nb. the kernel matrix will be left centered if this is False
+
+        Returns
+        -------
+        projected_vectors: numpy.array, shape=(L,ndim)
+            projections of the given kernel wrt. the training kernel
+        """
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use transform.")
+
+        self._check_kmat(ktest, square=False)
+
+        if iscentered:
+            centered_ktest = ktest
+        else:
+            centered_ktest = self._center_test_kmat((ktest.copy() if copy else ktest))
+
+        return np.dot(centered_ktest, self._alphas)
+
+    def _check_kmat(self, kmat, square=True):
+        """Check the kernel matrix
+
+        checks if the matrix is real valued and its shape: square symmetric if square=True, LxM(self._m) otherwise
+
+        Parameters
+        ----------
+        kmat : numpy.array
+            kernel matrix to be checked
+        square : bool, default=True
+            if the matrix needs to be square and symmetric
+
+        Returns
+        -------
+
+        """
+
+        assert np.ndim(kmat) == 2
+        assert np.isreal(kmat).all()
+
+        if square:
+            # shape (M,M)
+            assert np.shape(kmat)[0] == np.shape(kmat)[1]
+            # symmetric
+            assert (kmat - kmat.T).max() < 1e-6
+        else:
+            # shape: (anything,M)
+            assert np.shape(kmat)[1] == self._m
+
+    def fit_vectors(self, vecs):
+        """Fit Kernel PCA from vectors in the large dimension
+
+        for future, not implemented yet
+        """
+        raise NotImplementedError
+
+    def transform_vectors(self, vecs):
+        """Fit Kernel PCA from vectors in the large dimension & project to lower dimension
+
+        for future, not implemented yet
+        """
+        raise NotImplementedError

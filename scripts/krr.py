@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-Performing kernel ridge regression (with optional learning curve)
+Python script for performing kernel ridge regression 
+(with optional learning curve)
 """
 
 import argparse
@@ -26,8 +27,8 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     prefix: filename prefix for learning curve figure
     test_ratio: train/test ratio
     jitter: jitter level, default is 1e-10
-    n_sparse: number of representative samples
-    sigma: noise level in kernel ridge regression
+    n_sparse: number of representative samples, default is 5% of the data
+    sigma: noise level in kernel ridge regression, default is 0.1% of the standard deviation of the data.
     lc_points : number of points on the learning curve
     lc_repeats : number of sub-sampling when compute the learning curve
 
@@ -85,6 +86,9 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     n_train = len(K_train)
     n_test = len(K_test)
 
+    # set default value of n_sparse
+    if n_sparse == 0:
+        n_sparse = n_train // 20
     # sparsification
     if n_sparse >= n_train:
         print("the number of representative structure is too large, please select n < ", n_train)
@@ -99,23 +103,37 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         K_NM = K_train
         K_TM = K_test
 
+
+    # if sigma is not set...
+    if sigma < 0:
+        sigma = 0.001 * np.std(y_train)
+
     delta = np.std(y_train) / (np.trace(K_MM) / len(K_MM))
     krr = KRRSparse(jitter, delta, sigma)
     # fit the model
     krr.fit(K_MM, K_NM, y_train)
 
+    fit_error = {}
     # get the predictions for train set
     y_pred = krr.predict(K_NM)
     # compute the CV score for the dataset
-    print("train score: ", get_score(y_pred, y_train))
+    train_error = get_score(y_pred, y_train)
+    print("train score: ", train_error)
+    fit_error['train_error'] = train_error
     # get the predictions for test set
     y_pred_test = krr.predict(K_TM)
     # compute the CV score for the dataset
-    print("test score: ", get_score(y_pred_test, y_test))
+    test_error = get_score(y_pred_test, y_test)
+    print("test score: ", test_error)
+    fit_error['test_error'] = test_error
+    # dump to file
+    import json
+    with open('KRR_train_test_errors_4' + prefix + '.json', 'w') as fp:
+        json.dump(fit_error, fp)
 
     # learning curve
     # decide train sizes
-    if lc_points > 1:
+    if lc_points > 1 and n_sparse > 0:
         train_sizes = exponential_split(n_sparse, n_train - n_test, lc_points)
         print("Learning curves using train sizes: ", train_sizes)
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
@@ -152,11 +170,11 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("KRR_learning_curve.dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("KRR_learning_curve_4" + prefix + ".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
     
-    if lc_points > 1:
+    if lc_points > 1 and n_sparse > 0:
         fig = plt.figure(figsize=(8 * 2.1, 8))
         ax = fig.add_subplot(121)
     else:
@@ -169,9 +187,9 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     ax.set_xlabel('actual y')
     ax.set_ylabel('predicted y')
 
-    if lc_points > 1:
+    if lc_points > 1 and n_sparse > 0:
         ax2 = fig.add_subplot(122)
-        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error)
+        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error, linestyle='', uplims=True, lolims=True)
         ax2.set_title('Learning curve')
         ax2.set_xlabel('Number of training samples')
         ax2.set_ylabel('Test {}'.format(sc_name))
@@ -192,7 +210,7 @@ if __name__ == '__main__':
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
     parser.add_argument('--jitter', type=float, default=1e-10,
                         help='regularizer that improves the stablity of matrix inversion')
-    parser.add_argument('--n', type=int, default=-1, help='number of the representative samples')
+    parser.add_argument('--n', type=int, default=0, help='number of the representative samples, set negative if using no sparsification')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
     parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
     parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')

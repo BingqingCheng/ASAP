@@ -17,10 +17,14 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
         except:
             raise ValueError('Cannot load the xyz file')
 
+
         if len(frames) == 1:
-            print('Only one frame so set the color function to the index of atoms')
-            fcolor = 'index'
-            plotcolor = np.arange(len(frames[0].get_positions()))
+            try:
+                plotcolor = frames[0].get_array(fcolor)
+            except:
+                 print('Only one frame so set the color function to the index of atoms')
+                 fcolor = 'index'
+                 plotcolor = np.arange(n_samples)
 
         elif len(frames) != n_samples:
             raise ValueError('Length of the xyz trajectory is not the same as number of samples')
@@ -32,6 +36,7 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
                 for index, frame in enumerate(frames):
                     natomsnow = len(frame.get_positions())
                     # print(natomsnow)
+                    atomic_color = False
                     if fcolor == 'volume' or fcolor == 'Volume':
                         use_color_scheme = frame.get_volume() / natomsnow
                     elif fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
@@ -44,11 +49,23 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
                         else:
                             use_color_scheme = frame.info[fcolor] / natomsnow
                     else:
-                        raise ValueError('Cannot find the specified property from the xyz file')
+                        try:
+                            use_color_scheme_atomic = frame.get_array(fcolor)
+                            atomic_color = True
+                            if use_color_scheme_atomic.ndim > 1:
+                                raise ValueError('The info from the xyz file for the color scheme has more than one column')
+                        except:
+                            ValueError('Cannot find the specified property from the xyz file for the color scheme')
+                        if peratom: 
+                            plotcolor_atomic = np.append(plotcolor_atomic, use_color_scheme_atomic)
+                        use_color_scheme = np.mean(use_color_scheme_atomic)
+
                     plotcolor.append(use_color_scheme)
-                    if peratom: plotcolor_atomic = np.append(plotcolor_atomic, use_color_scheme * np.ones(natomsnow))
+                    if peratom and not atomic_color: 
+                        plotcolor_atomic = np.append(plotcolor_atomic, use_color_scheme * np.ones(natomsnow))
             except:
                 raise ValueError('Cannot load the property vector from the xyz file')
+
 
     elif os.path.isfile(fcolor):
         # load the column=colorscol for color functions
@@ -88,9 +105,11 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
 
     if peratom:
         print(np.shape(plotcolor_atomic))
-        return plotcolor, np.asarray(plotcolor_atomic), colorlabel
+        colorscale = [ np.amin(plotcolor_atomic), np.amax(plotcolor_atomic) ]
+        return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     else:
-        return plotcolor, colorlabel
+        colorscale = [ None, None ] 
+        return plotcolor, colorlabel, colorscale
 
 
 class COLOR_PALETTE:

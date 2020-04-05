@@ -50,6 +50,7 @@ def add_subplot_axes(ax, rect, axisbg='w'):
 
 def plot_density_map(X, z, fig=None, ax=None,
                      xlabel=None, ylabel=None, clabel=None, label=None,
+                     xaxis=True, yaxis=True,
                      centers=None,
                      psize=20,
                      out_file=None, title=None, show=True, cmap='coolwarm',
@@ -110,6 +111,11 @@ def plot_density_map(X, z, fig=None, ax=None,
 
     if remove_tick:
         ax.tick_params(labelbottom='off', labelleft='off')
+
+    if xaxis is not True:
+        ax.set_xticklabels([])
+    if yaxis is not True:
+        ax.set_yticklabels([])
 
     if xlabel is not None:
         plt.xlabel(xlabel, fontsize=fontsize)
