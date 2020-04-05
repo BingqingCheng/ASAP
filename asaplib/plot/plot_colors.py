@@ -17,7 +17,6 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
         except:
             raise ValueError('Cannot load the xyz file')
 
-
         if len(frames) == 1:
             try:
                 plotcolor = frames[0].get_array(fcolor)
@@ -66,7 +65,6 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             except:
                 raise ValueError('Cannot load the property vector from the xyz file')
 
-
     elif os.path.isfile(fcolor):
         # load the column=colorscol for color functions
         try:
@@ -77,7 +75,9 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             else:
                 plotcolor = loadcolor
             print('load file: ' + fcolor + ' for color schemes')
-            if (len(plotcolor) != n_samples):
+            print(plotcolor)
+            print(n_samples)
+            if len(plotcolor) != n_samples:
                 raise ValueError('Length of the vector of properties is not the same as number of samples')
 
             if peratom:

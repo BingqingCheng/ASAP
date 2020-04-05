@@ -9,7 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from asaplib.pca import kpca
+from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DBaa
@@ -62,7 +62,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
 
     # do a low dimensional projection of the kernel matrix
     if kmat != 'none':
-        proj = kpca(kNN, dimension)
+        proj = KernelPCA(dimension).fit_transform(kNN)
 
     density_model = KDE()
     # fit density model to data

@@ -103,7 +103,6 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         K_NM = K_train
         K_TM = K_test
 
-
     # if sigma is not set...
     if sigma < 0:
         sigma = 0.001 * np.std(y_train)
@@ -163,7 +162,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
                 avg += sc[sc_name]
                 var += sc[sc_name] ** 2.
             avg /= len(score)
-            var /= len(score);
+            var /= len(score)
             var -= avg ** 2.
             avg_scores.append(avg)
             avg_scores_error.append(np.sqrt(var))

@@ -32,6 +32,7 @@ a system with boron (5) and germanium (32). The output is
 
 """
 
+
 def main(Zs, soap_n, soap_l, multisoap, sharpness, scalerange, verbose, outfile):
 
     hypers = gen_default_soap_hyperparameters(Zs, soap_n, soap_l, multisoap, sharpness, scalerange, verbose)
@@ -43,6 +44,7 @@ def main(Zs, soap_n, soap_l, multisoap, sharpness, scalerange, verbose, outfile)
     else:
         with open(outfile, 'w') as jd:
             json.dump(hypers, jd)
+
 
 if __name__ == '__main__':
 

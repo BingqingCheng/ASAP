@@ -44,7 +44,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
 
         desc = []
         ndesc = 0
-        # load from xyze file
+        # load from xyz file
         if nframes > 1:
             for i, frame in enumerate(frames):
                 if fmat in frame.info:

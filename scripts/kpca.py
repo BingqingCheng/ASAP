@@ -8,11 +8,31 @@ import argparse
 from ase.io import write
 
 from asaplib.io import str2bool
-from asaplib.pca import KernelPCA
+from asaplib.pca import KernelPCA, kpca
 from asaplib.plot import *
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
+    """
+
+    Parameters
+    ----------
+    fmat
+    fxyz
+    ftags
+    fcolor
+    colorscol
+    prefix
+    output
+    kpca_d: number of dimensions
+    pc1
+    pc2
+    adtext
+
+    Returns
+    -------
+
+    """
     # if it has been computed before we can simply load it
     try:
         kNN = np.genfromtxt(fmat, dtype=float)
@@ -39,7 +59,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
-    proj = KernelPCA(kpca_d).fit_transform(kNN)
+    proj = kpca(kNN, kpca_d)
+    # proj = KernelPCA(kpca_d).fit_transform(kNN)  # breaks the Ti02 example
 
     # save
     if output == 'matrix':

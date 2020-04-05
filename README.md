@@ -14,7 +14,7 @@ python3 setup.py install --user
 
 Requirements:
 
-+ numpy scipy scikit-learn json ase dscribe 
++ numpy scipy scikit-learn json ase dscribe pytest
 
 + The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
 
