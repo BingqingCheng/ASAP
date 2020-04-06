@@ -7,8 +7,9 @@ import numpy as np
 from ase.io import read, write
 from dscribe.descriptors import SOAP
 
-from asaplib.io import str2bool, NpEncoder
 from asaplib.hypers import gen_default_soap_hyperparameters
+from asaplib.io import str2bool, NpEncoder
+
 
 
 def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
@@ -37,7 +38,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, slice(0,None,stride))
+        fframes = read(fxyz, slice(0, None, stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -101,7 +102,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     for i, frame in enumerate(frames):
         fnow = soap_desc_atomic[0].create(frame, n_jobs=8)
 
-        
         for soap_desc_atomic_now in soap_desc_atomic[1:]:
             fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
 
@@ -144,7 +144,8 @@ if __name__ == '__main__':
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
-    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
+    parser.add_argument('--stride', type=int, default=1,
+                        help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)

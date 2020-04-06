@@ -1,15 +1,14 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+script for making PCA map based on precomputed design matrix
 """
 
 import argparse
 import sys
 
-from ase.io import write
-
+from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.pca import pca, pca_project
+from asaplib.pca import PCA
 from asaplib.plot import *
 
 
@@ -46,49 +45,15 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     plotatomic = bool(plotatomic)
     adtext = bool(adtext)
     scale = bool(scale)
-    total_natoms = 0
+    use_atomic_desc = (peratom or plotatomic)
 
-    if output == 'xyz' and fxyz == 'none':
-        raise ValueError('Need input xyz in order to output xyz')
-
-    desc = [];
-    ndesc = 0
     # try to read the xyz file
     if fxyz != 'none':
-        try:
-            frames = read(fxyz, ':')
-            nframes = len(frames)
-            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except:
-            raise ValueError('Cannot load the xyz file')
-
-        # load from xyz file
-        if nframes > 1:
-            for i, frame in enumerate(frames):
-                total_natoms += len(frame.get_positions())
-                if fmat in frame.info:
-                    try:
-                        desc.append(frame.info[fmat])
-                        if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                            raise ValueError('mismatch of number of descriptors between frames')
-                        ndesc = len(frame.info[fmat])
-                    except:
-                        raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-            if desc != [] and np.shape(desc)[1] != nframes:
-                desc = np.asmatrix(desc)
-                # print(np.shape(desc))
-                desc.reshape((ndesc, nframes))
-        else:
-            # only one frame
-            total_natoms = len(frames[0].get_positions())
-            try:
-                desc = frames[0].get_array(fmat)
-            except:
-                ValueError('Cannot read the descriptor matrix from single frame')
+        asapxyz = ASAPXYZ(fxyz)
+        desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
     else:
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
-
     # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
@@ -96,6 +61,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
+    # sanity check
     if len(desc) == 0:
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
@@ -104,53 +70,29 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
-    # scale & center
-    if scale:
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        print(scaler.fit(desc))
-        desc = scaler.transform(desc)  # normalizing the features
-
-    # main thing
-    proj, pvec = pca(desc, pca_d)
-    proj_atomic_all = np.zeros((total_natoms, pca_d), dtype=float)
-    # print(total_natoms)
+    # the main thing
+    pca = PCA(pca_d, scale)
+    proj = pca.fit_transform(desc)
+    if use_atomic_desc:
+        proj_atomic_all = pca.transform(desc_atomic)
 
     # save
     if output == 'matrix':
         np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-    if output == 'xyz' or peratom or plotatomic:
+    if output == 'xyz':
         if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
-        if nframes > 1:
-            atom_index = 0
-            for i, frame in enumerate(frames):
-                frame.info['pca_coord'] = proj[i]
-                # !!! this is the bits for per_atom proj
-                if peratom or plotatomic:
-                    try:
-                        desc_atomic = frame.get_array(fmat)
-                    except:
-                        ValueError('Cannot read the descriptor per atom for frame ' + str(i))
-                    desc_atomic = scaler.transform(desc_atomic)  # normalizing the features
-                    proj_atomic = pca_project(desc_atomic, pvec)
-                    if peratom: frame.new_array('pca_coord', proj_atomic)
-                    if plotatomic:
-                        natomnow = len(frame.get_positions())
-                        proj_atomic_all[atom_index:atom_index + natomnow, :] = proj_atomic[:, :]
-                        atom_index += natomnow
-                # remove the raw descriptors
-                if not keepraw:
-                    frame.info[fmat] = None
-                    frame.set_array(fmat, None)
-
-                if output == 'xyz': write(foutput + ".xyz", frame, append=True)
-        else:
-            frames[0].new_array('pca_coord', proj)
-            if output == 'xyz': write(prefix + "-pca-d" + str(pca_d) + ".xyz", frames[0], append=False)
+        asapxyz.set_descriptors(proj, 'pca_coord')
+        if peratom: asapxyz.set_atomic_descriptors(proj_atomic, 'pca_coord')
+        # remove the raw descriptors
+        if not keepraw:
+            asapxyz.remove_descriptors(fmat)
+            asapxyz.remove_atomic_descriptors(fmat)
+        asapxyz.write(foutput)
 
     # color scheme
     if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj),
+                                                                                  True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
@@ -199,7 +141,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=10, color='red'))
+                                     ha='center', va='center', fontsize=10, color='red'))
         if adtext:
             from adjustText import adjust_text
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},

@@ -1,8 +1,8 @@
 """
 Tools for doing kernel PCA on environmental similarity
 e.g.
-eva = np.genfromtxt(prefix+".k",skip_header=1)
-proj = KernelPCA(6).fit_transform(eva)
+kNN = np.genfromtxt(prefix+".k",skip_header=1)
+proj = KernelPCA(kpca_d).fit_transform(kNN)
 """
 
 import numpy as np

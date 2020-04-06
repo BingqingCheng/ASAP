@@ -30,7 +30,7 @@ def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
     for i in range(n_col):
         rval, RX = CUR_deterministic_step(RX, n_col - i, costs)
         rsel[i] = rval
-        if error_estimate: 
+        if error_estimate:
             rerror[i] = np.sum(np.abs(RX))
     return rsel, rerror
 
