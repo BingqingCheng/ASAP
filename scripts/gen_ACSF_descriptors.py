@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 import argparse
+import json
 import os
 import sys
-import json
+
 import numpy as np
 from ase.io import read, write
 from dscribe.descriptors import ACSF
@@ -34,7 +35,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, slice(0,None,stride))
+        fframes = read(fxyz, slice(0, None, stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -59,12 +60,12 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
 
     # template for an ACSF descriptor
     acsf_dict = {'species': global_species,
-    'rcut': r_cut,
-    'g2_params': None,
-    'g3_params': None,
-    'g4_params': None,
-    'g5_params': None} #,
-    #'periodic': periodic, 'sparse': False}
+                 'rcut': r_cut,
+                 'g2_params': None,
+                 'g3_params': None,
+                 'g4_params': None,
+                 'g5_params': None}  # ,
+    # 'periodic': periodic, 'sparse': False}
     # currenly Dscribe only supports ASCF for finite system!
 
     # Setting up the ACSF descriptor
@@ -73,13 +74,13 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
         try:
             with open(facsf_param, 'r') as facsffile:
                 acsf_param = json.load(facsffile)
-            #print(acsf_param)
+            # print(acsf_param)
         except:
             raise IOError('Cannot load the json file for ACSF parameters')
         # fill in the values
-        for k,v in acsf_param.items():
+        for k, v in acsf_param.items():
             if k in acsf_dict.keys():
-                if isinstance(v, list): 
+                if isinstance(v, list):
                     acsf_dict[k] = np.asarray(v)
                 else:
                     acsf_dict[k] = v
@@ -90,7 +91,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
         pass
     else:
         print("use very basic selections for ACSF")
-        acsf_dict['g2_params']= [[1, 1], [1, 2], [1, 3]]
+        acsf_dict['g2_params'] = [[1, 1], [1, 2], [1, 3]]
         acsf_dict['g4_params']: [[1, 1, 1], [1, 2, 1], [1, 1, -1], [1, 2, -1]]
 
     # set it up
@@ -99,7 +100,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
     if facsf_param != 'none':
         foutput = prefix + "-rcut" + str(r_cut) + '-' + facsf_param
         desc_name = "ACSF" + "-rcut" + str(r_cut) + '-' + facsf_param
-    else: 
+    else:
         foutput = prefix + "-rcut" + str(r_cut)
         desc_name = "ACSF" + "-rcut" + str(r_cut)
 
@@ -109,7 +110,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
 
     for i, frame in enumerate(frames):
         fnow = rep_atomic.create(frame, n_jobs=8)
-        
+
         frame.info[desc_name] = fnow.mean(axis=0)
 
         # save
@@ -122,10 +123,9 @@ def main(fxyz, dictxyz, prefix, output, per_atom, r_cut, facsf_param, periodic, 
         elif output == 'xyz':
             # output per-atom info
             if per_atom:
-                
                 frame.new_array(desc_name, fnow)
             # write xyze
-            #print(desc_name,foutput,frame)
+            # print(desc_name,foutput,frame)
             write(foutput + ".xyz", frame, append=True)
         else:
             raise ValueError('Cannot find the output format')
@@ -142,14 +142,17 @@ if __name__ == '__main__':
     parser.add_argument('--per_atom', type=str2bool, nargs='?', const=True, default=True,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
     parser.add_argument('--rcut', type=float, default=4.0, help='Cutoff radius')
-    parser.add_argument('-param_path', type=str, default='none',help='Specify the atom centered symmetry function parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)')
+    parser.add_argument('-param_path', type=str, default='none',
+                        help='Specify the atom centered symmetry function parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/acsf.html for details)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
-    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
+    parser.add_argument('--stride', type=int, default=1,
+                        help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.rcut, args.param_path, args.periodic, args.stride)
+    main(args.fxyz, args.fdict, args.prefix, args.output, args.per_atom, args.rcut, args.param_path, args.periodic,
+         args.stride)

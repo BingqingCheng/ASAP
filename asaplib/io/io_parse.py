@@ -4,6 +4,7 @@ TODO: Module-level description
 
 import argparse
 import json
+
 import numpy as np
 
 
@@ -27,6 +28,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -37,4 +39,3 @@ class NpEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(NpEncoder, self).default(obj)
-

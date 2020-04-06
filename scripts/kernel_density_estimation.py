@@ -8,8 +8,8 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read
 
+from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.kde import KDE
 from asaplib.plot import plot_styles
@@ -35,33 +35,8 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
 
     # try to read the xyz file
     if fxyz != 'none':
-        try:
-            frames = read(fxyz, ':')
-            nframes = len(frames)
-            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except:
-            raise ValueError('Cannot load the xyz file')
-
-        desc = []
-        ndesc = 0
-        # load from xyze file
-        if nframes > 1:
-            for i, frame in enumerate(frames):
-                if fmat in frame.info:
-                    try:
-                        desc.append(frame.info[fmat])
-                        if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                            raise ValueError('mismatch of number of descriptors between frames')
-                        ndesc = len(frame.info[fmat])
-                    except:
-                        raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-        else:
-            # only one frame
-            try:
-                desc = frames[0].get_array(fmat)
-            except:
-                ValueError('Cannot read the descriptor matrix from single frame')
-    # we can also load the descriptor matrix from a standalone file
+        asapxyz = ASAPXYZ(fxyz)
+        desc, _ = asapxyz.get_descriptors(fmat)
     if os.path.isfile(fmat):
         try:
             desc = np.genfromtxt(fmat, dtype=float)
@@ -121,7 +96,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=15, color='red'))
+                                     ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text

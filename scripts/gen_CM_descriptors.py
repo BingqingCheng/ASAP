@@ -7,8 +7,6 @@ import numpy as np
 from ase.io import read, write
 from dscribe.descriptors import CoulombMatrix
 
-from asaplib.io import str2bool
-
 
 def main(fxyz, dictxyz, prefix, output, max_atoms, stride):
     """
@@ -25,14 +23,12 @@ def main(fxyz, dictxyz, prefix, output, max_atoms, stride):
     stride: compute descriptor each X frames
     """
 
-
-
     fframes = []
     dictframes = []
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, slice(0,None,stride))
+        fframes = read(fxyz, slice(0, None, stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -55,14 +51,13 @@ def main(fxyz, dictxyz, prefix, output, max_atoms, stride):
     foutput = prefix + "-max_atoms" + str(max_atoms)
     desc_name = "CM" + "-max_atoms" + str(max_atoms)
 
-
     # prepare for the output
     if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
     if os.path.isfile(foutput + ".desc"): os.rename(foutput + ".desc", "bck." + foutput + ".desc")
 
     for i, frame in enumerate(frames):
         fnow = rep_atomic.create(frame, n_jobs=8)
-        
+
         frame.info[desc_name] = fnow
         # save
         if output == 'matrix':
@@ -87,7 +82,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--max_atoms', type=int, default=30,
                         help='Max number of atoms in the Coulomb Matrix')
-    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
+    parser.add_argument('--stride', type=int, default=1,
+                        help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)

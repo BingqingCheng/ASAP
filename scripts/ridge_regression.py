@@ -10,14 +10,15 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ase.io import read
 from sklearn.model_selection import train_test_split
 
-from asaplib.fit import RidgeRegression
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
+from asaplib.data import ASAPXYZ
+from asaplib.fit import RidgeRegression
 from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
+
 
 def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats):
     """
@@ -45,40 +46,8 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     # try to read the xyz file
     if fxyz != 'none':
-        try:
-            frames = read(fxyz, ':')
-            nframes = len(frames)
-            print('load xyz file: ', fxyz, ', a total of ', str(nframes), 'frames')
-        except:
-            raise ValueError('Cannot load the xyz file')
-
-        desc = []
-        ndesc = 0
-        # load from xyz file
-        if nframes > 1:
-            for i, frame in enumerate(frames):
-                if fmat in frame.info:
-                    try:
-                        desc.append(frame.info[fmat])
-                        if ndesc > 0 and len(frame.info[fmat]) != ndesc:
-                            raise ValueError('mismatch of number of descriptors between frames')
-                        ndesc = len(frame.info[fmat])
-                    except:
-                        raise ValueError('Cannot combine the descriptor matrix from the xyz file')
-            if desc != [] and np.shape(desc)[1] != nframes:
-                desc = np.asmatrix(desc)
-                # print(np.shape(desc))
-                desc.reshape((ndesc, nframes))
-        else:
-            # only one frame
-            try:
-                desc = frames[0].get_array(fmat)
-            except:
-                ValueError('Cannot read the descriptor matrix from single frame')
-    else:
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-        output = 'matrix'
-
+        asapxyz = ASAPXYZ(fxyz)
+        desc, _ = asapxyz.get_descriptors(fmat)
     # we can also load the descriptor matrix from a standalone file
     if os.path.isfile(fmat):
         try:
@@ -95,19 +64,9 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     try:
         y_all = np.genfromtxt(fy, dtype=float)
     except:
-        try:
-            for frame in frames:
-                if fy == 'volume' or fy == 'Volume':
-                    y_all.append(frame.get_volume() / len(frame.get_positions()))
-                elif fy == 'size' or fy == 'Size':
-                    y_all.append(len(frame.get_positions()))
-                else:
-                    y_all.append(frame.info[fy] / len(frame.get_positions()))
-            y_all = np.array(y_all)
-        except:
-            raise ValueError('Cannot load the property vector')
+        y_all = asapxyz.get_property(fy)
 
-    if len(y_all) != nframes:
+    if len(y_all) != len(desc):
         raise ValueError('Length of the vector of properties is not the same as number of samples')
 
     # scale & center
@@ -130,7 +89,6 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     n_test = len(X_test)
 
     # TODO: add sparsification
-
 
     # if sigma is not set...
     if sigma < 0:
@@ -155,7 +113,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     fit_error['test_error'] = test_error
     # dump to file
     import json
-    with open("RR_train_test_errors_4_"+prefix+".json", 'w') as fp:
+    with open("RR_train_test_errors_4_" + prefix + ".json", 'w') as fp:
         json.dump(fit_error, fp)
 
     # learning curve
@@ -195,10 +153,10 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("RR_learning_curve_4_"+prefix+".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("RR_learning_curve_4_" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
-    
+
     if lc_points > 1:
         fig = plt.figure(figsize=(8 * 2.1, 8))
         ax = fig.add_subplot(121)
@@ -236,9 +194,12 @@ if __name__ == '__main__':
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
                         help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
-    parser.add_argument('--sigma', type=float, default=-1, help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.')
-    parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
-    parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
+    parser.add_argument('--sigma', type=float, default=-1,
+                        help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.')
+    parser.add_argument('--lcpoints', type=int, default=10,
+                        help='the number of points on the learning curve, <= 1 means no learning curve')
+    parser.add_argument('--lcrepeats', type=int, default=8,
+                        help='the number of sub-samples to take when compute the learning curve')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
