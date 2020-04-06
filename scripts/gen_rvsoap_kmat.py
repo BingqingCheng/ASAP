@@ -43,7 +43,7 @@ def main(fxyz, prefix, cutoff, sigma, matrix_plot):
         for j in range(i):
             ddm = cdist(rij[i],rij[j])
             #print i, j, ddm
-        kmat[i,j] = kmat[j,i] = np.sum( np.exp( -np.square(ddm) / sigma2 ))
+            kmat[i,j] = kmat[j,i] = np.sum( np.exp( -np.square(ddm) / sigma2 ))
         kmat[i,i] = len(rij[i])
 
     np.savetxt(prefix+"-rvSOAP"+"-r-"+str(cutoff)+"-g-"+str(sigma)+(".kmat"), kmat, fmt='%.4e')
