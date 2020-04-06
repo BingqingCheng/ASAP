@@ -12,12 +12,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.data import ASAPXYZ
 from asaplib.fit import RidgeRegression
-from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
+
 
 def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats):
     """
@@ -89,7 +90,6 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     # TODO: add sparsification
 
-
     # if sigma is not set...
     if sigma < 0:
         sigma = 0.001 * np.std(y_train)
@@ -113,7 +113,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     fit_error['test_error'] = test_error
     # dump to file
     import json
-    with open("RR_train_test_errors_4_"+prefix+".json", 'w') as fp:
+    with open("RR_train_test_errors_4_" + prefix + ".json", 'w') as fp:
         json.dump(fit_error, fp)
 
     # learning curve
@@ -153,10 +153,10 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("RR_learning_curve_4_"+prefix+".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("RR_learning_curve_4_" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
-    
+
     if lc_points > 1:
         fig = plt.figure(figsize=(8 * 2.1, 8))
         ax = fig.add_subplot(121)
@@ -194,9 +194,12 @@ if __name__ == '__main__':
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
                         help='Scale the coordinates (True/False). Scaling highly recommanded.')
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
-    parser.add_argument('--sigma', type=float, default=-1, help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.')
-    parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
-    parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
+    parser.add_argument('--sigma', type=float, default=-1,
+                        help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.')
+    parser.add_argument('--lcpoints', type=int, default=10,
+                        help='the number of points on the learning curve, <= 1 means no learning curve')
+    parser.add_argument('--lcrepeats', type=int, default=8,
+                        help='the number of sub-samples to take when compute the learning curve')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)

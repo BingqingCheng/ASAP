@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
 from ase.io import read, write
+
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1):
@@ -29,17 +31,16 @@ class ASAPXYZ:
 
         # try to read the xyz file
         try:
-            self.frames = read(self.fxyz, slice(0,None,self.stride))
+            self.frames = read(self.fxyz, slice(0, None, self.stride))
         except:
             raise ValueError('Exception occurred when loading the xyz file')
-
 
         self.nframes = len(self.frames)
         for frame in self.frames:
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
         self.total_natoms = np.sum(self.natom_list)
-        print('load xyz file: ', self.fxyz, 
+        print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
               ', a total of ', str(self.total_natoms), 'atoms')
 
@@ -77,7 +78,7 @@ class ASAPXYZ:
             desc = np.row_stack([a.info[desc_name] for a in self.frames])
             print("Use descriptor matrix with shape: ", np.shape(desc))
             # for the atomic descriptors
-            if use_atomic_desc:    
+            if use_atomic_desc:
                 atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
                 print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
         else:
@@ -154,9 +155,9 @@ class ASAPXYZ:
 
         atom_index = 0
         for i, frame in enumerate(self.frames):
-                natomnow = self.natom_list[i]
-                frame.new_array(atomic_desc_name, atomic_desc[atom_index:atom_index + natomnow, :])
-                atom_index += natomnow
+            natomnow = self.natom_list[i]
+            frame.new_array(atomic_desc_name, atomic_desc[atom_index:atom_index + natomnow, :])
+            atom_index += natomnow
 
     def remove_descriptors(self, desc_name=None):
         """
@@ -186,6 +187,3 @@ class ASAPXYZ:
                 write(str(filename) + ".xyz", self.frames[i], append=True)
         else:
             write(str(filename) + ".xyz", self.frames)
-
-        
-

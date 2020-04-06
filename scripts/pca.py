@@ -91,7 +91,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # color scheme
     if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), True)
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj),
+                                                                                  True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
@@ -140,7 +141,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=10, color='red'))
+                                     ha='center', va='center', fontsize=10, color='red'))
         if adtext:
             from adjustText import adjust_text
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},

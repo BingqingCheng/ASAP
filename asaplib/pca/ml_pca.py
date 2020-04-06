@@ -9,6 +9,7 @@ import numpy as np
 import scipy.linalg as salg
 from sklearn.preprocessing import StandardScaler
 
+
 class PCA:
     def __init__(self, ndim=2, scalecenter=True):
         """PCA with precomputed descriptor matrix
@@ -130,6 +131,3 @@ class PCA:
         """
         self.fit(desc)
         return self.transform(desc)
-
-
-

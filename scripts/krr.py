@@ -6,12 +6,13 @@ Python script for performing kernel ridge regression
 
 import argparse
 import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-from asaplib.data import ASAPXYZ
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.compressor import fps, kernel_random_split
+from asaplib.data import ASAPXYZ
 from asaplib.fit import KRRSparse
 from asaplib.fit import get_score
 from asaplib.plot import plot_styles
@@ -45,7 +46,6 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     except OSError:
         raise Exception('fmat file could not be loaded. Please check the filename')
     print("loaded", fmat)
-
 
     # read in the properties to be predicted
     y_all = []
@@ -90,7 +90,6 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         K_MM = K_train
         K_NM = K_train
         K_TM = K_test
-
 
     # if sigma is not set...
     if sigma < 0:
@@ -158,10 +157,10 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
             Ntrains.append(Ntrain)
 
         # output learning curve
-        np.savetxt("KRR_learning_curve_4" + prefix + ".dat",np.stack((Ntrains,avg_scores,avg_scores_error), axis=-1))
+        np.savetxt("KRR_learning_curve_4" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
 
     plot_styles.set_nice_font()
-    
+
     if lc_points > 1 and n_sparse > 0:
         fig = plt.figure(figsize=(8 * 2.1, 8))
         ax = fig.add_subplot(121)
@@ -198,14 +197,18 @@ if __name__ == '__main__':
     parser.add_argument('--test', type=float, default=0.05, help='the test ratio')
     parser.add_argument('--jitter', type=float, default=1e-10,
                         help='regularizer that improves the stablity of matrix inversion')
-    parser.add_argument('--n', type=int, default=0, help='number of the representative samples, set negative if using no sparsification')
+    parser.add_argument('--n', type=int, default=0,
+                        help='number of the representative samples, set negative if using no sparsification')
     parser.add_argument('--sigma', type=float, default=1e-2, help='the noise level of the signal')
-    parser.add_argument('--lcpoints', type=int, default=10, help='the number of points on the learning curve, <= 1 means no learning curve')
-    parser.add_argument('--lcrepeats', type=int, default=8, help='the number of sub-samples to take when compute the learning curve')
+    parser.add_argument('--lcpoints', type=int, default=10,
+                        help='the number of points on the learning curve, <= 1 means no learning curve')
+    parser.add_argument('--lcrepeats', type=int, default=8,
+                        help='the number of sub-samples to take when compute the learning curve')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma, args.lcpoints, args.lcrepeats)
+    main(args.fmat, args.fxyz, args.fy, args.prefix, args.test, args.jitter, args.n, args.sigma, args.lcpoints,
+         args.lcrepeats)

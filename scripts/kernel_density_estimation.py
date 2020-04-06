@@ -96,7 +96,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=15, color='red'))
+                                     ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if adtext:
             from adjustText import adjust_text

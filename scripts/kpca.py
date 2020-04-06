@@ -12,7 +12,6 @@ from asaplib.plot import *
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
-
     foutput = prefix + "-kpca-d" + str(kpca_d)
     # load the kernel matrix
     try:
@@ -75,7 +74,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=15, color='red'))
+                                     ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
         if (adtext):
             from adjustText import adjust_text

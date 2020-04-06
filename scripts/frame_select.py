@@ -7,9 +7,9 @@ import argparse
 import os
 
 import numpy as np
-from asaplib.data import ASAPXYZ
 
 from asaplib.compressor import fps, CUR_deterministic
+from asaplib.data import ASAPXYZ
 
 
 def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
@@ -123,6 +123,7 @@ def main(fxyz, fy, prefix, nkeep, algorithm, fmat, fkde, reweight_lambda):
     if fy != 'none':
         np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '-' + fy, np.asarray(y_all)[sbs], fmt='%4.8f')
     asapxyz.write(prefix + "-" + algorithm + "-n-" + str(nkeep), sbs)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
