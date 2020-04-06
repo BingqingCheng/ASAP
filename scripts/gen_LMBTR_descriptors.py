@@ -1,9 +1,8 @@
 #!/usr/bin/python3
 import argparse
+import json
 import os
 import sys
-import json
-
 
 import numpy as np
 from ase.io import read, write
@@ -12,7 +11,7 @@ from dscribe.descriptors import LMBTR
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic, stride):
+def main(fxyz, dictxyz, prefix, output, per_atom, config_path, periodic, stride):
     """
 
     Generate the LMBTR Representation.
@@ -35,7 +34,7 @@ def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic, strid
 
     # read frames
     if fxyz != 'none':
-        fframes = read(fxyz, slice(0,None,stride))
+        fframes = read(fxyz, slice(0, None, stride))
         nfframes = len(fframes)
         print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
     # read frames in the dictionary
@@ -60,18 +59,19 @@ def main(fxyz, dictxyz, prefix, output, per_atom , config_path , periodic, strid
                 config = json.load(config_file)
         except Exception:
             raise IOError('Cannot load the json file for parameters')
-    
-    if config_path:    rep_atomic = LMBTR(species = global_species, periodic = periodic, flatten=True,**config)
-    else:    rep_atomic = LMBTR(species = global_species, flatten=True, periodic = periodic)
+
+    if config_path:
+        rep_atomic = LMBTR(species=global_species, periodic=periodic, flatten=True, **config)
+    else:
+        rep_atomic = LMBTR(species=global_species, flatten=True, periodic=periodic)
     if config_path:
         foutput = prefix + '-' + config_path
-        desc_name = "LMBTR"+ '-' + config_path
-    else: 
+        desc_name = "LMBTR" + '-' + config_path
+    else:
         foutput = prefix
-        desc_name = "LMBTR" 
+        desc_name = "LMBTR"
 
-
-    # prepare for the output
+        # prepare for the output
     if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
     if os.path.isfile(foutput + ".desc"): os.rename(foutput + ".desc", "bck." + foutput + ".desc")
 
@@ -106,11 +106,13 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--per_atom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
-    
-    parser.add_argument('-param_path', type=str, default=False, help='Specify the hyper parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
+
+    parser.add_argument('-param_path', type=str, default=False,
+                        help='Specify the hyper parameters using a json file. (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=False,
                         help='Is the system periodic (True/False)?')
-    parser.add_argument('--stride', type=int, default=1, help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
+    parser.add_argument('--stride', type=int, default=1,
+                        help='Read in the xyz trajectory with X stide. Default: read/compute all frames')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)

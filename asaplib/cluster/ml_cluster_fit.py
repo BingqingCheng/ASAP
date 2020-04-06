@@ -207,7 +207,6 @@ class LAIO_DB(FitClusterBase):
                 nneigh[i] = js[np.argmin(dist[i, js])]
         return delta, nneigh
 
-
     def pack(self):
         '''return all the info'''
         state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
