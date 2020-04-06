@@ -8,7 +8,7 @@ import argparse
 from ase.io import write
 
 from asaplib.io import str2bool
-from asaplib.pca import KernelPCA, kpca
+from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
 
@@ -59,8 +59,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         raise ValueError('Need input xyz in order to output xyz')
 
     # main thing
-    proj = kpca(kNN, kpca_d)
-    # proj = KernelPCA(kpca_d).fit_transform(kNN)  # breaks the Ti02 example
+    proj = KernelPCA(kpca_d).fit_transform(kNN)
 
     # save
     if output == 'matrix':
@@ -108,7 +107,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
                 texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
                                  ha='center', va='center', fontsize=15, color='red'))
             # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if (adtext):
+        if adtext:
             from adjustText import adjust_text
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
                         expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),

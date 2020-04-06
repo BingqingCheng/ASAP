@@ -1,43 +1,12 @@
 """
-tools for doing kernal PCA on environmental similarity
+Tools for doing kernel PCA on environmental similarity
 e.g.
 eva = np.genfromtxt(prefix+".k",skip_header=1)
-proj = kpca(eva,6)
+proj = KernelPCA(6).fit_transform(eva)
 """
 
 import numpy as np
 import scipy.linalg as salg
-
-
-def fixcenter(kernel):
-    cernel = kernel.copy()
-    cols = np.mean(cernel, axis=0)
-    # print "numcol ", cols.shape
-    rows = np.mean(cernel, axis=1)
-    # print "numrows", rows.shape
-    mean = np.mean(cols)
-    for i in range(len(rows)):
-        cernel[i, :] -= cols
-    for j in range(len(cols)):
-        cernel[:, j] -= rows
-    cernel += mean
-    return cernel
-
-
-def kpca(kernel, ndim=2):
-    print(" - Centering the data ")
-    k = fixcenter(kernel)
-
-    print("  And now we build a projection ")
-    eval, evec = salg.eigh(k, eigvals=(len(k) - ndim, len(k) - 1))
-    eval = np.flipud(eval)
-    evec = np.fliplr(evec)
-
-    pvec = evec.copy()
-    for i in range(ndim):
-        pvec[:, i] *= 1. / np.sqrt(eval[i])
-    print("Done, super quick. ")
-    return np.dot(k, pvec)
 
 
 class KernelPCA:

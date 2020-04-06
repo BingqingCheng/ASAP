@@ -10,6 +10,7 @@ from dscribe.descriptors import SOAP
 from asaplib.io import str2bool, NpEncoder
 from asaplib.hypers import gen_default_soap_hyperparameters
 
+
 def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
     """
 

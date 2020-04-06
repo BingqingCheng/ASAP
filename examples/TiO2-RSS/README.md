@@ -9,7 +9,7 @@ python ../../scripts/gen_soap_kmat.py -fxyz rss.xyz -fdict knownphases.xyz --pre
 python ../../scripts/kpca.py -fmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2 --d 10 --pc1 0 --pc2 1
 
 * step 2.2
-python ../../scripts/kernel_density_estimation.py -fmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2
+python ../../scripts/kernel_density_estimation.py -fmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2 --d 10
 
 * step 3
 python ../../scripts/clustering.py -kmat TiO2-n6-l6-c4.0-g0.5.kmat -tags knowntags.dat --prefix TiO2

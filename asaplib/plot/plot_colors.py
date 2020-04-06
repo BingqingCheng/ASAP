@@ -75,8 +75,6 @@ def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom
             else:
                 plotcolor = loadcolor
             print('load file: ' + fcolor + ' for color schemes')
-            print(plotcolor)
-            print(n_samples)
             if len(plotcolor) != n_samples:
                 raise ValueError('Length of the vector of properties is not the same as number of samples')
 

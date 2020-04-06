@@ -12,7 +12,7 @@ import numpy as np
 from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
-from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DBaa
+from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
@@ -94,11 +94,10 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         dmat = kerneltodis(kNN)
-        trainer = LAIO_DBaa(-1, -1)  # adjust the parameters here!
-        #trainer = LAIO_DB()
+        trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(dmat, rho)
-        #do_clustering.fit(proj)
+        #do_clustering.fit(dmat, rho) # for use with old class
+        do_clustering.fit(proj)
     else:
         raise ValueError('Please select from fdb or dbscan')
 
