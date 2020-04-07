@@ -93,10 +93,8 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
         if kmat == 'none':
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
-        dmat = kerneltodis(kNN)
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
-        #do_clustering.fit(dmat, rho) # for use with old class
         do_clustering.fit(proj)
     else:
         raise ValueError('Please select from fdb or dbscan')
@@ -139,9 +137,9 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
                                               clabel=colorlabel, title=None,
                                               w_size=True, w_label=True,
-                                              circle_size=20, alpha=0.5, edgecolors=None,
+                                              circle_size=30, alpha=0.5, edgecolors=None,
                                               cmap='gnuplot', vmax=None, vmin=None, psize=20,
-                                              show=False, savefile=None, fontsize=15,
+                                              show=False, savefile=None, fontsize=25,
                                               figsize=None, rasterized=True, remove_tick=True,
                                               dpi=200, outlier=True)
     """

@@ -103,126 +103,6 @@ class sklearn_DB(FitClusterBase):
         return self.db.get_params
 
 
-class LAIO_DBaa(FitClusterBase):
-    """Laio Clustering scheme
-    Clustering by fast search and find of density peaks
-    https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
-
-    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$ i.e. the local density of data point x_i
-    $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density
-    """
-
-#    A summary of laio clustering algorithm:
-#    1. First do a kernel density estimation (rho_i) for each data point i
-#    2. For each data point i, compute the distance (delta_i) between i and j,
-#       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
-#    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)
-#    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:
-#       i) rho({cl}) > rhomin
-#       ii) delta({cl}) > delta_min
-#       one needs to set the two parameters rhomin and delta_min.
-#    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.
-# one needs to set two parameters:
-
-    _pairwise = True
-
-    def __init__(self, deltamin=-1, rhomin=-1):
-        """
-        :param deltamin: the lower bound on the distance between two cluster centres
-        :param rhomin: The lower bound in kernel density, if the density of a cluster is lower
-                       than this threshold, this "cluster" will be discarded as noise
-        """
-
-        self.deltamin = deltamin
-        self.rhomin = rhomin
-
-    def fit(self, dmatrix, rho=None):
-
-        """
-
-        Parameters
-        ----------
-        dmatrix: The distance matrix of shape (Nele, Nele)
-        rho: The log densities of the points of shape (Nele,)
-
-        Returns
-        -------
-
-        """
-
-        if rho is None:
-            raise ValueError('for fdb it is better to compute kernel density first')
-
-        delta, nneigh = self.estimate_delta(dmatrix, rho)
-
-        #  if there's no input values for rhomin and deltamin, we use simple heuristics
-        if self.rhomin < 0:
-            self.rhomin = 0.2*np.mean(rho) + 0.8*np.min(rho)
-        if self.deltamin < 0:
-            self.deltamin = np.mean(delta)
-
-        #here we make the decision graph
-        #x axis (rho) is the kernel density for each data point
-        #y axis (delta) is the distance to the nearest higher density points
-
-        plt.scatter(rho, delta)
-        plt.plot([min(rho), max(rho)], [self.deltamin, self.deltamin], c='red')
-        plt.plot([self.rhomin, self.rhomin], [min(delta), max(delta)], c='red')
-        plt.xlabel('rho')
-        plt.ylabel('delta')
-        plt.show()
-
-        nclust = 0  # cluster index
-        cl = np.zeros(len(rho), dtype='int')-1  # numpy array of -1's
-        for i in range(len(rho)):
-            if rho[i] > self.rhomin and delta[i] > self.deltamin:
-                nclust += 1
-                cl[i] = nclust
-
-        # Assignment
-        ordrho = np.argsort(rho)[::-1]  # Indices of data points in descending order of local density
-        rho_ord = rho[ordrho]
-        for i in range(len(rho)):
-            if cl[ordrho[i]] == -1:
-                cl[ordrho[i]] = cl[nneigh[ordrho[i]]]
-        return cl
-
-    def estimate_delta(self, dist, rho):
-        """
-        For each data point i, compute the distance (delta_i) between i and j,
-        j is the closest data point that has a density higher then i, i.e. rho(j) > rho(i).
-
-        Parameters
-        ----------
-        dist: distance matrix of shape (Nele, Nele)
-        rho: log densities for each data point array of shape (Nele,)
-
-        Returns: delta: numpy array of distances to nearest cluster centre for each datapoint.
-                 nneight: numpy array giving the index of the nearest cluster centre.
-        -------
-
-        """
-        delta = (rho*0.0).copy()
-        nneigh = np.ones(len(delta), dtype='int')
-        for i in range(len(rho)):
-            #  for data i, find all points that have higher density
-            js = np.where(rho > rho[i])[0]
-            #  if there's no j's that have higher density than i, we set delta_i to be a large distance
-            if len(js) == 0:
-                delta[i] = np.max(dist[i, :])
-                nneigh[i] = i
-            else:
-                # find the nearest j that has higher density then i
-                delta[i] = np.min(dist[i, js])
-                nneigh[i] = js[np.argmin(dist[i, js])]
-        return delta, nneigh
-
-    def pack(self):
-        '''return all the info'''
-        state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
-        return state
-
-
 class LAIO_DB(FitClusterBase):
     """
     Clustering by fast search and find of density peaks, Rodriguez and Laio (2014).
@@ -419,10 +299,8 @@ class LAIO_DB(FitClusterBase):
         ----------
         data: numpy array of shape (Nele, proj_dim) where proj_dim gives the number of dimensions the kernel matrix is
               projected to
-        Returns: center label: numpy array of shape (Nele,). A data point is labelled -1 if it is not a cluster centre.
-                 If the data point is a cluster centre it is given an integer {0,...,N} where 0 is the label of
-                 the highest density cluster and N is the label of the lowest density cluster.
-        -------
+        Returns: self.halo numpy array of shape (Nele, ) where halo points are designated as -1 and otherwise are
+        assigned to their respective cluster centres.
         """
         ordered_by_dens = np.argsort(-self.dens)  # data points in descending order of density
         self.cluster = np.zeros(data.shape[0], dtype='int')
@@ -460,7 +338,7 @@ class LAIO_DB(FitClusterBase):
             i += 1
         self.halo[indices[(self.dens < halo_cutoff[self.cluster])]] = -1
 
-        return center_label
+        return self.halo
 
     def fit(self, data, rho=None):
         """
@@ -471,15 +349,16 @@ class LAIO_DB(FitClusterBase):
         data: numpy array of shape (Nele, proj_dim) where proj_dim is the number of components the kernel matrix has been
               projected to.
         rho: densities, default is None since the DP.py module computes the densities itself.
-        Returns: center_label: numpy array of shape (Nele,) giving the index of the cluster centre for each data point
+        Returns: cluster_labels: numpy array of shape (Nele,) giving the cluster (int from 0 to N) each data point
+        belongs to. Halo points are designated as -1.
         -------
         """
 
         self.get_dc(data)
         self.get_decision_graph(data)
-        center_label = self.get_assignation(data)
+        cluster_labels = self.get_assignation(data)
 
-        return center_label
+        return cluster_labels
 
     def pack(self):
         """
@@ -487,4 +366,129 @@ class LAIO_DB(FitClusterBase):
         of another data point as well as self.dens_cut, the density threshold for defining a cluster.
         """
         state = dict(deltamin=self.dc, rhomin=self.dens_cut)
+        return state
+
+
+"""
+Legacy Code below for old Fast Search and Find of Density Peaks class.
+"""
+
+
+class old_LAIO(FitClusterBase):
+    """Laio Clustering scheme
+    Clustering by fast search and find of density peaks
+    https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
+
+    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$ i.e. the local density of data point x_i
+    $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density
+    """
+
+#    A summary of laio clustering algorithm:
+#    1. First do a kernel density estimation (rho_i) for each data point i
+#    2. For each data point i, compute the distance (delta_i) between i and j,
+#       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
+#    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)
+#    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:
+#       i) rho({cl}) > rhomin
+#       ii) delta({cl}) > delta_min
+#       one needs to set the two parameters rhomin and delta_min.
+#    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.
+# one needs to set two parameters:
+
+    _pairwise = True
+
+    def __init__(self, deltamin=-1, rhomin=-1):
+        """
+        :param deltamin: the lower bound on the distance between two cluster centres
+        :param rhomin: The lower bound in kernel density, if the density of a cluster is lower
+                       than this threshold, this "cluster" will be discarded as noise
+        """
+
+        self.deltamin = deltamin
+        self.rhomin = rhomin
+
+    def fit(self, dmatrix, rho=None):
+
+        """
+
+        Parameters
+        ----------
+        dmatrix: The distance matrix of shape (Nele, Nele)
+        rho: The log densities of the points of shape (Nele,)
+
+        Returns
+        -------
+
+        """
+
+        if rho is None:
+            raise ValueError('for fdb it is better to compute kernel density first')
+
+        delta, nneigh = self.estimate_delta(dmatrix, rho)
+
+        #  if there's no input values for rhomin and deltamin, we use simple heuristics
+        if self.rhomin < 0:
+            self.rhomin = 0.2*np.mean(rho) + 0.8*np.min(rho)
+        if self.deltamin < 0:
+            self.deltamin = np.mean(delta)
+
+        #here we make the decision graph
+        #x axis (rho) is the kernel density for each data point
+        #y axis (delta) is the distance to the nearest higher density points
+
+        plt.scatter(rho, delta)
+        plt.plot([min(rho), max(rho)], [self.deltamin, self.deltamin], c='red')
+        plt.plot([self.rhomin, self.rhomin], [min(delta), max(delta)], c='red')
+        plt.xlabel('rho')
+        plt.ylabel('delta')
+        plt.show()
+
+        nclust = 0  # cluster index
+        cl = np.zeros(len(rho), dtype='int')-1  # numpy array of -1's
+        for i in range(len(rho)):
+            if rho[i] > self.rhomin and delta[i] > self.deltamin:
+                nclust += 1
+                cl[i] = nclust
+
+        # Assignment
+        ordrho = np.argsort(rho)[::-1]  # Indices of data points in descending order of local density
+        rho_ord = rho[ordrho]
+        for i in range(len(rho)):
+            if cl[ordrho[i]] == -1:
+                cl[ordrho[i]] = cl[nneigh[ordrho[i]]]
+        return cl
+
+    def estimate_delta(self, dist, rho):
+        """
+        For each data point i, compute the distance (delta_i) between i and j,
+        j is the closest data point that has a density higher then i, i.e. rho(j) > rho(i).
+
+        Parameters
+        ----------
+        dist: distance matrix of shape (Nele, Nele)
+        rho: log densities for each data point array of shape (Nele,)
+
+        Returns: delta: numpy array of distances to nearest cluster centre for each datapoint.
+                 nneight: numpy array giving the index of the nearest cluster centre.
+        -------
+
+        """
+        delta = (rho*0.0).copy()
+        nneigh = np.ones(len(delta), dtype='int')
+        for i in range(len(rho)):
+            #  for data i, find all points that have higher density
+            js = np.where(rho > rho[i])[0]
+            #  if there's no j's that have higher density than i, we set delta_i to be a large distance
+            if len(js) == 0:
+                delta[i] = np.max(dist[i, :])
+                nneigh[i] = i
+            else:
+                # find the nearest j that has higher density then i
+                delta[i] = np.min(dist[i, js])
+                nneigh[i] = js[np.argmin(dist[i, js])]
+        return delta, nneigh
+
+    def pack(self):
+        '''return all the info'''
+        state = dict(deltamin=self.deltamin, rhomin=self.rhomin)
         return state
