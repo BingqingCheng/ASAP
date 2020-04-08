@@ -130,7 +130,7 @@ class ASAPXYZ:
         """
         y_all = []
         try:
-            y_all = np.concatenate([a.get_array(desc_name) for a in self.frames])
+            y_all = np.concatenate([a.get_array(y_key) for a in self.frames])
         except:
             raise ValueError('Cannot load the property vector')
         return y_all
