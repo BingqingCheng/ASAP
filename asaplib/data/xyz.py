@@ -103,21 +103,33 @@ class ASAPXYZ:
         """
         y_all = []
         try:
-            for frame in self.frames:
+            for index, frame in enumerate(self.frames):
                 if y_key == 'volume' or y_key == 'Volume':
                     y_all.append(frame.get_volume() / len(frame.get_positions()))
                 elif y_key == 'size' or y_key == 'Size':
                     y_all.append(len(frame.get_positions()))
+                elif y_key == 'index' or y_key == 'Index' or y_key == None:
+                    y_all.append(index)
                 elif extensive:
                     y_all.append(frame.info[y_key] / len(frame.get_positions()))
                 else:
                     y_all.append(frame.info[y_key])
-            y_all = np.array(y_all)
         except:
-            raise ValueError('Cannot load the property vector')
-        return y_all
+            try:
+                for frame in self.frames:
+                   if extensive:
+                       # use the sum of atomic properties
+                       y_all.append(np.sum(frame.get_array(y_key)))
+                   else:
+                       # use the average of atomic properties
+                       y_all.append(np.mean(frame.get_array(y_key)))
+            except:
+                raise ValueError('Cannot load the property vector')
+        if len(np.shape(y_all)) > 1:
+            raise ValueError('The property from the xyz file has more than one column')
+        return np.array(y_all)
 
-    def get_atomic_property(self, y_key=None):
+    def get_atomic_property(self, y_key=None, extensive=True):
         """ extract the property array from each atom
 
         Parameters
@@ -132,7 +144,13 @@ class ASAPXYZ:
         try:
             y_all = np.concatenate([a.get_array(y_key) for a in self.frames])
         except:
-            raise ValueError('Cannot load the property vector')
+            try:
+                for index, y in enumerate(self.get_property(y_key, extensive)):
+                    y_all = np.append(y_all, y * np.ones(self.natom_list[index]))
+                print("Cannot find the atomic properties, use the per-frame property instead")
+            except: raise ValueError('Cannot load the property vector')
+        if len(np.shape(y_all)) > 1:
+            raise ValueError('The property from the xyz file has more than one column')
         return y_all
 
     def set_descriptors(self, desc=None, desc_name=None):
