@@ -74,13 +74,16 @@ class ASAPXYZ:
 
         # load from xyz file
         if self.nframes > 1:
-            # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-            desc = np.row_stack([a.info[desc_name] for a in self.frames])
-            print("Use descriptor matrix with shape: ", np.shape(desc))
-            # for the atomic descriptors
-            if use_atomic_desc:
-                atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
-                print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
+            try:
+                # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
+                desc = np.row_stack([a.info[desc_name] for a in self.frames])
+                print("Use descriptor matrix with shape: ", np.shape(desc))
+                # for the atomic descriptors
+                if use_atomic_desc:
+                    atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
+                    print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
+            except:
+                pass
         else:
             # only one frame
             try:
