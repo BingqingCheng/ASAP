@@ -40,11 +40,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     """
 
     foutput = prefix + "-pca-d" + str(pca_d)
-    peratom = bool(peratom)
-    keepraw = bool(keepraw)
-    plotatomic = bool(plotatomic)
-    adtext = bool(adtext)
-    scale = bool(scale)
     use_atomic_desc = (peratom or plotatomic)
 
     # try to read the xyz file
@@ -160,7 +155,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='ASAP_desc',
+    parser.add_argument('-fmat', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none',

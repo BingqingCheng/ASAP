@@ -32,5 +32,6 @@ setuptools.setup(
              'scripts/kernel_density_estimation.py',
              'scripts/krr.py',
              'scripts/kpca.py',
+             'scripts/kpca_sparse.py',
              'scripts/clustering.py'],
 )
