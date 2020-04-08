@@ -90,7 +90,7 @@ class ASAPXYZ:
 
         return desc, atomic_desc
 
-    def get_property(self, y_key=None):
+    def get_property(self, y_key=None, extensive=True):
         """ extract the descriptor array from each frame
 
         Parameters
@@ -108,9 +108,29 @@ class ASAPXYZ:
                     y_all.append(frame.get_volume() / len(frame.get_positions()))
                 elif y_key == 'size' or y_key == 'Size':
                     y_all.append(len(frame.get_positions()))
-                else:
+                elif extensive:
                     y_all.append(frame.info[y_key] / len(frame.get_positions()))
+                else:
+                    y_all.append(frame.info[y_key])
             y_all = np.array(y_all)
+        except:
+            raise ValueError('Cannot load the property vector')
+        return y_all
+
+    def get_atomic_property(self, y_key=None):
+        """ extract the property array from each atom
+
+        Parameters
+        ----------
+        y_name: string_like, the name of the property in the extended xyz file
+
+        Returns
+        -------
+        y_all: array [N_atoms]
+        """
+        y_all = []
+        try:
+            y_all = np.concatenate([a.get_array(desc_name) for a in self.frames])
         except:
             raise ValueError('Cannot load the property vector')
         return y_all
