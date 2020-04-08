@@ -60,7 +60,7 @@ def set_color_function(fcolor=None, asapxyz=None, colorscol=0, n_samples=0, pera
     colorlabel = 'use ' + str(fcolor) + ' for coloring the data points'
     if peratom:
         # print(np.shape(plotcolor_atomic))
-        colorscale = [np.amin(plotcolor_atomic), np.amax(plotcolor_atomic)]
+        colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     else:
         colorscale = [None, None]
