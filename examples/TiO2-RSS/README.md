@@ -12,5 +12,5 @@ python ../../scripts/pca.py -fxyz TiO2-n4-l4-c4.0-g0.5.xyz -fmat SOAP-n4-l4-c4.0
 python ../../scripts/kernel_density_estimation.py -fxyz TiO2-n4-l4-c4.0-g0.5.xyz -fmat TiO2-pca-d10.coord -tags knowntags.dat --prefix TiO2 --d 5
 
 * step 3
-python ../../scripts/clustering.py -fxyz TiO2-n4-l4-c4.0-g0.5.xyz -fmat TiO2-pca-d10.coord -tags knowntags.dat --prefix TiO2
+python ../../scripts/clustering.py -fmat TiO2-pca-d10.coord -tags knowntags.dat --prefix TiO2
 
