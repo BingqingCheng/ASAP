@@ -1,111 +1,66 @@
 """
-TODO: Module-level description
+Color functions
 """
 
 import os
-
 import numpy as np
-from ase.io import read
+
+from asaplib.data import ASAPXYZ
 
 
-def set_color_function(fcolor=None, fxyz=None, colorscol=0, n_samples=0, peratom=False):
-    if os.path.isfile(fxyz) and not os.path.isfile(fcolor):
-        # use the information given in the xyz file
-        try:
-            frames = read(fxyz, ':')
-            print('load xyz file: ' + fxyz + ' for color schemes')
-        except:
-            raise ValueError('Cannot load the xyz file')
+def set_color_function(fcolor=None, asapxyz=None, colorscol=0, n_samples=0, peratom=False):
 
-        if len(frames) == 1:
-            try:
-                plotcolor = frames[0].get_array(fcolor)
-            except:
-                print('Only one frame so set the color function to the index of atoms')
-                fcolor = 'index'
-                plotcolor = np.arange(n_samples)
+    plotcolor = []
+    plotcolor_atomic = []
+    colorscale = [None, None]
 
-        elif len(frames) != n_samples:
-            raise ValueError('Length of the xyz trajectory is not the same as number of samples')
-
-        else:
-            plotcolor = []
-            plotcolor_atomic = []
-            try:
-                for index, frame in enumerate(frames):
-                    natomsnow = len(frame.get_positions())
-                    # print(natomsnow)
-                    atomic_color = False
-                    if fcolor == 'volume' or fcolor == 'Volume':
-                        use_color_scheme = frame.get_volume() / natomsnow
-                    elif fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
-                        # we use the index as the color scheme
-                        use_color_scheme = index
-                        fcolor = 'index'
-                    elif fcolor in frame.info:
-                        if fcolor == 'Pressure' or fcolor == 'pressure' or fcolor == 'Temperature' or fcolor == 'temperature':
-                            use_color_scheme = frame.info[fcolor]
-                        else:
-                            use_color_scheme = frame.info[fcolor] / natomsnow
-                    else:
-                        try:
-                            use_color_scheme_atomic = frame.get_array(fcolor)
-                            atomic_color = True
-                            if use_color_scheme_atomic.ndim > 1:
-                                raise ValueError(
-                                    'The info from the xyz file for the color scheme has more than one column')
-                        except:
-                            ValueError('Cannot find the specified property from the xyz file for the color scheme')
-                        if peratom:
-                            plotcolor_atomic = np.append(plotcolor_atomic, use_color_scheme_atomic)
-                        use_color_scheme = np.mean(use_color_scheme_atomic)
-
-                    plotcolor.append(use_color_scheme)
-                    if peratom and not atomic_color:
-                        plotcolor_atomic = np.append(plotcolor_atomic, use_color_scheme * np.ones(natomsnow))
-            except:
-                raise ValueError('Cannot load the property vector from the xyz file')
-
-
-    elif os.path.isfile(fcolor):
+    # if there is a file named "fcolor", we load it for the color scheme
+    if os.path.isfile(fcolor):
         # load the column=colorscol for color functions
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
-            # print(np.shape(loadcolor))
-            if colorscol > 0 or len(np.shape(loadcolor)) > 1:
-                plotcolor = loadcolor[:, colorscol]
+        except: 
+            raise IOError('Error in loading fcolor files for the color scheme')
+
+        # print(np.shape(loadcolor))
+        if colorscol > 0 or len(np.shape(loadcolor)) > 1:
+            plotcolor = loadcolor[:, colorscol]
+        else:
+            plotcolor = loadcolor
+        print('load file: ' + fcolor + ' for color schemes')
+
+        if peratom:
+            if asapxyz is None:
+                raise IOError('Need the xyz so that we know the number of atoms in each frame')
+            elif asapxyz.get_num_frames() != len(plotcolor):
+                raise ValueError('Length of the xyz trajectory is not the same as number of colors in the fcolor file')
             else:
-                plotcolor = loadcolor
-            print('load file: ' + fcolor + ' for color schemes')
-            if (len(plotcolor) != n_samples):
-                raise ValueError('Length of the vector of properties is not the same as number of samples')
+                for index, natomnow in enumerate(asapxyz.get_natom_list()):
+                    plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
 
-            if peratom:
-                plotcolor_atomic = []
-                try:
-                    frames = read(fxyz, ':')
-                    print('load xyz file: ' + fxyz + ' so that we know the number of atoms in each frame')
-                except:
-                    raise ValueError('Cannot load the xyz file')
-                for index, frame in enumerate(frames):
-                    natomsnow = len(frame.get_positions())
-                    plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomsnow))
-        except:
-            raise ValueError('Cannot load the ' + str(colorscol) + 'th column from the file ' + fcolor)
-
-    elif fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
+    elif n_samples > 0 and (fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index') and peratom == False:
         # we use the index as the color scheme
         plotcolor = np.arange(n_samples)
         fcolor = 'sample index'
 
+    elif asapxyz is None:
+        raise IOError('Cannot find the xyz or fcolor files for the color scheme')
+
     else:
-        raise ValueError('Cannot set the color function')
-
-    colorlabel = 'use ' + fcolor + ' for coloring the data points'
-
+        try:
+            plotcolor = asapxyz.get_property(fcolor)
+        except:
+            raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
+        if peratom:
+            try:
+                plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
+            except:
+                raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
+ 
+    colorlabel = 'use ' + str(fcolor) + ' for coloring the data points'
     if peratom:
         # print(np.shape(plotcolor_atomic))
-        colorscale = [np.amin(plotcolor_atomic), np.amax(plotcolor_atomic)]
+        colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     else:
         colorscale = [None, None]
