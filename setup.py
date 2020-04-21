@@ -27,7 +27,7 @@ setuptools.setup(
              'scripts/gen_CM_descriptors.py',
              'scripts/gen_LMBTR_descriptors.py',
              'scripts/pca.py',
-             'scripts/pca_minimal.py',
+             'scripts/kpca_for_projection_viewer.py',
              'scripts/ridge_regression.py',
              'scripts/kernel_density_estimation.py',
              'scripts/krr.py',
