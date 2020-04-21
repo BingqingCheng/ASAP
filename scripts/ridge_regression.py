@@ -78,7 +78,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     # add bias
     desc_bias = np.ones((np.shape(desc)[0], np.shape(desc)[1] + 1))
     desc_bias[:, 1:] = desc
-    print(np.shape(desc_bias))
+    #print(np.shape(desc_bias))
     # train test split
     if test_ratio > 0:
         X_train, X_test, y_train, y_test = train_test_split(desc_bias, y_all, test_size=test_ratio, random_state=42)
@@ -122,13 +122,14 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
         train_sizes = exponential_split(20, n_train - n_test, lc_points)
         print("Learning curves using train sizes: ", train_sizes)
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
-        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
+        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=0, random_state=10)
 
         scores = {size: [] for size in train_sizes}
-        for lctrain, lctest in lc.split(y_train):
+        for lctrain, _ in lc.split(y_train):
             Ntrain = len(lctrain)
             lc_X_train = X_train[lctrain, :]
             lc_y_train = y_train[lctrain]
+            # here we always use the same test set
             lc_X_test = X_test
             lc_y_test = y_test
             rr.fit(lc_X_train, lc_y_train)
@@ -146,7 +147,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
                 avg += sc[sc_name]
                 var += sc[sc_name] ** 2.
             avg /= len(score)
-            var /= len(score);
+            var /= len(score)
             var -= avg ** 2.
             avg_scores.append(avg)
             avg_scores_error.append(np.sqrt(var))
@@ -155,6 +156,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
         # output learning curve
         np.savetxt("RR_learning_curve_4_" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
 
+    # make plot
     plot_styles.set_nice_font()
 
     if lc_points > 1:
