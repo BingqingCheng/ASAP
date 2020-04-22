@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.data import ASAPXYZ
-from asaplib.fit import RidgeRegression
+from asaplib.fit import RidgeRegression, LC_SCOREBOARD
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
@@ -110,34 +110,18 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
         lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
 
-        scores = {size: [] for size in train_sizes}
+        lc_scores = LC_SCOREBOARD(train_sizes)
         for lctrain, _ in lc.split(y_train):
             Ntrain = len(lctrain)
             lc_X_train = X_train[lctrain, :]
             lc_y_train = y_train[lctrain]
             # here we always use the same test set
-            scores[Ntrain].append(rr.fit_get_test_error(lc_X_train, lc_y_train, X_test, y_test))
-            print()
+            lc_score_now = rr.fit_get_test_error(lc_X_train, lc_y_train, X_test, y_test)
+            lc_scores.add_score(Ntrain, lc_score_now)
 
-        sc_name = 'RMSE'
-        Ntrains = []
-        avg_scores = []
-        avg_scores_error = []
-        for Ntrain, score in scores.items():
-            avg = 0.
-            var = 0.
-            for sc in score:
-                avg += sc[sc_name]
-                var += sc[sc_name] ** 2.
-            avg /= len(score)
-            var /= len(score)
-            var -= avg ** 2.
-            avg_scores.append(avg)
-            avg_scores_error.append(np.sqrt(var))
-            Ntrains.append(Ntrain)
-
-        # output learning curve
-        np.savetxt("RR_learning_curve_4_" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
+        sc_name = 'RMSE' #     MAE, RMSE, SUP, R2, CORR
+        lc_results = lc_scores.fetch(sc_name)
+        np.savetxt("RR_learning_curve_4_" + prefix + ".dat",lc_results)
 
     # make plot
     plot_styles.set_nice_font()
@@ -157,7 +141,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     if lc_points > 1:
         ax2 = fig.add_subplot(122)
-        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error, linestyle='', uplims=True, lolims=True)
+        ax2.errorbar(lc_results[:,0], lc_results[:,1], yerr=lc_results[:,2], linestyle='', uplims=True, lolims=True)
         ax2.set_title('Learning curve')
         ax2.set_xlabel('Number of training samples')
         ax2.set_ylabel('Test {}'.format(sc_name))
