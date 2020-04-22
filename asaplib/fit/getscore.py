@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Functions for assessing the quality of the fits
 """
 
 import numpy as np
