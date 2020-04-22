@@ -1,36 +1,42 @@
-#!/usr/bin/python3
+#!python3
 """
-script for making PCA map based on precomputed design matrix
+script for applying UMAP to a precomputed design matrix. See: https://arxiv.org/abs/1802.03426 and
+https://umap-learn.readthedocs.io/en/latest/index.html
 """
 
 import argparse
+import os
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
+import umap
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.pca import PCA
-from asaplib.plot import *
+from asaplib.plot import set_color_function, plot_styles
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, pca_d, pc1, pc2, plotatomic,
-         adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
+         plotatomic, adtext):
     """
 
     Parameters
     ----------
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
     fxyz: Location of xyz file for reading the properties.
-    ftags: Location of tags for the first M samples. Plot the tags on the PCA map.
+    ftags: Location of tags for the first M samples. Plot the tags on the t-SNE map.
     fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
     output: The format for output files ([xyz], [matrix]). Default is xyz.
-    peratom: Whether to output per atom pca coordinates (True/False)
+    peratom: Whether to output per atom t-SNE coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
-    pca_d: Number of the principle components to keep
-    pc1: Plot the projection along which principle axes
-    pc2: Plot the projection along which principle axes
+    umap_d: Dimension of the embedded space.
+    dim1: Plot the projection along which principle axes
+    dim2: Plot the projection along which principle axes
+    perplexity: Perplexity setting for t-SNE: Typical values between 5 and 50.
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -39,15 +45,19 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     """
 
-    foutput = prefix + "-pca-d" + str(pca_d)
+    foutput = prefix + "-pca-d" + str(umap_d)
+    peratom = bool(peratom)
+    keepraw = bool(keepraw)
+    plotatomic = bool(plotatomic)
+    adtext = bool(adtext)
+    scale = bool(scale)
     use_atomic_desc = (peratom or plotatomic)
 
     # try to read the xyz file
-    if fxyz is not None:
+    if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
     else:
-        asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
@@ -62,15 +72,24 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
-    if ftags is not None:
+    if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
-    # the main thing
-    pca = PCA(pca_d, scale)
-    proj = pca.fit_transform(desc)
+    # scale & center
+    if scale:
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        print('Shape of descriptor matrix is {}'.format(desc.shape))
+        print(scaler.fit(desc))
+        desc = scaler.transform(desc)  # normalizing the features
+
+    # fit UMAP
+
+    reducer = umap.UMAP()
+    proj = reducer.fit_transform(desc)
     if use_atomic_desc:
-        proj_atomic_all = pca.transform(desc_atomic)
+        proj_atomic_all = reducer.transform(desc_atomic)
 
     # save
     if output == 'matrix':
@@ -89,17 +108,19 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # color scheme
     if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj),
+                                                                                  True)
     else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
 
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
     if plotatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
+        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
+                                               xlabel='Principal Axis ' + str(dim1),
+                                               ylabel='Principal Axis ' + str(dim2),
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
@@ -114,14 +135,14 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                vmax=colorscale[1],
                                                vmin=colorscale[0])
 
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
-                                           xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
+    fig, ax = plot_styles.plot_density_map(proj[::-1, [dim1, dim2]], plotcolor[::-1], fig, ax,
+                                           xlabel='Principal Axis ' + str(dim1), ylabel='Principal Axis ' + str(dim2),
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
                                            psize=200,
                                            out_file=None,
-                                           title='PCA for: ' + prefix,
+                                           title='UMAP for: ' + prefix,
                                            show=False, cmap='gnuplot',
                                            remove_tick=False,
                                            use_perc=False,
@@ -136,8 +157,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         texts = []
         for i in range(ndict):
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
-                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
+                ax.scatter(proj[i, dim1], proj[i, dim2], marker='^', c='black')
+                texts.append(ax.text(proj[i, dim1], proj[i, dim2], tags[i],
                                      ha='center', va='center', fontsize=10, color='red'))
         if adtext:
             from adjustText import adjust_text
@@ -149,20 +170,20 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     plt.show()
     if plotatomic:
-        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
+        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
     else:
-        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '.png')
+        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '.png')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True,
+    parser.add_argument('-fmat', type=str, default='ASAP_desc',
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
-    parser.add_argument('-fxyz', type=str, default=None, help='Location of xyz file for reading the properties.')
-    parser.add_argument('-tags', type=str, default=None,
+    parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
+    parser.add_argument('-tags', type=str, default='none',
                         help='Location of tags for the first M samples. Plot the tags on the PCA map.')
-    parser.add_argument('-colors', type=str, default=None,
+    parser.add_argument('-colors', type=str, default='none',
                         help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
@@ -172,13 +193,13 @@ if __name__ == '__main__':
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to keep the high dimensional descriptor when output xyz file (True/False)?')
-    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
+    parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=False,
                         help='Scale the coordinates (True/False). Scaling highly recommended.')
-    parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
-    parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
-    parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
+    parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
+    parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
-                        help='Plot the PCA coordinates of all atomic environments (True/False)')
+                        help='Plot the manifold coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
 
@@ -188,4 +209,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.pc1, args.pc2, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.plotatomic, args.adjusttext)
