@@ -12,6 +12,7 @@ class RidgeRegression(RegressorBase):
         self.alpha = None
         self.jitter = jitter  # noise level^2
         self.coninv = None  # inverse of the covariance matrix
+        self._fitted = False
 
     def fit(self, desc, y):
         """
@@ -23,6 +24,8 @@ class RidgeRegression(RegressorBase):
         y : array-like, shape=[n_samples]
         Input points.
         """
+        if self._fitted:
+            raise RuntimeError('RR already fitted before, please reinitialise the object!')
 
         print("a total of ", np.shape(desc), "column")
 
@@ -34,9 +37,12 @@ class RidgeRegression(RegressorBase):
         # self.coninv = np.linalg.inv(COV+reg)
         # self.alpha = np.dot(self.coninv, np.dot(desc.T,y))
         self.alpha = np.linalg.solve(COV + reg, np.dot(desc.T, y))
+        self._fitted = True
 
     def predict(self, desc):
-        '''kernel.shape is expected as (nPred, nTrain)'''
+        '''desc.shape is expected as [n_descriptors, n_samples]'''
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
         return np.dot(desc, self.alpha.flatten()).reshape((-1))
 
     def get_error(self, desc, y):
@@ -49,6 +55,9 @@ class RidgeRegression(RegressorBase):
         y : array-like, shape=[n_samples]
         Input points.
         """
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
+
         # get the predictions for train set
         y_pred = self.predict(desc)
         # compute the CV score
