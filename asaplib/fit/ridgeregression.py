@@ -1,7 +1,8 @@
 import numpy as np
+import json
 
 from .base import RegressorBase
-
+from .getscore import get_score
 
 class RidgeRegression(RegressorBase):
     _pairwise = True
@@ -37,6 +38,30 @@ class RidgeRegression(RegressorBase):
     def predict(self, desc):
         '''kernel.shape is expected as (nPred, nTrain)'''
         return np.dot(desc, self.alpha.flatten()).reshape((-1))
+
+    def geterror(self, desc, y):
+        # get the predictions for train set
+        y_pred = self.predict(desc)
+        # compute the CV score
+        y_error = get_score(y_pred, y)
+        return y_error, y_pred
+
+    def get_train_test_error(self, desc_train, y_train, desc_test, y_test, verbose=True, return_pred=True):
+        fit_error = {}
+        # compute the CV score for the train dataset
+        train_error, y_pred = self.geterror(desc_train, y_train)
+        if verbose: print("train score: ", train_error)
+        fit_error['train_error'] = train_error
+
+        # compute the CV score for the test dataset
+        test_error, y_pred_test = self.geterror(desc_test, y_test)
+        if verbose: print("test score: ", test_error)
+        fit_error['test_error'] = test_error
+
+        if return_pred == True:
+            return fit_error, y_pred, y_pred_test
+        else:
+            return fit_error
 
     def get_params(self, deep=True):
         return dict(sigma=self.jitter)

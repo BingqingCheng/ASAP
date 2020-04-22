@@ -7,6 +7,7 @@ Python script for performing ridge regression.
 import argparse
 import os
 import sys
+import json
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -98,21 +99,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     # fit the model
     rr.fit(X_train, y_train)
 
-    fit_error = {}
-    # get the predictions for train set
-    y_pred = rr.predict(X_train)
-    # compute the CV score for the dataset
-    train_error = get_score(y_pred, y_train)
-    print("train score: ", train_error)
-    fit_error['train_error'] = train_error
-    # get the predictions for test set
-    y_pred_test = rr.predict(X_test)
-    # compute the CV score for the dataset
-    test_error = get_score(y_pred_test, y_test)
-    print("test score: ", test_error)
-    fit_error['test_error'] = test_error
-    # dump to file
-    import json
+    fit_error, y_pred, y_pred_test = rr.get_train_test_error(X_train, y_train, X_test, y_test, verbose=True, return_pred=True)
     with open("RR_train_test_errors_4_" + prefix + ".json", 'w') as fp:
         json.dump(fit_error, fp)
 
