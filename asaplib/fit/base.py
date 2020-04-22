@@ -96,7 +96,7 @@ class RegressorBase(BaseEstimator, RegressorMixin):
         fit_error['test_error'] = test_error
 
         if return_pred == True:
-            return fit_error, y_pred, y_pred_test
+            return y_pred, y_pred_test, fit_error
         else:
             return fit_error
 

@@ -96,7 +96,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     # fit the model
     rr.fit(X_train, y_train)
 
-    fit_error, y_pred, y_pred_test = rr.get_train_test_error(X_train, y_train, X_test, y_test, verbose=True, return_pred=True)
+    y_pred, y_pred_test, fit_error = rr.get_train_test_error(X_train, y_train, X_test, y_test, verbose=True, return_pred=True)
     with open("RR_train_test_errors_4_" + prefix + ".json", 'w') as fp:
         json.dump(fit_error, fp)
 
