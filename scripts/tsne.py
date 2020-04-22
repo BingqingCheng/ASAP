@@ -7,11 +7,12 @@ for getting the most out of t-SNE for your example.
 import argparse
 import sys
 
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.plot import *
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, tsne_d, dim1, dim2, perplexity,
@@ -84,7 +85,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # fit t-SNE
 
     if desc.shape[1] >= 50:
-
         # pre-process with PCA if dim > 50
         # suggested here: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
 
@@ -125,7 +125,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if plotatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
         fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(dim1), ylabel='Principal Axis ' + str(dim2),
+                                               xlabel='Principal Axis ' + str(dim1),
+                                               ylabel='Principal Axis ' + str(dim2),
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,

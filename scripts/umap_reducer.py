@@ -7,10 +7,11 @@ https://umap-learn.readthedocs.io/en/latest/index.html
 import argparse
 import sys
 
+import umap
+
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.plot import *
-import umap
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
@@ -115,7 +116,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if plotatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
         fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(dim1), ylabel='Principal Axis ' + str(dim2),
+                                               xlabel='Principal Axis ' + str(dim1),
+                                               ylabel='Principal Axis ' + str(dim2),
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
