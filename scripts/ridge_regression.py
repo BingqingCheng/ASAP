@@ -86,8 +86,6 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     else:
         X_train = X_test = desc_bias
         y_train = y_test = y_all
-    n_train = len(X_train)
-    n_test = len(X_test)
 
     # TODO: add sparsification
 
@@ -105,11 +103,13 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 
     # learning curve
     # decide train sizes
+    n_train = len(X_train)
+    n_test = len(X_test)
     if lc_points > 1:
         train_sizes = exponential_split(20, n_train - n_test, lc_points)
         print("Learning curves using train sizes: ", train_sizes)
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
-        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=0, random_state=10)
+        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
 
         scores = {size: [] for size in train_sizes}
         for lctrain, _ in lc.split(y_train):
