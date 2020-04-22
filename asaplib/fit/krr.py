@@ -5,7 +5,7 @@ adapted from Felix Musil's ml_tools
 import numpy as np
 
 from .base import RegressorBase
-
+from .getscore import get_score
 
 class KRR(RegressorBase):
     _pairwise = True
@@ -27,7 +27,7 @@ class KRR(RegressorBase):
         '''kernel.shape is expected as (nPred, nTrain)'''
         return np.dot(kernel, self.alpha.flatten()).reshape((-1))
 
-    def predict_error(self, k, delta):
+    def predict_uncertainty(self, k, delta):
         '''
         k.shape is expected as (nPred, nTrain), delta is the variance of y
         '''
