@@ -12,8 +12,8 @@ Automatically generate the hyperparameters of SOAP descriptors for arbitrary ele
     * maximum bond length (from equilibrium bond length in lowest energy 2D or 3D structure)
     * minimal bond length (from shortest bond length of any equilibrium structure, including dimer)
   * Apply a scaling for these length scales
-    * largest soap cutoff = maximum bond length * 2.5
-    * smallest soap cutoff = minimal bond length * 2.0
+    * largest soap cutoff = maximum bond length * 3.0
+    * smallest soap cutoff = minimal bond length * 1.8
     * Add other cutoffs in between if requires more sets of SOAP descriptors 
     * The atom sigma is the `cutoff / 8`, divided by an optional `sharpness` factor
 
@@ -49,10 +49,10 @@ def gen_default_soap_hyperparameters(Zs, soap_n=6, soap_l=6, multisoap=2, sharpn
         print(Zs, "range of bond lengths", shortest_bond, longest_bond)
 
     # factor between shortest bond and shortest cutoff threshold
-    factor_inner = 2.0 * scalerange
+    factor_inner = 1.8 * scalerange
     rcut_min = factor_inner * shortest_bond
     # factor between longest bond and longest cutoff threshold
-    factor_outer = 2.5 * scalerange
+    factor_outer = 3.0 * scalerange
     rcut_max = factor_outer * longest_bond
     if verbose:
         print("Considering minimum and maximum cutoff", rcut_min, rcut_max)
