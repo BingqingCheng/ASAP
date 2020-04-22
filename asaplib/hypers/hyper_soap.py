@@ -1,8 +1,10 @@
 """
 tools for generating hyperparameters for SOAP descriptors
 """
+import json
 
 from .univeral_length_scales import uni_length_scales, system_pair_bond_lengths, round_sigfigs
+from ..io import NpEncoder
 
 """
 Automatically generate the hyperparameters of SOAP descriptors for arbitrary elements and combinations.
@@ -25,8 +27,23 @@ will return length scales needed to define the SOAP descriptors for
 a system with boron (5) and germanium (32).
 """
 
+def universal_soap_hyper(global_species, fsoap_param, dump=True):
 
-def gen_default_soap_hyperparameters(Zs, soap_n=6, soap_l=6, multisoap=2, sharpness=1.0, scalerange=1.0, verbose=False):
+    if fsoap_param == 'smart' or fsoap_param == 'Smart' or fsoap_param == 'SMART':
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2)
+    elif fsoap_param == 'minimal' or fsoap_param == 'Minimal' or fsoap_param == 'MINIMAL':
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=1, scalerange=1.5, soap_n=4, soap_l=4)
+    elif fsoap_param == 'longrange' or fsoap_param == 'Longrange' or fsoap_param == 'LONGRANGE':
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.5)
+    else:
+        raise IOError('Did not specify soap parameters. You can use [smart/minimal/longrange].')
+    print(soap_js)
+    if dump:
+        with open('smart-soap-parameters', 'w') as jd:
+            json.dump(soap_js, jd, cls=NpEncoder)
+    return soap_js
+
+def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=6, soap_l=6, sharpness=1.0, verbose=False):
     """
     Parameters
     ----------
@@ -59,8 +76,8 @@ def gen_default_soap_hyperparameters(Zs, soap_n=6, soap_l=6, multisoap=2, sharpn
 
     hypers = {}
     num_soap = 1
-    # first soap cutoff is just the rcut_max
-    r_cut = rcut_max
+    # first soap cutoff is just the rcut_min
+    r_cut = rcut_min
     g_width = r_cut / 8.0 / sharpness
     hypers['soap' + str(num_soap)] = {'species': Zs, 'cutoff': float(round_sigfigs(r_cut, 2)), 'n': soap_n, 'l': soap_l,
                                       'atom_gaussian_width': float(round_sigfigs(g_width, 2))}
@@ -68,9 +85,9 @@ def gen_default_soap_hyperparameters(Zs, soap_n=6, soap_l=6, multisoap=2, sharpn
     if multisoap >= 2:
         # ratio between subsequent rcut values
         rcut_ratio = (rcut_max / rcut_min) ** (1. / (multisoap - 1))
-        while r_cut > rcut_min * 1.01:
+        while r_cut < rcut_max * 1.01:
             num_soap += 1
-            r_cut /= rcut_ratio
+            r_cut *= rcut_ratio
             g_width = r_cut / 8.0 / sharpness
             hypers['soap' + str(num_soap)] = {"species": Zs, 'cutoff': float(round_sigfigs(r_cut, 2)), 'n': soap_n,
                                               'l': soap_l, 'atom_gaussian_width': float(round_sigfigs(g_width, 2))}
