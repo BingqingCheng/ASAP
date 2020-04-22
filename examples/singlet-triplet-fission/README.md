@@ -17,4 +17,4 @@ kpca.py -fmat ASAP-n4-l6-c2.5-g0.4.kmat --d 10 --pc1 0 --pc2 1 -colors ASAP-rand
 
 * step 3: use kernel ridge regression to predict the triplet band gap (tda_triplet)
 
-krr.py -fmat ASAP-n4-l6-c2.5-g0.4.kmat -y ASAP-random-n-1000-tda_triplet --test 0.1 --n 100 --sigma 0.002
+krr.py -fmat ASAP-n4-l6-c2.5-g0.4.kmat -fy ASAP-random-n-1000-tda_triplet --test 0.1 --n 100 --sigma 0.002
