@@ -70,7 +70,8 @@ class RidgeRegression(RegressorBase):
         Input points.
         """
         self.fit(desc, y)
-        return self.get_error(desc_test, y_test)
+        test_error, _ = self.get_error(desc_test, y_test)
+        return test_error
 
     def get_error(self, desc, y):
         """

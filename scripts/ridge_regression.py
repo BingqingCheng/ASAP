@@ -117,6 +117,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
             lc_y_train = y_train[lctrain]
             # here we always use the same test set
             scores[Ntrain].append(rr.fit_get_test_error(lc_X_train, lc_y_train, X_test, y_test))
+            print()
 
         sc_name = 'RMSE'
         Ntrains = []
