@@ -5,14 +5,17 @@ for getting the most out of t-SNE for your example.
 """
 
 import argparse
+import os
 import sys
 
+import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.plot import *
+from asaplib.plot import set_color_function, plot_styles
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, tsne_d, dim1, dim2, perplexity,
