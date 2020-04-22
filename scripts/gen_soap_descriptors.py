@@ -85,7 +85,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         foutput = prefix + "-soapparam" + '-' + fsoap_param
         desc_name = "SOAPPARAM" + '-' + fsoap_param
 
-    elif fsoap_param == 'none':
+    else:
         soap_desc_atomic = [SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
                                  sigma=soap_g, rbf="gto", crossover=False, average=False, periodic=soap_periodic)]
         foutput = prefix + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
