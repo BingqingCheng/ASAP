@@ -30,8 +30,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_periodic: string (True or False) indicating whether the system is periodic
     stride: compute descriptor each X frames
     """
-    soap_periodic = bool(soap_periodic)
-    peratom = bool(peratom)
     fframes = []
     dictframes = []
 
