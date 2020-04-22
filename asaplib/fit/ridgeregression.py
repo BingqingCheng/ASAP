@@ -24,9 +24,6 @@ class RidgeRegression(RegressorBase):
         y : array-like, shape=[n_samples]
         Input points.
         """
-        if self._fitted:
-            raise RuntimeError('RR already fitted before, please reinitialise the object!')
-
         print("a total of ", np.shape(desc), "column")
 
         # calculate covariance matrix
@@ -44,6 +41,36 @@ class RidgeRegression(RegressorBase):
         if not self._fitted:
             raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
         return np.dot(desc, self.alpha.flatten()).reshape((-1))
+
+    def fit_predict(self, desc, y, desc_test):
+        """
+        Train the ridge regression model with the design matrix and trainLabel.
+        Parameters
+        ----------
+        desc : array-like, shape=[n_descriptors, n_samples]
+        Input points.
+        y : array-like, shape=[n_samples]
+        Input points.
+        desc_test : array-like, shape=[n_descriptors, n_test_samples]
+        Input points.
+        """
+        self.fit(desc, y)
+        return self.predict(desc_test)
+
+    def fit_get_test_error(self, desc, y, desc_test, y_test):
+        """
+        Train the ridge regression model with the design matrix and trainLabel.
+        Parameters
+        ----------
+        desc : array-like, shape=[n_descriptors, n_samples]
+        Input points.
+        y : array-like, shape=[n_samples]
+        Input points.
+        desc_test : array-like, shape=[n_descriptors, n_test_samples]
+        Input points.
+        """
+        self.fit(desc, y)
+        return self.get_error(desc_test, y_test)
 
     def get_error(self, desc, y):
         """

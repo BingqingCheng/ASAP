@@ -16,7 +16,6 @@ from sklearn.model_selection import train_test_split
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.data import ASAPXYZ
 from asaplib.fit import RidgeRegression
-from asaplib.fit import get_score
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
@@ -117,11 +116,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
             lc_X_train = X_train[lctrain, :]
             lc_y_train = y_train[lctrain]
             # here we always use the same test set
-            lc_X_test = X_test
-            lc_y_test = y_test
-            rr.fit(lc_X_train, lc_y_train)
-            lc_y_pred = rr.predict(lc_X_test)
-            scores[Ntrain].append(get_score(lc_y_pred, lc_y_test))
+            scores[Ntrain].append(rr.fit_get_test_error(lc_X_train, lc_y_train, X_test, y_test))
 
         sc_name = 'RMSE'
         Ntrains = []
