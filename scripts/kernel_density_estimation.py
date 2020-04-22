@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+Script for doing kernel density estimation + plotting
+from a low dimensional projection of the data set
 """
 
 import argparse
