@@ -103,15 +103,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     # get the predictions for train set
     y_pred = krr.predict(K_NM)
     # compute the CV score for the dataset
-    train_error = get_score(y_pred, y_train)
-    print("train score: ", train_error)
-    fit_error['train_error'] = train_error
-    # get the predictions for test set
-    y_pred_test = krr.predict(K_TM)
-    # compute the CV score for the dataset
-    test_error = get_score(y_pred_test, y_test)
-    print("test score: ", test_error)
-    fit_error['test_error'] = test_error
+    y_pred, y_pred_test, fit_error = krr.get_train_test_error(K_NM, y_train, K_TM, y_test, verbose=True, return_pred=True)
     # dump to file
     import json
     with open('KRR_train_test_errors_4' + prefix + '.json', 'w') as fp:
@@ -126,17 +118,15 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
 
         lc_scores = LC_SCOREBOARD(train_sizes)
-        for lctrain, lctest in lc.split(y_train):
+        for lctrain, _ in lc.split(y_train):
             Ntrain = len(lctrain)
             lc_K_NM = K_NM[lctrain, :]
             lc_y_train = y_train[lctrain]
-            # lc_K_test = K_NM[lctest,:]
-            lc_K_test = K_TM
-            # lc_y_test = y_train[lctest]
-            lc_y_test = y_test
+            # here we always use the same test set
+            # otherwise, one can do `lc_K_test = K_NM[lctest,:]; lc_y_test = y_train[lctest]`
             krr.fit(K_MM, lc_K_NM, lc_y_train)
-            lc_y_pred = krr.predict(lc_K_test)
-            lc_score_now = get_score(lc_y_pred, lc_y_test)
+            # here we always use the same test set
+            _, lc_score_now = krr.fit_predict_error(K_MM, lc_K_NM, lc_y_train, K_TM, y_test)
             lc_scores.add_score(Ntrain, lc_score_now)
 
         sc_name = 'RMSE' #     MAE, RMSE, SUP, R2, CORR

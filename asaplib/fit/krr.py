@@ -15,6 +15,7 @@ class KRR(RegressorBase):
         self.alpha = None
         self.jitter = jitter  # noise level^2
         self.coninv = None  # inverse of the covariance matrix
+        self._fitted = False
 
     def fit(self, kernel, y):
         '''Train the krr model with trainKernel and trainLabel.'''
@@ -22,9 +23,12 @@ class KRR(RegressorBase):
         reg = np.eye(kernel.shape[0]) * self.jitter
         self.coninv = np.linalg.inv(kernel + reg)
         self.alpha = np.linalg.solve(kernel + reg, y)
+        self._fitted = True
 
     def predict(self, kernel):
         '''kernel.shape is expected as (nPred, nTrain)'''
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
         return np.dot(kernel, self.alpha.flatten()).reshape((-1))
 
     def predict_uncertainty(self, k, delta):
@@ -67,6 +71,7 @@ class KRRSparse(RegressorBase):
         self.jitter = jitter
         self.delta = delta  # variance of the prior
         self.sigma = sigma  # noise
+        self._fitted = False
 
     def fit(self, kMM, kNM, y):
         '''N train structures, M sparsified representative structures '''
@@ -81,10 +86,21 @@ class KRRSparse(RegressorBase):
         reg = np.eye(kMM.shape[0]) * self.jitter
 
         self.alpha = np.linalg.solve(sparseK + reg, sparseY)
+        self._fitted = True
 
-    def predict(self, kernel):
-        '''kernel.shape is expected as (nPred,nTrain)'''
-        return np.dot(self.delta ** 2 * kernel, self.alpha.flatten()).reshape((-1))
+    def predict(self, kNM):
+        '''kNM: the kernel matrix between the representative and the new structures with shape (N,M)'''
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
+        return np.dot(self.delta ** 2 * kNM, self.alpha.flatten()).reshape((-1))
+
+    def fit_predict(self, kMM, kNM, y, kNM_test):
+        self.fit(kMM, kNM, y)
+        return self.predict(kNM_test)
+
+    def fit_predict_error(self, kMM, kNM, y, kNM_test, y_test):
+        self.fit(kMM, kNM, y)
+        return self.predict_error(kNM_test, y_test)
 
     def get_params(self, deep=True):
         return dict(jitter=self.jitter, delta=self.delta, sigma=self.sigma)
@@ -126,6 +142,7 @@ class KRRFastCV(RegressorBase):
         self.jitter = jitter
         self.cv = cv
         self.delta = delta
+        self._fitted = False
 
     def fit(self, kernel, y):
         '''Fast cv scheme. Destroy kernel.'''
@@ -144,8 +161,11 @@ class KRRFastCV(RegressorBase):
             self.error[test] = beta  # beta = y_true - y_pred
 
         del kernel
+        self._fitted = True
 
     def predict(self, kernel=None):
+        if not self._fitted:
+            raise RuntimeError("The model has not been fitted yet, please fit it and then use predict.")
         '''kernel.shape is expected as (nPred, nTrain)'''
         return self.y_pred
 
