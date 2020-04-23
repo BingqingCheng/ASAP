@@ -95,7 +95,7 @@ if __name__ == '__main__':
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
-    parser.add_argument('-colors', type=str, default='index',
+    parser.add_argument('-colors', type=str, default='none',
                         help='Location of a file that contains properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
