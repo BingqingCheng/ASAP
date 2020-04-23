@@ -43,7 +43,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     use_atomic_desc = (peratom or plotatomic)
 
     # try to read the xyz file
-    if fxyz is not None:
+    if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
     else:
@@ -62,7 +62,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
-    if ftags is not None:
+    if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
 
@@ -159,10 +159,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-fmat', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
-    parser.add_argument('-fxyz', type=str, default=None, help='Location of xyz file for reading the properties.')
-    parser.add_argument('-tags', type=str, default=None,
+    parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
+    parser.add_argument('-tags', type=str, default='none',
                         help='Location of tags for the first M samples. Plot the tags on the PCA map.')
-    parser.add_argument('-colors', type=str, default='index',
+    parser.add_argument('-colors', type=str, default='none',
                         help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
