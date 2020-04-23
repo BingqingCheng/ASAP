@@ -8,3 +8,6 @@ gen_soap_descriptors.py -fxyz lj-nucleus.xyz --rcut 4 --n 4 --l 6 --g 0.2 --peri
 
 * step 2
 pca.py -fmat ASAP-n4-l6-c4.0-g0.2.atomic-desc -colors FCCUBIC.list --prefix lj-nucleus-atomic-orderparameter
+
+* step 2.1: Try T-SNE
+tsne.py -fmat ASAP-n4-l6-c4.0-g0.2.atomic-desc -colors FCCUBIC.list --prefix lj-nucleus-atomic-orderparameter
