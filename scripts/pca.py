@@ -162,7 +162,7 @@ if __name__ == '__main__':
     parser.add_argument('-fxyz', type=str, default=None, help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default=None,
                         help='Location of tags for the first M samples. Plot the tags on the PCA map.')
-    parser.add_argument('-colors', type=str, default=None,
+    parser.add_argument('-colors', type=str, default='index',
                         help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
