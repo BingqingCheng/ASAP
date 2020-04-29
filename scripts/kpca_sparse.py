@@ -31,6 +31,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     kpca_d: Number of the principle components to keep
     pc1: Plot the projection along which principle axes
     pc2: Plot the projection along which principle axes
+    projectatomic: build the projection using the (big) atomic descriptor matrix
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -43,6 +44,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic: desc = desc_atomic.copy()
     else:
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
@@ -58,7 +60,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if len(desc) == 0:
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
 
-    if projectatomic: desc = desc_atomic.copy()
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':

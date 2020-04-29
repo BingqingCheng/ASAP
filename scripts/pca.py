@@ -12,7 +12,7 @@ from asaplib.pca import PCA
 from asaplib.plot import *
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, pca_d, pc1, pc2, plotatomic,
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, pca_d, pc1, pc2, projectatomic, plotatomic,
          adtext):
     """
 
@@ -31,6 +31,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     pca_d: Number of the principle components to keep
     pc1: Plot the projection along which principle axes
     pc2: Plot the projection along which principle axes
+    projectatomic: build the projection using the (big) atomic descriptor matrix
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -40,12 +41,13 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     """
 
     foutput = prefix + "-pca-d" + str(pca_d)
-    use_atomic_desc = (peratom or plotatomic)
+    use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic: desc = desc_atomic.copy()
     else:
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
@@ -69,7 +71,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     # the main thing
     pca = PCA(pca_d, scale)
     proj = pca.fit_transform(desc)
-    if use_atomic_desc:
+    if peratom or plotatomic and not projectatomic:
         proj_atomic_all = pca.transform(desc_atomic)
 
     # save
@@ -88,15 +90,16 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic:
+    if plotatomic or projectatomic:
         plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+    if projectatomic: plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
-    if plotatomic:
+    if plotatomic and not projectatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
         fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
                                                xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
@@ -177,6 +180,8 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Plot the PCA coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
@@ -188,4 +193,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.pc1, args.pc2, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)

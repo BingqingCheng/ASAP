@@ -18,7 +18,7 @@ from asaplib.plot import set_color_function, plot_styles
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
-         plotatomic, adtext):
+        projectatomic, plotatomic, adtext):
     """
 
     Parameters
@@ -36,6 +36,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     umap_d: Dimension of the embedded space.
     dim1: Plot the projection along which principle axes
     dim2: Plot the projection along which principle axes
+    projectatomic: build the projection using the (big) atomic descriptor matrix
     perplexity: Perplexity setting for t-SNE: Typical values between 5 and 50.
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
@@ -46,17 +47,13 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     """
 
     foutput = prefix + "-pca-d" + str(umap_d)
-    peratom = bool(peratom)
-    keepraw = bool(keepraw)
-    plotatomic = bool(plotatomic)
-    adtext = bool(adtext)
-    scale = bool(scale)
-    use_atomic_desc = (peratom or plotatomic)
+    use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic: desc = desc_atomic.copy()
     else:
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
@@ -88,7 +85,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     reducer = umap.UMAP()
     proj = reducer.fit_transform(desc)
-    if use_atomic_desc:
+    if peratom or plotatomic and not projectatomic:
         proj_atomic_all = reducer.transform(desc_atomic)
 
     # save
@@ -108,15 +105,15 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # color scheme
     if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj),
-                                                                                  True)
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+    if projectatomic: plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
-    if plotatomic:
+    if plotatomic and not projectatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
         fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
                                                xlabel='Principal Axis ' + str(dim1),
@@ -198,6 +195,8 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Plot the manifold coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
@@ -209,4 +208,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext)
