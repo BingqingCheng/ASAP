@@ -3,16 +3,16 @@ Szlachta, Bartók & Csányi Accuracy and transferability of Gaussian
 approximation potential models for tungsten PRB 2014
 
 * step 0
-python ../../scripts/frame_select.py -fxyz Tungstun_GAP_6.xyz --n 1000 --prefix subset --algo random
+scripts/frame_select.py -fxyz Tungstun_GAP_6.xyz --n 1000 --prefix subset --algo random
 
 * step 1
-python ../../scripts/gen_soap_kmat.py -fxyz subset-random-n-1000.xyz --prefix W --rcut 5 --n 4 --l 6 --g 0.5 --periodic True
+scripts/gen_soap_kmat.py -fxyz subset-random-n-1000.xyz --prefix W --rcut 5 --n 4 --l 6 --g 0.5 --periodic True
 
 * step 2
-python ../../scripts/kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors energy --prefix W-GAP-train-set
+scripts/kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors energy --prefix W-GAP-train-set
 
 * step 3
-python ../../scripts/kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors volume --prefix W-GAP-train-set
+scripts/kpca.py -fmat W-n4-l6-c5.0-g0.5.kmat -fxyz subset-random-n-1000.xyz -colors volume --prefix W-GAP-train-set
 
 * step 4
-python ../../scripts/krr.py -fxyz subset-random-n-1000.xyz -fy energy -fmat W-n4-l6-c5.0-g0.5.kmat --lcpoints 10 --test 0.05 --n 100
+scripts/krr.py -fxyz subset-random-n-1000.xyz -fy energy -fmat W-n4-l6-c5.0-g0.5.kmat --lcpoints 10 --test 0.05 --n 100
