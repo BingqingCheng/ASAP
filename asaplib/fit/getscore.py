@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Functions for assessing the quality of the fits
 """
 
 import numpy as np
@@ -102,3 +102,31 @@ def get_score(ypred, y):
     for k, func in score_func.items():
         scores[k] = func(ypred, y)
     return scores
+
+class LC_SCOREBOARD():
+    def __init__(self, train_sizes):
+        self.scores = {size: [] for size in train_sizes}
+
+    def add_score(self, Ntrain, score):
+        self.scores[Ntrain].append(score)
+
+    def fetch(self, sc_name='RMSE'):
+        Ntrains = []
+        avg_scores = []
+        avg_scores_error = []
+        for Ntrain, score in self.scores.items():
+            avg = 0.
+            var = 0.
+            for sc in score:
+                avg += sc[sc_name]
+                var += sc[sc_name] ** 2.
+            avg /= len(score)
+            var /= len(score)
+            var -= avg ** 2.
+            avg_scores.append(avg)
+            avg_scores_error.append(np.sqrt(var))
+            Ntrains.append(Ntrain)
+        return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1)
+
+
+

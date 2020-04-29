@@ -13,8 +13,7 @@ import numpy as np
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
 from asaplib.compressor import fps, kernel_random_split
 from asaplib.data import ASAPXYZ
-from asaplib.fit import KRRSparse
-from asaplib.fit import get_score
+from asaplib.fit import KRRSparse, LC_SCOREBOARD
 from asaplib.plot import plot_styles
 
 
@@ -104,15 +103,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
     # get the predictions for train set
     y_pred = krr.predict(K_NM)
     # compute the CV score for the dataset
-    train_error = get_score(y_pred, y_train)
-    print("train score: ", train_error)
-    fit_error['train_error'] = train_error
-    # get the predictions for test set
-    y_pred_test = krr.predict(K_TM)
-    # compute the CV score for the dataset
-    test_error = get_score(y_pred_test, y_test)
-    print("test score: ", test_error)
-    fit_error['test_error'] = test_error
+    y_pred, y_pred_test, fit_error = krr.get_train_test_error(K_NM, y_train, K_TM, y_test, verbose=True, return_pred=True)
     # dump to file
     import json
     with open('KRR_train_test_errors_4' + prefix + '.json', 'w') as fp:
@@ -126,38 +117,22 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
         lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
         lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
 
-        scores = {size: [] for size in train_sizes}
-        for lctrain, lctest in lc.split(y_train):
+        lc_scores = LC_SCOREBOARD(train_sizes)
+        for lctrain, _ in lc.split(y_train):
             Ntrain = len(lctrain)
             lc_K_NM = K_NM[lctrain, :]
             lc_y_train = y_train[lctrain]
-            # lc_K_test = K_NM[lctest,:]
-            lc_K_test = K_TM
-            # lc_y_test = y_train[lctest]
-            lc_y_test = y_test
+            # here we always use the same test set
+            # otherwise, one can do `lc_K_test = K_NM[lctest,:]; lc_y_test = y_train[lctest]`
             krr.fit(K_MM, lc_K_NM, lc_y_train)
-            lc_y_pred = krr.predict(lc_K_test)
-            scores[Ntrain].append(get_score(lc_y_pred, lc_y_test))
+            # here we always use the same test set
+            _, lc_score_now = krr.fit_predict_error(K_MM, lc_K_NM, lc_y_train, K_TM, y_test)
+            lc_scores.add_score(Ntrain, lc_score_now)
 
-        sc_name = 'RMSE'
-        Ntrains = []
-        avg_scores = []
-        avg_scores_error = []
-        for Ntrain, score in scores.items():
-            avg = 0.
-            var = 0.
-            for sc in score:
-                avg += sc[sc_name]
-                var += sc[sc_name] ** 2.
-            avg /= len(score)
-            var /= len(score)
-            var -= avg ** 2.
-            avg_scores.append(avg)
-            avg_scores_error.append(np.sqrt(var))
-            Ntrains.append(Ntrain)
-
+        sc_name = 'RMSE' #     MAE, RMSE, SUP, R2, CORR
+        lc_results = lc_scores.fetch(sc_name)
         # output learning curve
-        np.savetxt("KRR_learning_curve_4" + prefix + ".dat", np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1))
+        np.savetxt("KRR_learning_curve_4" + prefix + ".dat", lc_results)
 
     plot_styles.set_nice_font()
 
@@ -176,7 +151,7 @@ def main(fmat, fxyz, fy, prefix, test_ratio, jitter, n_sparse, sigma, lc_points,
 
     if lc_points > 1 and n_sparse > 0:
         ax2 = fig.add_subplot(122)
-        ax2.errorbar(Ntrains, avg_scores, yerr=avg_scores_error, linestyle='', uplims=True, lolims=True)
+        ax2.errorbar(lc_results[:,0], lc_results[:,1], yerr=lc_results[:,2], linestyle='', uplims=True, lolims=True)
         ax2.set_title('Learning curve')
         ax2.set_xlabel('Number of training samples')
         ax2.set_ylabel('Test {}'.format(sc_name))

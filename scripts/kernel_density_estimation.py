@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+Script for doing kernel density estimation + plotting
+from a low dimensional projection of the data set
 """
 
 import argparse
@@ -79,7 +80,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
                                            xaxis=True, yaxis=True,
                                            centers=None,
                                            psize=20,
-                                           out_file='KDE_4_' + prefix + '.png',
+                                           out_file=None,
                                            title='KDE for: ' + prefix,
                                            show=False, cmap='gnuplot',
                                            remove_tick=False,

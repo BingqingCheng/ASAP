@@ -46,6 +46,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
             tags = tags[:, 0]
         ndict = len(tags)
 
+    asapxyz = None
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
@@ -66,7 +67,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
         asapxyz.write(foutput)
 
     # color scheme
-    plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj))
+    plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj))
 
     # make plot
     plot_styles.set_nice_font()
