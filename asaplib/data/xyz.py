@@ -93,7 +93,7 @@ class ASAPXYZ:
 
         return desc, atomic_desc
 
-    def get_property(self, y_key=None, extensive=True):
+    def get_property(self, y_key=None, extensive=False):
         """ extract the descriptor array from each frame
 
         Parameters
@@ -132,7 +132,7 @@ class ASAPXYZ:
             raise ValueError('The property from the xyz file has more than one column')
         return np.array(y_all)
 
-    def get_atomic_property(self, y_key=None, extensive=True):
+    def get_atomic_property(self, y_key=None, extensive=False):
         """ extract the property array from each atom
 
         Parameters
