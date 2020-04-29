@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Python script for performing ridge regression. 
+Python script for performing ridge regression.
 (with optional learning curve)
 """
 

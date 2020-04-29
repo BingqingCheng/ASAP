@@ -9,15 +9,36 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
-from asaplib.io import str2bool
+from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
 from asaplib.kernel import kerneltodis
-from asaplib.pca import kpca
+from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import plot_styles
+from asaplib.io import str2bool
 
 
 def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
+
+    """
+
+    Parameters
+    ----------
+    fmat
+    kmat
+    ftags
+    prefix
+    fcolor
+    dimension
+    pc1
+    pc2
+    algorithm
+    adtext
+
+    Returns
+    -------
+
+    """
+
     if fmat == 'none' and kmat == 'none':
         raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
@@ -41,7 +62,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
 
     # do a low dimensional projection of the kernel matrix
     if kmat != 'none':
-        proj = kpca(kNN, dimension)
+        proj = KernelPCA(dimension).fit_transform(kNN)
 
     density_model = KDE()
     # fit density model to data
@@ -72,10 +93,9 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
         if kmat == 'none':
             kNN = np.dot(proj, proj.T)
             print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
-        dmat = kerneltodis(kNN)
-        trainer = LAIO_DB(-1, -1)  # adjust the parameters here!
+        trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(dmat, rho)
+        do_clustering.fit(proj)
     else:
         raise ValueError('Please select from fdb or dbscan')
 
@@ -117,9 +137,9 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
     fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
                                               clabel=colorlabel, title=None,
                                               w_size=True, w_label=True,
-                                              circle_size=20, alpha=0.5, edgecolors=None,
+                                              circle_size=30, alpha=0.5, edgecolors=None,
                                               cmap='gnuplot', vmax=None, vmin=None, psize=20,
-                                              show=False, savefile=None, fontsize=15,
+                                              show=False, savefile=None, fontsize=25,
                                               figsize=None, rasterized=True, remove_tick=True,
                                               dpi=200, outlier=True)
     """

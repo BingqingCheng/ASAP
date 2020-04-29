@@ -1,5 +1,5 @@
 """
-tools for doing kernal PCA on environmental similarity
+Tools for doing kernel PCA on environmental similarity
 e.g.
 kNN = np.genfromtxt(prefix+".k",skip_header=1)
 proj = KernelPCA(kpca_d).fit_transform(kNN)

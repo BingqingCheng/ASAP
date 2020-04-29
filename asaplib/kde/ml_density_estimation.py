@@ -72,8 +72,8 @@ class KDE:
             self.nh_size = max([int(25 * np.log10(X.shape[0])), 4])
 
         if X.shape[1] > 8:
-            print(
-                'Careful, you are trying to do density estimation for data in a D > 8 dimensional space\n ... you are warned !')
+            print('Careful, you are trying to do density estimation for data in a D > 8 dimensional space\n'
+                  ' ... you are warned !')
 
         if self.bandwidth is None:
             self.bandwidth = self.find_optimal_bandwidth(X)

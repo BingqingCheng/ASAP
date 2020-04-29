@@ -284,7 +284,6 @@ def plot_cluster_w_label(X, y, Xcluster=None,
             Xmean = Xcluster[i]
         else:
             Xmean = np.mean(Xsub, axis=0)
-        # Xmean = np.mean(Xsub,axis=0)
         idx_centers.append(all_idx[pos][np.argmin(np.linalg.norm(Xsub - Xmean, axis=1))])
 
     if outlier is True:
