@@ -37,7 +37,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     dim1: Plot the projection along which principle axes
     dim2: Plot the projection along which principle axes
     projectatomic: build the projection using the (big) atomic descriptor matrix
-    perplexity: Perplexity setting for t-SNE: Typical values between 5 and 50.
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -121,7 +120,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
-                                               psize=20,
+                                               psize=10,
                                                out_file=None,
                                                title=None,
                                                show=False, cmap='gnuplot',
@@ -137,7 +136,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=200,
+                                           psize=10,
                                            out_file=None,
                                            title='UMAP for: ' + prefix,
                                            show=False, cmap='gnuplot',
