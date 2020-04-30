@@ -205,7 +205,7 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
-    parser.add_argument('--perp', type=int, default=30, help='Perplexity value for t-SNE')
+    parser.add_argument('--perp', type=int, default=30, help='Perplexity value for t-SNE. Typical values between 5 and 50.')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Building the UMAP projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
