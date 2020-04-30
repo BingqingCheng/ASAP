@@ -12,7 +12,7 @@ from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, n_sparse, kpca_d, pc1, pc2, projectatomic, plotatomic,
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, n_sparse, power, kpca_d, pc1, pc2, projectatomic, plotatomic,
          adtext):
     """
 
@@ -28,6 +28,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     peratom: Whether to output per atom pca coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     n_sparse: number of representative samples, default is 5% of the data
+    power: use polynomial kernel function of degree n. 
     kpca_d: Number of the principle components to keep
     pc1: Plot the projection along which principle axes
     pc2: Plot the projection along which principle axes
@@ -81,8 +82,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         ifps = np.range(n_sample)
 
     # use linear kernel for now
-    kNN = np.dot(desc[ifps],desc[ifps].T)
-    kNM = np.dot(desc[:],desc[ifps].T)
+    kNN = np.power(np.dot(desc[ifps],desc[ifps].T),power)
+    kNM = np.power(np.dot(desc[:],desc[ifps].T),power)
     print("Shape of the kNN matrix: ", np.shape(kNN), ", and shape of the kNM matrix:", np.shape(kNM))
     # main thing
     kpca = KernelPCA(kpca_d)
@@ -167,6 +168,8 @@ if __name__ == '__main__':
                         help='Do you want to keep the high dimensional descriptor when output xyz file (True/False)?')
     parser.add_argument('--n', type=int, default=0,
                         help='number of the representative samples, set negative if using no sparsification')
+    parser.add_argument('--power', type=int, default=1,
+                        help='Take the nth power of the polynomial kernel function. 1 means linear kernel.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
@@ -180,4 +183,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.n, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.keepraw, args.n, args.power, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
