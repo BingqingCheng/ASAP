@@ -103,7 +103,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic:
+    if plotatomic or projectatomic:
         plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
@@ -120,7 +120,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
-                                               psize=10,
+                                               psize=100,
                                                out_file=None,
                                                title=None,
                                                show=False, cmap='gnuplot',
@@ -195,7 +195,7 @@ if __name__ == '__main__':
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
-                        help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
+                        help='Building the UMAP projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Plot the manifold coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
