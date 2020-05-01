@@ -121,6 +121,7 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
 
+
     # save
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
