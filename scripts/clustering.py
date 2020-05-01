@@ -9,16 +9,16 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
 from asaplib.pca import KernelPCA
-from asaplib.kde import KDE
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
+def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
          adtext):
 
     """
@@ -59,15 +59,17 @@ def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension,
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
 
-    if fmat == 'none' and kmat == 'none' and fxyz == 'none':
-        raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
-
-    if fmat != 'none':
+    # we can also load the descriptor matrix from a standalone file
+    if os.path.isfile(fmat):
         try:
-            proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
+            desc = np.genfromtxt(fmat, dtype=float)
+            print("loaded the descriptor matrix from file: ", fmat)
         except:
-            raise ValueError('Cannot load the coordinates')
-        print("loaded coordinates ", fmat, "with shape", np.shape(proj))
+            raise ValueError('Cannot load the descriptor matrix from file')
+
+    if ftags != 'none':
+        tags = np.loadtxt(ftags, dtype="str")
+        ndict = len(tags)
 
     if kmat != 'none':
         try:
@@ -76,26 +78,22 @@ def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension,
             raise ValueError('Cannot load the coordinates')
         print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
 
-    if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")
-        ndict = len(tags)
+
 
     # do a low dimensional projection of the kernel matrix
     if kmat != 'none':
         proj = KernelPCA(dimension).fit_transform(kNN)
 
-    density_model = KDE()
-    # fit density model to data
-    try:
-        density_model.fit(proj)
-    except:
-        raise RuntimeError('KDE did not work. Try smaller dimension.')
-    # the characteristic bandwidth of the data
-    sigma_kij = density_model.bandwidth
-    rho = density_model.evaluate_density(proj)
+
 
     # now we do the clustering
     if algorithm == 'dbscan':
+        # we compute the characteristic bandwidth of the data
+        # first select a subset of structures (20)
+        sbs = np.random.choice(len(desc), 20, replace=False)
+        desc_dist = np.asarray(cdist(desc[sbs], desc, 'euclidean')).sort(axis=0)
+        # the characteristic bandwidth of the data
+        sigma_kij = np.mean(desc[:,:20])
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
@@ -134,22 +132,12 @@ def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension,
         plotcolor = plotcolor_peratom
 
     # color scheme
-    if fcolor == 'rho':  # we use the local density as the color scheme
-        plotcolor = rho
-        colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ =' + "{:4.0e}".format(
-            sigma_kij) + ' )'
-    elif fcolor == 'cluster':
-        plotcolor = labels_db
-        colorlabel = 'a total of' + str(n_clusters) + ' clusters'
+    if plotatomic or projectatomic:
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
-        try:
-            plotcolor = np.genfromtxt(fcolor, dtype=float)
-        except:
-            raise ValueError('Cannot load the vector of properties')
-        if len(plotcolor) != len(kNN):
-            raise ValueError('Length of the vector of properties is not the same as number of samples')
-        colorlabel = 'use ' + fcolor + ' for coloring the data points'
-    [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+    if projectatomic:
+        plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()
@@ -196,10 +184,9 @@ def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='none', help='Location of the low D projection of the data.')
+    parser.add_argument('-fmat', type=str, required=True,
+                        help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
-    parser.add_argument('-kmat', type=str, default='none',
-                        help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('-colors', type=str, default='cluster',
@@ -225,5 +212,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.kmat, args.tags, args.prefix, args.colors, args.peratom, args.d,
+    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.peratom, args.d,
          args.pc1, args.pc2, args.algo, args.projectatomic, args.plotatomic, args.adjusttext)
