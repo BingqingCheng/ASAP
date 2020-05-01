@@ -19,7 +19,7 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorithm, projectatomic, adtext):
+def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
 
     """
 
@@ -114,8 +114,11 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, al
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    pca = PCA(pca_d, True)
-    proj = pca.fit_transform(desc)
+    if fmat != 'none':
+        pca = PCA(dimension, True)
+        proj = pca.fit_transform(desc)
+    elif kmat != 'none':
+      proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
     if projectatomic:
