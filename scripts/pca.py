@@ -47,7 +47,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
-        if projectatomic: desc = desc_atomic.copy()
+        if projectatomic:
+            desc = desc_atomic.copy()
     else:
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
@@ -172,7 +173,7 @@ if __name__ == '__main__':
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='matrix', help='The format for output files ([xyz], [matrix])')
+    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,

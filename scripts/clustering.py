@@ -4,40 +4,61 @@ TODO: Module-level description
 """
 
 import argparse
+import os
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from asaplib.data import ASAPXYZ
 from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
-from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import plot_styles
 from asaplib.io import str2bool
 
 
-def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
+def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
+         adtext):
 
     """
 
     Parameters
     ----------
-    fmat
-    kmat
-    ftags
-    prefix
-    fcolor
-    dimension
-    pc1
-    pc2
-    algorithm
-    adtext
+    fmat: Location of the low D projection of the data
+    fxyz: Location of xyz file for reading the properties.
+    kmat: Location of kernel matrix file. You can use gen_kmat.py to compute it
+    ftags: Location of tags for the first M samples
+    prefix: Filename prefix. Default is ASAP.
+    output: The format for output files ([xyz], [matrix]). Default is xyz.
+    fcolor: Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]
+    peratom: Whether to output per atom pca coordinates (True/False)
+    dimension: The number of principle components to keep
+    pc1: int, default is 0, which principle axis to plot the projection on
+    pc2: int, default is 1, which principle axis to plot the projection on
+    algorithm: the algorithm for density-based clustering options are: ([dbscan], [fdb])
+    projectatomic: build the projection using the (big) atomic descriptor matrix
+    plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
+    adtext: Whether to adjust the text (True/False)
 
     Returns
     -------
 
     """
+
+    foutput = prefix + "-cluster-label.dat"
+    use_atomic_desc = (peratom or plotatomic or projectatomic)
+
+    # try to read the xyz file
+    if fxyz != 'none':
+        asapxyz = ASAPXYZ(fxyz)
+        desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic:
+            desc = desc_atomic.copy()
+    else:
+        asapxyz = None
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+        output = 'matrix'
 
     if fmat == 'none' and kmat == 'none':
         raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
@@ -90,9 +111,6 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
         # do_clustering.fit(dmat)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
-        if kmat == 'none':
-            kNN = np.dot(proj, proj.T)
-            print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
         do_clustering.fit(proj)
@@ -177,17 +195,25 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-fmat', type=str, default='none', help='Location of the low D projection of the data.')
+    parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-kmat', type=str, default='none',
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
+    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('-colors', type=str, default='cluster',
                         help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
+    parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
+                        help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--algo', type=str, default='fdb',
                         help='the algorithm for density-based clustering ([dbscan], [fdb])')
+    parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
+    parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Plot the PCA coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
 
@@ -196,5 +222,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo,
-         args.adjusttext)
+    main(args.fmat, args.fxyz, args.kmat, args.tags, args.prefix, args.output, args.colors, args.peratom, args.d,
+         args.pc1, args.pc2, args.algo, args.projectatomic, args.plotatomic, args.adjusttext)
