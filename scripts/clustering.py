@@ -183,5 +183,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.peratom, args.d,
+    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.d,
          args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
