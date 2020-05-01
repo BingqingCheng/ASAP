@@ -83,7 +83,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, al
     if algorithm == 'dbscan':
         # we compute the characteristic bandwidth of the data
         # first select a subset of structures (20)
-        sbs = np.random.choice(np.asarray(range(len(desc))), 20, replace=False)
+        sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
         # the characteristic bandwidth of the data
         sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 100*10./len(desc))
         ''' option 1: do on the projected coordinates'''
@@ -92,10 +92,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, al
         do_clustering.fit(desc)
 
         ''' option 2: do directly on kernel matrix.'''
-        # dmat = kerneltodis(kNN)
         # trainer = sklearn_DB(sigma_kij, 5, 'precomputed') # adjust the parameters here!
         # do_clustering = DBCluster(trainer)
-        # do_clustering.fit(dmat)
+        # do_clustering.fit(desc)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
         trainer = LAIO_DB()
