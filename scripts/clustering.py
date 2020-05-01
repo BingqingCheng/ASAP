@@ -12,19 +12,21 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
-from asaplib.pca import PCA
+from asaplib.pca import PCA, KernelPCA
+from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorithm, projectatomic, adtext):
+def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorithm, projectatomic, adtext):
 
     """
 
     Parameters
     ----------
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
+    kmat: Location of the kernel matrix.
     fxyz: Location of xyz file for reading the properties.
     ftags: Location of tags for the first M samples
     prefix: Filename prefix. Default is ASAP.
@@ -41,6 +43,9 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorith
     -------
     cluster labels, PCA plots
     """
+
+    if fmat == 'none' and kmat == 'none':
+        raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
     # try to read the xyz file
     if fxyz != 'none':
@@ -60,6 +65,15 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorith
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
+
+    if kmat != 'none':
+        try:
+            kNN = np.genfromtxt(kmat, dtype=float)
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
+            desc =  kerneltodis(kNN)
+        except:
+            raise ValueError('Cannot load the coordinates')
+        
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -155,8 +169,10 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorith
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True,
+    parser.add_argument('-fmat', type=str, default='none',
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
+    parser.add_argument('-kmat', type=str, default='none',
+                        help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
@@ -179,5 +195,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
+    main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
          args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
