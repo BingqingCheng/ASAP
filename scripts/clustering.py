@@ -12,7 +12,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
-from asaplib.pca import KernelPCA
+from asaplib.pca import PCA
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.plot import *
 from asaplib.io import str2bool
@@ -82,7 +82,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, 
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(proj)
+        do_clustering.fit(desc)
 
         ''' option 2: do directly on kernel matrix.'''
         # dmat = kerneltodis(kNN)
@@ -93,7 +93,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, 
     elif algorithm == 'fdb' or algorithm == 'FDB':
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(proj)
+        do_clustering.fit(desc)
         rho_min, delta_min = do_clustering.pack()
         fdb_param_dict = {'rho_min': rho_min, 'delta_min': delta_min}
         np.savetxt(prefix + "FDB parameters", fdb_param_dict, header='FDB parameters', fmt='%d $d')
@@ -108,21 +108,14 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, 
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic:
-        plotcolor = plotcolor_peratom
+    pca = PCA(pca_d, scale)
+    proj = pca.fit_transform(desc)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+    if projectatomic:
+        _, plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic:
-        plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()
