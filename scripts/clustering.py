@@ -18,8 +18,7 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic,
-         adtext):
+def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
 
     """
 
@@ -183,5 +182,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.d,
+    main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
          args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
