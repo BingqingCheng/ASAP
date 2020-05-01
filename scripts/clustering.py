@@ -18,27 +18,24 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic,
+def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic,
          adtext):
 
     """
 
     Parameters
     ----------
-    fmat: Location of the low D projection of the data
+    fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
     fxyz: Location of xyz file for reading the properties.
-    kmat: Location of kernel matrix file. You can use gen_kmat.py to compute it
     ftags: Location of tags for the first M samples
     prefix: Filename prefix. Default is ASAP.
     fcolor: Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]
     colorscol: The column number of the properties used for the coloring. Starts from 0.
-    peratom: Whether to output per atom pca coordinates (True/False)
     dimension: The number of principle components to keep
     pc1: int, default is 0, which principle axis to plot the projection on
     pc2: int, default is 1, which principle axis to plot the projection on
     algorithm: the algorithm for density-based clustering options are: ([dbscan], [fdb])
     projectatomic: build the projection using the (big) atomic descriptor matrix
-    plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the text (True/False)
 
     Returns
@@ -171,8 +168,6 @@ if __name__ == '__main__':
                         help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
-    parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
-                        help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
