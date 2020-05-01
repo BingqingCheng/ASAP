@@ -109,6 +109,11 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     print(do_clustering.pack())
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
+    
+    if projectatomic:
+        asapxyz.set_atomic_descriptors(labels_db, 'cluster_label')
+    else:
+        asapxyz.set_descriptors(labels_db, 'cluster_label')
 
     # save
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
@@ -178,7 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('-colors', type=str, default='none',
+    parser.add_argument('-colors', type=str, default='cluster_label',
                         help='Properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
