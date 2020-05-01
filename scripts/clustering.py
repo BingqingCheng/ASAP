@@ -110,26 +110,30 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
     
-    if projectatomic:
+    if asapxyz is not None and projectatomic:
         asapxyz.set_atomic_descriptors(labels_db, 'cluster_label')
-    else:
+    elif asapxyz is not None:
         asapxyz.set_descriptors(labels_db, 'cluster_label')
 
     # save
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    if fmat != 'none':
+    if  fmat != 'none':
         pca = PCA(dimension, True)
         proj = pca.fit_transform(desc)
-    elif kmat != 'none':
+    elif  kmat != 'none':
         proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
-    if projectatomic:
-        _, plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+    if fcolor == 'cluster_label': 
+        plotcolor = labels_db
+        colorlabel = 'cluster_label'
     else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+        if projectatomic:
+            _, plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+        else:
+            plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
 
     # make plot
     plot_styles.set_nice_font()
