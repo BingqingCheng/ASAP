@@ -71,21 +71,6 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, 
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
-    if kmat != 'none':
-        try:
-            kNN = np.genfromtxt(kmat, dtype=float)
-        except:
-            raise ValueError('Cannot load the coordinates')
-        print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
-
-
-
-    # do a low dimensional projection of the kernel matrix
-    if kmat != 'none':
-        proj = KernelPCA(dimension).fit_transform(kNN)
-
-
-
     # now we do the clustering
     if algorithm == 'dbscan':
         # we compute the characteristic bandwidth of the data
