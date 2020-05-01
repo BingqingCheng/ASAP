@@ -131,6 +131,7 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
     # [ unique_labels, cluster_x ]  = get_cluster_properties(labels_db[:],proj[:,pc1],'mean')
     # [ unique_labels, cluster_y ]  = get_cluster_properties(labels_db[:],proj[:,pc2],'mean')
 
+
     # color scheme
     fcolor = str(fcolor)
     if fcolor == 'rho':  # we use the local density as the color scheme
