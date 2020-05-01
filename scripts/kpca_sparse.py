@@ -71,7 +71,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     n_sample = len(desc)
     # set default value of n_sparse
     if n_sparse == 0:
-        n_sparse = n_sample // 20
+        n_sparse = max(10, n_sample // 20)
     # sparsification
     if n_sparse >= n_sample:
         print("the number of representative structure is too large, please select n < ", n_sample)
@@ -89,6 +89,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     kpca = KernelPCA(kpca_d)
     kpca.fit(kNN)
     proj = kpca.transform(kNM)
+    if peratom or plotatomic and not projectatomic:
+        kNT = np.power(np.dot(desc_atomic[:],desc[ifps].T),power)
+        proj_atomic_all = kpca.transform(kNT)
 
     # save
     if output == 'matrix':
@@ -108,14 +111,31 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # make plot
     plot_styles.set_nice_font()
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
+    if plotatomic and not projectatomic:
+        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
+        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
+                                               xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
+                                               clabel=None, label=None,
+                                               xaxis=True, yaxis=True,
+                                               centers=None,
+                                               psize=5,
+                                               out_file=None,
+                                               title=None,
+                                               show=False, cmap='gnuplot',
+                                               remove_tick=False,
+                                               use_perc=False,
+                                               rasterized=True,
+                                               fontsize=15,
+                                               vmax=colorscale[1],
+                                               vmin=colorscale[0])
 
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1],
+    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=20,
+                                           psize=100,
                                            out_file=None,
                                            title='KPCA for: ' + prefix,
                                            show=False, cmap='gnuplot',
