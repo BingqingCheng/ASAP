@@ -69,10 +69,9 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorith
     if algorithm == 'dbscan':
         # we compute the characteristic bandwidth of the data
         # first select a subset of structures (20)
-        sbs = np.random.choice(len(desc), 20, replace=False)
-        desc_dist = np.asarray(cdist(desc[sbs], desc, 'euclidean')).sort(axis=0)
+        sbs = np.random.choice(np.asarray(range(len(desc))), 20, replace=False)
         # the characteristic bandwidth of the data
-        sigma_kij = np.mean(desc[:,:20])
+        sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 20/len(desc))
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
