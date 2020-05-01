@@ -118,7 +118,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         pca = PCA(dimension, True)
         proj = pca.fit_transform(desc)
     elif kmat != 'none':
-      proj = KernelPCA(dimension).fit_transform(kNN)
+        proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
     if projectatomic:
