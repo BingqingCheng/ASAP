@@ -69,7 +69,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     if kmat != 'none':
         try:
             kNN = np.genfromtxt(kmat, dtype=float)
-            print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
             desc =  kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
@@ -170,7 +170,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
                         ax=ax, precision=0.01,
                         arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
-    plt.title('PCA and clustering for: ' + prefix)
+    plt.title('(k)PCA and clustering for: ' + prefix)
     plt.xlabel('Princple Axis ' + str(pc1))
     plt.ylabel('Princple Axis ' + str(pc2))
     plt.show()
