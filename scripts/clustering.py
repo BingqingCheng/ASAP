@@ -18,7 +18,7 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
+def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic,
          adtext):
 
     """
@@ -180,8 +180,6 @@ if __name__ == '__main__':
                         help='the algorithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
-    parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
-                        help='Plot the PCA coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
 
@@ -191,4 +189,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.prefix, args.colors, args.peratom, args.d,
-         args.pc1, args.pc2, args.algo, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
