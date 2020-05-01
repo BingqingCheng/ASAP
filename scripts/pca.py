@@ -97,7 +97,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic: plotcolor = plotcolor_peratom
+    if projectatomic:
+        plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()

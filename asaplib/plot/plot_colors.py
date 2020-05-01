@@ -1,14 +1,26 @@
 """
-Color functions
+Colour functions
 """
 
 import os
 import numpy as np
 
-from asaplib.data import ASAPXYZ
-
 
 def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False):
+    """
+
+    Parameters
+    ----------
+    fcolor
+    asapxyz
+    colorscol
+    n_samples
+    peratom
+
+    Returns
+    -------
+
+    """
 
     plotcolor = []
     plotcolor_atomic = []

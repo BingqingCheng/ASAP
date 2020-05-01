@@ -14,11 +14,11 @@ from asaplib.data import ASAPXYZ
 from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
-from asaplib.plot import plot_styles
+from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
+def main(fmat, fxyz, kmat, ftags, prefix, fcolor, colorscol, peratom, dimension, pc1, pc2, algorithm, projectatomic, plotatomic,
          adtext):
 
     """
@@ -30,8 +30,8 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
     kmat: Location of kernel matrix file. You can use gen_kmat.py to compute it
     ftags: Location of tags for the first M samples
     prefix: Filename prefix. Default is ASAP.
-    output: The format for output files ([xyz], [matrix]). Default is xyz.
     fcolor: Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]
+    colorscol: The column number of the properties used for the coloring. Starts from 0.
     peratom: Whether to output per atom pca coordinates (True/False)
     dimension: The number of principle components to keep
     pc1: int, default is 0, which principle axis to plot the projection on
@@ -46,7 +46,6 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
 
     """
 
-    foutput = prefix + "-cluster-label.dat"
     use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
@@ -60,7 +59,7 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
 
-    if fmat == 'none' and kmat == 'none':
+    if fmat == 'none' and kmat == 'none' and fxyz == 'none':
         raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
     if fmat != 'none':
@@ -94,11 +93,9 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
     # the characteristic bandwidth of the data
     sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
-    meanrho = np.mean(rho)
 
-    algorithm = str(algorithm)
     # now we do the clustering
-    if algorithm == 'dbscan' or algorithm == 'DBSCAN':
+    if algorithm == 'dbscan':
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
@@ -114,6 +111,9 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
         do_clustering.fit(proj)
+        rho_min, delta_min = do_clustering.pack()
+        fdb_param_dict = {'rho_min': rho_min, 'delta_min': delta_min}
+        np.savetxt(prefix + "FDB parameters", fdb_param_dict, header='FDB parameters', fmt='%d $d')
     else:
         raise ValueError('Please select from fdb or dbscan')
 
@@ -121,19 +121,19 @@ def main(fmat, fxyz, kmat, ftags, prefix, output, fcolor, peratom, dimension, pc
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
 
-
     # save
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
-    # properties of each cluster
-    # [ unique_labels, cluster_size ]  = get_cluster_size(labels_db[:])
-    # center of each cluster
-    # [ unique_labels, cluster_x ]  = get_cluster_properties(labels_db[:],proj[:,pc1],'mean')
-    # [ unique_labels, cluster_y ]  = get_cluster_properties(labels_db[:],proj[:,pc2],'mean')
-
 
     # color scheme
-    fcolor = str(fcolor)
+    if plotatomic or projectatomic:
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+    else:
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+    if projectatomic:
+        plotcolor = plotcolor_peratom
+
+    # color scheme
     if fcolor == 'rho':  # we use the local density as the color scheme
         plotcolor = rho
         colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ =' + "{:4.0e}".format(
@@ -202,9 +202,10 @@ if __name__ == '__main__':
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('-colors', type=str, default='cluster',
                         help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
+    parser.add_argument('--colorscolumn', type=int, default=0,
+                        help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
@@ -224,5 +225,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.fxyz, args.kmat, args.tags, args.prefix, args.output, args.colors, args.peratom, args.d,
+    main(args.fmat, args.fxyz, args.kmat, args.tags, args.prefix, args.colors, args.peratom, args.d,
          args.pc1, args.pc2, args.algo, args.projectatomic, args.plotatomic, args.adjusttext)
