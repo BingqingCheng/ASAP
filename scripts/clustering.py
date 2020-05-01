@@ -18,7 +18,7 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
+def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorithm, projectatomic, adtext):
 
     """
 
@@ -39,15 +39,13 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algo
 
     Returns
     -------
-
+    cluster labels, PCA plots
     """
-
-    use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
-        desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        desc, desc_atomic = asapxyz.get_descriptors(fmat, projectatomic)
         if projectatomic:
             desc = desc_atomic.copy()
     else:
@@ -90,9 +88,9 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algo
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
         do_clustering.fit(desc)
-        rho_min, delta_min = do_clustering.pack()
-        fdb_param_dict = {'rho_min': rho_min, 'delta_min': delta_min}
-        np.savetxt(prefix + "FDB parameters", fdb_param_dict, header='FDB parameters', fmt='%d $d')
+        #rho_min, delta_min = do_clustering.pack()
+        #fdb_param_dict = {'rho_min': rho_min, 'delta_min': delta_min}
+        #np.savetxt(prefix + "FDB parameters", fdb_param_dict, header='FDB parameters', fmt='%d $d')
     else:
         raise ValueError('Please select from fdb or dbscan')
 
@@ -104,7 +102,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algo
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    pca = PCA(pca_d, scale)
+    pca = PCA(pca_d, True)
     proj = pca.fit_transform(desc)
 
     # color scheme
@@ -116,7 +114,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algo
     # make plot
     plot_styles.set_nice_font()
 
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
+    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, plotcolor, s=None,
                                               clabel=colorlabel, title=None,
                                               w_size=True, w_label=True,
                                               circle_size=30, alpha=0.5, edgecolors=None,
@@ -130,7 +128,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algo
                       title=None, w_label = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True)
     """
-    fig.set_size_inches(18.5, 10.5)
+    fig.set_size_inches(160.5, 80.5)
 
     # project the known structures
     if ftags != 'none':
@@ -163,8 +161,8 @@ if __name__ == '__main__':
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('-colors', type=str, default='cluster',
-                        help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
+    parser.add_argument('-colors', type=str, default='none',
+                        help='Properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
