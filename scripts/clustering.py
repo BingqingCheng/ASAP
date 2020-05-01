@@ -71,7 +71,7 @@ def main(fmat, fxyz, ftags, prefix, fcolor, colorscol, pca_d, pc1, pc2, algorith
         # first select a subset of structures (20)
         sbs = np.random.choice(np.asarray(range(len(desc))), 20, replace=False)
         # the characteristic bandwidth of the data
-        sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 20/len(desc))
+        sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 100*10./len(desc))
         ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
