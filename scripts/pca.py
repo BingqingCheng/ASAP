@@ -177,7 +177,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom pca coordinates (True/False)?')
-    parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,
+    parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=True,
                         help='Do you want to keep the high dimensional descriptor when output xyz file (True/False)?')
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=True,
                         help='Scale the coordinates (True/False). Scaling highly recommended.')
