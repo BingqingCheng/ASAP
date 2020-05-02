@@ -6,9 +6,6 @@ TODO: Module-level description
 import argparse
 import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
-
 from asaplib.pca import KernelPCA
 from asaplib.kde import KDE
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
