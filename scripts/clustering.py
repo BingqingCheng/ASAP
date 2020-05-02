@@ -4,137 +4,137 @@ TODO: Module-level description
 """
 
 import argparse
+import os
 import sys
+import json
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.spatial.distance import cdist
 
-from asaplib.pca import KernelPCA
-from asaplib.kde import KDE
+from asaplib.data import ASAPXYZ
+from asaplib.pca import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
-from asaplib.plot import plot_styles
+from asaplib.io import NpEncoder
+from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adtext):
+def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
 
     """
 
     Parameters
     ----------
-    fmat
-    kmat
-    ftags
-    prefix
-    fcolor
-    dimension
-    pc1
-    pc2
-    algorithm
-    adtext
+    fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
+    kmat: Location of the kernel matrix.
+    fxyz: Location of xyz file for reading the properties.
+    ftags: Location of tags for the first M samples
+    prefix: Filename prefix. Default is ASAP.
+    fcolor: Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]
+    colorscol: The column number of the properties used for the coloring. Starts from 0.
+    dimension: The number of principle components to keep
+    pc1: int, default is 0, which principle axis to plot the projection on
+    pc2: int, default is 1, which principle axis to plot the projection on
+    algorithm: the algorithm for density-based clustering options are: ([dbscan], [fdb])
+    projectatomic: build the projection using the (big) atomic descriptor matrix
+    adtext: Whether to adjust the text (True/False)
 
     Returns
     -------
-
+    cluster labels, PCA plots
     """
 
     if fmat == 'none' and kmat == 'none':
         raise ValueError('Must provide either the low-dimensional coordinates fmat or the kernel matrix kmat')
 
-    if fmat != 'none':
+    # try to read the xyz file
+    if fxyz != 'none':
+        asapxyz = ASAPXYZ(fxyz)
+        desc, desc_atomic = asapxyz.get_descriptors(fmat, projectatomic)
+        if projectatomic:
+            desc = desc_atomic.copy()
+    else:
+        asapxyz = None
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+        output = 'matrix'
+
+    # we can also load the descriptor matrix from a standalone file
+    if os.path.isfile(fmat):
         try:
-            proj = np.genfromtxt(fmat, dtype=float)[:, 0:dimension]
+            desc = np.genfromtxt(fmat, dtype=float)
+            print("loaded the descriptor matrix from file: ", fmat)
         except:
-            raise ValueError('Cannot load the coordinates')
-        print("loaded coordinates ", fmat, "with shape", np.shape(proj))
+            raise ValueError('Cannot load the descriptor matrix from file')
 
     if kmat != 'none':
         try:
             kNN = np.genfromtxt(kmat, dtype=float)
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
+            desc =  kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
-        print("loaded kernal matrix", kmat, "with shape", np.shape(kmat))
+        
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
         ndict = len(tags)
 
-    # do a low dimensional projection of the kernel matrix
-    if kmat != 'none':
-        proj = KernelPCA(dimension).fit_transform(kNN)
-
-    density_model = KDE()
-    # fit density model to data
-    try:
-        density_model.fit(proj)
-    except:
-        raise RuntimeError('KDE did not work. Try smaller dimension.')
-    # the characteristic bandwidth of the data
-    sigma_kij = density_model.bandwidth
-    rho = density_model.evaluate_density(proj)
-    meanrho = np.mean(rho)
-
-    algorithm = str(algorithm)
     # now we do the clustering
-    if algorithm == 'dbscan' or algorithm == 'DBSCAN':
-        ''' option 1: do on the projected coordinates'''
+    if algorithm == 'dbscan':
+        # we compute the characteristic bandwidth of the data
+        # first select a subset of structures (20)
+        sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
+        # the characteristic bandwidth of the data
+        sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 100*10./len(desc))
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(proj)
-
-        ''' option 2: do directly on kernel matrix.'''
-        # dmat = kerneltodis(kNN)
-        # trainer = sklearn_DB(sigma_kij, 5, 'precomputed') # adjust the parameters here!
-        # do_clustering = DBCluster(trainer)
-        # do_clustering.fit(dmat)
+        do_clustering.fit(desc)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
-        if kmat == 'none':
-            kNN = np.dot(proj, proj.T)
-            print("convert coordinates to kernal matrix with dimension: ", np.shape(kNN))
         trainer = LAIO_DB()
         do_clustering = DBCluster(trainer)
-        do_clustering.fit(proj)
+        do_clustering.fit(desc)
     else:
         raise ValueError('Please select from fdb or dbscan')
 
     print(do_clustering.pack())
+    with open("clustering_results_4_" + prefix + ".json", 'w') as fp:
+        json.dump(do_clustering.pack(), fp, cls=NpEncoder)
+
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
+    
+    if asapxyz is not None and projectatomic:
+        asapxyz.set_atomic_descriptors(labels_db, 'cluster_label')
+    elif asapxyz is not None:
+        asapxyz.set_descriptors(labels_db, 'cluster_label')
 
     # save
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
-    # properties of each cluster
-    # [ unique_labels, cluster_size ]  = get_cluster_size(labels_db[:])
-    # center of each cluster
-    # [ unique_labels, cluster_x ]  = get_cluster_properties(labels_db[:],proj[:,pc1],'mean')
-    # [ unique_labels, cluster_y ]  = get_cluster_properties(labels_db[:],proj[:,pc2],'mean')
+
+    if  fmat != 'none':
+        pca = PCA(dimension, True)
+        proj = pca.fit_transform(desc)
+    elif  kmat != 'none':
+        proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
-    fcolor = str(fcolor)
-    if fcolor == 'rho':  # we use the local density as the color scheme
-        plotcolor = rho
-        colorlabel = 'local density of each data point (bandwith $\sigma(k_{ij})$ =' + "{:4.0e}".format(
-            sigma_kij) + ' )'
-    elif fcolor == 'cluster':
+    if fcolor == 'cluster_label': 
         plotcolor = labels_db
-        colorlabel = 'a total of' + str(n_clusters) + ' clusters'
+        colorlabel = 'cluster_label'
     else:
-        try:
-            plotcolor = np.genfromtxt(fcolor, dtype=float)
-        except:
-            raise ValueError('Cannot load the vector of properties')
-        if len(plotcolor) != len(kNN):
-            raise ValueError('Length of the vector of properties is not the same as number of samples')
-        colorlabel = 'use ' + fcolor + ' for coloring the data points'
-    [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
+        if projectatomic:
+            _, plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
+        else:
+            plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
 
     # make plot
     plot_styles.set_nice_font()
 
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, rho, s=None,
+    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, plotcolor, s=None,
                                               clabel=colorlabel, title=None,
                                               w_size=True, w_label=True,
                                               circle_size=30, alpha=0.5, edgecolors=None,
@@ -148,7 +148,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
                       title=None, w_label = True, figsize=None,
                       dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True)
     """
-    fig.set_size_inches(18.5, 10.5)
+    fig.set_size_inches(160.5, 80.5)
 
     # project the known structures
     if ftags != 'none':
@@ -166,7 +166,7 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
                         ax=ax, precision=0.01,
                         arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
-    plt.title('PCA and clustering for: ' + prefix)
+    plt.title('(k)PCA and clustering for: ' + prefix)
     plt.xlabel('Princple Axis ' + str(pc1))
     plt.ylabel('Princple Axis ' + str(pc2))
     plt.show()
@@ -176,18 +176,24 @@ def main(fmat, kmat, ftags, prefix, fcolor, dimension, pc1, pc2, algorithm, adte
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='none', help='Location of the low D projection of the data.')
+    parser.add_argument('-fmat', type=str, default='none',
+                        help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-kmat', type=str, default='none',
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('-colors', type=str, default='cluster',
-                        help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
+    parser.add_argument('-colors', type=str, default='cluster_label',
+                        help='Properties for all samples (N floats) used to color the scatter plot')
+    parser.add_argument('--colorscolumn', type=int, default=0,
+                        help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--algo', type=str, default='fdb',
                         help='the algorithm for density-based clustering ([dbscan], [fdb])')
+    parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
 
@@ -196,5 +202,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.kmat, args.tags, args.prefix, args.colors, args.d, args.pc1, args.pc2, args.algo,
-         args.adjusttext)
+    main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
+         args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
