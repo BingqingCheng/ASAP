@@ -41,7 +41,7 @@ def Avgerage_Descriptor_By_Species(atomic_desc, atomic_numbers, global_species):
         desc_by_species[species] = np.zeros(n_adesc,dtype=float)
         natoms_by_species[species] = 0
     for at, at_desc in enumerate(atomic_desc):
-        desc_by_species[atomic_numbers(at)][:] += at_desc[:]
+        desc_by_species[atomic_numbers[at]][:] += at_desc[:]
         natoms_by_species[species] += 1
     for i, species in enumerate(global_species):
         desc_by_species[species] /=  natoms_by_species[species]
