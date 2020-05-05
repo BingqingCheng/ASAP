@@ -101,7 +101,9 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
             fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
 
         # average over all atomic environments inside the system
-        frame.info[desc_name] = fnow.mean(axis=0)
+        frame.info[desc_name] = Avgerage_Descriptor(fnow)
+        # element-wise average desciptor
+        frame.info[desc_name] = Avgerage_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species)
 
         # save
         if output == 'matrix':
