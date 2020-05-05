@@ -16,7 +16,7 @@ def Avgerage_Descriptor(atomic_desc):
     -------
     desc: np.matrix [N_desc]. Global descriptors for a frame.
     """
-    return atomic_desc.mean(axis=0)
+    return np.mean(atomic_desc, axis=0)
 
 def Avgerage_Descriptor_By_Species(atomic_desc, atomic_numbers, global_species):
     """ get the global descriptor from atomic ones by a simple averaging
@@ -61,4 +61,46 @@ def Sum_Descriptor(atomic_desc):
     desc: np.matrix [N_desc]. Global descriptors for a frame.
     """
     return np.sum(np.asmatrix(atomic_desc),axis=0)
+
+def Average_Moment_Descriptor(atomic_desc, zeta_list=[1,2,3]):
+    """ get the global descriptor from atomic ones 
+        by averaging over the atomic descriptors of z th power 
+
+    Parameters
+    ----------
+    atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
+    zeta: highest moment considered
+    Returns
+    -------
+    desc: np.matrix [N_desc*zeta] or [N_desc*zeta+1]. Global descriptors for a frame.
+    """
+    n_adesc = len(atomic_desc[0])
+    n_moment = len(zeta_list)
+    desc = np.zeros(n_adesc*n_moment,dtype=float)
+
+    desc[:n_adesc] = np.mean(atomic_desc, axis=0)
+    for i, z in enumerate(zeta_list):
+        desc[i*n_adesc:(i+1)*n_adesc] = np.mean(np.power(atomic_desc,z), axis=0)
+    return desc
+
+def Sum_Moment_Descriptor(atomic_desc, zeta_list=[0,1,2,3]):
+    """ get the global descriptor from atomic ones 
+        by summing over the atomic descriptors of z th power
+
+    Parameters
+    ----------
+    atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
+    zeta: highest moment considered
+    Returns
+    -------
+    desc: np.matrix [N_desc*zeta] or [N_desc*zeta+1]. Global descriptors for a frame.
+    """
+    n_adesc = len(atomic_desc[0])
+    n_moment = len(zeta_list)
+    desc = np.zeros(n_adesc*n_moment,dtype=float)
+
+    desc[:n_adesc] = np.mean(atomic_desc, axis=0)
+    for i, z in enumerate(zeta_list):
+        desc[i*n_adesc:(i+1)*n_adesc] = np.sum(np.power(atomic_desc,z), axis=0)
+    return desc
 
