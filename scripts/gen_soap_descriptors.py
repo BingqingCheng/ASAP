@@ -9,10 +9,10 @@ from dscribe.descriptors import SOAP
 
 from asaplib.hypers import universal_soap_hyper
 from asaplib.io import str2bool
-from asaplib.kernel import Avgerage_Descriptor, Avgerage_Descriptor_By_Species
+from asaplib.kernel import Avgerage_Descriptor, Avgerage_Descriptor_By_Species, Sum_Descriptor
 
 
-def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
+def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, kernel_type, stride):
     """
 
     Generate the SOAP descriptors.
@@ -29,6 +29,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_n: int giving the maximum radial label
     soap_l: int giving the maximum angular label. Must be less than or equal to 9
     soap_periodic: string (True or False) indicating whether the system is periodic
+    kernel_type: type of operations to get global descriptors from the atomic soap vectors
     stride: compute descriptor each X frames
     """
     fframes = []
@@ -100,10 +101,17 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         for soap_desc_atomic_now in soap_desc_atomic[1:]:
             fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
 
-        # average over all atomic environments inside the system
-        frame.info[desc_name] = Avgerage_Descriptor(fnow)
-        # element-wise average desciptor
-        frame.info[desc_name] = Avgerage_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species)
+        if kernel_type == 'average':
+            # average over all atomic environments inside the system
+            frame.info[desc_name] = Avgerage_Descriptor(fnow)
+        elif kernel_type == 'sum':
+            # sum over all atomic environments inside the system
+            frame.info[desc_name+'-'+kernel_type] = Sum_Descriptor(fnow)
+        elif kernel_type == 'average_by_element':
+            # element-wise average desciptor
+            frame.info[desc_name+'-'+kernel_type] = Avgerage_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species)
+        else:
+            raise NotImplementedError
 
         # save
         if output == 'matrix':
@@ -138,6 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
+    parser.add_argument('--kernel', type=str, default='average', help='type of operations to get global descriptors from the atomic soap vectors [average], [average_by_element], [sum]')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
     parser.add_argument('--stride', type=int, default=1,
@@ -149,4 +158,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.param_path, args.rcut, args.g, args.n,
-         args.l, args.periodic, args.stride)
+         args.l, args.periodic, args.kernel, args.stride)

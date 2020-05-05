@@ -49,3 +49,16 @@ def Avgerage_Descriptor_By_Species(atomic_desc, atomic_numbers, global_species):
         desc[i*n_adesc:(i+1)*n_adesc] = desc_by_species[species]
     return desc
 
+def Sum_Descriptor(atomic_desc):
+    """ get the global descriptor from atomic ones by summing over atomic ones
+
+    Parameters
+    ----------
+    atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
+
+    Returns
+    -------
+    desc: np.matrix [N_desc]. Global descriptors for a frame.
+    """
+    return np.sum(np.asmatrix(atomic_desc),axis=0)
+
