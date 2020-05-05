@@ -9,6 +9,7 @@ from dscribe.descriptors import SOAP
 
 from asaplib.hypers import universal_soap_hyper
 from asaplib.io import str2bool
+from asaplib.kernel import Avgerage_Descriptor, Avgerage_Descriptor_By_Species
 
 
 def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
