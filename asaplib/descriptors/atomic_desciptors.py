@@ -32,7 +32,10 @@ class Atomic_Descriptors:
         self.desc_spec_list.append(desc_spec)
 
     def pack(self):
-        return json.dumps(self.desc_spec_list, sort_keys=True)
+        desc_name = ''
+        for desc_spec in self.desc_spec_list:
+            desc_name += json.dumps(desc_spec, sort_keys=True)
+        return desc_name
 
     def bind(self):
         """
@@ -60,17 +63,6 @@ class Atomic_Descriptors:
         for descriptor_object in self.descriptor_objects[1:]:
             fnow = np.append(fnow, descriptor_object.create(frame), axis=1)
         return fnow
-
-    def Get_Atomic_Descriptors(self, frame, desc):
-
-        if desc["type"] == "SOAP":
-            [species_now, cutoff_now, g_now, n_now, l_now, rdf_now, crossover_now] = [desc['species'], desc['cutoff'],
-                                                              desc['atom_gaussian_width'], desc['n'],
-                                                              desc['l'], desc['rbf'], desc['crossover']]
-            soap_desc_atomic.append(SOAP(species=species_now, rcut=cutoff_now, nmax=n_now, lmax=l_now,
-                                         sigma=g_now, rbf="gto", crossover=False, average=False,
-                                         periodic=soap_periodic))
-
 
 class Atomic_Descriptor_Base:
     def __init__(self, desc_spec):
