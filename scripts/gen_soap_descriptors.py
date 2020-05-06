@@ -4,12 +4,9 @@ import os
 import sys
 
 import numpy as np
-from ase.io import read, write
-from dscribe.descriptors import SOAP
-
+from asaplib.data import ASAPXYZ
 from asaplib.hypers import universal_soap_hyper
 from asaplib.io import str2bool
-from asaplib.kernel import Atomic_2_Global_Descriptor_By_Species
 
 
 def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, zeta_list, kernel_type, element_wise, soap_periodic, stride):
@@ -20,7 +17,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     Parameters
     ----------
     fxyz: string giving location of xyz file
-    dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
     output: [xyz]: append the SOAP descriptors to extended xyz file; [mat] output as a standlone matrix
     fsoap_param: use (possibly multiple sets) of SOAP descriptors using parameters specified in fsoap_param file (json format)
@@ -34,30 +30,10 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_periodic: string (True or False) indicating whether the system is periodic
     stride: compute descriptor each X frames
     """
-    fframes = []
-    dictframes = []
 
     # read frames
-    if fxyz is not None:
-        fframes = read(fxyz, slice(0, None, stride))
-        nfframes = len(fframes)
-        print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
-    # read frames in the dictionary
-    if dictxyz is not None:
-        dictframes = read(dictxyz, ':')
-        ndictframes = len(dictframes)
-        print("read xyz file used for a dictionary:", dictxyz, ", a total of",
-              ndictframes, "frames")
-
-    frames = dictframes + fframes
-    nframes = len(frames)
-    global_species = []
-    for frame in frames:
-        global_species.extend(frame.get_atomic_numbers())
-        if not soap_periodic:
-            frame.set_pbc([False, False, False])
-    global_species = np.unique(global_species)
-    print("a total of", nframes, "frames, with elements: ", global_species)
+    asapxyz = ASAPXYZ(fxyz, stride, soap_periodic)
+    soap_js = []
 
     if fsoap_param is not None:
         import json
@@ -68,65 +44,44 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
                     soap_js = json.load(soapfile)
             except:
                 raise IOError('Cannot load the json file for soap parameters')
-
         # use the default parameters
         else: 
             soap_js = universal_soap_hyper(global_species, fsoap_param, dump=True)
-
-        # make descriptors
-        soap_desc_atomic = []
-        for element in soap_js.keys():
-            soap_param = soap_js[element]
-            [species_now, cutoff_now, g_now, n_now, l_now] = [soap_param['species'], soap_param['cutoff'],
-                                                              soap_param['atom_gaussian_width'], soap_param['n'],
-                                                              soap_param['l']]
-            soap_desc_atomic.append(SOAP(species=species_now, rcut=cutoff_now, nmax=n_now, lmax=l_now,
-                                         sigma=g_now, rbf="gto", crossover=False, average=False,
-                                         periodic=soap_periodic))
-
-        foutput = prefix + "-soapparam" + '-' + fsoap_param
-        desc_name = "SOAPPARAM" + '-' + fsoap_param
-
+        soap_tag = "SOAP-" + fsoap_param
     else:
-        soap_desc_atomic = [SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
-                                 sigma=soap_g, rbf="gto", crossover=False, average=False, periodic=soap_periodic)]
-        foutput = prefix + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
-        desc_name = "SOAP" + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
+        # use the argparse arguments to make the dictionary of the SOAP parameters
+        soap_js = {'soap1': {'cutoff': soap_rcut, 
+                      'n': soap_n, 'l': soap_l,
+                      'atom_gaussian_width': soap_g, 
+                      'rbf': 'gto', 'crossover': False}}
+        soap_tag = "SOAP-" + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
 
-    # prepare for the output
-    if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
-    if os.path.isfile(foutput + ".desc"): os.rename(foutput + ".desc", "bck." + foutput + ".desc")
+    for element in soap_js.keys():
+        print("Use SOAP descriptors: ", soap_js[element])
+        soap_js[element]['type'] = 'SOAP'
 
-    for i, frame in enumerate(frames):
-        fnow = soap_desc_atomic[0].create(frame, n_jobs=8)
+    kernel_js = {'kernel_type': kernel_type,  
+                 'zeta_list': zeta_list,
+                'elementwise': element_wise}
+    print("Use kernel functions to compute global descriptors: ", kernel_js)
+    kernel_tag = "-z-"+str(zeta_list)+"-k-"+str(kernel_type)
+    if element_wise: kernel_tag+="-e" 
+    if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
+        # this is the vanilla situation. We just take the average soap for all atoms
+        kernel_tag = ''
+                 
+    # compute the descripitors
+    asapxyz.compute_global_descriptors(soap_js, kernel_js, [], peratom, soap_tag, kernel_tag)
+    # save
+    if output == 'matrix':
+        asapxyz.write_descriptor_matrix(prefix+'-'+soap_tag+kernel_tag, soap_tag+kernel_tag)
+        if peratom or nframes == 1:
+            asapxyz.write_atomic_descriptor_matrix(prefix+'-'+soap_tag, soap_tag)
+    elif output == 'xyz':
+       asapxyz.write(prefix+'-'+soap_tag+kernel_tag)
 
-        for soap_desc_atomic_now in soap_desc_atomic[1:]:
-            fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
-            
-        if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
-            # this is the vanilla situation. We just take the average soap for all atoms
-            frame.info[desc_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
-        elif element_wise == False:
-            frame.info[desc_name+'-'+kernel_type] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
-        else:
-            frame.info[desc_name+'-'+kernel_type+'-elementwise-'] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species, kernel_type, zeta_list)
-
-        # save
-        if output == 'matrix':
-            with open(foutput + ".desc", "ab") as f:
-                np.savetxt(f, frame.info[desc_name][None])
-            if peratom or nframes == 1:
-                with open(foutput + ".atomic-desc", "ab") as fatomic:
-                    np.savetxt(fatomic, fnow)
-        elif output == 'xyz':
-            # output per-atom info
-            if peratom:
-                frame.new_array(desc_name, fnow)
-            # write xyze
-            write(foutput + ".xyz", frame, append=True)
-        else:
-            raise ValueError('Cannot find the output format')
-
+    asapxyz.write(prefix+'-'+soap_tag+kernel_tag)
+    asapxyz.save_descriptor_state(prefix+'-'+soap_tag+kernel_tag)
 
 if __name__ == '__main__':
 
