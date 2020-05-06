@@ -3,9 +3,10 @@ Methods and functions to compute atomic desciptors
 """
 import numpy as np
 import json
+from ..io import NpEncoder
 
 class Atomic_Descriptors:
-    def __init__(self, desc_spec_list=[{}]):
+    def __init__(self, desc_spec_dict={}):
         """
         Object handing the sepcification and the computation of atomic descriptors
         Parameters
@@ -17,24 +18,24 @@ class Atomic_Descriptors:
         {"type" = 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
         }]
         """
-        self.desc_spec_list = desc_spec_list
+        self.desc_spec_dict = desc_spec_dict
         self.desc_objects = []
 
         self.bind()
 
-    def add(self, desc_spec):
+    def add(self, desc_spec, tag):
         """
         adding the specifications of a new atomic descriptors
         Parameters
         ----------
         desc_spec: a dictionary that specify which atomic descriptor to use 
         """
-        self.desc_spec_list.append(desc_spec)
+        self.desc_spec_dict[tag] = desc_spec
 
     def pack(self):
         desc_name = ''
-        for desc_spec in self.desc_spec_list:
-            desc_name += json.dumps(desc_spec, sort_keys=True)
+        for element in self.desc_spec_dict.keys():
+            desc_name += json.dumps(self.desc_spec_dict[element], sort_keys=True, cls=NpEncoder)
         return desc_name
 
     def bind(self):
@@ -44,8 +45,9 @@ class Atomic_Descriptors:
         """
         # clear up the objects
         self.descriptor_objects = []
-        for desc_spec in desc_spec_list:
-            self.descriptor_objects.append(self._call(desc_spec))
+        for element in self.desc_spec_dict.keys():
+            self.descriptor_objects.append(self._call(self.desc_spec_dict[element]))
+        #print(self.descriptor_objects)
 
     def _call(self, desc_spec):
         """
@@ -78,7 +80,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
         from dscribe.descriptors import SOAP
 
-        if "type" not in desc_spec.keys() or desc["type"] != "SOAP":
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "SOAP":
             raise ValueError("Type is not SOAP or cannot find the type of the descriptor")
 
         # required
@@ -93,9 +95,9 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
         # we have defaults here
         if 'rbf' in desc_spec.keys():
-            self.rdf = desc_spec['rdf']
+            self.rbf = desc_spec['rdf']
         else:
-            self.rdf = 'gto'
+            self.rbf = 'gto'
 
         if 'crossover' in desc_spec.keys():
             self.crossover = bool(desc_spec['crossover'])
@@ -112,5 +114,5 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
                                          sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
                                          periodic=self.periodic)
 
-    def create(self,frame):
-        self.soap.create(frame, n_jobs=8)
+    def create(self, frame):
+        return self.soap.create(frame, n_jobs=8)

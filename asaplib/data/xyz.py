@@ -44,7 +44,7 @@ class ASAPXYZ:
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
             all_species.extend(frame.get_atomic_numbers())
-            if not self.periodic or if not sum(self.frame.get_cell()) > 0:
+            if not self.periodic or not np.sum(frame.get_cell()) > 0:
                 frame.set_pbc([False, False, False])
 
         self.total_natoms = np.sum(self.natom_list)
@@ -95,7 +95,7 @@ class ASAPXYZ:
         # we mark down that this descriptor has been computed
         self.computed_desc_list.append(desc_name)
 
-    def compute_global_descriptors(self, desc_spec_list=[{}], kernel_spec, sbs=[], keep_atomic = False):
+    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec={}, sbs=[], keep_atomic = False):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -110,9 +110,9 @@ class ASAPXYZ:
             sbs = range(self.nframes)
 
         # add some system specific information to the list to descriptor specifications
-        for desc_spec in desc_spec_list:
-            desc_spec['global_spices'] = self.global_species
-            desc_spec['periodic'] = self.periodic
+        for element in desc_spec_dict.keys():
+            desc_spec_dict[element]['global_spices'] = self.global_species
+            desc_spec_dict[element]['periodic'] = self.periodic
 
         kernel_name = json.dumps(kernel_spec, sort_keys=True) 
         kernel_type = kernel_spec['kernel_type']
@@ -120,18 +120,20 @@ class ASAPXYZ:
         elementwise = bool(kernel_spec['elementwise'])
 
         # business!
-        atomic_desc = Atomic_Descriptors(desc_spec_list)
+        atomic_desc = Atomic_Descriptors(desc_spec_dict)
         desc_name = atomic_desc.pack()
+        #print(desc_name)
 
-        for frame in self.frames[sbs]:
-            fnow = atomic_desc.create(frame)
+        for i in sbs:
+            frame = self.frames[i]
+            fnow = atomic_desc.compute(frame)
             if keep_atomic:
                 frame.new_array(desc_name, fnow)
 
-            if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
+            if kernel_type == 'average' and elementwise == False and len(zeta_list)==1 and zeta_list[0]==1:
                 # this is the vanilla situation. We just take the average soap for all atoms
                 frame.info[desc_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
-            elif element_wise == False:
+            elif elementwise == False:
                 frame.info[desc_name+kernel_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
             else:
                 frame.info[desc_name+kernel_name] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), self.global_species, kernel_type, zeta_list)
