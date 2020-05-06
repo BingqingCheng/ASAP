@@ -263,7 +263,7 @@ class ASAPXYZ:
         else:
             write(str(filename) + ".xyz", self.frames)
 
-    def write_descriptor_matrix(self, filename, desc_name, sbs=[]):
+    def write_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
         """
         write the selected descriptor matrix in a matrix format to file
 
@@ -272,15 +272,16 @@ class ASAPXYZ:
         filename: str
         desc_name: str. Name of the properties/descriptors to write
         sbs: array, integer
+        comment: str
         """
 
         desc, _ = self.get_descriptors(desc_name, False, sbs)
 
-        if os.path.isfile(str(filename)): 
-            os.rename(str(filename), "bck." + str(filename))
-        np.savetxt(str(filename), desc)
+        if os.path.isfile(str(filename) + ".desc"): 
+            os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
+        np.savetxt(str(filename) + ".desc", desc, fmt='%4.8f', header=comment)
 
-    def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[]):
+    def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
         """
         write the selected descriptor matrix in a matrix format to file
 
@@ -289,10 +290,11 @@ class ASAPXYZ:
         filename: str
         desc_name: str. Name of the properties/descriptors to write
         sbs: array, integer
+        comment: str
         """
 
         _, atomic_desc = self.get_descriptors(desc_name, True, sbs)
 
-        if os.path.isfile(str(filename)): 
-            os.rename(str(filename), "bck." + str(filename))
-        np.savetxt(str(filename), atomic_desc)
+        if os.path.isfile(str(filename) + "atomic-desc"): 
+            os.rename(str(filename) + "atomic-desc", "bck." + str(filename) + "atomic-desc")
+        np.savetxt(str(filename) + "atomic-desc", desc, fmt='%4.8f', header=comment)
