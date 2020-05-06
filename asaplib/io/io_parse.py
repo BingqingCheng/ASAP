@@ -6,7 +6,8 @@ import argparse
 import json
 
 import numpy as np
-
+import random
+import string
 
 def str2bool(v):
     """
@@ -28,6 +29,9 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
+def randomString(stringLength=8):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
