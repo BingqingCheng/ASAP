@@ -6,6 +6,7 @@ import sys
 import numpy as np
 from asaplib.data import ASAPXYZ
 from asaplib.hypers import universal_soap_hyper
+from asaplib.descriptors import Atomic_2_Global_Kernel
 from asaplib.io import str2bool
 
 
@@ -60,15 +61,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         print("Use SOAP descriptors: ", soap_js[element])
         soap_js[element]['type'] = 'SOAP'
 
-    kernel_js = {'kernel_type': kernel_type,  
-                 'zeta_list': zeta_list,
-                'elementwise': element_wise}
-    print("Use kernel functions to compute global descriptors: ", kernel_js)
-    kernel_tag = "-z-"+str(zeta_list)+"-k-"+str(kernel_type)
-    if element_wise: kernel_tag+="-e" 
-    if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
-        # this is the vanilla situation. We just take the average soap for all atoms
-        kernel_tag = ''
+    kernel_js, kernel_tag = Atomic_2_Global_Kernel(kernel_type, zeta_list, element_wise).get()
                  
     # compute the descripitors
     asapxyz.compute_global_descriptors(soap_js, kernel_js, [], peratom, soap_tag, kernel_tag)
