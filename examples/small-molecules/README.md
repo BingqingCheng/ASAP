@@ -7,8 +7,8 @@ gen_soap_descriptors.py -fxyz small_molecules-1000.xyz -param_path two_soap_para
 
 * step 2: visualize
 
-pca.py -fxyz ASAP-soapparam-two_soap_param.xyz -fmat SOAPPARAM-two_soap_param -colors dft_formation_energy_per_atom_in_eV
+pca.py -fxyz ASAP-SOAP-two_soap_param.xyz -fmat SOAP-two_soap_param -colors dft_formation_energy_per_atom_in_eV
 
 * step 3: predict
 
-ridge_regression.py -fxyz ASAP-soapparam-two_soap_param.xyz -fmat SOAPPARAM-two_soap_param -fy dft_formation_energy_per_atom_in_eV
+ridge_regression.py -fxyz ASAP-SOAP-two_soap_param.xyz -fmat SOAP-two_soap_param -fy dft_formation_energy_per_atom_in_eV
