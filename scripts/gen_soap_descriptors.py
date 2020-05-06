@@ -54,7 +54,7 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
                       'n': soap_n, 'l': soap_l,
                       'atom_gaussian_width': soap_g, 
                       'rbf': 'gto', 'crossover': False}}
-        soap_tag = "SOAP-" + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
+        soap_tag = "SOAP-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
 
     for element in soap_js.keys():
         print("Use SOAP descriptors: ", soap_js[element])
