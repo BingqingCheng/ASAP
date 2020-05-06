@@ -33,10 +33,10 @@ class Atomic_Descriptors:
         self.desc_spec_dict[tag] = desc_spec
 
     def pack(self):
-        desc_name = ''
-        for element in self.desc_spec_dict.keys():
-            desc_name += json.dumps(self.desc_spec_dict[element], sort_keys=True, cls=NpEncoder)
-        return desc_name
+        #desc_name = ''
+        #for element in self.desc_spec_dict.keys():
+        #    desc_name += json.dumps(self.desc_spec_dict[element], sort_keys=True, cls=NpEncoder)
+        return json.dumps(self.desc_spec_dict, sort_keys=True, cls=NpEncoder)
 
     def bind(self):
         """
@@ -95,7 +95,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
         # we have defaults here
         if 'rbf' in desc_spec.keys():
-            self.rbf = desc_spec['rdf']
+            self.rbf = desc_spec['rbf']
         else:
             self.rbf = 'gto'
 

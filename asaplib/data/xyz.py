@@ -89,7 +89,8 @@ class ASAPXYZ:
         atomic_desc = Atomic_Descriptors(desc_spec_list)
         desc_name = atomic_desc.pack()
 
-        for frame in self.frames[sbs]:
+        for i in sbs:
+            frame = self.frames[sbs]
             frame.new_array(desc_name, atomic_desc.create(frame))
 
         # we mark down that this descriptor has been computed
@@ -111,7 +112,7 @@ class ASAPXYZ:
 
         # add some system specific information to the list to descriptor specifications
         for element in desc_spec_dict.keys():
-            desc_spec_dict[element]['global_spices'] = self.global_species
+            desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
 
         kernel_name = json.dumps(kernel_spec, sort_keys=True) 
@@ -121,8 +122,8 @@ class ASAPXYZ:
 
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
-        desc_name = atomic_desc.pack()
-        #print(desc_name)
+        desc_name_long = atomic_desc.pack()
+        desc_name = 'mmm'
 
         for i in sbs:
             frame = self.frames[i]
