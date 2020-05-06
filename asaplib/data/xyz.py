@@ -205,26 +205,28 @@ class ASAPXYZ:
 
         y_all = []
         try:
-            for index, frame in enumerate(self.frames[sbs]):
+            for i in sbs:
+                frame = self.frames[i]
                 if y_key == 'volume' or y_key == 'Volume':
                     y_all.append(frame.get_volume() / len(frame.get_positions()))
                 elif y_key == 'size' or y_key == 'Size':
                     y_all.append(len(frame.get_positions()))
                 elif y_key == 'index' or y_key == 'Index' or y_key == None:
-                    y_all.append(index)
+                    y_all.append(i)
                 elif extensive:
                     y_all.append(frame.info[y_key] / len(frame.get_positions()))
                 else:
                     y_all.append(frame.info[y_key])
         except:
             try:
-                for frame in self.frames[sbs]:
-                   if extensive:
-                       # use the sum of atomic properties
-                       y_all.append(np.sum(frame.get_array(y_key)))
-                   else:
-                       # use the average of atomic properties
-                       y_all.append(np.mean(frame.get_array(y_key)))
+                for i in sbs:
+                    frame = self.frames[i]
+                    if extensive:
+                        # use the sum of atomic properties
+                        y_all.append(np.sum(frame.get_array(y_key)))
+                    else:
+                        # use the average of atomic properties
+                        y_all.append(np.mean(frame.get_array(y_key)))
             except:
                 raise ValueError('Cannot load the property vector')
         if len(np.shape(y_all)) > 1:
