@@ -7,7 +7,7 @@ class Atomic_2_Global_Kernel:
                           'zeta_list': zeta_list,
                           'elementwise': element_wise}
         print("Use kernel functions to compute global descriptors: ", self.kernel_js)
-        self.kernel_tag = "-z-"+str(zeta_list)+"-k-"+str(kernel_type)
+        self.kernel_tag = "-z-"+list2str(zeta_list)+"-k-"+str(kernel_type)
         if element_wise: self.kernel_tag+="-e" 
         if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
             # this is the vanilla situation. We just take the average soap for all atoms
@@ -20,3 +20,8 @@ class Atomic_2_Global_Kernel:
     def get(self):
         return self.kernel_js, self.kernel_tag
 
+def list2str(input_list):
+    output_str = ""
+    for l in input_list:
+        output_str += str(l)
+    return output_str
