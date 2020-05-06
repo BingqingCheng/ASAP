@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 from ase.io import read, write
+from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Atomic_2_Global_Descriptor_By_Species
 
 class ASAPXYZ:
@@ -27,7 +28,7 @@ class ASAPXYZ:
         self.natom_list = []
         self.total_natoms = 0
         self.global_species = []
-        self.computed_desc_list = []
+        self.computed_desc_dict = {}
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -69,7 +70,11 @@ class ASAPXYZ:
     def get_global_species(self):
         return self.global_species
 
-    def compute_atomic_descriptors(self, desc_spec_list=[{}], sbs=[]):
+    def save_descriptor_state(self, filename):
+        with open(filename+'-descriptor-state.json', 'w') as jd:
+            json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
+
+    def compute_atomic_descriptors(self, desc_spec_list={}, sbs=[], tag=None):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -80,23 +85,25 @@ class ASAPXYZ:
 
         if len(sbs) == 0:
             sbs = range(self.nframes)
+        if tag is None: tag = randomString(6)
+
         # add some system specific information to the list to descriptor specifications
-        for desc_spec in desc_spec_list:
-            desc_spec['global_spices'] = self.global_species
-            desc_spec['periodic'] = self.periodic
+        for element in desc_spec_dict.keys():
+            desc_spec_dict[element]['species'] = self.global_species
+            desc_spec_dict[element]['periodic'] = self.periodic
 
         # business!
-        atomic_desc = Atomic_Descriptors(desc_spec_list)
-        desc_name = atomic_desc.pack()
+        atomic_desc = Atomic_Descriptors(desc_spec_dict)
+        desc_name_long = atomic_desc.pack()
 
         for i in sbs:
             frame = self.frames[sbs]
             frame.new_array(desc_name, atomic_desc.create(frame))
 
         # we mark down that this descriptor has been computed
-        self.computed_desc_list.append(desc_name)
+        self.computed_desc_dict[tag] =  {'atomic_descriptor': desc_name_long, 'kernel_function': None}
 
-    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec={}, sbs=[], keep_atomic = False):
+    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec={}, sbs=[], keep_atomic = False, tag=None, ktag=None):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -109,13 +116,15 @@ class ASAPXYZ:
 
         if len(sbs) == 0:
             sbs = range(self.nframes)
+        if tag is None: tag = randomString(6)
+        if ktag is None: ktag = '-'+randomString(6)
 
         # add some system specific information to the list to descriptor specifications
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
 
-        kernel_name = json.dumps(kernel_spec, sort_keys=True) 
+        kernel_name_long = json.dumps(kernel_spec, sort_keys=True)
         kernel_type = kernel_spec['kernel_type']
         zeta_list = kernel_spec['zeta_list']
         elementwise = bool(kernel_spec['elementwise'])
@@ -123,21 +132,23 @@ class ASAPXYZ:
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
         desc_name_long = atomic_desc.pack()
-        desc_name = 'mmm'
 
         for i in sbs:
             frame = self.frames[i]
             fnow = atomic_desc.compute(frame)
             if keep_atomic:
-                frame.new_array(desc_name, fnow)
+                frame.new_array(tag, fnow)
 
             if kernel_type == 'average' and elementwise == False and len(zeta_list)==1 and zeta_list[0]==1:
                 # this is the vanilla situation. We just take the average soap for all atoms
-                frame.info[desc_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
+                frame.info[tag] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
             elif elementwise == False:
-                frame.info[desc_name+kernel_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
+                frame.info[tag+ktag] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
             else:
-                frame.info[desc_name+kernel_name] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), self.global_species, kernel_type, zeta_list)
+                frame.info[tag+ktag] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), self.global_species, kernel_type, zeta_list)
+
+        # we mark down that this descriptor has been computed
+        self.computed_desc_dict[tag+'-'+ktag] = {'atomic_descriptor': desc_name_long, 'kernel_function': kernel_name_long}
 
     def get_descriptors(self, desc_name=None, use_atomic_desc=False, sbs=[]):
         """ extract the descriptor array from each frame
