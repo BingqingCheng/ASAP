@@ -5,7 +5,7 @@ from ase.io import read, write
 
 
 class ASAPXYZ:
-    def __init__(self, fxyz=None, stride=1):
+    def __init__(self, fxyz=None, stride=1, periodic=True):
         """extended xyz class
 
         Parameters
@@ -19,12 +19,14 @@ class ASAPXYZ:
         # essential
         self.fxyz = fxyz
         self.stride = stride
+        self.periodic = periodic
 
         # store the xyz file
         self.frames = None
         self.nframes = 0
         self.natom_list = []
         self.total_natoms = 0
+        self.global_species = []
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -36,13 +38,20 @@ class ASAPXYZ:
             raise ValueError('Exception occurred when loading the xyz file')
 
         self.nframes = len(self.frames)
+        all_species = []
         for frame in self.frames:
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
+            all_species.extend(frame.get_atomic_numbers())
+            if not self.periodic:
+                frame.set_pbc([False, False, False])
+
         self.total_natoms = np.sum(self.natom_list)
+        self.global_species = np.unique(all_species)
         print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
-              ', a total of ', str(self.total_natoms), 'atoms')
+              ', a total of ', str(self.total_natoms), 'atoms',
+              ', with elements: ', self.global_species,'.')
 
     def get_xyz(self):
         return self.frames
