@@ -150,42 +150,34 @@ class ASAPXYZ:
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag+'-'+ktag] = {'atomic_descriptor': desc_name_long, 'kernel_function': kernel_name_long}
 
-    def get_descriptors(self, desc_name=None, use_atomic_desc=False, sbs=[]):
+    def get_descriptors(self, desc_name=None, use_atomic_desc=False):
         """ extract the descriptor array from each frame
 
         Parameters
         ----------
         fmat: string_like, the name of the descriptors in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
-        sbs: array, integer
 
         Returns
         -------
         desc: np.matrix
         atomic_desc: np.matrix
         """
-
-        if len(sbs) == 0:
-            sbs = range(self.nframes)
-
         desc = []
         atomic_desc = []
-       
+
         # load from xyz file
         if self.nframes > 1:
             try:
                 # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-                desc = np.row_stack([a.info[desc_name] for a in self.frames[sbs]])
+                desc = np.row_stack([a.info[desc_name] for a in self.frames])
                 print("Use descriptor matrix with shape: ", np.shape(desc))
+                # for the atomic descriptors
+                if use_atomic_desc:
+                    atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
+                    print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
             except:
                 pass
-            if use_atomic_desc:
-                # for the atomic descriptors
-                try:
-                    atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames[sbs]])
-                    print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
-                except:
-                    pass
         else:
             # only one frame
             try:
