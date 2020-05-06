@@ -1,8 +1,8 @@
 import os
-
+import json
 import numpy as np
 from ase.io import read, write
-
+from ..descriptors import Atomic_Descriptors
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
@@ -67,6 +67,25 @@ class ASAPXYZ:
 
     def get_global_species(self):
         return self.global_species
+
+    def compute_atomic_descriptors(self, desc_spec=[{}], sbs=[]):
+        """
+        compute the atomic descriptors for selected frames
+        Parameters
+        ----------
+        desc_spec: a list of dictionaries, contrains infos on the descriptors to use
+        sbs: array, integer
+        """
+
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+        desc_name = json.dumps(desc_spec, sort_keys=True)
+
+        for frame in self.frames[sbs]:            
+            fnow = Atomic_Descriptors(frame,  desc_spec[0])
+            for more_desc_spec in desc_spec[1:]:
+                fnow = np.append(fnow, Atomic_Descriptors(frame,  more_desc_spec), axis=1)
+            frame.new_array(desc_name, fnow)
 
     def get_descriptors(self, desc_name=None, use_atomic_desc=False, sbs=[]):
         """ extract the descriptor array from each frame
