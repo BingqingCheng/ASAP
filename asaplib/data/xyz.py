@@ -276,9 +276,9 @@ class ASAPXYZ:
 
         desc, _ = self.get_descriptors(desc_name, False, sbs)
 
-        if os.path.isfile(str(filename) + ".desc"): 
-            os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
-        np.savetxt(str(filename) + ".desc", desc)
+        if os.path.isfile(str(filename)): 
+            os.rename(str(filename), "bck." + str(filename))
+        np.savetxt(str(filename), desc)
 
     def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[]):
         """
@@ -293,6 +293,6 @@ class ASAPXYZ:
 
         _, atomic_desc = self.get_descriptors(desc_name, True, sbs)
 
-        if os.path.isfile(str(filename) + "atomic-desc"): 
-            os.rename(str(filename) + "atomic-desc", "bck." + str(filename) + "atomic-desc")
-        np.savetxt(str(filename) + "atomic-desc", atomic_desc)
+        if os.path.isfile(str(filename)): 
+            os.rename(str(filename), "bck." + str(filename))
+        np.savetxt(str(filename), atomic_desc)
