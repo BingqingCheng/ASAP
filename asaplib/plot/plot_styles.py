@@ -74,7 +74,8 @@ def plot_density_map(X, z, fig=None, ax=None,
     """
 
     # start the plots
-    if ax == None or fig == None: fig, ax = plt.subplots()
+    if ax == None or fig == None:
+        fig, ax = plt.subplots()
 
     x, y = X[:, 0], X[:, 1]
     z = np.asarray(z)
@@ -107,7 +108,8 @@ def plot_density_map(X, z, fig=None, ax=None,
             axscatter = ax.scatter(x, y, c=z, cmap=cmap, s=psize, alpha=1.0, rasterized=rasterized, vmax=vmax,
                                    vmin=vmin)
 
-        if clabel is not None: cb = fig.colorbar(axscatter)
+        if clabel is not None:
+            cb = fig.colorbar(axscatter)
 
     if remove_tick:
         ax.tick_params(labelbottom='off', labelleft='off')

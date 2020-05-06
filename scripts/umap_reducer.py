@@ -18,7 +18,7 @@ from asaplib.plot import set_color_function, plot_styles
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
-        projectatomic, plotatomic, adtext):
+         projectatomic, plotatomic, adtext, use_morgan):
     """
 
     Parameters
@@ -39,70 +39,99 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     projectatomic: build the projection using the (big) atomic descriptor matrix
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
+    use_morgan: Whether to use Morgan fingerprints. True for the photoswitch example.
 
     Returns
     -------
 
     """
 
-    foutput = prefix + "-pca-d" + str(umap_d)
-    use_atomic_desc = (peratom or plotatomic or projectatomic)
+    if not use_morgan:
 
-    # try to read the xyz file
-    if fxyz != 'none':
-        asapxyz = ASAPXYZ(fxyz)
-        desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
-        if projectatomic: desc = desc_atomic.copy()
+        foutput = prefix + "-umap-d" + str(umap_d)
+        use_atomic_desc = (peratom or plotatomic or projectatomic)
+
+        # try to read the xyz file
+        if fxyz != 'none':
+            asapxyz = ASAPXYZ(fxyz)
+            desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+            if projectatomic:
+                desc = desc_atomic.copy()
+        else:
+            print("Did not provide the xyz file. We can only output descriptor matrix.")
+            output = 'matrix'
+        # we can also load the descriptor matrix from a standalone file
+        if os.path.isfile(fmat):
+            try:
+                desc = np.genfromtxt(fmat, dtype=float)
+                print("loaded the descriptor matrix from file: ", fmat)
+            except:
+                raise ValueError('Cannot load the descriptor matrix from file')
+        # sanity check
+        if len(desc) == 0:
+            raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
+        print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
+
+        if ftags != 'none':
+            tags = np.loadtxt(ftags, dtype="str")[:]
+            ndict = len(tags)
+
+        # scale & center
+        if scale:
+            from sklearn.preprocessing import StandardScaler
+            scaler = StandardScaler()
+            print('Shape of descriptor matrix is {}'.format(desc.shape))
+            print(scaler.fit(desc))
+            desc = scaler.transform(desc)  # normalizing the features
+
+        # fit UMAP
+
+        reducer = umap.UMAP(n_neighbors=5)
+        proj = reducer.fit_transform(desc)
+        if peratom or plotatomic and not projectatomic:
+            proj_atomic_all = reducer.transform(desc_atomic)
+
+        # save
+        if output == 'matrix':
+            np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+            if peratom:
+                np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header='low D coordinates of samples')
+        if output == 'xyz':
+            if os.path.isfile(foutput + ".xyz"):
+                os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
+            asapxyz.set_descriptors(proj, 'umap_coord')
+            if peratom:
+                asapxyz.set_atomic_descriptors(proj_atomic_all, 'umap_coord')
+            # remove the raw descriptors
+            if not keepraw:
+                asapxyz.remove_descriptors(fmat)
+                asapxyz.remove_atomic_descriptors(fmat)
+            asapxyz.write(foutput)
+
     else:
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-        output = 'matrix'
-    # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
-        try:
-            desc = np.genfromtxt(fmat, dtype=float)
-            print("loaded the descriptor matrix from file: ", fmat)
-        except:
-            raise ValueError('Cannot load the descriptor matrix from file')
-    # sanity check
-    if len(desc) == 0:
-        raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
-    print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
-    if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")[:]
-        ndict = len(tags)
+        if fxyz != 'none':
+            asapxyz = ASAPXYZ(fxyz)
+        else:
+            raise Exception('xyz file required for plotting')
 
-    # scale & center
-    if scale:
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        print('Shape of descriptor matrix is {}'.format(desc.shape))
-        print(scaler.fit(desc))
-        desc = scaler.transform(desc)  # normalizing the features
+        # Use Morgan fingerprints
 
-    # fit UMAP
+        import pandas as pd
+        from rdkit.Chem import MolFromSmiles
+        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 
-    reducer = umap.UMAP()
-    proj = reducer.fit_transform(desc)
-    if peratom or plotatomic and not projectatomic:
-        proj_atomic_all = reducer.transform(desc_atomic)
+        path = 'photoswitches.csv'
 
-    # save
-    if output == 'matrix':
-        np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-        if peratom:  
-            np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header='low D coordinates of samples')
-    if output == 'xyz':
-        if os.path.isfile(foutput + ".xyz"):
-            os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
-        asapxyz.set_descriptors(proj, 'pca_coord')
-        if peratom:
-            asapxyz.set_atomic_descriptors(proj_atomic_all, 'pca_coord')
-        # remove the raw descriptors
-        if not keepraw:
-            asapxyz.remove_descriptors(fmat)
-            asapxyz.remove_atomic_descriptors(fmat)
-        asapxyz.write(foutput)
+        df = pd.read_csv(path)
+        smiles_list = df['SMILES'].to_list()
+
+        rdkit_mols = [MolFromSmiles(smiles) for smiles in smiles_list]
+        X = [GetMorganFingerprintAsBitVect(mol, 2, nBits=512) for mol in rdkit_mols]
+        X = np.asarray(X)
+
+        reducer = umap.UMAP(n_neighbors=50, min_dist=0.1)
+        proj = reducer.fit_transform(X, )
 
     # color scheme
     if plotatomic or projectatomic:
@@ -138,7 +167,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=10,
+                                           psize=20,
                                            out_file=None,
                                            title='UMAP for: ' + prefix,
                                            show=False, cmap='gnuplot',
@@ -177,12 +206,14 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-fmat', type=str, default='ASAP_desc',
-                        help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
+                        help='Location of descriptor matrix file or name of the tags in ase xyz file. '
+                             'You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none',
                         help='Location of tags for the first M samples. Plot the tags on the PCA map.')
     parser.add_argument('-colors', type=str, default='none',
-                        help='Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatter plot')
+                        help='Location of a file or name of the tags in ase xyz file. '
+                             'It should contain properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
@@ -197,11 +228,13 @@ if __name__ == '__main__':
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
-                        help='Building the UMAP projection based on atomic descriptors instead of global ones (True/False)')
+                        help='Building the UMAP projection based on atomic descriptors instead of global ones '
+                             '(True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Plot the manifold coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
+    parser.add_argument('--use_morgan', type=bool, default=False, help='Whether to use Morgan fingerprints')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -209,4 +242,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext,
+         args.use_morgan)

@@ -10,23 +10,26 @@ from asaplib.io import str2bool
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
+from sklearn.decomposition import KernelPCA as kpca_sklearn
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext):
+
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext, use_sklearn):
     """
 
     Parameters
     ----------
-    fmat
-    fxyz
-    ftags
-    fcolor
-    colorscol
-    prefix
-    output
+    fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
+    fxyz: Location of xyz file for reading the properties.
+    ftags: Location of tags for the first M samples. Plot the tags on the umap.
+    fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
+    colorscol: The column number of the properties used for the coloring. Starts from 0.
+    prefix: Filename prefix, default is ASAP
+    output: The format for output files ([xyz], [matrix]). Default is xyz.
     kpca_d: number of dimensions
-    pc1
-    pc2
-    adtext
+    pc1: Plot the projection along which principle axes
+    pc2: Plot the projection along which principle axes
+    adtext: Whether to adjust the texts (True/False)
+    use_morgan: Whether to use Morgan fingerprints. True for the photoswitch example.
 
     Returns
     -------
@@ -56,6 +59,10 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
 
     # main thing
     proj = KernelPCA(kpca_d).fit_transform(kNN)
+
+    if use_sklearn:
+        kpca = kpca_sklearn(n_components=2, kernel='cosine')
+        proj = kpca.fit_transform(kNN)
 
     # save
     if output == 'matrix':
@@ -128,8 +135,9 @@ if __name__ == '__main__':
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
+    parser.add_argument('--use_sklearn', type=bool, default=False, help='Use sklearn kpca implementation')
 
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.d, args.pc1,
-         args.pc2, args.adjusttext)
+         args.pc2, args.adjusttext, args.use_sklearn)

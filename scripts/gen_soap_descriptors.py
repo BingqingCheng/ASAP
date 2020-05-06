@@ -124,13 +124,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
     parser.add_argument('-fdict', type=str, default=None, help='Location of xyz file '
-                                                                 'that is used for a dictionary')
+                        'that is used for a dictionary')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
     parser.add_argument('--output', type=str, default='xyz', help='The format for output files ([xyz], [matrix])')
     parser.add_argument('--peratom', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to output per atom descriptors for multiple frames (True/False)?')
     parser.add_argument('-param_path', type=str, default=None,
-                        help='Specify the hyper parameters using a json file. You can set it to "smart","minimal", or "longrange" to try out our universal SOAP parameters.')
+                        help='Specify the hyper parameters using a json file. You can set it to "smart","minimal", '
+                             'or "longrange" to try out our universal SOAP parameters.')
     parser.add_argument('--rcut', type=float, default=3.0, help='Cutoff radius')
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
