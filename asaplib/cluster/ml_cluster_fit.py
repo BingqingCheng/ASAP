@@ -101,7 +101,7 @@ class sklearn_DB(FitClusterBase):
 
     def pack(self):
         """return all the info"""
-        return self.db.get_params
+        return self.db.get_params()
 
 
 class LAIO_DB(FitClusterBase):
