@@ -3,7 +3,7 @@ import json
 import numpy as np
 from ase.io import read, write
 from ..io import randomString,  NpEncoder
-from ..descriptors import Atomic_Descriptors, Atomic_2_Global_Descriptors
+from ..descriptors import Atomic_Descriptors, Global_Descriptors
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
@@ -28,7 +28,7 @@ class ASAPXYZ:
         self.natom_list = []
         self.total_natoms = 0
         self.global_species = []
-        self.computed_desc_dict = {}
+        self.computed_desc_dict = {'data' : {'fxyz': fxyz} }
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -103,7 +103,7 @@ class ASAPXYZ:
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  {'atomic_descriptor': desc_name_long, 'kernel_function': None}
 
-    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec_dict={}, sbs=[], keep_atomic = False, tag=None, ktag=None):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag=None):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -121,29 +121,23 @@ class ASAPXYZ:
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
-        for element in kernel_spec_dict.keys():
-            kernel_spec_dict[element]['species'] = self.global_species
+
 
         # business!
-        atomic_desc = Atomic_Descriptors(desc_spec_dict)
-        desc_name_long = atomic_desc.pack()
-        if tag is None: tag = atomic_desc.get_acronym() # '-'+randomString(6)
-
-        atomic_2_global = Atomic_2_Global_Descriptors(kernel_spec_dict)
-        kernel_name_long = atomic_2_global.pack()
-        if ktag is None: ktag = atomic_2_global.get_acronym() # '-'+randomString(6)
+        global_desc = Global_Descriptors(desc_spec_dict)
+        if tag == 'acronym': tag = global_desc.get_acronym() # '-'+randomString(6)
 
         for i in sbs:
             frame = self.frames[i]
             # compute atomic descriptor
-            fnow = atomic_desc.compute(frame)
-            if keep_atomic:
-                frame.new_array(tag, fnow)
-            # compute global descriptor for the frame
-            frame.info[tag+'-'+ktag] = atomic_2_global.compute(fnow)
+            desc_now, atomic_desc_now = global_desc.compute(frame)
+            if keep_atomic and atomic_desc_now != []:
+                frame.new_array(tag, atomic_desc_now)
+            frame.info[tag] = desc_now
 
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag+'-'+ktag] = {'atomic_descriptor': desc_name_long, 'kernel_function': kernel_name_long}
+        desc_name_long = global_desc.pack()
+        self.computed_desc_dict[tag] = desc_name_long
 
     def get_descriptors(self, desc_name=None, use_atomic_desc=False):
         """ extract the descriptor array from each frame
