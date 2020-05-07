@@ -21,6 +21,7 @@ class Atomic_Descriptors:
         self.desc_spec_dict = desc_spec_dict
         # list of Atomic_Descriptor objections
         self.engines = []
+        self.acronym = ""
 
         self.bind()
 
@@ -35,6 +36,12 @@ class Atomic_Descriptors:
 
     def pack(self):
         return json.dumps(self.desc_spec_dict, sort_keys=True, cls=NpEncoder)
+
+    def get_acronym(self):
+        if self.acronym == "":
+            for engine in self.engines: 
+                self.acronym.append(engine.get_acronym())
+        return self.acronym
 
     def bind(self):
         """

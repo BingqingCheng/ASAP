@@ -3,7 +3,7 @@ import json
 import numpy as np
 from ase.io import read, write
 from ..io import randomString,  NpEncoder
-from ..descriptors import Atomic_Descriptors, Atomic_2_Global_Descriptor_By_Species
+from ..descriptors import Atomic_Descriptors, Atomic_2_Global_Descriptors
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
@@ -103,49 +103,44 @@ class ASAPXYZ:
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  {'atomic_descriptor': desc_name_long, 'kernel_function': None}
 
-    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec={}, sbs=[], keep_atomic = False, tag=None, ktag=None):
+    def compute_global_descriptors(self, desc_spec_dict={}, kernel_spec_dict={}, sbs=[], keep_atomic = False, tag=None, ktag=None):
         """
         compute the atomic descriptors for selected frames
         Parameters
         ----------
-        desc_spec_list: a list of dictionaries, contrains infos on the descriptors to use
-        kernel_spec: a dictionary contains specifications on how the global descriptors should be computed from the local ones
-                     e.g. kernel_spec={'kernel_type'='average','zeta_list'=[1,2,3],'elementwise'=True}
+        desc_spec_dict: a list of dictionaries, contrains infos on the descriptors to use
+        kernel_spec_dict: a dictionary contains specifications on how the global descriptors should be computed from the local ones
+                     e.g. kernel_spec={'kernel1': {'kernel_type'='average','zeta_list'=[1,2,3],'element_wise'=True}}
         sbs: array, integer
         """
 
         if len(sbs) == 0:
             sbs = range(self.nframes)
-        if tag is None: tag = randomString(6)
-        if ktag is None: ktag = '-'+randomString(6)
 
         # add some system specific information to the list to descriptor specifications
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
-
-        kernel_name_long = json.dumps(kernel_spec, sort_keys=True)
-        kernel_type = kernel_spec['kernel_type']
-        zeta_list = kernel_spec['zeta_list']
-        elementwise = bool(kernel_spec['elementwise'])
+        for element in kernel_spec_dict.keys():
+            kernel_spec_dict[element]['species'] = self.global_species
 
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
         desc_name_long = atomic_desc.pack()
+        if tag is None: tag = atomic_desc.get_acronym() # '-'+randomString(6)
+
+        atomic_2_global = Atomic_2_Global_Descriptors(kernel_spec_dict)
+        kernel_name_long = atomic_2_global.pack()
+        if ktag is None: ktag =atomic_2_global.get_acronym() # '-'+randomString(6)
 
         for i in sbs:
             frame = self.frames[i]
+            # compute atomic descriptor
             fnow = atomic_desc.compute(frame)
             if keep_atomic:
                 frame.new_array(tag, fnow)
-
-            if kernel_type == 'average' and elementwise == False and len(zeta_list)==1 and zeta_list[0]==1:
-                # this is the vanilla situation. We just take the average soap for all atoms
-                frame.info[tag] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
-            elif elementwise == False:
-                frame.info[tag+ktag] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
-            else:
-                frame.info[tag+ktag] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), self.global_species, kernel_type, zeta_list)
+            # compute global descriptor for the frame
+            frame.info[tag+'-'+ktag] = atomic_2_global.compute(fnow)
 
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag+'-'+ktag] = {'atomic_descriptor': desc_name_long, 'kernel_function': kernel_name_long}
