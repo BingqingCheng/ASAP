@@ -51,7 +51,9 @@ class Atomic_Descriptors:
         # clear up the objects
         self.engines = []
         for element in self.desc_spec_dict.keys():
-            self.engines.append(self._call(self.desc_spec_dict[element]))
+            new_engine = self._call(self.desc_spec_dict[element])
+            self.engines.append(new_engine)
+            self.desc_spec_dict[element]['acronym'] = new_engine.get_acronym()
 
     def _call(self, desc_spec):
         """

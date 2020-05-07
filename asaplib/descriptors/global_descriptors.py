@@ -58,12 +58,6 @@ class Global_Descriptors:
     def pack(self):
         return json.dumps(self.desc_spec_dict, sort_keys=True, cls=NpEncoder)
 
-    def get_acronym(self):
-        if self.acronym == "":
-            for engine in self.engines: 
-                self.acronym += engine.get_acronym()
-        return self.acronym
-
     def bind(self):
         """
         binds the objects that actually compute the descriptors
@@ -72,7 +66,9 @@ class Global_Descriptors:
         # clear up the objects
         self.engines = []
         for element in self.desc_spec_dict.keys():
-            self.engines.append(self._call(self.desc_spec_dict[element]))
+            new_engine = self._call(self.desc_spec_dict[element])
+            self.engines.append(new_engine)
+            self.desc_spec_dict[element]['acronym'] = new_engine.get_acronym()
 
     def _call(self, desc_spec):
         """
@@ -109,7 +105,20 @@ class Global_Descriptors:
             atomic_desc_dict.update(atomic_desc_dict_new)
         return global_desc_dict, atomic_desc_dict
 
-class Global_Descriptor_from_Atomic():
+class Global_Descriptor_Base:
+    def __init__(self, desc_spec):
+        self._is_atomic = False
+        self.acronym = ""
+        pass
+    def is_atomic(self):
+        return self._is_atomic
+    def get_acronym(self):
+        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        return self.acronym
+    def create(self, frame):
+        return {}, {}
+
+class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
     def __init__(self, desc_spec):
         """
         First compute an atomic descriptors (e.g. SOAP, ACSF,...) and convert to global ones
@@ -156,6 +165,8 @@ class Global_Descriptor_from_Atomic():
         self.atomic_desc = Atomic_Descriptors(self.atomic_desc_spec)
         # initialize a Atomic_2_Global_Descriptors object
         self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
+        
+        self.acronym = "atomic-to-global"
 
     def pack(self):
         return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }
@@ -166,18 +177,6 @@ class Global_Descriptor_from_Atomic():
         # compute global descriptor for the frame
         return self.atomic_2_global.compute(atomic_desc_dict), atomic_desc_dict
 
-class Global_Descriptor_Base:
-    def __init__(self, desc_spec):
-        self._is_atomic = False
-        self.acronym = ""
-        pass
-    def is_atomic(self):
-        return self._is_atomic
-    def get_acronym(self):
-        # we use an acronym for each descriptor, so it's easy to find it and refer to it
-        return self.acronym
-    def create(self, frame):
-        return {}, {}
 
 class Global_Descriptor_CM(Global_Descriptor_Base):
     def __init__(self, desc_spec):

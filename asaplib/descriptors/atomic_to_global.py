@@ -46,7 +46,9 @@ class Atomic_2_Global_Descriptors:
         # clear up the objects
         self.engines = []
         for element in self.k_spec_dict.keys():
-            self.engines.append(self._call(self.k_spec_dict[element]))
+            new_engine = self._call(self.k_spec_dict[element])
+            self.engines.append(new_engine)
+            self.k_spec_dict[element]['acronym'] = new_engine.get_acronym()
  
     def _call(self, k_spec):
         """
