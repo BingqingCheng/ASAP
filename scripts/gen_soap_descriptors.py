@@ -6,7 +6,6 @@ import sys
 import numpy as np
 from asaplib.data import ASAPXYZ
 from asaplib.hypers import universal_soap_hyper
-from asaplib.descriptors import Atomic_2_Global_Kernel
 from asaplib.io import str2bool
 
 
@@ -61,10 +60,15 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         print("Use SOAP descriptors: ", soap_js[element])
         soap_js[element]['type'] = 'SOAP'
 
-    kernel_js, kernel_tag = Atomic_2_Global_Kernel(kernel_type, zeta_list, element_wise).get()
-                 
+    kernel_js = {'first_kernel': {'kernel_type': kernel_type,  
+                          'zeta_list': zeta_list,
+                          'element_wise': element_wise}}
+    [ soap_tag, kernel_tag ] = ['m','n']
+
+    desc_spec_js = {'test:q':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js}}
+
     # compute the descripitors
-    asapxyz.compute_global_descriptors(soap_js, kernel_js, [], peratom, soap_tag, kernel_tag)
+    asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, None)
     # save
     if output == 'matrix':
         asapxyz.write_descriptor_matrix(prefix+'-'+soap_tag+kernel_tag, soap_tag+kernel_tag)
@@ -73,7 +77,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     elif output == 'xyz':
        asapxyz.write(prefix+'-'+soap_tag+kernel_tag)
 
-    asapxyz.write(prefix+'-'+soap_tag+kernel_tag)
     asapxyz.save_descriptor_state(prefix+'-'+soap_tag+kernel_tag)
 
 if __name__ == '__main__':
