@@ -199,10 +199,12 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
             raise ValueError("Coulomb Matrix cannot be used for periodic systems")
 
 
-        self.cm = CoulombMatrix(max_atoms)
+        self.cm = CoulombMatrix(self.max_atoms)
         # make an acronym
-        self.acronym = "CM" + "-" + str(max_atoms)
+        self.acronym = "CM" + "-" + str(self.max_atoms)
 
     def create(self, frame):
+        if len(frame.get_positions()) > self.max_atoms:
+            raise ValueError('the size of the system is larger than the max_atoms of the CM descriptor')
         # notice that we return an empty dictionary for "atomic descriptors"
         return {self.acronym: self.cm.create(frame, n_jobs=8)}, {}

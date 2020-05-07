@@ -21,7 +21,7 @@ def main(fxyz, prefix):
     """
 
     # read frames
-    asapxyz = ASAPXYZ(fxyz)
+    asapxyz = ASAPXYZ(fxyz, 1, False) # not periodic
 
     peratom = True
     tag = 'test'
@@ -47,8 +47,9 @@ def main(fxyz, prefix):
     kernel_js[2] = {'kernel_type': 'sum',  
                               'element_wise': True}
 
-    desc_spec_js = {'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
-                   'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
+    desc_spec_js = {'testcm': {'type': "CM", 'max_atoms': 30},
+                    'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
+                    'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
 
     # compute the descripitors
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, tag)
@@ -59,7 +60,7 @@ def main(fxyz, prefix):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
-    parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
+    parser.add_argument('-fxyz', type=str, default='small_molecules-1000.xyz', help='Location of xyz file')
+    parser.add_argument('--prefix', type=str, default='ASAP-test', help='Filename prefix')
     args = parser.parse_args()
     main(args.fxyz, args.prefix)
