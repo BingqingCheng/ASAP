@@ -60,12 +60,15 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         print("Use SOAP descriptors: ", soap_js[element])
         soap_js[element]['type'] = 'SOAP'
 
-    kernel_js = {'first_kernel': {'kernel_type': kernel_type,  
-                          'zeta_list': zeta_list,
-                          'element_wise': element_wise}}
+    kernel_js = {}
+    for i, zeta in enumerate(zeta_list):
+        kernel_js['kernel'+str(i)] = {'kernel_type': kernel_type,  
+                              'zeta': zeta,
+                              'element_wise': element_wise}
+
     [ soap_tag, kernel_tag ] = ['m','n']
 
-    desc_spec_js = {'test:q':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js}}
+    desc_spec_js = {'test':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js}}
 
     # compute the descripitors
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, None)
