@@ -23,6 +23,7 @@ class Atomic_2_Global_Descriptors:
         self.k_spec_dict = k_spec_dict
         # list of Atomic_2_Global_Descriptor objections
         self.engines = []
+        self.acronym = ""
 
         self.bind()
 
@@ -37,6 +38,12 @@ class Atomic_2_Global_Descriptors:
 
     def pack(self):
         return json.dumps(self.k_spec_dict, sort_keys=True, cls=NpEncoder)
+
+    def get_acronym(self):
+        if self.acronym == "":
+            for engine in self.engines: 
+                self.acronym.append(engine.get_acronym())
+        return self.acronym
 
     def bind(self):
         """
@@ -86,13 +93,13 @@ class Atomic_2_Global_Base:
         self.acronym = ""
         # we have defaults here; the default is not to distinguish between different elements
         if 'element_wise' in k_spec.keys():
-            self.element_wise = bool(desc_spec['element_wise'])
+            self.element_wise = bool(k_spec['element_wise'])
         else:
             self.element_wise = False
 
         if self.element_wise:
             try:
-                self.species = desc_spec['species']
+                self.species = k_spec['species']
             except:
                 raise ValueError("Cannot do element-wise operations without specifying the global species")
             self.acronym = "e"

@@ -131,7 +131,7 @@ class ASAPXYZ:
 
         atomic_2_global = Atomic_2_Global_Descriptors(kernel_spec_dict)
         kernel_name_long = atomic_2_global.pack()
-        if ktag is None: ktag =atomic_2_global.get_acronym() # '-'+randomString(6)
+        if ktag is None: ktag = atomic_2_global.get_acronym() # '-'+randomString(6)
 
         for i in sbs:
             frame = self.frames[i]
