@@ -8,18 +8,19 @@ from ..io import NpEncoder
 class Atomic_Descriptors:
     def __init__(self, desc_spec_dict={}):
         """
-        Object handing the sepcification and the computation of atomic descriptors
+        Object handing the specification and the computation of atomic descriptors
         Parameters
         ----------
-        desc_spec_list: a list of dictionaries that specify which atomic descriptor to use 
+        desc_spec_dict: dictionaries that specify which atomic descriptor to use 
         e.g.
-        desc_spec_list = [{
+        desc_spec_dict = {
         "firstsoap": 
         {"type" = 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
-        }]
+        }
         """
         self.desc_spec_dict = desc_spec_dict
-        self.desc_objects = []
+        # list of Atomic_Descriptor objections
+        self.engines = []
 
         self.bind()
 
@@ -41,10 +42,9 @@ class Atomic_Descriptors:
         these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)
         """
         # clear up the objects
-        self.descriptor_objects = []
+        self.engines = []
         for element in self.desc_spec_dict.keys():
-            self.descriptor_objects.append(self._call(self.desc_spec_dict[element]))
-        #print(self.descriptor_objects)
+            self.engines.append(self._call(self.desc_spec_dict[element]))
 
     def _call(self, desc_spec):
         """
@@ -58,15 +58,22 @@ class Atomic_Descriptors:
             raise NotImplementedError 
 
     def compute(self, frame):
-        fnow = self.descriptor_objects[0].create(frame)
-        for descriptor_object in self.descriptor_objects[1:]:
-            fnow = np.append(fnow, descriptor_object.create(frame), axis=1)
-        return fnow
+        atomic_desc = self.engines[0].create(frame)
+        for engine in self.engines[1:]:
+            atomic_desc = np.append(atomic_desc, engine.create(frame), axis=1)
+        return atomic_desc
 
 class Atomic_Descriptor_Base:
     def __init__(self, desc_spec):
+        self._is_atomic = None
+        self.acronym = ""
         pass
-    def create(frame):
+    def is_atomic(self):
+        return self._is_atomic
+    def get_acronym(self):
+        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        return self.acronym
+    def create(self, frame):
         pass
 
 class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
@@ -76,6 +83,8 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         """
 
         from dscribe.descriptors import SOAP
+
+        self._is_atomic = True
 
         if "type" not in desc_spec.keys() or desc_spec["type"] != "SOAP":
             raise ValueError("Type is not SOAP or cannot find the type of the descriptor")
@@ -110,6 +119,8 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
                                          sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
                                          periodic=self.periodic)
+        # make an acronym
+        self.acronym = "SOAP-n" + str(self.n) + "-l" + str(self.l) + "-c" + str(self.cutoff) + "-g" + str(self.g)
 
     def create(self, frame):
         return self.soap.create(frame, n_jobs=8)

@@ -33,6 +33,14 @@ def randomString(stringLength=8):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
+def list2str(input_list):
+    output_str = ""
+    for l in input_list:
+        output_str += str(l)
+        output_str += "-"
+    return output_str
+
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
