@@ -78,7 +78,9 @@ class Global_Descriptors:
         """
         call the specific descriptor objects
         """
-        if "type" not in desc_spec.keys():
+        if "atomic_descriptor" in desc_spec.keys() and "kernel_function" in desc_spec.keys():
+            return Global_Descriptor_from_Atomic(desc_spec)
+        elif "type" not in desc_spec.keys():
             raise ValueError("Did not specify the type of the descriptor.")
         if desc_spec["type"] == "CM":
             return Global_Descriptor_CM(desc_spec)
