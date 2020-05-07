@@ -94,16 +94,17 @@ class ASAPXYZ:
 
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
-        desc_name_long = atomic_desc.pack()
 
         for i in sbs:
             frame = self.frames[sbs]
-            frame.new_array(desc_name, atomic_desc.create(frame))
+            atomic_desc_dict_now = atomic_desc.create(frame)
+            for element in atomic_desc_dict_now.keys():
+                 frame.new_array(element, atomic_desc_dict_now[element])
 
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag] =  {'atomic_descriptor': desc_name_long, 'kernel_function': None}
+        self.computed_desc_dict[tag] =  atomic_desc.pack()
 
-    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag=None):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -116,28 +117,31 @@ class ASAPXYZ:
 
         if len(sbs) == 0:
             sbs = range(self.nframes)
+        if tag is None: tag = randomString(6)
 
         # add some system specific information to the list to descriptor specifications
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
 
-
         # business!
         global_desc = Global_Descriptors(desc_spec_dict)
-        if tag == 'acronym': tag = global_desc.get_acronym() # '-'+randomString(6)
 
         for i in sbs:
             frame = self.frames[i]
             # compute atomic descriptor
-            desc_now, atomic_desc_now = global_desc.compute(frame)
-            if keep_atomic and atomic_desc_now != []:
-                frame.new_array(tag, atomic_desc_now)
-            frame.info[tag] = desc_now
+            desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
+
+            # now we recorded the computed descriptors to the xyz object
+            for element in desc_dict_now.keys():
+                frame.info[element] = desc_dict_now[element]
+
+            if keep_atomic:
+                for element in atomic_desc_dict_now.keys():
+                     frame.new_array(element, atomic_desc_dict_now[element])
 
         # we mark down that this descriptor has been computed
-        desc_name_long = global_desc.pack()
-        self.computed_desc_dict[tag] = desc_name_long
+        self.computed_desc_dict[tag] = global_desc.pack()
 
     def get_descriptors(self, desc_name=None, use_atomic_desc=False):
         """ extract the descriptor array from each frame

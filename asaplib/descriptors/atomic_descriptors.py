@@ -65,10 +65,22 @@ class Atomic_Descriptors:
             raise NotImplementedError 
 
     def compute(self, frame):
-        atomic_desc = self.engines[0].create(frame)
-        for engine in self.engines[1:]:
-            atomic_desc = np.append(atomic_desc, engine.create(frame), axis=1)
-        return atomic_desc
+        """
+        compute the global descriptor vector for a frame from atomic contributions
+        Parameters
+        ----------
+        frame: ASE atom object. Coordinates of a frame.
+
+        Returns
+        -------
+        atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+        """
+        atomic_desc_dict = {}
+        for engine in self.engines:
+            name_now, atomic_desc_now = engine.create(frame)
+            atomic_desc_dict[namenow] = atomic_desc_now
+        return atomic_desc_dict
 
 class Atomic_Descriptor_Base:
     def __init__(self, desc_spec):
@@ -81,7 +93,8 @@ class Atomic_Descriptor_Base:
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
         return self.acronym
     def create(self, frame):
-        pass
+        # notice that we return the acronym here!!!
+        return self.acronym, []
 
 class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -128,4 +141,5 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         self.acronym = "SOAP-n" + str(self.n) + "-l" + str(self.l) + "-c" + str(self.cutoff) + "-g" + str(self.g)
 
     def create(self, frame):
-        return self.soap.create(frame, n_jobs=8)
+        # notice that we return the acronym here!!!
+        return self.acronym, self.soap.create(frame, n_jobs=8)

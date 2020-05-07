@@ -23,7 +23,6 @@ class Atomic_2_Global_Descriptors:
         self.k_spec_dict = k_spec_dict
         # list of Atomic_2_Global_Descriptor objections
         self.engines = []
-        self.acronym = ""
 
         self.bind()
 
@@ -38,12 +37,6 @@ class Atomic_2_Global_Descriptors:
 
     def pack(self):
         return json.dumps(self.k_spec_dict, sort_keys=True, cls=NpEncoder)
-
-    def get_acronym(self):
-        if self.acronym == "":
-            for engine in self.engines: 
-                self.acronym += engine.get_acronym()
-        return self.acronym
 
     def bind(self):
         """
@@ -72,21 +65,27 @@ class Atomic_2_Global_Descriptors:
         else:
             raise NotImplementedError 
 
-    def compute(self, atomic_desc):
+    def compute(self, atomic_desc_dict):
         """
         compute the global descriptor vector for a frame from atomic contributions
         Parameters
         ----------
-        atomic_desc: np.matrix. [N_atoms, N_atomi_desc]. Atomic descriptors for a frame.
+        atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc*N_atoms]. Global descriptors for a frame.
+                     see Atomic_Descriptors.compute() in .atomic_descriptors.py
 
         Returns
         -------
-        desc: np.array [N_desc]. Global descriptors for a frame.
+        desc_dict: a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc]. Global descriptors for a frame.
         """
-        desc = []
-        for engine in self.engines:
-            desc = np.append(desc, engine.create(atomic_desc), axis=0)
-        return desc
+        desc_dict = {}
+        for element in atomic_desc_dict.keys():
+            atomic_desc_now = atomic_desc_dict[element]
+            for engine in self.engines:
+                name_now, desc_now = engine.create(atomic_desc_now)
+                desc_dict[element+"_"+namenow] = desc_now
+        return desc_dict
 
 class Atomic_2_Global_Base:
     def __init__(self, k_spec):
@@ -113,14 +112,14 @@ class Atomic_2_Global_Base:
         compute the global descriptor vector for a frame from atomic contributions
         Parameters
         ----------
-        atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
-        atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.
+        atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
 
         Returns
         -------
-        desc: np.array [N_desc*len(global_species)]. Global descriptors for a frame.
+        acronym: self.acronym
+        desc:  a np.array [N_desc]. Global descriptors for a frame.
         """
-        pass
+        return self.acronym, []
 
 
 class Atomic_2_Global_Average(Atomic_2_Global_Base):
@@ -152,9 +151,9 @@ class Atomic_2_Global_Sum(Atomic_2_Global_Base):
 
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
-            return Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, False)
+            return self.acronym, Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, False)
         else:
-            return np.sum(atomic_desc, axis=0)
+            return self.acronym, np.sum(atomic_desc, axis=0)
 
 class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
     """ 
@@ -183,9 +182,9 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
     def create(self, atomic_desc, atomic_numbers=[]):
         zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
         if self.element_wise:
-            return Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, True)
+            return self.acronym, Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, True)
         else:
-            return np.mean(zeta_desc, axis=0)
+            return self.acronym, np.mean(zeta_desc, axis=0)
 
 class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
     """ 
@@ -214,9 +213,9 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
     def create(self, atomic_desc, atomic_numbers=[]):
         zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
         if self.element_wise:
-            return Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, False)
+            return self.acronym, Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, False)
         else:
-            return np.sum(zeta_desc, axis=0)
+            return self.acronym, np.sum(zeta_desc, axis=0)
 
 def Get_Moment(atomic_desc, zeta_list):
     """ 

@@ -88,27 +88,28 @@ class Global_Descriptors:
             raise NotImplementedError 
 
     def compute(self, frame):
-        global_desc, atomic_desc = self.engines[0].create(frame)
-        for engine in self.engines[1:]:
-            global_desc_new, atomic_desc_new = engine.create(frame)
-            global_desc = np.append(global_desc, global_desc_new, axis=0)
-            atomic_desc = np.append(atomic_desc, atomic_desc_new, axis=0)
-        return global_desc, atomic_desc
+        """
+        compute the global descriptor vector for a frame from atomic contributions
+        Parameters
+        ----------
+        frame: ASE atom object. Coordinates of a frame.
 
-class Global_Descriptor_Base:
-    def __init__(self, desc_spec):
-        self._is_atomic = False
-        self.acronym = ""
-        pass
-    def is_atomic(self):
-        return self._is_atomic
-    def get_acronym(self):
-        # we use an acronym for each descriptor, so it's easy to find it and refer to it
-        return self.acronym
-    def create(self, frame):
-        return [], []
+        Returns
+        -------
+        global_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc]. Global descriptors for a frame.
+        atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+        """
+        global_desc_dict = {} 
+        atomic_desc_dict = {}
+        for engine in self.engines:
+            global_desc_dict_new, atomic_desc_dict_new = engine.create(frame)
+            global_desc_dict.update(global_desc_dict_new)
+            atomic_desc_dict.update(atomic_desc_dict_new)
+        return global_desc_dict, atomic_desc_dict
 
-class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
+class Global_Descriptor_from_Atomic():
     def __init__(self, desc_spec):
         """
         First compute an atomic descriptors (e.g. SOAP, ACSF,...) and convert to global ones
@@ -156,16 +157,27 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         # initialize a Atomic_2_Global_Descriptors object
         self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
 
-        self.acronym = self.atomic_desc.get_acronym() + '-' + self.atomic_2_global.get_acronym()
-
     def pack(self):
         return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }
 
     def create(self, frame):
         # compute atomic descriptor
-        fnow = self.atomic_desc.compute(frame)
+        atomic_desc_dict = self.atomic_desc.compute(frame)
         # compute global descriptor for the frame
-        return self.atomic_2_global.compute(fnow), fnow
+        return self.atomic_2_global.compute(atomic_desc_dict), atomic_desc_dict
+
+class Global_Descriptor_Base:
+    def __init__(self, desc_spec):
+        self._is_atomic = False
+        self.acronym = ""
+        pass
+    def is_atomic(self):
+        return self._is_atomic
+    def get_acronym(self):
+        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        return self.acronym
+    def create(self, frame):
+        return {}, {}
 
 class Global_Descriptor_CM(Global_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -190,8 +202,8 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
 
         self.cm = CoulombMatrix(max_atoms)
         # make an acronym
-        self.acronym = "CM" + "-ma-" + str(max_atoms)
+        self.acronym = "CM" + "-" + str(max_atoms)
 
     def create(self, frame):
-        # notice that we return an empty list for "atomic descriptors"
-        return self.cm.create(frame, n_jobs=8), []
+        # notice that we return an empty dictionary for "atomic descriptors"
+        return {self.acronym: self.cm.create(frame, n_jobs=8)}, {}
