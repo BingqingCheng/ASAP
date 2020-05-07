@@ -198,11 +198,6 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
                 dense numpy array.
         """
 
-        from dscribe.descriptors import LMBTR
-
-        if "type" not in desc_spec.keys() or desc_spec["type"] != "LMBTR":
-            raise ValueError("Type is not LMBTR or cannot find the type of the descriptor")
-
         # required
         try:
             self.species = desc_spec['species']
@@ -229,10 +224,15 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
         # notice that we return the acronym here!!!
         return self.acronym, self.lmbtr.create(frame, n_jobs=8)
 
-class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_Base):
+class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
     def __init__(self, desc_spec):
 
         super().__init__(desc_spec)
+
+        from dscribe.descriptors import LMBTR
+
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "LMBTR_K2":
+            raise ValueError("Type is not LMBTR_K2 or cannot find the type of the descriptor")
 
         # required
         try:
@@ -246,10 +246,15 @@ class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_Base):
         # make an acronym
         self.acronym = "LMBTR-K2" # perhaps add more info here
 
-class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_Base):
+class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
     def __init__(self, desc_spec):
 
         super().__init__(desc_spec)
+
+        from dscribe.descriptors import LMBTR
+
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "LMBTR_K3":
+            raise ValueError("Type is not LMBTR_K3 or cannot find the type of the descriptor")
 
         # required
         try:
