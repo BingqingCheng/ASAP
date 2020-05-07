@@ -17,8 +17,8 @@ from asaplib.io import str2bool
 from asaplib.plot import set_color_function, plot_styles
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
-         projectatomic, plotatomic, adtext, use_morgan):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, n_neighbors, min_dist,
+         dim1, dim2, projectatomic, plotatomic, adtext, use_morgan):
     """
 
     Parameters
@@ -26,14 +26,17 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
     fxyz: Location of xyz file for reading the properties.
     ftags: Location of tags for the first M samples. Plot the tags on the umap.
-    fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
+    fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples
+    (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
     output: The format for output files ([xyz], [matrix]). Default is xyz.
     peratom: Whether to output per atom t-SNE coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
-    scale: Scale the coordinates (True/False). Scaling highly recommanded.
+    scale: Scale the coordinates (True/False). Scaling highly recommended.
     umap_d: Dimension of the embedded space.
+    n_neighbors: Number of neighbours parameter for UMAP
+    min_dist: Minimum distance parameter for UMAP
     dim1: Plot the projection along which principle axes
     dim2: Plot the projection along which principle axes
     projectatomic: build the projection using the (big) atomic descriptor matrix
@@ -87,7 +90,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
         # fit UMAP
 
-        reducer = umap.UMAP(n_neighbors=5)
+        reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist)
         proj = reducer.fit_transform(desc)
         if peratom or plotatomic and not projectatomic:
             proj_atomic_all = reducer.transform(desc_atomic)
@@ -131,7 +134,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         X = [GetMorganFingerprintAsBitVect(mol, 2, nBits=512) for mol in rdkit_mols]
         X = np.asarray(X)
 
-        reducer = umap.UMAP(n_neighbors=50, min_dist=0.1)
+        reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist)
         proj = reducer.fit_transform(X, )
 
     # color scheme
@@ -226,6 +229,9 @@ if __name__ == '__main__':
     parser.add_argument('--scale', type=str2bool, nargs='?', const=True, default=False,
                         help='Scale the coordinates (True/False). Scaling highly recommended.')
     parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
+    parser.add_argument('--n_neighbors', type=int, default=50, help='UMAP parameter - number of neighbors. '
+                                                                    'Should be in range 2-100')
+    parser.add_argument('--min_dist', type=float, default=0.1, help='UMAP parameter - minimum distance')
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
@@ -243,5 +249,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext,
-         args.use_morgan)
+         args.keepraw, args.scale, args.d, args.n_neighbors, args.min_dist, args.dim1, args.dim2, args.projectatomic,
+         args.plotatomic, args.adjusttext, args.use_morgan)

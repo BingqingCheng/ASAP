@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-TODO: Module-level description
+script for making k-PCA map based on precomputed design matrix
 """
 
 import argparse
@@ -10,10 +10,8 @@ from asaplib.io import str2bool
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
-from sklearn.decomposition import KernelPCA as kpca_sklearn
 
-
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext, use_sklearn):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2, adtext, use_morgan, metric):
     """
 
     Parameters
@@ -30,48 +28,75 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
     pc2: Plot the projection along which principle axes
     adtext: Whether to adjust the texts (True/False)
     use_morgan: Whether to use Morgan fingerprints. True for the photoswitch example.
+    metric: KPCA metric to use if using Morgan fingerprints [linear, cosine, rbf, poly, sigmoid]
 
     Returns
     -------
 
     """
-    foutput = prefix + "-kpca-d" + str(kpca_d)
-    # load the kernel matrix
-    try:
-        kNN = np.genfromtxt(fmat, dtype=float)
-    except:
-        raise ValueError('Cannot load the kernel matrix')
 
-    print("loaded", fmat)
-    if ftags != 'none':
-        tags = np.loadtxt(ftags, dtype="str")
-        if tags.ndim > 1:
-            tags = tags[:, 0]
-        ndict = len(tags)
+    if not use_morgan:
 
-    asapxyz = None
-    # try to read the xyz file
-    if fxyz != 'none':
-        asapxyz = ASAPXYZ(fxyz)
-    elif output == 'xyz':
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-        output = 'matrix'
+        foutput = prefix + "-kpca-d" + str(kpca_d)
+        # load the kernel matrix
+        try:
+            kNN = np.genfromtxt(fmat, dtype=float)
+        except:
+            raise ValueError('Cannot load the kernel matrix')
 
-    # main thing
-    proj = KernelPCA(kpca_d).fit_transform(kNN)
+        print("loaded", fmat)
+        if ftags != 'none':
+            tags = np.loadtxt(ftags, dtype="str")
+            if tags.ndim > 1:
+                tags = tags[:, 0]
+            ndict = len(tags)
 
-    if use_sklearn:
-        kpca = kpca_sklearn(n_components=2, kernel='cosine')
-        proj = kpca.fit_transform(kNN)
+        asapxyz = None
+        # try to read the xyz file
+        if fxyz != 'none':
+            asapxyz = ASAPXYZ(fxyz)
+        elif output == 'xyz':
+            print("Did not provide the xyz file. We can only output descriptor matrix.")
+            output = 'matrix'
 
-    # save
-    if output == 'matrix':
-        np.savetxt(prefix + "-kpca-d" + str(kpca_d) + ".coord", proj, fmt='%4.8f',
-                   header='low D coordinates of samples')
-    elif output == 'xyz':
-        if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
-        asapxyz.set_descriptors(proj, 'kpca_coord')
-        asapxyz.write(foutput)
+        # main thing
+        proj = KernelPCA(kpca_d).fit_transform(kNN)
+
+        # save
+        if output == 'matrix':
+            np.savetxt(prefix + "-kpca-d" + str(kpca_d) + ".coord", proj, fmt='%4.8f',
+                       header='low D coordinates of samples')
+        elif output == 'xyz':
+            if os.path.isfile(foutput + ".xyz"):
+                os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
+            asapxyz.set_descriptors(proj, 'kpca_coord')
+            asapxyz.write(foutput)
+
+    else:
+
+        if fxyz != 'none':
+            asapxyz = ASAPXYZ(fxyz)
+        else:
+            raise Exception('xyz file required for plotting')
+
+        # Use Morgan fingerprints
+
+        import pandas as pd
+        from rdkit.Chem import MolFromSmiles
+        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
+        from sklearn.decomposition import kernel_pca
+
+        path = 'photoswitches.csv'
+
+        df = pd.read_csv(path)
+        smiles_list = df['SMILES'].to_list()
+
+        rdkit_mols = [MolFromSmiles(smiles) for smiles in smiles_list]
+        X = [GetMorganFingerprintAsBitVect(mol, 2, nBits=512) for mol in rdkit_mols]
+        X = np.asarray(X)
+
+        reducer = kernel_pca.KernelPCA(kernel=metric, n_components=2)
+        proj = reducer.fit_transform(X, )
 
     # color scheme
     plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj))
@@ -85,7 +110,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=None,
+                                           psize=20,
                                            out_file=None,
                                            title='KPCA for: ' + prefix,
                                            show=False, cmap='gnuplot',
@@ -135,9 +160,10 @@ if __name__ == '__main__':
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to adjust the texts (True/False)?')
-    parser.add_argument('--use_sklearn', type=bool, default=False, help='Use sklearn kpca implementation')
-
+    parser.add_argument('--use_morgan', type=bool, default=False, help='Whether or not to use Morgan fingerprints')
+    parser.add_argument('--metric', type=str, default='cosine', help='Which kernel metric to use if using Morgan'
+                                                                     'fingerprints')
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.d, args.pc1,
-         args.pc2, args.adjusttext, args.use_sklearn)
+         args.pc2, args.adjusttext, args.use_morgan, args.metric)

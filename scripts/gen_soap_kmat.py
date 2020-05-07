@@ -15,7 +15,7 @@ from dscribe.kernels import AverageKernel
 from asaplib.io import str2bool
 
 
-def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, matrix_plot):
+def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, metric, matrix_plot):
     """
 
     Generate the SOAP kernel matrix.
@@ -30,6 +30,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
     soap_n: int giving the maximum radial label
     soap_l: int giving the maximum angular label. Must be less than or equal to 9
     soap_periodic: string (True or False) indicating whether the system is periodic
+    metric: Kernel metric to use. Default is linear
     matrix_plot: string (True or False) indicating whether a plot of the kernel matrix
                  is to be generated
     """
@@ -75,7 +76,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
 
     # compute kmat
     fshape = np.shape(fall)
-    re = AverageKernel(metric="linear")
+    re = AverageKernel(metric=metric)
 
     kNN = re.create(fall.reshape((fshape[0], 1, fshape[1])))
 
@@ -102,8 +103,9 @@ if __name__ == '__main__':
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
+    parser.add_argument('--metric', type=str, default='linear', help='Kernel metric to use')
     parser.add_argument('--plot', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to plot the kernel matrix (True/False)?')
     args = parser.parse_args()
 
-    main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic, args.plot)
+    main(args.fxyz, args.fdict, args.prefix, args.rcut, args.g, args.n, args.l, args.periodic, args.metric, args.plot)
