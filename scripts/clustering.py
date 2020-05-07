@@ -4,15 +4,19 @@ TODO: Module-level description
 """
 
 import argparse
+import os
 import sys
+import json
 
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
-from asaplib.pca import KernelPCA, PCA
-from asaplib.kde import KDE
+from asaplib.pca import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
+from asaplib.io import NpEncoder
 from asaplib.plot import *
 from asaplib.io import str2bool
 
@@ -23,8 +27,8 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
 
     Parameters
     ----------
-    fmat: Location of the low D projection of the data
-    kmat: Location of kernel matrix file. You can use gen_kmat.py to compute it
+    fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
+    kmat: Location of the kernel matrix.
     fxyz: Location of xyz file for reading the properties.
     ftags: Location of tags for the first M samples
     prefix: Filename prefix. Default is ASAP.
@@ -67,11 +71,11 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     if kmat != 'none':
         try:
             kNN = np.genfromtxt(kmat, dtype=float)
-            print("loaded kernel matrix", kmat, "with shape", np.shape(kNN))
-            #desc = KernelPCA(dimension).fit_transform(kNN)
-            desc = kerneltodis(kNN)
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
+            desc =  kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
+
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -84,16 +88,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
         # the characteristic bandwidth of the data
         sigma_kij = np.percentile(cdist(desc[sbs], desc, 'euclidean'), 100*10./len(desc))
-        ''' option 1: do on the projected coordinates'''
         trainer = sklearn_DB(sigma_kij, 5, 'euclidean')  # adjust the parameters here!
         do_clustering = DBCluster(trainer)
         do_clustering.fit(desc)
-
-        ''' option 2: do directly on kernel matrix.'''
-        # dmat = kerneltodis(kNN)
-        # trainer = sklearn_DB(sigma_kij, 5, 'precomputed') # adjust the parameters here!
-        # do_clustering = DBCluster(trainer)
-        # do_clustering.fit(desc)
 
     elif algorithm == 'fdb' or algorithm == 'FDB':
         trainer = LAIO_DB()
@@ -103,6 +100,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         raise ValueError('Please select from fdb or dbscan')
 
     print(do_clustering.pack())
+    with open("clustering_results_4_" + prefix + ".json", 'w') as fp:
+        json.dump(do_clustering.pack(), fp, cls=NpEncoder)
+
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
 
@@ -115,10 +115,10 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    if fmat != 'none':
+    if  fmat != 'none':
         pca = PCA(dimension, True)
         proj = pca.fit_transform(desc)
-    elif kmat != 'none':
+    elif  kmat != 'none':
         proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
@@ -166,7 +166,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
                         ax=ax, precision=0.01,
                         arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
 
-    plt.title('PCA and clustering for: ' + prefix)
+    plt.title('(k)PCA and clustering for: ' + prefix)
     plt.xlabel('Princple Axis ' + str(pc1))
     plt.ylabel('Princple Axis ' + str(pc2))
     plt.show()
@@ -183,8 +183,8 @@ if __name__ == '__main__':
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('--prefix', type=str, default='ASAP', help='Filename prefix')
-    parser.add_argument('-colors', type=str, default='cluster',
-                        help='Properties for all samples (N floats) used to color the scatter plot,[filename/rho/cluster]')
+    parser.add_argument('-colors', type=str, default='cluster_label',
+                        help='Properties for all samples (N floats) used to color the scatter plot')
     parser.add_argument('--colorscolumn', type=int, default=0,
                         help='The column number of the properties used for the coloring. Starts from 0.')
     parser.add_argument('--d', type=int, default=8, help='number of the principle components to keep')
@@ -202,5 +202,5 @@ if __name__ == '__main__':
         sys.exit(1)
     args = parser.parse_args()
 
-    main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d, args.pc1, args.pc2, args.algo,
-         args.projectatomic, args.adjusttext)
+    main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
+         args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)

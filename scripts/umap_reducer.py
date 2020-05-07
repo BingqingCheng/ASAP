@@ -58,6 +58,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
             if projectatomic:
                 desc = desc_atomic.copy()
         else:
+            asapxyz = None
             print("Did not provide the xyz file. We can only output descriptor matrix.")
             output = 'matrix'
         # we can also load the descriptor matrix from a standalone file

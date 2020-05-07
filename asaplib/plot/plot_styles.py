@@ -81,6 +81,9 @@ def plot_density_map(X, z, fig=None, ax=None,
     z = np.asarray(z)
     fontsize = fontsize
 
+    if psize == None:
+        psize = 200*200/len(X)
+
     if use_perc:
         n_sample = len(x)
         outlier_window = int(0.05 * n_sample)

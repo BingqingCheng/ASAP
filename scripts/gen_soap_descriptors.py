@@ -9,9 +9,10 @@ from dscribe.descriptors import SOAP
 
 from asaplib.hypers import universal_soap_hyper
 from asaplib.io import str2bool
+from asaplib.kernel import Atomic_2_Global_Descriptor_By_Species
 
 
-def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, soap_periodic, stride):
+def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g, soap_n, soap_l, zeta_list, kernel_type, element_wise, soap_periodic, stride):
     """
 
     Generate the SOAP descriptors.
@@ -27,6 +28,9 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_g: float giving the atom width
     soap_n: int giving the maximum radial label
     soap_l: int giving the maximum angular label. Must be less than or equal to 9
+    zeta_list : get the global descriptor from atomic ones of zeta th power
+    kernel_type: type of operations to get global descriptors from the atomic soap vectors
+    elementwise: consider different species seperately when computing global descriptors from the atomic soap vectors
     soap_periodic: string (True or False) indicating whether the system is periodic
     stride: compute descriptor each X frames
     """
@@ -98,9 +102,14 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
 
         for soap_desc_atomic_now in soap_desc_atomic[1:]:
             fnow = np.append(fnow, soap_desc_atomic_now.create(frame, n_jobs=8), axis=1)
-
-        # average over all atomic environments inside the system
-        frame.info[desc_name] = fnow.mean(axis=0)
+            
+        if kernel_type == 'average' and element_wise == False and len(zeta_list)==1 and zeta_list[0]==1:
+            # this is the vanilla situation. We just take the average soap for all atoms
+            frame.info[desc_name] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
+        elif element_wise == False:
+            frame.info[desc_name+'-'+kernel_type] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
+        else:
+            frame.info[desc_name+'-'+kernel_type+'-elementwise-'] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species, kernel_type, zeta_list)
 
         # save
         if output == 'matrix':
@@ -136,6 +145,10 @@ if __name__ == '__main__':
     parser.add_argument('--n', type=int, default=6, help='Maximum radial label')
     parser.add_argument('--l', type=int, default=6, help='Maximum angular label (<= 9)')
     parser.add_argument('--g', type=float, default=0.5, help='Atom width')
+    parser.add_argument('--zeta', nargs='+', type=int, default=[1], 
+                       help='a list of the moments to take when converting atomic descriptors to global ones. e.g. 1 2 3 4, default:1')
+    parser.add_argument('--kernel', type=str, default='average', help='type of operations to get global descriptors from the atomic soap vectors [average], [sum]')
+    parser.add_argument('--elementwise', type=str2bool, default=False, help='element-wise operation to get global descriptors from the atomic soap vectors')
     parser.add_argument('--periodic', type=str2bool, nargs='?', const=True, default=True,
                         help='Is the system periodic (True/False)?')
     parser.add_argument('--stride', type=int, default=1,
@@ -147,4 +160,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fxyz, args.fdict, args.prefix, args.output, args.peratom, args.param_path, args.rcut, args.g, args.n,
-         args.l, args.periodic, args.stride)
+         args.l, args.zeta, args.kernel, args.elementwise, args.periodic, args.stride)

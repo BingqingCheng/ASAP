@@ -5,7 +5,7 @@ from ase.io import read, write
 
 
 class ASAPXYZ:
-    def __init__(self, fxyz=None, stride=1):
+    def __init__(self, fxyz=None, stride=1, periodic=True):
         """extended xyz class
 
         Parameters
@@ -19,12 +19,14 @@ class ASAPXYZ:
         # essential
         self.fxyz = fxyz
         self.stride = stride
+        self.periodic = periodic
 
         # store the xyz file
         self.frames = None
         self.nframes = 0
         self.natom_list = []
         self.total_natoms = 0
+        self.global_species = []
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -36,13 +38,20 @@ class ASAPXYZ:
             raise ValueError('Exception occurred when loading the xyz file')
 
         self.nframes = len(self.frames)
+        all_species = []
         for frame in self.frames:
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
+            all_species.extend(frame.get_atomic_numbers())
+            if not self.periodic:
+                frame.set_pbc([False, False, False])
+
         self.total_natoms = np.sum(self.natom_list)
+        self.global_species = np.unique(all_species)
         print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
-              ', a total of ', str(self.total_natoms), 'atoms')
+              ', a total of ', str(self.total_natoms), 'atoms',
+              ', with elements: ', self.global_species,'.')
 
     def get_xyz(self):
         return self.frames
@@ -56,22 +65,30 @@ class ASAPXYZ:
     def get_natom_list(self):
         return self.natom_list
 
-    def get_descriptors(self, desc_name=None, use_atomic_desc=False):
+    def get_global_species(self):
+        return self.global_species
+
+    def get_descriptors(self, desc_name=None, use_atomic_desc=False, sbs=[]):
         """ extract the descriptor array from each frame
 
         Parameters
         ----------
         fmat: string_like, the name of the descriptors in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
+        sbs: array, integer
 
         Returns
         -------
         desc: np.matrix
         atomic_desc: np.matrix
         """
+
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+
         desc = []
         atomic_desc = []
-
+       
         # load from xyz file
         if self.nframes > 1:
             try:
@@ -93,20 +110,25 @@ class ASAPXYZ:
 
         return desc, atomic_desc
 
-    def get_property(self, y_key=None, extensive=False):
+    def get_property(self, y_key=None, extensive=False, sbs=[]):
         """ extract the descriptor array from each frame
 
         Parameters
         ----------
         y_name: string_like, the name of the property in the extended xyz file
+        sbs: array, integer
 
         Returns
         -------
         y_all: array [N_samples]
         """
+
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+
         y_all = []
         try:
-            for index, frame in enumerate(self.frames):
+            for index, frame in enumerate(self.frames[sbs]):
                 if y_key == 'volume' or y_key == 'Volume':
                     y_all.append(frame.get_volume() / len(frame.get_positions()))
                 elif y_key == 'size' or y_key == 'Size':
@@ -119,7 +141,7 @@ class ASAPXYZ:
                     y_all.append(frame.info[y_key])
         except:
             try:
-                for frame in self.frames:
+                for frame in self.frames[sbs]:
                    if extensive:
                        # use the sum of atomic properties
                        y_all.append(np.sum(frame.get_array(y_key)))
@@ -132,23 +154,28 @@ class ASAPXYZ:
             raise ValueError('The property from the xyz file has more than one column')
         return np.array(y_all)
 
-    def get_atomic_property(self, y_key=None, extensive=False):
+    def get_atomic_property(self, y_key=None, extensive=False, sbs=[]):
         """ extract the property array from each atom
 
         Parameters
         ----------
         y_name: string_like, the name of the property in the extended xyz file
+        sbs: array, integer
 
         Returns
         -------
         y_all: array [N_atoms]
         """
+
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+
         y_all = []
         try:
-            y_all = np.concatenate([a.get_array(y_key) for a in self.frames])
+            y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]])
         except:
             try:
-                for index, y in enumerate(self.get_property(y_key, extensive)):
+                for index, y in enumerate(self.get_property(y_key, extensive, sbs)):
                     y_all = np.append(y_all, y * np.ones(self.natom_list[index]))
                 print("Cannot find the atomic properties, use the per-frame property instead")
             except: raise ValueError('Cannot load the property vector')
@@ -189,7 +216,6 @@ class ASAPXYZ:
         Returns
         -------
         """
-
         # check if the length of the descriptor matrix is the same as the total number of atoms
         if len(atomic_desc) != self.total_natoms:
             raise ValueError('The length of the atomic descriptor matrix is not the same as the total number of atoms.')
@@ -221,10 +247,51 @@ class ASAPXYZ:
 
         Parameters
         ----------
+        filename: str
         sbs: array, integer
         """
+        # prepare for the output
+        if os.path.isfile(str(filename) + ".xyz"): 
+            os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
+
         if len(sbs) > 0:
             for i in sbs:
                 write(str(filename) + ".xyz", self.frames[i], append=True)
         else:
             write(str(filename) + ".xyz", self.frames)
+
+    def write_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
+        """
+        write the selected descriptor matrix in a matrix format to file
+
+        Parameters
+        ----------
+        filename: str
+        desc_name: str. Name of the properties/descriptors to write
+        sbs: array, integer
+        comment: str
+        """
+
+        desc, _ = self.get_descriptors(desc_name, False, sbs)
+
+        if os.path.isfile(str(filename) + ".desc"): 
+            os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
+        np.savetxt(str(filename) + ".desc", desc, fmt='%4.8f', header=comment)
+
+    def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
+        """
+        write the selected descriptor matrix in a matrix format to file
+
+        Parameters
+        ----------
+        filename: str
+        desc_name: str. Name of the properties/descriptors to write
+        sbs: array, integer
+        comment: str
+        """
+
+        _, atomic_desc = self.get_descriptors(desc_name, True, sbs)
+
+        if os.path.isfile(str(filename) + "atomic-desc"): 
+            os.rename(str(filename) + "atomic-desc", "bck." + str(filename) + "atomic-desc")
+        np.savetxt(str(filename) + "atomic-desc", desc, fmt='%4.8f', header=comment)

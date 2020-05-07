@@ -56,6 +56,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
         if projectatomic: desc = desc_atomic.copy()
     else:
+        asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
@@ -131,7 +132,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
-                                               psize=20,
+                                               psize=None,
                                                out_file=None,
                                                title=None,
                                                show=False, cmap='gnuplot',
@@ -147,7 +148,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=200,
+                                           psize=None,
                                            out_file=None,
                                            title='t-SNE for: ' + prefix,
                                            show=False, cmap='gnuplot',

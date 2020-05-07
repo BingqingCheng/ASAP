@@ -59,7 +59,7 @@ class DBCluster(ClusterBase):
 
     def pack(self):
         """return all the info"""
-        state = dict(trainer=self.trainer, trainer_params=self.trainer.pack(), labels=self.labels,
+        state = dict(trainer=self.trainer.name, trainer_params=self.trainer.pack(), labels=self.labels,
                      n_clusters=self.n_clusters, n_noise=self.n_noise)
         return state
 
@@ -87,6 +87,7 @@ class sklearn_DB(FitClusterBase):
 
     def __init__(self, eps=None, min_samples=None, metrictype='precomputed'):
         super().__init__()
+        self.name='DBSCAN'
         self.metric = metrictype  # e.g. 'euclidean'
         # distance metric
         self.eps = eps
@@ -100,7 +101,7 @@ class sklearn_DB(FitClusterBase):
 
     def pack(self):
         """return all the info"""
-        return self.db.get_params
+        return self.db.get_params()
 
 
 class LAIO_DB(FitClusterBase):
@@ -131,6 +132,7 @@ class LAIO_DB(FitClusterBase):
         is 1-2% of the total number of points in the dataset. Default is 2%.
         """
 
+        self.name='LAIO_DB'
         self.distances = distances
         self.indices = indices
         self.dens_type = dens_type
