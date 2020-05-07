@@ -156,7 +156,7 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
 
     Parameters
     ----------
-    zeta_list: highest moment considered
+    zeta_list: moments considered
     """
     def __init__(self, k_spec_dict):
 
@@ -164,7 +164,7 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
         super().__init__(k_spec)
 
         if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "moment_average":
-            raise ValueError("kernel type is not sum or cannot find the type")
+            raise ValueError("kernel type is not moment_average or cannot find the type")
 
         try:
             self.zeta_list = k_spec['zeta_list']
@@ -174,12 +174,60 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
         self.acronym += "-z-"+list2str(zeta_list)
 
     def create(self, atomic_desc, atomic_numbers=[]):
+        zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
         if self.element_wise:
-            return Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, False)
+            return Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, True)
         else:
-            return np.sum(atomic_desc, axis=0)
+            return np.mean(zeta_desc, axis=0)
 
-def Atomic_Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_over_natom=True):
+class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
+    """ 
+    get the global descriptor from atomic ones 
+    by averaging over the atomic descriptors of z th power 
+
+    Parameters
+    ----------
+    zeta_list: moments considered
+    """
+    def __init__(self, k_spec_dict):
+
+
+        super().__init__(k_spec)
+
+        if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "moment_sum":
+            raise ValueError("kernel type is not moment_sum or cannot find the type")
+
+        try:
+            self.zeta_list = k_spec['zeta_list']
+        except:
+            raise ValueError("cannot initialize the zeta list")
+
+        self.acronym += "-z-"+list2str(zeta_list)+"-sum"
+
+    def create(self, atomic_desc, atomic_numbers=[]):
+        zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
+        if self.element_wise:
+            return Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, False)
+        else:
+            return np.sum(zeta_desc, axis=0)
+
+def Get_Moment(atomic_desc, zeta_list):
+    """ 
+    get the higher moments for atomic descriptors
+
+    Parameters
+    ----------
+    atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
+    zeta_list: moments considered
+    """
+    n_zeta = len(zeta_list)
+    n_desc = len(desc_list)
+    new_desc = np.zeros(n_zeta*n_desc)
+    for i, z in enumerate(zeta_list):
+        new_desc[i::n_zeta] = np.power(atomic_desc,z)
+    return new_desc
+
+def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_over_natom=True):
     """ 
     first compute the average/sum descriptors for each species,
     then concatenate them.
@@ -195,34 +243,18 @@ def Atomic_Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, av
     -------
     desc: np.matrix [N_desc*len(global_species)]. Global descriptors for a frame.
     """
-
-    atomicdesc_by_species = {}
+    desc_by_species = {}
+    desc_len = 0
     for species in global_species:
         atomicdesc_by_species = [atomic_desc[i] for i,at in enumerate(atomic_numbers) if at==species]
+        desc_by_species[species] = np.sum(atomicdesc_by_species, axis=0)
+        desc_len =  max(len(desc_by_species[species]), desc_len)
 
     desc = np.zeros(desc_len*len(global_species),dtype=float)
     for i, species in enumerate(global_species):
         if len(desc_by_species[species]) > 0:
+            # normalize by the number of atoms
+            if average_over_natom:
+                desc_by_species[species] /=  len(desc_by_species[species])
             desc[i*desc_len:(i+1)*desc_len] = desc_by_species[species]
     return np.asarray(desc)
-
-    n_adesc = len(atomic_desc[0])
-    desc = np.zeros(n_adesc*len(global_species),dtype=float)
-    desc_by_species = {}
-    natoms_by_species = {}
-    for species in global_species:
-        desc_by_species[species] = np.zeros(n_adesc,dtype=float)
-        natoms_by_species[species] = 0
-    for at, at_desc in enumerate(atomic_desc):
-        desc_by_species[atomic_numbers[at]][:] += at_desc[:]
-        natoms_by_species[species] += 1
-
-    for i, species in enumerate(global_species):
-        # normalize by the number of atoms
-        if average_over_natom:
-            if natoms_by_species[species] > 0:
-                desc_by_species[species] /=  natoms_by_species[species]
-        desc[i*n_adesc:(i+1)*n_adesc] = desc_by_species[species]
-    return desc
-
-
