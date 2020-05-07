@@ -88,8 +88,10 @@ class Global_Descriptors:
     def compute(self, frame):
         global_desc, atomic_desc = self.engines[0].create(frame)
         for engine in self.engines[1:]:
-            global_desc = np.append(global_desc, engine.create(frame), axis=0)
-            atomic_desc = np.append(atomic_desc, engine.create(frame), axis=0)
+            global_desc_new, atomic_desc_new = self.engines[0].create(frame)
+            global_desc = np.append(global_desc, global_desc_new, axis=0)
+            atomic_desc = np.append(atomic_desc, atomic_desc_new, axis=0)
+        del global_desc_new, atomic_desc_new
         return global_desc, atomic_desc
 
 class Global_Descriptor_Base:
