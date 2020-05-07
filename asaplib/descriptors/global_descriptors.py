@@ -61,7 +61,7 @@ class Global_Descriptors:
     def get_acronym(self):
         if self.acronym == "":
             for engine in self.engines: 
-                self.acronym.append(engine.get_acronym())
+                self.acronym += engine.get_acronym()
         return self.acronym
 
     def bind(self):
@@ -90,10 +90,9 @@ class Global_Descriptors:
     def compute(self, frame):
         global_desc, atomic_desc = self.engines[0].create(frame)
         for engine in self.engines[1:]:
-            global_desc_new, atomic_desc_new = self.engines[0].create(frame)
+            global_desc_new, atomic_desc_new = engine.create(frame)
             global_desc = np.append(global_desc, global_desc_new, axis=0)
             atomic_desc = np.append(atomic_desc, atomic_desc_new, axis=0)
-        del global_desc_new, atomic_desc_new
         return global_desc, atomic_desc
 
 class Global_Descriptor_Base:
@@ -139,27 +138,28 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
 
 
         self.atomic_desc_spec = desc_spec['atomic_descriptor']
-
         self.kernel_spec = desc_spec['kernel_function']
 
         # pass down some key information
         if 'species' in desc_spec.keys():
             # add some system specific information to the list to descriptor specifications
             for element in self.atomic_desc_spec.keys():
-                self.atomic_desc_spec[element]['species'] = self.global_species
-                self.atomic_desc_spec[element]['periodic'] = self.periodic
+                self.atomic_desc_spec[element]['species'] = desc_spec['species']
             for element in self.kernel_spec.keys():
-                self.kernel_spec[element]['species'] = self.global_species
+                self.kernel_spec[element]['species'] = desc_spec['species']
+        if 'periodic' in desc_spec.keys():
+            for element in self.atomic_desc_spec.keys():
+                self.atomic_desc_spec[element]['periodic'] = desc_spec['periodic']
 
         # initialize a Atomic_Descriptors object
-        self.atomic_desc = Atomic_Descriptors(desc_spec_dict)
+        self.atomic_desc = Atomic_Descriptors(self.atomic_desc_spec)
         # initialize a Atomic_2_Global_Descriptors object
-        self.atomic_2_global = Atomic_2_Global_Descriptors(kernel_spec_dict)
+        self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
 
         self.acronym = self.atomic_desc.get_acronym() + '-' + self.atomic_2_global.get_acronym()
 
     def pack(self):
-        return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack())
+        return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }
 
     def create(self, frame):
         # compute atomic descriptor
@@ -185,7 +185,7 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
             raise ValueError("Not enough information to intialize the `Atomic_Descriptor_CM` object")
 
         if 'periodic' in desc_spec.keys() and desc_spec['periodic'] == True:
-            raise ValueError("CoulombMatrix cannot be used for periodic systems")
+            raise ValueError("Coulomb Matrix cannot be used for periodic systems")
 
 
         self.cm = CoulombMatrix(max_atoms)

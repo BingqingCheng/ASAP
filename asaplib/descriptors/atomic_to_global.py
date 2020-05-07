@@ -42,7 +42,7 @@ class Atomic_2_Global_Descriptors:
     def get_acronym(self):
         if self.acronym == "":
             for engine in self.engines: 
-                self.acronym.append(engine.get_acronym())
+                self.acronym += engine.get_acronym()
         return self.acronym
 
     def bind(self):

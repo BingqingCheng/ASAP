@@ -15,7 +15,7 @@ class Atomic_Descriptors:
         e.g.
         desc_spec_dict = {
         "firstsoap": 
-        {"type" = 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
+        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
         }
         """
         self.desc_spec_dict = desc_spec_dict
@@ -40,7 +40,7 @@ class Atomic_Descriptors:
     def get_acronym(self):
         if self.acronym == "":
             for engine in self.engines: 
-                self.acronym.append(engine.get_acronym())
+                self.acronym += engine.get_acronym()
         return self.acronym
 
     def bind(self):
@@ -72,7 +72,7 @@ class Atomic_Descriptors:
 
 class Atomic_Descriptor_Base:
     def __init__(self, desc_spec):
-        self._is_atomic = None
+        self._is_atomic = True
         self.acronym = ""
         pass
     def is_atomic(self):
@@ -90,8 +90,6 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         """
 
         from dscribe.descriptors import SOAP
-
-        self._is_atomic = True
 
         if "type" not in desc_spec.keys() or desc_spec["type"] != "SOAP":
             raise ValueError("Type is not SOAP or cannot find the type of the descriptor")
