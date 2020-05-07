@@ -67,7 +67,7 @@ class Atomic_2_Global_Descriptors:
         else:
             raise NotImplementedError 
 
-    def compute(self, atomic_desc_dict):
+    def compute(self, atomic_desc_dict, atomic_numbers):
         """
         compute the global descriptor vector for a frame from atomic contributions
         Parameters
@@ -75,6 +75,7 @@ class Atomic_2_Global_Descriptors:
         atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
                           and a np.array [N_desc*N_atoms]. Global descriptors for a frame.
                      see Atomic_Descriptors.compute() in .atomic_descriptors.py
+        atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.
 
         Returns
         -------
@@ -85,7 +86,7 @@ class Atomic_2_Global_Descriptors:
         for element in atomic_desc_dict.keys():
             atomic_desc_now = atomic_desc_dict[element]
             for engine in self.engines:
-                name_now, desc_now = engine.create(atomic_desc_now)
+                name_now, desc_now = engine.create(atomic_desc_now, atomic_numbers)
                 desc_dict[element+name_now] = desc_now
         return desc_dict
 
@@ -115,6 +116,7 @@ class Atomic_2_Global_Base:
         Parameters
         ----------
         atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+        atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.
 
         Returns
         -------
@@ -234,17 +236,17 @@ def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_o
     desc: np.matrix [N_desc*len(global_species)]. Global descriptors for a frame.
     """
     desc_by_species = {}
-    desc_len = 0
     for species in global_species:
-        atomicdesc_by_species = [atomic_desc[i] for i,at in enumerate(atomic_numbers) if at==species]
-        desc_by_species[species] = np.sum(atomicdesc_by_species, axis=0)
-        desc_len =  max(len(desc_by_species[species]), desc_len)
+        atomic_desc_by_species = [atomic_desc[i] for i,at in enumerate(atomic_numbers) if at==species]
+        if average_over_natom:
+            # normalize by the number of atoms
+            desc_by_species[species] = np.mean(atomic_desc_by_species, axis=0)
+        else:
+            desc_by_species[species] = np.sum(atomic_desc_by_species, axis=0)
+        #print(np.shape(atomic_desc),len(atomic_desc))
 
+    desc_len = np.shape(atomic_desc)[1]
     desc = np.zeros(desc_len*len(global_species),dtype=float)
     for i, species in enumerate(global_species):
-        if len(desc_by_species[species]) > 0:
-            # normalize by the number of atoms
-            if average_over_natom:
-                desc_by_species[species] /=  len(desc_by_species[species])
-            desc[i*desc_len:(i+1)*desc_len] = desc_by_species[species]
+        desc[i*desc_len:(i+1)*desc_len] = desc_by_species[species]
     return np.asarray(desc)

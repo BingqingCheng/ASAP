@@ -63,6 +63,10 @@ class Atomic_Descriptors:
             raise ValueError("Did not specify the type of the descriptor.")
         if desc_spec["type"] == "SOAP":
             return Atomic_Descriptor_SOAP(desc_spec)
+        if desc_spec["type"] == "LMBTR_K2":
+            return Atomic_Descriptor_LMBTR_K2(desc_spec)
+        if desc_spec["type"] == "LMBTR_K3":
+            return Atomic_Descriptor_LMBTR_K3(desc_spec)
         else:
             raise NotImplementedError 
 
@@ -145,3 +149,116 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
     def create(self, frame):
         # notice that we return the acronym here!!!
         return self.acronym, self.soap.create(frame, n_jobs=8)
+
+
+class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
+    def __init__(self, desc_spec):
+        """
+        make a DScribe LMBTR object
+        (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)')
+        Args:
+            species:
+            periodic (bool): Determines whether the system is considered to be
+                periodic.
+            k2 (dict): Dictionary containing the setup for the k=2 term.
+                Contains setup for the used geometry function, discretization and
+                weighting function. For example::
+
+                    k2 = {
+                        "geometry": {"function": "inverse_distance"},
+                        "grid": {"min": 0.1, "max": 2, "sigma": 0.1, "n": 50},
+                        "weighting": {"function": "exp", "scale": 0.75, "cutoff": 1e-2}
+                    }
+
+            k3 (dict): Dictionary containing the setup for the k=3 term.
+                Contains setup for the used geometry function, discretization and
+                weighting function. For example::
+
+                    k3 = {
+                        "geometry": {"function": "angle"},
+                        "grid": {"min": 0, "max": 180, "sigma": 5, "n": 50},
+                        "weighting" = {"function": "exp", "scale": 0.5, "cutoff": 1e-3}
+                    }
+            normalize_gaussians (bool): Determines whether the gaussians are
+                normalized to an area of 1. Defaults to True. If False, the
+                normalization factor is dropped and the gaussians have the form.
+                :math:`e^{-(x-\mu)^2/2\sigma^2}`
+            normalization (str): Determines the method for normalizing the
+                output. The available options are:
+
+                * "none": No normalization.
+                * "l2_each": Normalize the Euclidean length of each k-term
+                  individually to unity.
+
+            flatten (bool): Whether the output should be flattened to a 1D
+                array. If False, a dictionary of the different tensors is
+                provided, containing the values under keys: "k1", "k2", and
+                "k3":
+            sparse (bool): Whether the output should be a sparse matrix or a
+                dense numpy array.
+        """
+
+        from dscribe.descriptors import LMBTR
+
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "LMBTR":
+            raise ValueError("Type is not LMBTR or cannot find the type of the descriptor")
+
+        # required
+        try:
+            self.species = desc_spec['species']
+        except:
+            raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
+
+        # we have defaults here
+        if 'normalization' in desc_spec.keys():
+            self.normalization = desc_spec['normalization']
+        else:
+            self.normalization =  None # or "l2_each"
+
+        if 'normalize_gaussians' in desc_spec.keys():
+            self.normalize_gaussians = desc_spec['normalize_gaussians']
+        else:
+            self.normalize_gaussians = "True" # or False
+
+        if 'periodic' in desc_spec.keys():
+            self.periodic = bool(desc_spec['periodic'])
+        else:
+            self.periodic = True
+
+    def create(self, frame):
+        # notice that we return the acronym here!!!
+        return self.acronym, self.lmbtr.create(frame, n_jobs=8)
+
+class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_Base):
+    def __init__(self, desc_spec):
+
+        super().__init__(desc_spec)
+
+        # required
+        try:
+            self.k2 = desc_spec['k2']
+        except:
+            raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
+
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
+                            k2=self.k2)
+
+        # make an acronym
+        self.acronym = "LMBTR-K2" # perhaps add more info here
+
+class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_Base):
+    def __init__(self, desc_spec):
+
+        super().__init__(desc_spec)
+
+        # required
+        try:
+            self.k2 = desc_spec['k3']
+        except:
+            raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
+
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
+                            k3=self.k3)
+
+        # make an acronym
+        self.acronym = "LMBTR-K3" # perhaps add more info here

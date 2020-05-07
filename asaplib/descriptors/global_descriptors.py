@@ -175,7 +175,7 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         # compute atomic descriptor
         atomic_desc_dict = self.atomic_desc.compute(frame)
         # compute global descriptor for the frame
-        return self.atomic_2_global.compute(atomic_desc_dict), atomic_desc_dict
+        return self.atomic_2_global.compute(atomic_desc_dict, frame.get_atomic_numbers()), atomic_desc_dict
 
 
 class Global_Descriptor_CM(Global_Descriptor_Base):
