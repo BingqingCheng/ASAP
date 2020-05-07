@@ -34,7 +34,7 @@ class Global_Descriptors:
         }
         and
         kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
-                          'zeta_list': zeta_list,
+                          'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
         """
@@ -127,7 +127,7 @@ class Global_Descriptor_from_Atomic():
         }
         and
         kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
-                          'zeta_list': zeta_list,
+                          'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
         """

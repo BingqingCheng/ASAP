@@ -16,7 +16,7 @@ class Atomic_2_Global_Descriptors:
         k_spec_dict: dictionaries that specify which atomic to global descriptor to use 
         e.g.
         k_spec_dict = {'first_kernel': {'kernel_type': kernel_type,  
-                          'zeta_list': zeta_list,
+                          'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
         """
@@ -59,9 +59,9 @@ class Atomic_2_Global_Descriptors:
         if k_spec["kernel_type"] == "sum":
             return Atomic_2_Global_Sum(k_spec)
         if k_spec["kernel_type"] == "moment_average":
-            return Atomic_2_Global_MomentAverage(k_spec)
+            return Atomic_2_Global_Moment_Average(k_spec)
         if k_spec["kernel_type"] == "moment_sum":
-            return Atomic_2_Global_MomentSum(k_spec)
+            return Atomic_2_Global_Moment_Sum(k_spec)
         else:
             raise NotImplementedError 
 
@@ -84,7 +84,7 @@ class Atomic_2_Global_Descriptors:
             atomic_desc_now = atomic_desc_dict[element]
             for engine in self.engines:
                 name_now, desc_now = engine.create(atomic_desc_now)
-                desc_dict[element+"_"+namenow] = desc_now
+                desc_dict[element+name_now] = desc_now
         return desc_dict
 
 class Atomic_2_Global_Base:
@@ -101,7 +101,7 @@ class Atomic_2_Global_Base:
                 self.species = k_spec['species']
             except:
                 raise ValueError("Cannot do element-wise operations without specifying the global species")
-            self.acronym = "e"
+            self.acronym = "-e"
 
     def get_acronym(self):
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
@@ -133,9 +133,9 @@ class Atomic_2_Global_Average(Atomic_2_Global_Base):
 
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
-            return Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, True)
+            return self.acronym, Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, True)
         else:
-            return np.mean(atomic_desc, axis=0)
+            return self.acronym, np.mean(atomic_desc, axis=0)
 
 
 class Atomic_2_Global_Sum(Atomic_2_Global_Base):
@@ -162,9 +162,9 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
 
     Parameters
     ----------
-    zeta_list: moments considered
+    zeta: take the zeta th power
     """
-    def __init__(self, k_spec_dict):
+    def __init__(self, k_spec):
 
 
         super().__init__(k_spec)
@@ -173,18 +173,17 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
             raise ValueError("kernel type is not moment_average or cannot find the type")
 
         try:
-            self.zeta_list = k_spec['zeta_list']
+            self.zeta = k_spec['zeta']
         except:
-            raise ValueError("cannot initialize the zeta list")
+            raise ValueError("cannot initialize the zeta value")
 
-        self.acronym += "-z-"+list2str(zeta_list)
+        self.acronym += "-z-"+str(self.zeta)
 
     def create(self, atomic_desc, atomic_numbers=[]):
-        zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
         if self.element_wise:
-            return self.acronym, Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, True)
+            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species, True)
         else:
-            return self.acronym, np.mean(zeta_desc, axis=0)
+            return self.acronym, np.mean(np.power(atomic_desc, self.zeta), axis=0)
 
 class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
     """ 
@@ -193,9 +192,9 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
 
     Parameters
     ----------
-    zeta_list: moments considered
+    zeta: take the zeta th power
     """
-    def __init__(self, k_spec_dict):
+    def __init__(self, k_spec):
 
 
         super().__init__(k_spec)
@@ -204,34 +203,17 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
             raise ValueError("kernel type is not moment_sum or cannot find the type")
 
         try:
-            self.zeta_list = k_spec['zeta_list']
+            self.zeta = k_spec['zeta']
         except:
             raise ValueError("cannot initialize the zeta list")
 
-        self.acronym += "-z-"+list2str(zeta_list)+"-sum"
+        self.acronym += "-z-"+str(self.zeta)+"-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):
-        zeta_desc = Get_Moment(atomic_desc, self.zeta_list)
         if self.element_wise:
-            return self.acronym, Descriptor_By_Species(zeta_desc, atomic_numbers, self.species, False)
+            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species, False)
         else:
-            return self.acronym, np.sum(zeta_desc, axis=0)
-
-def Get_Moment(atomic_desc, zeta_list):
-    """ 
-    get the higher moments for atomic descriptors
-
-    Parameters
-    ----------
-    atomic_desc: np.matrix. [N_atoms, N_desc]. Atomic descriptors for a frame.
-    zeta_list: moments considered
-    """
-    n_zeta = len(zeta_list)
-    n_desc = len(desc_list)
-    new_desc = np.zeros(n_zeta*n_desc)
-    for i, z in enumerate(zeta_list):
-        new_desc[i::n_zeta] = np.power(atomic_desc,z)
-    return new_desc
+            return self.acronym, np.sum(np.power(atomic_desc, self.zeta), axis=0)
 
 def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_over_natom=True):
     """ 

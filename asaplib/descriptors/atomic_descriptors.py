@@ -79,7 +79,7 @@ class Atomic_Descriptors:
         atomic_desc_dict = {}
         for engine in self.engines:
             name_now, atomic_desc_now = engine.create(frame)
-            atomic_desc_dict[namenow] = atomic_desc_now
+            atomic_desc_dict[name_now] = atomic_desc_now
         return atomic_desc_dict
 
 class Atomic_Descriptor_Base:
