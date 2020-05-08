@@ -41,13 +41,13 @@ def main(fxyz, prefix):
          'normalization': "l2_each"}}
 
     kernel_js = {}
-    kernel_js[1] = {'kernel_type': 'moment_sum',  
-                              'zeta': 1,
+    kernel_js['k1'] = {'kernel_type': 'moment_average',  
+                              'zeta': 2,
                               'element_wise': False}
-    kernel_js[2] = {'kernel_type': 'sum',  
+    kernel_js['k2'] = {'kernel_type': 'sum',  
                               'element_wise': True}
 
-    desc_spec_js = {'testcm': {'type': "CM", 'max_atoms': 30},
+    desc_spec_js = {'testcm': {'type': "CM"},
                     'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
                     'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
 
@@ -55,6 +55,7 @@ def main(fxyz, prefix):
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, tag)
 
     asapxyz.write(prefix)
+    asapxyz.save_state(tag)
     asapxyz.save_descriptor_state(tag)
 
 if __name__ == '__main__':
