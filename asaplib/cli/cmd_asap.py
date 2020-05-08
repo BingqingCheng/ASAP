@@ -26,12 +26,20 @@ def desc_options(f):
                      help='Tag for the descriptor output',
                      default='ASAP')(f)
     f = click.option('--prefix', help='Prefix to be used', default='ASAP')(f)
-    f = click.option('--peratom', is_flag=True, default=False)(f)
-    f = click.option('--kernel_type', default='moment_average')(f)
-    f = click.option('--zeta', default=2, type=int)(f)
+    f = click.option('--peratom', is_flag=True,
+                     help='Do you want to output per atom descriptors (True/False)?', 
+                     default=False)(f)
+    f = click.option('--kernel_type',
+                     help='type of operations to get global descriptors from the atomic soap vectors [average], [sum], [moment_avg], [moment_sum]',
+                     default='average')(f)
+    f = click.option('--zeta', default=1, type=int)(f)
     f = click.option('--element-wise', default=False, is_flag=True)(f)
-    f = click.option('--periodic/--no-periodic', default=False)(f)
-    f = click.option('--stride', default=1)(f)
+    f = click.option('--periodic/--no-periodic', 
+                     help='Is the system periodic? If not specified, will infer from the XYZ file.',
+                     default=True)(f)
+    f = click.option('--stride',
+                     help='Read in the xyz trajectory with X stide. Default: read/compute all frames',
+                     default=1)(f)
     f = click.option('--state-file', type=click.Path('r'))(f)
     return f
 
@@ -44,7 +52,7 @@ def gen_desc(ctx, fxyz, tag, prefix, peratom, kernel_type, element_wise,
     """
     Descriptor generation sub-command
     This command function evaluated before the descriptor specific ones,
-    we setup the geral stuff here, such as read the files and setting up
+    we setup the general stuff here, such as read the files and setting up
     the kernel function.
     At the moment only one single kernel function can be used.
     """
