@@ -381,18 +381,18 @@ class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
         raise NotImplementedError
         from qml.representations import generate_fchl_acsf
 
-        self.fchl_acsf_dict = {'nRs2'= None, 
-                               'nRs3' = None, 
-                               'nFourier' = None,
-                               'eta2' = None , 
-                               'eta3' = None, 
-                               'zeta'= None,
-                               'rcut' = None, 
-                               'acut' = None,
-                              'two_body_decay' = None, 
-                              'three_body_decay' = None,
-                              'three_body_weight' = None,
-                              'pad' = False, 'gradients' = False}
+        self.fchl_acsf_dict = {'nRs2': None, 
+                               'nRs3': None, 
+                               'nFourier': None,
+                               'eta2': None , 
+                               'eta3': None, 
+                               'zeta': None,
+                               'rcut': None, 
+                               'acut': None,
+                              'two_body_decay': None, 
+                              'three_body_decay': None,
+                              'three_body_weight': None,
+                              'pad': False, 'gradients': False}
 
         # required
         try:
