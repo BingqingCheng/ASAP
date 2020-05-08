@@ -29,6 +29,7 @@ class ASAPXYZ:
         self.total_natoms = 0
         self.global_species = []
         self.computed_desc_dict = {'data' : {'fxyz': fxyz} }
+        self.tag_to_acronym = {'global':{}, 'atomic':{}}
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -49,6 +50,7 @@ class ASAPXYZ:
                 frame.set_pbc([False, False, False])
 
         self.total_natoms = np.sum(self.natom_list)
+        self.max_atoms = max(self.natom_list)
         self.global_species = np.unique(all_species)
         print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
@@ -70,9 +72,13 @@ class ASAPXYZ:
     def get_global_species(self):
         return self.global_species
 
-    def save_descriptor_state(self, filename):
-        with open(filename+'-descriptor-state.json', 'w') as jd:
+    def save_state(self, filename):
+        with open(filename+'-state.json', 'w') as jd:
             json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
+
+    def save_descriptor_state(self, filename):
+        with open(filename+'-descriptor-acronyms.json', 'w') as jd:
+            json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
 
     def compute_atomic_descriptors(self, desc_spec_list={}, sbs=[], tag=None):
         """
@@ -80,6 +86,12 @@ class ASAPXYZ:
         Parameters
         ----------
         desc_spec: a list of dictionaries, contrains infos on the descriptors to use
+        e.g.
+        atomic_desc_dict = {
+        "firstsoap": 
+        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
+        }
+
         sbs: array, integer
         """
 
@@ -91,6 +103,7 @@ class ASAPXYZ:
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
+            desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
@@ -98,8 +111,7 @@ class ASAPXYZ:
         for i in sbs:
             frame = self.frames[sbs]
             atomic_desc_dict_now = atomic_desc.create(frame)
-            for element in atomic_desc_dict_now.keys():
-                 frame.new_array(element, atomic_desc_dict_now[element])
+            self._parse_computed_atomic_descriptors(atomic_desc_dict_now, frame)
 
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  atomic_desc.pack()
@@ -109,11 +121,29 @@ class ASAPXYZ:
         compute the atomic descriptors for selected frames
         Parameters
         ----------
-        desc_spec_dict: a list of dictionaries, contrains infos on the descriptors to use
-        kernel_spec_dict: a dictionary contains specifications on how the global descriptors should be computed from the local ones
-                     e.g. kernel_spec={'kernel1': {'kernel_type'='average','zeta_list'=[1,2,3],'element_wise'=True}}
+        desc_spec_dict: dictionaries that specify which global descriptor to use.
+
+        e.g.
+        {'global_desc1': 
+        {"type": 'CM'}}
+
+        e.g.
+        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'kernel_function': kernel_dict}}
+        and
+        atomic_desc_dict = {
+        "firstsoap": 
+        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
+        }
+        and
+        kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
+                          'zeta': zeta,
+                          'species': species,
+                          'element_wise': element_wise}}
+
         sbs: array, integer
         """
+
+
 
         if len(sbs) == 0:
             sbs = range(self.nframes)
@@ -123,6 +153,7 @@ class ASAPXYZ:
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
             desc_spec_dict[element]['periodic'] = self.periodic
+            desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
         # business!
         global_desc = Global_Descriptors(desc_spec_dict)
@@ -131,17 +162,39 @@ class ASAPXYZ:
             frame = self.frames[i]
             # compute atomic descriptor
             desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
-
-            # now we recorded the computed descriptors to the xyz object
-            for element in desc_dict_now.keys():
-                frame.info[element] = desc_dict_now[element]
-
+            self._parse_computed_descriptors(desc_dict_now, frame)
             if keep_atomic:
-                for element in atomic_desc_dict_now.keys():
-                     frame.new_array(element, atomic_desc_dict_now[element])
-
+                self._parse_computed_atomic_descriptors(atomic_desc_dict_now, frame)
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] = global_desc.pack()
+
+    def _parse_computed_descriptors(self, desc_dict_now, frame):
+        """parse the information computed"""
+        # now we recorded the computed descriptors to the xyz object
+        for e in desc_dict_now.keys():
+            # we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
+            try:
+                frame.info[desc_dict_now[e]['acronym']] = desc_dict_now[e]['descriptors']
+                self.tag_to_acronym['global'][e] = desc_dict_now[e]['acronym']
+            except:
+                # if we use atomic to global descriptor, this is a nested dictionary
+                self.tag_to_acronym['global'][e] = {}
+                for e2 in desc_dict_now[e].keys():
+                    self.tag_to_acronym['global'][e][e2] = {}
+                    #print(e2), print(desc_dict_now[e][e2])
+                    for e3 in desc_dict_now[e][e2].keys():
+                        #print(e3); print(desc_dict_now[e][e2][e3]); print(desc_dict_now[e][e2][e3].keys())
+                        frame.info[desc_dict_now[e][e2][e3]['acronym']] = desc_dict_now[e][e2][e3]['descriptors']
+                        self.tag_to_acronym['global'][e][e2][e3] = desc_dict_now[e][e2][e3]['acronym']
+
+    def _parse_computed_atomic_descriptors(self, atomic_desc_dict_now, frame):
+        """parse the information computed"""
+        #print(atomic_desc_dict_now)
+        for e in atomic_desc_dict_now.keys():
+            self.tag_to_acronym['atomic'][e] = {}
+            for e2 in atomic_desc_dict_now[e].keys():
+                frame.new_array(atomic_desc_dict_now[e][e2]['acronym'], atomic_desc_dict_now[e][e2]['atomic_descriptors'])
+                self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
     def get_descriptors(self, desc_name=None, use_atomic_desc=False):
         """ extract the descriptor array from each frame

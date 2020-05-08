@@ -20,7 +20,7 @@ class Atomic_Descriptors:
         """
         self.desc_spec_dict = desc_spec_dict
         # list of Atomic_Descriptor objections
-        self.engines = []
+        self.engines = {}
         self.acronym = ""
 
         self.bind()
@@ -39,8 +39,8 @@ class Atomic_Descriptors:
 
     def get_acronym(self):
         if self.acronym == "":
-            for engine in self.engines: 
-                self.acronym += engine.get_acronym()
+            for element in self.desc_spec_dict.keys():
+                self.acronym += self.engines[element].get_acronym()
         return self.acronym
 
     def bind(self):
@@ -49,11 +49,10 @@ class Atomic_Descriptors:
         these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)
         """
         # clear up the objects
-        self.engines = []
+        self.engines = {}
         for element in self.desc_spec_dict.keys():
-            new_engine = self._call(self.desc_spec_dict[element])
-            self.engines.append(new_engine)
-            self.desc_spec_dict[element]['acronym'] = new_engine.get_acronym()
+            self.engines[element] = self._call(self.desc_spec_dict[element])
+            self.desc_spec_dict[element]['acronym'] = self.engines[element].get_acronym()
 
     def _call(self, desc_spec):
         """
@@ -81,11 +80,12 @@ class Atomic_Descriptors:
         -------
         atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
                           and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+                          e.g. {'ad1':{'acronym':'soap-1', 'atomic_descriptors': `a np.array [N_desc*N_atoms]`}}
         """
         atomic_desc_dict = {}
-        for engine in self.engines:
-            name_now, atomic_desc_now = engine.create(frame)
-            atomic_desc_dict[name_now] = atomic_desc_now
+        for element in self.desc_spec_dict.keys():
+            atomic_desc_dict[element] = {}
+            atomic_desc_dict[element]['acronym'], atomic_desc_dict[element]['atomic_descriptors'] = self.engines[element].create(frame)
         return atomic_desc_dict
 
 class Atomic_Descriptor_Base:
@@ -143,6 +143,9 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
                                          sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
                                          periodic=self.periodic)
+
+        print("Using SOAP Descriptors...")
+
         # make an acronym
         self.acronym = "SOAP-n" + str(self.n) + "-l" + str(self.l) + "-c" + str(self.cutoff) + "-g" + str(self.g)
 

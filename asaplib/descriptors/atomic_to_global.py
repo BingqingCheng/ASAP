@@ -22,7 +22,7 @@ class Atomic_2_Global_Descriptors:
         """
         self.k_spec_dict = k_spec_dict
         # list of Atomic_2_Global_Descriptor objections
-        self.engines = []
+        self.engines = {}
 
         self.bind()
 
@@ -44,12 +44,11 @@ class Atomic_2_Global_Descriptors:
         these objects need to have .create(atomic_desc) method to compute the global descriptors from atomic ones
         """
         # clear up the objects
-        self.engines = []
+        self.engines = {}
         for element in self.k_spec_dict.keys():
-            new_engine = self._call(self.k_spec_dict[element])
-            self.engines.append(new_engine)
-            self.k_spec_dict[element]['acronym'] = new_engine.get_acronym()
- 
+            self.engines[element] = self._call(self.k_spec_dict[element])
+            self.k_spec_dict[element]['acronym'] = self.engines[element].get_acronym()
+
     def _call(self, k_spec):
         """
         call the specific descriptor objects
@@ -79,15 +78,19 @@ class Atomic_2_Global_Descriptors:
 
         Returns
         -------
-        desc_dict: a dictionary. each entry contains the essential info of the descriptor (acronym) 
+        desc_dict: a dictionary. each entry contains the essential info of the descriptor, i.e. acronym 
                           and a np.array [N_desc]. Global descriptors for a frame.
+                   e.g. {'d1':{ 'acronym': 'XXX', 'descriptors': `a np.array [N_desc]`}}
         """
         desc_dict = {}
-        for element in atomic_desc_dict.keys():
-            atomic_desc_now = atomic_desc_dict[element]
-            for engine in self.engines:
-                name_now, desc_now = engine.create(atomic_desc_now, atomic_numbers)
-                desc_dict[element+name_now] = desc_now
+        for atomic_desc_element in atomic_desc_dict.keys():
+            atomic_desc_now = atomic_desc_dict[atomic_desc_element]['atomic_descriptors']
+            desc_dict[atomic_desc_element]  = {}
+            for element in self.k_spec_dict.keys():
+                desc_dict[atomic_desc_element][element] = {}
+                k_acronym, desc_dict[atomic_desc_element][element]['descriptors'] = self.engines[element].create(atomic_desc_now, atomic_numbers)
+                # we use a combination of the acronym of the descriptor and of the kernel function
+                desc_dict[atomic_desc_element][element]['acronym'] = atomic_desc_dict[atomic_desc_element]['acronym'] + k_acronym
         return desc_dict
 
 class Atomic_2_Global_Base:
@@ -135,6 +138,8 @@ class Atomic_2_Global_Average(Atomic_2_Global_Base):
         if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "average":
             raise ValueError("kernel type is not average or cannot find the type")
 
+        print("Using Atomic_2_Global_Average kernel ...")
+
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
             return self.acronym, Descriptor_By_Species(atomic_desc, atomic_numbers, self.species, True)
@@ -151,6 +156,7 @@ class Atomic_2_Global_Sum(Atomic_2_Global_Base):
         if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "sum":
             raise ValueError("kernel type is not sum or cannot find the type")
 
+        print("Using Atomic_2_Global_Sum kernel ...")
         self.acronym += "-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):
@@ -181,6 +187,7 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
         except:
             raise ValueError("cannot initialize the zeta value")
 
+        print("Using Atomic_2_Global_Moment_Average kernel ...")
         self.acronym += "-z-"+str(self.zeta)
 
     def create(self, atomic_desc, atomic_numbers=[]):
@@ -211,6 +218,7 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
         except:
             raise ValueError("cannot initialize the zeta list")
 
+        print("Using Atomic_2_Global_Moment_Sum kernel ...")
         self.acronym += "-z-"+str(self.zeta)+"-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):

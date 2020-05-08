@@ -3,7 +3,7 @@ Methods and functions to compute global desciptors
 """
 import numpy as np
 import json
-from ..io import NpEncoder
+from ..io import NpEncoder, randomString
 from .atomic_to_global import Atomic_2_Global_Descriptors
 from .atomic_descriptors import Atomic_Descriptors
 
@@ -41,7 +41,7 @@ class Global_Descriptors:
 
         self.desc_spec_dict = desc_spec_dict
         # list of Atomic_Descriptor objections
-        self.engines = []
+        self.engines = {}
         self.acronym = ""
 
         self.bind()
@@ -64,11 +64,10 @@ class Global_Descriptors:
         these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)
         """
         # clear up the objects
-        self.engines = []
+        self.engines = {}
         for element in self.desc_spec_dict.keys():
-            new_engine = self._call(self.desc_spec_dict[element])
-            self.engines.append(new_engine)
-            self.desc_spec_dict[element]['acronym'] = new_engine.get_acronym()
+            self.engines[element] = self._call(self.desc_spec_dict[element])
+            self.desc_spec_dict[element]['acronym'] = self.engines[element].get_acronym()
 
     def _call(self, desc_spec):
         """
@@ -85,24 +84,27 @@ class Global_Descriptors:
 
     def compute(self, frame):
         """
-        compute the global descriptor vector for a frame from atomic contributions
+        compute the global descriptor vector and atomic descriptor matrix (if any) for a frame
         Parameters
         ----------
         frame: ASE atom object. Coordinates of a frame.
 
         Returns
         -------
-        global_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+        desc_dict: a dictionary. each entry contains the essential info of the descriptor, i.e. acronym 
                           and a np.array [N_desc]. Global descriptors for a frame.
+                   e.g. {'d1':{ 'acronym': 'XXX', 'descriptors': `a np.array [N_desc]`}}
         atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
                           and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+                          e.g. {'ad1':{'acronym':'soap-1', 'atomic_descriptors': `a np.array [N_desc*N_atoms]`}}
         """
         global_desc_dict = {} 
         atomic_desc_dict = {}
-        for engine in self.engines:
-            global_desc_dict_new, atomic_desc_dict_new = engine.create(frame)
-            global_desc_dict.update(global_desc_dict_new)
-            atomic_desc_dict.update(atomic_desc_dict_new)
+        for element in self.desc_spec_dict.keys():
+            global_desc_dict[element], atomic_desc_dict[element] = self.engines[element].create(frame)
+            #global_desc_dict_new, atomic_desc_dict_new = self.engines[element].create(frame)
+            #global_desc_dict.update(global_desc_dict_new)
+            #atomic_desc_dict.update(atomic_desc_dict_new)
         return global_desc_dict, atomic_desc_dict
 
 class Global_Descriptor_Base:
@@ -116,7 +118,8 @@ class Global_Descriptor_Base:
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
         return self.acronym
     def create(self, frame):
-        return {}, {}
+        # return the dictionaries for global descriptors and atomic descriptors (if any)
+        return {'acronym': self.acronym, 'descriptors': []}, {}
 
 class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -166,12 +169,29 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         # initialize a Atomic_2_Global_Descriptors object
         self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
         
-        self.acronym = "atomic-to-global"
+        print("Using Atomic_2_Global_Descriptors...")
+
+        self.acronym = "atomic-to-global"+randomString(6)
 
     def pack(self):
         return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }
 
     def create(self, frame):
+        """
+        compute the global descriptor vector for a frame from atomic contributions
+        Parameters
+        ----------
+        frame: ASE atom object. Coordinates of a frame.
+
+        Returns
+        -------
+        desc_dict: a dictionary. each entry contains the essential info of the descriptor, i.e. acronym 
+                          and a np.array [N_desc]. Global descriptors for a frame.
+                   e.g. {'d1':{ 'acronym': 'XXX', 'descriptors': `a np.array [N_desc]`}}
+        atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) 
+                          and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+                          e.g. {'ad1':{'acronym':'soap-1', 'atomic_descriptors': `a np.array [N_desc*N_atoms]`}}
+        """
         # compute atomic descriptor
         atomic_desc_dict = self.atomic_desc.compute(frame)
         # compute global descriptor for the frame
@@ -200,11 +220,25 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
 
 
         self.cm = CoulombMatrix(self.max_atoms)
+        print("Using CoulombMatrix...")
         # make an acronym
         self.acronym = "CM" + "-" + str(self.max_atoms)
 
     def create(self, frame):
+        """
+        compute the CM descriptor vector for a frame
+        Parameters
+        ----------
+        frame: ASE atom object. Coordinates of a frame.
+
+        Returns
+        -------
+        desc_dict: a dictionary. each entry contains the essential info of the descriptor, i.e. acronym 
+                          and a np.array [N_desc]. Global descriptors for a frame.
+                   e.g. {'d1':{ 'acronym': 'CM-*', 'descriptors': `a np.array [N_desc]`}}
+        atomic_desc_dict : {}
+        """
         if len(frame.get_positions()) > self.max_atoms:
             raise ValueError('the size of the system is larger than the max_atoms of the CM descriptor')
         # notice that we return an empty dictionary for "atomic descriptors"
-        return {self.acronym: self.cm.create(frame, n_jobs=8)}, {}
+        return {'acronym': self.acronym, 'descriptors': self.cm.create(frame, n_jobs=8)}, {}
