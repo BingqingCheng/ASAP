@@ -32,6 +32,11 @@ def main(fxyz, prefix):
                       'atom_gaussian_width': 0.2, 
                       'rbf': 'gto', 'crossover': False}}
 
+    acsf_js = {'acsf1': {'type': 'ACSF',
+                        'cutoff': 2.0,
+                        'g2_params': [[1, 1], [1, 2], [1, 3]],
+                        'g4_params': [[1, 1, 1], [1, 2, 1], [1, 1, -1], [1, 2, -1]]}}
+
     k2_js = { 'lmbtr-k2': {'type': 'LMBTR_K2',
          'k2':{
         "geometry": {"function": "distance"},
@@ -49,6 +54,7 @@ def main(fxyz, prefix):
 
     desc_spec_js = {'testcm': {'type': "CM"},
                     'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
+                    'test_acsf':{'atomic_descriptor':  acsf_js, 'kernel_function': kernel_js},
                     'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
 
     # compute the descripitors

@@ -171,7 +171,7 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         
         #print("Using Atomic_2_Global_Descriptors ...")
 
-        self.acronym = "atomic-to-global"+randomString(6)
+        self.acronym = "atomic-to-global-"+randomString(6)
 
     def pack(self):
         return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }

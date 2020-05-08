@@ -62,6 +62,8 @@ class Atomic_Descriptors:
             raise ValueError("Did not specify the type of the descriptor.")
         if desc_spec["type"] == "SOAP":
             return Atomic_Descriptor_SOAP(desc_spec)
+        if desc_spec["type"] == "ACSF":
+            return Atomic_Descriptor_ACSF(desc_spec)
         if desc_spec["type"] == "LMBTR_K2":
             return Atomic_Descriptor_LMBTR_K2(desc_spec)
         if desc_spec["type"] == "LMBTR_K3":
@@ -153,6 +155,64 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         # notice that we return the acronym here!!!
         return self.acronym, self.soap.create(frame, n_jobs=8)
 
+
+class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
+    def __init__(self, desc_spec):
+        """
+        make a DScribe ACSF object
+
+        see: 
+        https://singroup.github.io/dscribe/tutorials/acsf.html
+
+        # template for an ACSF descriptor
+        # currenly Dscribe only supports ASCF for finite system!
+        """
+
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "ACSF":
+            raise ValueError("Type is not ACSF or cannot find the type of the descriptor")
+
+        if 'periodic' in desc_spec.keys():
+            self.periodic = bool(desc_spec['periodic'])
+        if self.periodic == True:
+            raise ValueError("Warning: currently DScribe only supports ACSF for finite systems")
+
+        from dscribe.descriptors import ACSF
+
+        self.acsf_dict = {
+                 'g2_params': None,
+                 'g3_params': None,
+                 'g4_params': None,
+                 'g5_params': None}
+
+        # required
+        try:
+            self.species = desc_spec['species']
+            self.cutoff = desc_spec['cutoff']
+        except:
+            raise ValueError("Not enough information to intialize the `Atomic_Descriptor_ACF` object")
+
+        # fill in the values
+        for k, v in desc_spec.items():
+            if k in self.acsf_dict.keys():
+                if isinstance(v, list):
+                    self.acsf_dict[k] = np.asarray(v)
+                else:
+                    self.acsf_dict[k] = v
+
+        self.acsf = ACSF(species=self.species, rcut=self.cutoff, **self.acsf_dict, sparse = False)
+
+        print("Using ACSF Descriptors ...")
+
+        # make an acronym
+        self.acronym = "ACSF-c" + str(self.cutoff) 
+        if self.acsf_dict['g2_params'] is not None: self.acronym += "-g2-" + str(len(self.acsf_dict['g2_params']))
+        if self.acsf_dict['g3_params'] is not None: self.acronym += "-g3-" + str(len(self.acsf_dict['g3_params']))
+        if self.acsf_dict['g4_params'] is not None: self.acronym += "-g4-" + str(len(self.acsf_dict['g4_params']))
+        if self.acsf_dict['g5_params'] is not None: self.acronym += "-g5-" + str(len(self.acsf_dict['g5_params']))
+
+    def create(self, frame):
+        # notice that we return the acronym here!!!
+        return self.acronym, self.acsf.create(frame, n_jobs=8)
 
 class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
