@@ -8,7 +8,7 @@ import numpy as np
 from asaplib.data import ASAPXYZ
 
 
-def set_color_function(fcolor=None, asapxyz=None, colorscol=0, n_samples=0, peratom=False):
+def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False):
 
     plotcolor = []
     plotcolor_atomic = []
@@ -19,7 +19,7 @@ def set_color_function(fcolor=None, asapxyz=None, colorscol=0, n_samples=0, pera
         # load the column=colorscol for color functions
         try:
             loadcolor = np.genfromtxt(fcolor, dtype=float)
-        except: 
+        except:
             raise IOError('Error in loading fcolor files for the color scheme')
 
         # print(np.shape(loadcolor))
@@ -47,16 +47,24 @@ def set_color_function(fcolor=None, asapxyz=None, colorscol=0, n_samples=0, pera
         raise IOError('Cannot find the xyz or fcolor files for the color scheme')
 
     else:
-        try:
-            plotcolor = asapxyz.get_property(fcolor)
-        except:
-            raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
-        if peratom:
+        if fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index':
+            # we use the index as the color scheme
+            plotcolor = np.arange(asapxyz.get_num_frames())
+            fcolor = 'sample index'
+            if peratom:
+                for index, natomnow in enumerate(asapxyz.get_natom_list()):
+                    plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
+        else:
             try:
-                plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
+                plotcolor = asapxyz.get_property(fcolor)
             except:
-                raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
- 
+                raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
+            if peratom:
+                try:
+                    plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
+                except:
+                    raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
+
     colorlabel = 'use ' + str(fcolor) + ' for coloring the data points'
     if peratom:
         # print(np.shape(plotcolor_atomic))

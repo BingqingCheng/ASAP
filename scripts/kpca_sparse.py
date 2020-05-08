@@ -11,9 +11,8 @@ from asaplib.compressor import fps, CUR_deterministic
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
-
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, kpca_d, pc1, pc2, projectatomic, plotatomic,
-         adtext):
+
     """
 
     Parameters
@@ -28,9 +27,11 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     peratom: Whether to output per atom pca coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     n_sparse: number of representative samples, default is 5% of the data
+    power: use polynomial kernel function of degree n. 
     kpca_d: Number of the principle components to keep
     pc1: Plot the projection along which principle axes
     pc2: Plot the projection along which principle axes
+    projectatomic: build the projection using the (big) atomic descriptor matrix
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -43,6 +44,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic: desc = desc_atomic.copy()
     else:
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
@@ -58,7 +60,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if len(desc) == 0:
         raise ValueError('Please supply descriptor in a xyz file or a standlone descriptor matrix')
 
-    if projectatomic: desc = desc_atomic.copy()
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
 
     if ftags != 'none':
@@ -69,7 +70,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     n_sample = len(desc)
     # set default value of n_sparse
     if n_sparse == 0:
-        n_sparse = n_sample // 20
+        n_sparse = max(10, n_sample // 20)
     # sparsification
     if n_sparse >= n_sample:
         print("the number of representative structure is too large, please select n < ", n_sample)
@@ -86,13 +87,16 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         ifps = np.range(n_sample)
 
     # use linear kernel for now
-    kNN = np.dot(desc[ifps],desc[ifps].T)
-    kNM = np.dot(desc[:],desc[ifps].T)
+    kNN = np.power(np.dot(desc[ifps],desc[ifps].T),power)
+    kNM = np.power(np.dot(desc[:],desc[ifps].T),power)
     print("Shape of the kNN matrix: ", np.shape(kNN), ", and shape of the kNM matrix:", np.shape(kNM))
     # main thing
     kpca = KernelPCA(kpca_d)
     kpca.fit(kNN)
     proj = kpca.transform(kNM)
+    if peratom or plotatomic and not projectatomic:
+        kNT = np.power(np.dot(desc_atomic[:],desc[ifps].T),power)
+        proj_atomic_all = kpca.transform(kNT)
 
     # save
     if output == 'matrix':
@@ -112,14 +116,31 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     # make plot
     plot_styles.set_nice_font()
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
+    if plotatomic and not projectatomic:
+        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
+        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
+                                               xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
+                                               clabel=None, label=None,
+                                               xaxis=True, yaxis=True,
+                                               centers=None,
+                                               psize=None,
+                                               out_file=None,
+                                               title=None,
+                                               show=False, cmap='gnuplot',
+                                               remove_tick=False,
+                                               use_perc=False,
+                                               rasterized=True,
+                                               fontsize=15,
+                                               vmax=colorscale[1],
+                                               vmin=colorscale[0])
 
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1],
+    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
                                            xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=20,
+                                           psize=None,
                                            out_file=None,
                                            title='KPCA for: ' + prefix,
                                            show=False, cmap='gnuplot',
@@ -173,6 +194,8 @@ if __name__ == '__main__':
     parser.add_argument('--sparsemode', type=str, default='fps', help='Sparsification method to use ([fps], [cur])')
     parser.add_argument('--n', type=int, default=0,
                         help='number of the representative samples, set negative if using no sparsification')
+    parser.add_argument('--power', type=int, default=1,
+                        help='Take the nth power of the polynomial kernel function. 1 means linear kernel.')
     parser.add_argument('--d', type=int, default=10, help='number of the principle components to keep')
     parser.add_argument('--pc1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--pc2', type=int, default=1, help='Plot the projection along which principle axes')
@@ -187,3 +210,4 @@ if __name__ == '__main__':
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
          args.keepraw, args.sparsemode, args.n, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
+

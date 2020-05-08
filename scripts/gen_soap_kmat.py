@@ -70,7 +70,7 @@ def main(fxyz, dictxyz, prefix, soap_rcut, soap_g, soap_n, soap_l, soap_periodic
         soap_desc = SOAP(species=global_species, rcut=soap_rcut, nmax=soap_n, lmax=soap_l,
                          sigma=soap_g, crossover=False, average=False, periodic=soap_periodic)
 
-    # compute soap finger prints
+    # compute soap fingerprints
     fall = soap_desc.create(frames, n_jobs=8)
 
     # compute kmat

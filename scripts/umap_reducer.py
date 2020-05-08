@@ -18,14 +18,14 @@ from asaplib.plot import set_color_function, plot_styles
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
-         plotatomic, adtext):
+        projectatomic, plotatomic, adtext):
     """
 
     Parameters
     ----------
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
     fxyz: Location of xyz file for reading the properties.
-    ftags: Location of tags for the first M samples. Plot the tags on the t-SNE map.
+    ftags: Location of tags for the first M samples. Plot the tags on the umap.
     fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
@@ -36,7 +36,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     umap_d: Dimension of the embedded space.
     dim1: Plot the projection along which principle axes
     dim2: Plot the projection along which principle axes
-    perplexity: Perplexity setting for t-SNE: Typical values between 5 and 50.
+    projectatomic: build the projection using the (big) atomic descriptor matrix
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -46,18 +46,15 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     """
 
     foutput = prefix + "-pca-d" + str(umap_d)
-    peratom = bool(peratom)
-    keepraw = bool(keepraw)
-    plotatomic = bool(plotatomic)
-    adtext = bool(adtext)
-    scale = bool(scale)
-    use_atomic_desc = (peratom or plotatomic)
+    use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
+        if projectatomic: desc = desc_atomic.copy()
     else:
+        asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
@@ -88,12 +85,14 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     reducer = umap.UMAP()
     proj = reducer.fit_transform(desc)
-    if use_atomic_desc:
+    if peratom or plotatomic and not projectatomic:
         proj_atomic_all = reducer.transform(desc_atomic)
 
     # save
     if output == 'matrix':
         np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+        if peratom:  
+            np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header='low D coordinates of samples')
     if output == 'xyz':
         if os.path.isfile(foutput + ".xyz"):
             os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
@@ -107,16 +106,16 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj),
-                                                                                  True)
+    if plotatomic or projectatomic:
+        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
     else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, fxyz, colorscol, len(proj), False)
+        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
+    if projectatomic: plotcolor = plotcolor_peratom
 
     # make plot
     plot_styles.set_nice_font()
     fig, ax = plt.subplots()
-    if plotatomic:
+    if plotatomic and not projectatomic:
         # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
         fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
                                                xlabel='Principal Axis ' + str(dim1),
@@ -124,7 +123,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                                clabel=None, label=None,
                                                xaxis=True, yaxis=True,
                                                centers=None,
-                                               psize=20,
+                                               psize=None,
                                                out_file=None,
                                                title=None,
                                                show=False, cmap='gnuplot',
@@ -140,7 +139,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            clabel=colorlabel, label=None,
                                            xaxis=True, yaxis=True,
                                            centers=None,
-                                           psize=200,
+                                           psize=None,
                                            out_file=None,
                                            title='UMAP for: ' + prefix,
                                            show=False, cmap='gnuplot',
@@ -198,6 +197,8 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
+                        help='Building the UMAP projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Plot the manifold coordinates of all atomic environments (True/False)')
     parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
@@ -209,4 +210,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext)

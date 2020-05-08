@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+some operations for kernel and distance matrices
 """
 
 import copy
