@@ -53,9 +53,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
+    if os.path.isfile(fmat[0]):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.genfromtxt(fmat[0], dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
@@ -80,8 +80,6 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         if peratom:  
             np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header='low D coordinates of samples')
     if output == 'xyz':
-        if os.path.isfile(foutput + ".xyz"):
-            os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
         asapxyz.set_descriptors(proj, 'pca_coord')
         if peratom:
             asapxyz.set_atomic_descriptors(proj_atomic_all, 'pca_coord')
@@ -162,7 +160,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True,
+    parser.add_argument('-fmat', nargs='+', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none',

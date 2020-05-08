@@ -196,12 +196,12 @@ class ASAPXYZ:
                 frame.new_array(atomic_desc_dict_now[e][e2]['acronym'], atomic_desc_dict_now[e][e2]['atomic_descriptors'])
                 self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
-    def get_descriptors(self, desc_name=None, use_atomic_desc=False):
+    def get_descriptors(self, desc_name_list=[], use_atomic_desc=False):
         """ extract the descriptor array from each frame
 
         Parameters
         ----------
-        desc_name: string_like, the name of the descriptors in the extended xyz file
+        desc_name_list: a list of strings, the name of the descriptors in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
 
         Returns
@@ -216,18 +216,18 @@ class ASAPXYZ:
         if self.nframes > 1:
             try:
                 # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-                desc = np.row_stack([a.info[desc_name] for a in self.frames])
+                desc = np.column_stack(np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
                 print("Use descriptor matrix with shape: ", np.shape(desc))
                 # for the atomic descriptors
                 if use_atomic_desc:
-                    atomic_desc = np.concatenate([a.get_array(desc_name) for a in self.frames])
+                    atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
                     print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
             except:
                 pass
         else:
             # only one frame
             try:
-                desc = self.frames[0].get_array(desc_name)
+                desc = np.column_stack(self.frames[0].get_array(desc_name) for desc_name in desc_name_list)
             except:
                 ValueError('Cannot read the descriptor matrix from single frame')
 
@@ -385,19 +385,19 @@ class ASAPXYZ:
         else:
             write(str(filename) + ".xyz", self.frames)
 
-    def write_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
+    def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment='#'):
         """
         write the selected descriptor matrix in a matrix format to file
 
         Parameters
         ----------
         filename: str
-        desc_name: str. Name of the properties/descriptors to write
+        desc_name_list: a list of str. Name of the properties/descriptors to write
         sbs: array, integer
         comment: str
         """
 
-        desc, _ = self.get_descriptors(desc_name, False, sbs)
+        desc, _ = self.get_descriptors(desc_name_list, False, sbs)
 
         if os.path.isfile(str(filename) + ".desc"): 
             os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
