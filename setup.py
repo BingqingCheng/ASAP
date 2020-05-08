@@ -8,7 +8,8 @@ setuptools.setup(
     version="0.0.1",
     author="Bingqing Cheng",
     author_email="tonicbq@gmail.com",
-    description="Automatic Selection And Prediction tools for materials and molecules",
+    description=
+    "Automatic Selection And Prediction tools for materials and molecules",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/BingqingCheng/ASAP",
@@ -18,6 +19,11 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        'dscribe>=0.3.5', 'click>=7.0', 'numpy', 'scipy', 'scikit-learn',
+        'dscribe', 'ase', 'umap-learn'
+    ],
+    extras_require={'testing': ['pytest>=5.0']},
     python_requires='>=3.6',
     # scripts=['scripts/clustering.py',
     #          'scripts/frame_select.py',
@@ -34,5 +40,4 @@ setuptools.setup(
     entry_points="""
     [console_scripts]
     asap=asaplib.cli.cmd_asap:asap
-    """
-             )
+    """)
