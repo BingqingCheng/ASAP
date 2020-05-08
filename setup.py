@@ -19,15 +19,20 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    scripts=['scripts/clustering.py',
-             'scripts/frame_select.py',
-             'scripts/gen_soap_descriptors.py',
-             'scripts/kernel_density_estimation.py',
-             'scripts/kpca.py',
-             'scripts/kpca_sparse.py',
-             'scripts/krr.py',
-             'scripts/pca.py',
-             'scripts/kpca_for_projection_viewer.py',
-             'scripts/ridge_regression.py',
-             'scripts/tsne.py',
-             'scripts/umap_reducer.py'])
+    # scripts=['scripts/clustering.py',
+    #          'scripts/frame_select.py',
+    #          'scripts/gen_soap_descriptors.py',
+    #          'scripts/kernel_density_estimation.py',
+    #          'scripts/kpca.py',
+    #          'scripts/kpca_sparse.py',
+    #          'scripts/krr.py',
+    #          'scripts/pca.py',
+    #          'scripts/kpca_for_projection_viewer.py',
+    #          'scripts/ridge_regression.py',
+    #          'scripts/tsne.py',
+    #          'scripts/umap_reducer.py']
+    entry_points="""
+    [console_scripts]
+    asap=asaplib.cli.cmd_asap:asap
+    """
+             )
