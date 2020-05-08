@@ -100,8 +100,8 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         raise ValueError('Please select from fdb or dbscan')
 
     print(do_clustering.pack())
-    with open("clustering_results_4_" + prefix + ".json", 'w') as fp:
-        json.dump(do_clustering.pack(), fp, cls=NpEncoder)
+    #with open("clustering_results_4_" + prefix + ".json", 'w') as fp:
+    #    json.dump(do_clustering.pack(), fp, cls=NpEncoder)
 
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
