@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Farthest Point Sampling methods for sparsification
 """
 
 import numpy as np
@@ -7,17 +7,20 @@ import numpy as np
 
 def fps(x, d=0, r=None):
     """
+    Farthest Point Sampling
 
     Parameters
     ----------
-    x
-    d
-    r
+    x: np.matrix.[n_samples, n_dim] coordinates of all the samples to be sparsified.
+    d: number of samples to keep
+    r: starting from sample of index r
 
     Returns
     -------
+    a list of selected samples, remaining error
 
     """
+
     if d == 0:
         d = len(x)
     n = len(x)
@@ -75,13 +78,6 @@ def fast_fps(x, d=0, r=None):
         # list of active voronoi (we check which of the voronoi cells contain points
         # that might contain points closer than dmax)
         iactive = np.where(rvor[:i] > dnew + syd[:i] * (syd[:i] - 2 * sdnew))[0]
-        # print syd, dnew, len(iactive), rvor[:i]
-        # print i, "active", iactive
-        # alld = n2 + n2[inew]- 2*np.dot(x,x[inew])
-        # newm=np.where(alld<ldmin)[0]
-        # for j in ivor[newm]:
-        ##    if not j in iactive:
-        #       print "WE HAVE A PROBLEM!", np.where(ivor==1)[0]
 
         rvor[iactive] = 0
         for j in xrange(n):
@@ -93,15 +89,5 @@ def fast_fps(x, d=0, r=None):
                         ivor[j] = i
                         ldmin[j] = dj
                     rvor[ivor[j]] = max(rvor[ivor[j]], ldmin[j])
-
-        # nd = n2 + n2[inew] - 2*np.dot(x,x[inew]) # distances to the i-th point
-        # imin = np.where(nd<=ldmin)[0]
-
-        # ivor[imin] = i
-        # ldmin[imin] = nd[imin]
-
-        # rvor[:] = 0
-        # for j in xrange(n):
-        #    rvor[ivor[j]] = max(rvor[ivor[j]], ldmin[j])
     print(" computed ", ndist, "distances")
     return iy, lmin, ivor, rvor
