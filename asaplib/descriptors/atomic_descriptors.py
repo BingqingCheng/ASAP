@@ -68,6 +68,8 @@ class Atomic_Descriptors:
             return Atomic_Descriptor_LMBTR_K2(desc_spec)
         if desc_spec["type"] == "LMBTR_K3":
             return Atomic_Descriptor_LMBTR_K3(desc_spec)
+        if desc_spec["type"] == "FCHL19":
+            return Atomic_Descriptor_FCHL19(desc_spec)
         else:
             raise NotImplementedError 
 
@@ -334,3 +336,104 @@ class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
 
         # make an acronym
         self.acronym = "LMBTR-K3" # perhaps add more info here
+
+class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
+    """
+    Generate the FCHL19 representation (https://doi.org/10.1063/1.5126701).
+    Requires the developer version of the QML package, see
+    https://www.qmlcode.org/installation.html for installation instructions.
+
+
+    Parameters
+    ----------
+    :param nRs2: Number of gaussian basis functions in the two-body terms
+    :type nRs2: integer
+    :param nRs3: Number of gaussian basis functions in the three-body radial part
+    :type nRs3: integer
+    :param nFourier: Order of Fourier expansion
+    :type nFourier: integer
+    :param eta2: Precision in the gaussian basis functions in the two-body terms
+    :type eta2: float
+    :param eta3: Precision in the gaussian basis functions in the three-body radial part
+    :type eta3: float
+    :param zeta: Precision parameter of basis functions in the three-body angular part
+    :type zeta: float
+    :param two_body_decay: exponential decay for the two body function
+    :type two_body_decay: float
+    :param three_body_decay: exponential decay for the three body function
+    :type three_body_decay: float
+    :param three_body_weight: relative weight of the three body function
+    :type three_body_weight: float
+    :is_periodic: Boolean determining Whether the system is periodic.
+    :type Boolean:
+    """
+    def __init__(self, desc_spec):
+
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "FCHL19":
+            raise ValueError("Type is not FCHL19 or cannot find the type of the descriptor")
+
+        if 'periodic' in desc_spec.keys():
+            self.periodic = bool(desc_spec['periodic'])
+        if self.periodic == True:
+            raise ValueError("Warning: currently DScribe only supports FCHL19 for finite systems")
+
+        print("Warning: This FCHL19 atomic descriptor is untested, because I (Bingqing) cannot install QML!")
+        raise NotImplementedError
+        from qml.representations import generate_fchl_acsf
+
+        self.fchl_acsf_dict = {'nRs2'= None, 
+                               'nRs3' = None, 
+                               'nFourier' = None,
+                               'eta2' = None , 
+                               'eta3' = None, 
+                               'zeta'= None,
+                               'rcut' = None, 
+                               'acut' = None,
+                              'two_body_decay' = None, 
+                              'three_body_decay' = None,
+                              'three_body_weight' = None,
+                              'pad' = False, 'gradients' = False}
+
+        # required
+        try:
+            self.species = desc_spec['species']
+        except:
+            raise ValueError("Not enough information to intialize the `Atomic_Descriptor_ACF` object")
+
+        # fill in the values
+        for k, v in desc_spec.items():
+            if k in self.fchl_acsf_dict.keys():
+                self.fchl_acsf_dict[k] = v
+
+        print("Using FCHL19 Descriptors ...")
+
+        # make an acronym
+        self.acronym = "FCHL19-c" # add more stuff here
+
+    def _repr_wrapper(frame, elements,
+                 nRs2=24, nRs3=20,
+                 nFourier=1, eta2=0.32, eta3=2.7,
+                 zeta=np.pi, rcut=8.0, acut=8.0,
+                 two_body_decay=1.8, three_body_decay=0.57,
+                 three_body_weight=13.4, stride=1):
+
+
+        nuclear_charges, coordinates = frame.get_atomic_numbers(), frame.get_positions()
+        rep = generate_fchl_acsf(nuclear_charges, coordinates, elements,
+                             nRs2=nRs2, nRs3=nRs3, nFourier=nFourier,
+                             eta2=eta2, eta3=eta3, zeta=zeta,
+                             rcut=rcut, acut=acut,
+                             two_body_decay=two_body_decay, three_body_decay=three_body_decay,
+                             three_body_weight=three_body_weight,
+                             pad=False, gradients=False)
+        rep_out = np.zeros((rep.shape[0], len(elements), rep.shape[1]))
+
+        for i, z in enumerate(nuclear_charges):
+            j = np.where(np.equal(z, elements))[0][0]
+            rep_out[i, j] = rep[i]
+        rep_out = rep_out.reshape(len(rep_out), -1)
+        return rep_out
+
+    def create(self, frame):
+        # notice that we return the acronym here!!!
+        return self.acronym, self_repr_wrapper(frame, self.species, **self.fchl_acsf_dict)
