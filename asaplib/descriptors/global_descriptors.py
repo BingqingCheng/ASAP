@@ -169,7 +169,7 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         # initialize a Atomic_2_Global_Descriptors object
         self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
         
-        print("Using Atomic_2_Global_Descriptors...")
+        #print("Using Atomic_2_Global_Descriptors ...")
 
         self.acronym = "atomic-to-global"+randomString(6)
 
@@ -220,7 +220,7 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
 
 
         self.cm = CoulombMatrix(self.max_atoms)
-        print("Using CoulombMatrix...")
+        print("Using CoulombMatrix ...")
         # make an acronym
         self.acronym = "CM" + "-" + str(self.max_atoms)
 

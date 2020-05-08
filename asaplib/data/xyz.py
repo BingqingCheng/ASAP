@@ -201,7 +201,7 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        fmat: string_like, the name of the descriptors in the extended xyz file
+        desc_name: string_like, the name of the descriptors in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
 
         Returns

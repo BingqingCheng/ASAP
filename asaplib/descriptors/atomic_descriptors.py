@@ -144,7 +144,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
                                          sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
                                          periodic=self.periodic)
 
-        print("Using SOAP Descriptors...")
+        print("Using SOAP Descriptors ...")
 
         # make an acronym
         self.acronym = "SOAP-n" + str(self.n) + "-l" + str(self.l) + "-c" + str(self.cutoff) + "-g" + str(self.g)
@@ -246,6 +246,8 @@ class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
         self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
                             k2=self.k2)
 
+        print("Using LMBTR-K2 Descriptors ...")
+
         # make an acronym
         self.acronym = "LMBTR-K2" # perhaps add more info here
 
@@ -267,6 +269,8 @@ class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
 
         self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
                             k3=self.k3)
+
+        print("Using LMBTR-K3 Descriptors ...")
 
         # make an acronym
         self.acronym = "LMBTR-K3" # perhaps add more info here
