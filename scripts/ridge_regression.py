@@ -49,9 +49,9 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
         asapxyz = ASAPXYZ(fxyz)
         desc, _ = asapxyz.get_descriptors(fmat)
     # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
+    if os.path.isfile(fmat[0]):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.genfromtxt(fmat[0], dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
@@ -155,7 +155,7 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='ASAP_desc',
+    parser.add_argument('-fmat', nargs='+', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-fy', type=str, default='none', help='Location of the list of properties (N floats)')
