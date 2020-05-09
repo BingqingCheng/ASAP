@@ -1,12 +1,12 @@
 import os
 import json
+from yaml import dump as ydump
+from yaml import Dumper
 import numpy as np
 from ase.io import read, write
+
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
-#from yaml import load as yload
-from yaml import dump as ydump
-from yaml import Loader, Dumper
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):

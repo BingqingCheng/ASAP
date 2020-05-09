@@ -60,7 +60,7 @@ def main(fxyz, prefix):
     # compute the descripitors
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, tag)
 
-    asapxyz.write_computed_descriptors(tag,['test_cm', 'test_soap'],[0])
+    asapxyz.write_computed_descriptors(prefix,['test_cm', 'test_soap'],[0])
 
     asapxyz.write(prefix)
     asapxyz.save_state(tag)
