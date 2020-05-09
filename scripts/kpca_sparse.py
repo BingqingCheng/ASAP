@@ -1,6 +1,5 @@
-#!/usr/bin/python3
 """
-TODO: Module-level description
+Sparse KPCA with plotting
 """
 
 import argparse
@@ -8,13 +7,14 @@ import argparse
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.compressor import fps, CUR_deterministic
+from asaplib.kernel import Descriptors_to_Kernels
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, kpca_d, pc1, pc2, projectatomic, plotatomic,
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, power,
+            kpca_d, pc1, pc2, projectatomic, plotatomic, adjusttext):
 
     """
-
     Parameters
     ----------
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
@@ -37,8 +37,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     Returns
     -------
-
     """
+
     use_atomic_desc = (peratom or plotatomic or projectatomic)
     # try to read the xyz file
     if fxyz != 'none':
@@ -50,9 +50,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
+    if os.path.isfile(fmat[0]):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.genfromtxt(fmat[0], dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
@@ -86,14 +86,16 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         print("Not using any sparsification")
         ifps = np.range(n_sample)
 
-    # use linear kernel for now
-    kNN = np.power(np.dot(desc[ifps],desc[ifps].T),power)
-    kNM = np.power(np.dot(desc[:],desc[ifps].T),power)
-    print("Shape of the kNN matrix: ", np.shape(kNN), ", and shape of the kNM matrix:", np.shape(kNM))
+    k_spec = {'k0':{"type": "cosine"}} #{ 'k1': {"type": "polynomial", "d": power}}
+    k_transform = Descriptors_to_Kernels(k_spec)
+
+    kNN = k_transform.compute(desc[ifps])
+    kMN = k_transform.compute(desc, desc[ifps])
+    print("Shape of the kNN matrix: ", np.shape(kNN), ", and shape of the kMN matrix:", np.shape(kMN))
     # main thing
     kpca = KernelPCA(kpca_d)
     kpca.fit(kNN)
-    proj = kpca.transform(kNM)
+    proj = kpca.transform(kMN)
     if peratom or plotatomic and not projectatomic:
         kNT = np.power(np.dot(desc_atomic[:],desc[ifps].T),power)
         proj_atomic_all = kpca.transform(kNT)
@@ -176,7 +178,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True,
+    parser.add_argument('-fmat', nargs='+', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none',
@@ -209,5 +211,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.sparsemode, args.n, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.keepraw, args.sparsemode, args.n, args.power, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
 

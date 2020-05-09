@@ -113,8 +113,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, kpca_d, pc1, pc2,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, required=True,
-                        help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
+    parser.add_argument('-fmat', nargs='+', type=str, required=True,
+                        help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none', help='Location of tags for the first M samples')
     parser.add_argument('-colors', type=str, default='none',
