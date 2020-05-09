@@ -91,7 +91,8 @@ def gen_desc(ctx, in_file, fxyz, prefix, tag,
             else:
                 state[k] = s
                 
-        fxyz = state['data']['fxyz']
+        if fxyz == None:
+           fxyz = state['data']['fxyz']
         ctx.obj['desc_spec'] = state['descriptors']
 
     asapxyz = ASAPXYZ(fxyz, stride, periodic)
