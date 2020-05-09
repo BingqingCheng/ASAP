@@ -4,6 +4,9 @@ import numpy as np
 from ase.io import read, write
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
+#from yaml import load as yload
+from yaml import dump as ydump
+from yaml import Loader, Dumper
 
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
@@ -83,13 +86,22 @@ class ASAPXYZ:
     def get_global_species(self):
         return self.global_species
 
-    def save_state(self, filename):
-        with open(filename+'-state.json', 'w') as jd:
-            json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
+    def save_state(self, filename, mode='yaml'):
+         if mode == 'yaml':
+             with open(filename+'-state.yaml', 'w') as yd:
+                 ydump(self.computed_desc_dict, yd, Dumper=Dumper)
+         else:
+             with open(filename+'-state.json', 'w') as jd:
+                 json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
 
-    def save_descriptor_acronym_state(self, filename):
-        with open(filename+'-descriptor-acronyms.json', 'w') as jd:
-            json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
+    def save_descriptor_acronym_state(self, filename, mode='yaml'):
+
+        if mode == 'yaml':
+            with open(filename+'-descriptor-acronyms.yaml', 'w') as yd:
+                ydump(self.tag_to_acronym, yd, Dumper=Dumper)
+        else:
+            with open(filename+'-descriptor-acronyms.json', 'w') as jd:
+                json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
 
     def _add_info_to_desc_spec(self, desc_spec_dict):
         """
