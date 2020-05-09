@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Functions for IO and type conversions
 """
 
 import argparse
@@ -8,6 +8,19 @@ import json
 import numpy as np
 import random
 import string
+
+def extract_from_nested_dict(key, var):
+    if hasattr(var,'iteritems'):
+        for k, v in var.iteritems():
+            if k == key:
+                yield v
+            if isinstance(v, dict):
+                for result in extract_from_nested_dict(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in extract_from_nested_dict(key, d):
+                        yield result
 
 def str2bool(v):
     """

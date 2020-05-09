@@ -52,7 +52,7 @@ def main(fxyz, prefix):
     kernel_js['k2'] = {'kernel_type': 'sum',  
                               'element_wise': True}
 
-    desc_spec_js = {'testcm': {'type': "CM"},
+    desc_spec_js = {'test_cm': {'type': "CM"},
                     'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
                     'test_acsf':{'atomic_descriptor':  acsf_js, 'kernel_function': kernel_js},
                     'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
@@ -60,9 +60,10 @@ def main(fxyz, prefix):
     # compute the descripitors
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, tag)
 
+    asapxyz.write_computed_descriptors(tag,['test_cm', 'test_soap'],[0])
+
     asapxyz.write(prefix)
     asapxyz.save_state(tag)
-    asapxyz.save_descriptor_state(tag)
 
 def test_gen(tmpdir):
     """Test the generation using pytest"""

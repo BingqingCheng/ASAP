@@ -25,11 +25,19 @@ class ASAPXYZ:
         # store the xyz file
         self.frames = None
         self.nframes = 0
-        self.natom_list = []
-        self.total_natoms = 0
-        self.global_species = []
+        self.natom_list = [] # number of atoms for each frame
+        self.total_natoms = 0 # total number of atoms for all frames
+        self.global_species = [] # list of elements contains in all frames
+
+        # record the state of the computation, e.g. which descriptors have been computed
         self.computed_desc_dict = {'data' : {'fxyz': fxyz} }
+        # the conversion between tag of the descriptors and their acronyms
         self.tag_to_acronym = {'global':{}, 'atomic':{}}
+
+        # we make a dictionary to store the computed descriptors
+        self.global_desc = {}
+        # this is for the atomic ones
+        self.atomic_desc = {}
 
         if not os.path.isfile(self.fxyz):
             raise IOError('Cannot find the xyz file.')
@@ -42,12 +50,15 @@ class ASAPXYZ:
 
         self.nframes = len(self.frames)
         all_species = []
-        for frame in self.frames:
+        for i, frame in enumerate(self.frames):
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
             all_species.extend(frame.get_atomic_numbers())
             if not self.periodic or not np.sum(frame.get_cell()) > 0:
                 frame.set_pbc([False, False, False])
+            # we also initialize the descriptor dictionary for each frame
+            self.global_desc[i] = {}
+            self.atomic_desc[i] = {}
 
         self.total_natoms = np.sum(self.natom_list)
         self.max_atoms = max(self.natom_list)
@@ -76,9 +87,21 @@ class ASAPXYZ:
         with open(filename+'-state.json', 'w') as jd:
             json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
 
-    def save_descriptor_state(self, filename):
+    def save_descriptor_acronym_state(self, filename):
         with open(filename+'-descriptor-acronyms.json', 'w') as jd:
             json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
+
+    def _add_info_to_desc_spec(self, desc_spec_dict):
+        """
+        add some system specific information to the list to descriptor specifications
+        Parameters
+        ----------
+        desc_spec_dict: dictionaries that specify which global descriptor to use.
+        """
+        for element in desc_spec_dict.keys():
+            desc_spec_dict[element]['species'] = self.global_species
+            desc_spec_dict[element]['periodic'] = self.periodic
+            desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
     def compute_atomic_descriptors(self, desc_spec_list={}, sbs=[], tag=None):
         """
@@ -100,18 +123,14 @@ class ASAPXYZ:
         if tag is None: tag = randomString(6)
 
         # add some system specific information to the list to descriptor specifications
-        for element in desc_spec_dict.keys():
-            desc_spec_dict[element]['species'] = self.global_species
-            desc_spec_dict[element]['periodic'] = self.periodic
-            desc_spec_dict[element]['max_atoms'] = self.max_atoms
+        self._add_info_to_desc_spec(desc_spec_dict)
 
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
 
         for i in sbs:
             frame = self.frames[sbs]
-            atomic_desc_dict_now = atomic_desc.create(frame)
-            self._parse_computed_atomic_descriptors(atomic_desc_dict_now, frame)
+            self.atomic_desc[i].update(atomic_desc.create(frame))
 
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  atomic_desc.pack()
@@ -143,36 +162,60 @@ class ASAPXYZ:
         sbs: array, integer
         """
 
-
-
         if len(sbs) == 0:
             sbs = range(self.nframes)
         if tag is None: tag = randomString(6)
 
         # add some system specific information to the list to descriptor specifications
-        for element in desc_spec_dict.keys():
-            desc_spec_dict[element]['species'] = self.global_species
-            desc_spec_dict[element]['periodic'] = self.periodic
-            desc_spec_dict[element]['max_atoms'] = self.max_atoms
+        self._add_info_to_desc_spec(desc_spec_dict)
 
-        # business!
+        # business! Intialize a Global_Descriptors object
         global_desc = Global_Descriptors(desc_spec_dict)
 
         for i in sbs:
             frame = self.frames[i]
             # compute atomic descriptor
             desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
-            self._parse_computed_descriptors(desc_dict_now, frame)
+            self.global_desc[i].update(desc_dict_now)
             if keep_atomic:
-                self._parse_computed_atomic_descriptors(atomic_desc_dict_now, frame)
+                self.atomic_desc[i].update(atomic_desc_dict_now)
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] = global_desc.pack()
 
-    def _parse_computed_descriptors(self, desc_dict_now, frame):
-        """parse the information computed"""
-        # now we recorded the computed descriptors to the xyz object
-        for e in desc_dict_now.keys():
-            # we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
+    def fetch_computed_descriptors(self, desc_dict_keys=[], sbs=[]):
+        """
+        Fetch the computed descriptors for selected frames
+        Parameters
+        ----------
+        desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+        sbs: array, integer
+
+        Returns
+        -------
+        desc: np.matrix [n_frame, n_desc]
+        """
+        return np.row_stack([self._parse_computed_descriptors_singleframe(desc_dict_keys, i) for i in sbs])
+
+    def _parse_computed_descriptors_singleframe(self, desc_dict_keys=[], i=0):
+        """return the global descriptor computed for frame i"""
+        # TODO: use the nested dictionaty search `extract_from_nested_dict` in ..io
+        desc_array = np.array([])
+        for e in desc_dict_keys:
+            try:
+                desc_array = np.append(desc_array,self.global_desc[i][e]['descriptors'])
+            except:
+                # if we use atomic to global descriptor, this is a nested dictionary
+                for e2 in self.global_desc[i][e].keys():
+                    for e3 in self.global_desc[i][e][e2].keys():
+                        desc_array = np.append(desc_array,self.global_desc[i][e][e2][e3]['descriptors'])
+        return desc_array
+
+    def _write_computed_descriptors_to_xyz(self, desc_dict_now, frame):
+        """  
+        we recorded the computed descriptors to the xyz object
+        we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
+        """
+        for e in desc_dict_now.keys():            
             try:
                 frame.info[desc_dict_now[e]['acronym']] = desc_dict_now[e]['descriptors']
                 self.tag_to_acronym['global'][e] = desc_dict_now[e]['acronym']
@@ -181,15 +224,15 @@ class ASAPXYZ:
                 self.tag_to_acronym['global'][e] = {}
                 for e2 in desc_dict_now[e].keys():
                     self.tag_to_acronym['global'][e][e2] = {}
-                    #print(e2), print(desc_dict_now[e][e2])
                     for e3 in desc_dict_now[e][e2].keys():
-                        #print(e3); print(desc_dict_now[e][e2][e3]); print(desc_dict_now[e][e2][e3].keys())
                         frame.info[desc_dict_now[e][e2][e3]['acronym']] = desc_dict_now[e][e2][e3]['descriptors']
                         self.tag_to_acronym['global'][e][e2][e3] = desc_dict_now[e][e2][e3]['acronym']
 
-    def _parse_computed_atomic_descriptors(self, atomic_desc_dict_now, frame):
-        """parse the information computed"""
-        #print(atomic_desc_dict_now)
+    def _write_computed_atomic_descriptors_to_xyz(self, atomic_desc_dict_now, frame):
+        """  
+        we recorded the computed descriptors to the xyz object
+        we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
+        """
         for e in atomic_desc_dict_now.keys():
             self.tag_to_acronym['atomic'][e] = {}
             for e2 in atomic_desc_dict_now[e].keys():
@@ -201,7 +244,7 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        desc_name_list: a list of strings, the name of the descriptors in the extended xyz file
+        desc_name_list: a list of strings, the name of the .info[] in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
 
         Returns
@@ -209,6 +252,7 @@ class ASAPXYZ:
         desc: np.matrix
         atomic_desc: np.matrix
         """
+        # TODO: (maybe?) rename this into get_info. Need to change pca.py/kpca.py/... that uses this function
         desc = []
         atomic_desc = []
 
@@ -234,11 +278,11 @@ class ASAPXYZ:
         return desc, atomic_desc
 
     def get_property(self, y_key=None, extensive=False, sbs=[]):
-        """ extract the descriptor array from each frame
+        """ extract specified property from selected frames
 
         Parameters
         ----------
-        y_name: string_like, the name of the property in the extended xyz file
+        y_key: string_like, the name of the property in the extended xyz file
         sbs: array, integer
 
         Returns
@@ -284,7 +328,7 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        y_name: string_like, the name of the property in the extended xyz file
+        y_key: string_like, the name of the property in the extended xyz file
         sbs: array, integer
 
         Returns
@@ -318,7 +362,7 @@ class ASAPXYZ:
         Returns
         -------
         """
-
+        # TODO: (maybe?) rename this into set_info. Need to change pca.py/kpca.py/... that uses this function
         # check if the length of the descriptor matrix is the same as the number of frames
         if len(desc) != self.nframes and self.nframes > 1:
             raise ValueError('The length of the descriptor matrix is not the same as the number of frames.')
@@ -375,15 +419,21 @@ class ASAPXYZ:
         filename: str
         sbs: array, integer
         """
+
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+
         # prepare for the output
         if os.path.isfile(str(filename) + ".xyz"): 
             os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
 
-        if len(sbs) > 0:
-            for i in sbs:
-                write(str(filename) + ".xyz", self.frames[i], append=True)
-        else:
-            write(str(filename) + ".xyz", self.frames)
+        for i in sbs:
+            self._write_computed_descriptors_to_xyz(self.global_desc[i], self.frames[i])
+            self._write_computed_atomic_descriptors_to_xyz(self.atomic_desc[i], self.frames[i])
+            write(str(filename) + ".xyz", self.frames[i], append=True)
+
+        # this acronym state file lets us know how the descriptors correspond to the outputs in the xyz file
+        self.save_descriptor_acronym_state(filename)
 
     def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment='#'):
         """
@@ -396,6 +446,8 @@ class ASAPXYZ:
         sbs: array, integer
         comment: str
         """
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
 
         desc, _ = self.get_descriptors(desc_name_list, False, sbs)
 
@@ -415,8 +467,27 @@ class ASAPXYZ:
         comment: str
         """
 
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+
         _, atomic_desc = self.get_descriptors(desc_name, True, sbs)
 
-        if os.path.isfile(str(filename) + "atomic-desc"): 
-            os.rename(str(filename) + "atomic-desc", "bck." + str(filename) + "atomic-desc")
-        np.savetxt(str(filename) + "atomic-desc", desc, fmt='%4.8f', header=comment)
+        if os.path.isfile(str(filename) + ".atomic-desc"): 
+            os.rename(str(filename) + ".atomic-desc", "bck." + str(filename) + "atomic-desc")
+        np.savetxt(str(filename) + ".atomic-desc", desc, fmt='%4.8f', header=comment)
+
+    def write_computed_descriptors(self, filename, desc_dict_keys=[], sbs=[], comment='#'):
+        """
+        write the computed descriptors for selected frames
+        Parameters
+        ----------
+        desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+        sbs: array, integer
+
+        Returns
+        -------
+        desc: np.matrix [n_frame, n_desc]
+        """
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+        np.savetxt(str(filename) + ".desc", self.fetch_computed_descriptors(desc_dict_keys, sbs), fmt='%4.8f', header=comment)
