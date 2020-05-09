@@ -435,7 +435,7 @@ class ASAPXYZ:
         # this acronym state file lets us know how the descriptors correspond to the outputs in the xyz file
         self.save_descriptor_acronym_state(filename)
 
-    def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment='#'):
+    def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment=''):
         """
         write the selected descriptor matrix in a matrix format to file
 
@@ -455,7 +455,7 @@ class ASAPXYZ:
             os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
         np.savetxt(str(filename) + ".desc", desc, fmt='%4.8f', header=comment)
 
-    def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[], comment='#'):
+    def write_atomic_descriptor_matrix(self, filename, desc_name, sbs=[], comment=''):
         """
         write the selected descriptor matrix in a matrix format to file
 
@@ -476,7 +476,7 @@ class ASAPXYZ:
             os.rename(str(filename) + ".atomic-desc", "bck." + str(filename) + "atomic-desc")
         np.savetxt(str(filename) + ".atomic-desc", desc, fmt='%4.8f', header=comment)
 
-    def write_computed_descriptors(self, filename, desc_dict_keys=[], sbs=[], comment='#'):
+    def write_computed_descriptors(self, filename, desc_dict_keys=[], sbs=[], comment=''):
         """
         write the computed descriptors for selected frames
         Parameters
