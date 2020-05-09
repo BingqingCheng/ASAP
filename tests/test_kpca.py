@@ -1,3 +1,5 @@
+from os import path
+
 import ase.io
 import numpy as np
 from dscribe.descriptors import SOAP
@@ -32,7 +34,8 @@ class TestKPCA(object):
     @classmethod
     def setup_class(cls):
         # todo: add docs for these
-        fn = "ice_test.xyz"
+        test_folder = path.split(__file__)[0]
+        fn = path.abspath(path.join(test_folder, "ice_test.xyz"))
         at_train = ase.io.read(fn, '0')
         at_test = ase.io.read(fn, '1')
 
