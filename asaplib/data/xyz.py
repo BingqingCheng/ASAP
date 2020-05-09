@@ -89,7 +89,7 @@ class ASAPXYZ:
     def save_state(self, filename, mode='yaml'):
          if mode == 'yaml':
              with open(filename+'-state.yaml', 'w') as yd:
-                 ydump(self.computed_desc_dict, yd, Dumper=Dumper)
+                 ydump(self.computed_desc_dict, yd, sort_keys=True, Dumper=Dumper)
          else:
              with open(filename+'-state.json', 'w') as jd:
                  json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
@@ -98,7 +98,7 @@ class ASAPXYZ:
 
         if mode == 'yaml':
             with open(filename+'-descriptor-acronyms.yaml', 'w') as yd:
-                ydump(self.tag_to_acronym, yd, Dumper=Dumper)
+                ydump(self.tag_to_acronym, yd, sort_keys=True, Dumper=Dumper)
         else:
             with open(filename+'-descriptor-acronyms.json', 'w') as jd:
                 json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
