@@ -96,7 +96,8 @@ def plot_density_map(X, z, fig=None, ax=None,
         # plot typical
         axscatter = ax.scatter(x[typical], y[typical], c=z[typical], cmap=cmap, s=psize, alpha=1.0,
                                rasterized=rasterized)
-        if clabel is not None: cb = fig.colorbar(axscatter)
+        if clabel is not None:
+            cb = fig.colorbar(axscatter)
         # plot bot outliers (black !)
         ax.scatter(x[bot_outliers], y[bot_outliers], c='black', s=psize, alpha=1.0, rasterized=rasterized)
         # plot top outliers (yellow !)
