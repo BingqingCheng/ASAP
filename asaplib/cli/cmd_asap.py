@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from asaplib.data import ASAPXYZ
 from asaplib.hypers import universal_soap_hyper
 from asaplib.plot import Plotters, set_color_function
-from asaplib.io import PythonLiteralOption
+from asaplib.io import ConvertStrToList
 
 @click.group('asap')
 @click.pass_context
@@ -218,8 +218,9 @@ def map_setup_options(f):
     f = click.option('--fxyz', '--f', 
                      type=click.Path('r'), 
                      help='Location of descriptor matrix file or name of the descriptors in ase xyz file.')(f)
-    f = click.option('--design_matrix', '--dm', cls=PythonLiteralOption, default=[],
-                     help='Location of descriptor matrix file or name of the tags in ase xyz file')(f)
+    f = click.option('--design_matrix', '--dm', cls=ConvertStrToList, default=[],
+                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
+                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
                      help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
