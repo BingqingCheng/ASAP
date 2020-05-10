@@ -59,7 +59,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
                 plotcolor = asapxyz.get_property(fcolor)
             except:
                 raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
-            if peratom:
+            if peratom or project_atomic:
                 try:
                     plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
                 except:
