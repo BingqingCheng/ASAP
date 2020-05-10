@@ -71,7 +71,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
         colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
     elif project_atomic:
-        colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
+        colorscale = [None, None]
         return np.asarray(plotcolor_atomic), [], colorlabel, colorscale
     else:
         colorscale = [None, None]
