@@ -322,4 +322,75 @@ class Plot_Function_Scatter(Plot_Function_Base):
             cb.set_label(label=self.p_spec['clabel'], labelpad=10)
 
         return fig, ax
+
+
+class Plot_Function_Cluster(Plot_Function_Base):
+    """
+    Plots a 2D clustering plot given x,y coordinates and a label z for
+    every data point.
+    Basically we draw a circle centered arround the mean position of the samples 
+    belonging to each cluster,
+    with a size propotional to log(cluster_size)
+    """
+    def __init__(self, p_spec):
+
+        self.acronym = "cluster"
+
+        self.p_spec = {
+        'w_label': False,
+        'circle_size': 20, 
+        'facecolor': 'none',
+        'edgecolor': 'gray',
+        'fontsize': 16,
+        'cmap': 'gnuplot',
+        'alpha': 1.0 # color transparency
+        }
+
+        # fill in the values
+        for k, v in p_spec.items():
+            if k in self.p_spec.keys():
+                self.p_spec[k] = v
+
+        print("Using cluster plot ...")
+
+    def create(self, fig, ax, X, z=[], y=[], tags=[]):
+        """
+        Parameters
+        ----------
+        X : array-like, shape=[n_samples,2]
+        Input points.
+        y : array-like, shape=[n_samples]
+        label for every point
+        z and tags are not used for this plot style
+        """
+
+        # get the cluster size and mean position
+        from ..cluster import get_cluster_size, get_cluster_properties
+        y_unique = np.unique(y)
+        [_, cluster_mx] = get_cluster_properties(y, X[:, 0], 'mean')
+        [_, cluster_my] = get_cluster_properties(y, X[:, 1], 'mean')
+        [_, cluster_size] = get_cluster_size(y)
+        s = {}
+        for k in y_unique:
+            s[k] = np.log(cluster_size[k]) # default is using log(frequency)
+
+        for k in y_unique:
+            ax.plot(cluster_mx[k], cluster_my[k], 'o', 
+                    markerfacecolor=self.p_spec['facecolor'],
+                    markeredgecolor=self.p_spec['edgecolor'], 
+                    markersize=self.p_spec['circle_size'] * s[k])
+
+        if self.p_spec['w_label'] is True:
+            for k in y_unique:
+                # Position of each label.
+                txt = ax.annotate(str(k), xy=(cluster_mx[k], cluster_my[k]),
+                              xytext=(0, 0), textcoords='offset points',
+                              fontsize=self.p_spec['fontsize'], 
+                              horizontalalignment='center', verticalalignment='center')
+                txt.set_path_effects([
+                              PathEffects.Stroke(linewidth=5, foreground='none'),
+                              PathEffects.Normal()])
+
+        return fig, ax
+
         

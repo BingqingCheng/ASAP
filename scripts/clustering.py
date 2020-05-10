@@ -61,9 +61,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         output = 'matrix'
 
     # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
+    if os.path.isfile(fmat[0]):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.genfromtxt(fmat[0], dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
@@ -131,52 +131,34 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         else:
             plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
 
+    print(labels_db[::-1])
+
+    outfile = 'Clustering_4_' + prefix + '.png'
     # make plot
-    plot_styles.set_nice_font()
-
-    fig, ax = plot_styles.plot_cluster_w_size(proj[:, [pc1, pc2]], labels_db, plotcolor, s=None,
-                                              clabel=colorlabel, title=None,
-                                              w_size=True, w_label=True,
-                                              circle_size=30, alpha=0.5, edgecolors=None,
-                                              cmap='gnuplot', vmax=None, vmin=None, psize=20,
-                                              show=False, savefile=None, fontsize=25,
-                                              figsize=None, rasterized=True, remove_tick=True,
-                                              dpi=200, outlier=True)
-    """
-    ax = plot_styles.plot_cluster_w_label(proj[:,[pc1,pc2]], labels_db, Xcluster=None, 
-                      show=False, savefile = None, fontsize =15, psize = 20, 
-                      title=None, w_label = True, figsize=None,
-                      dpi=200, alpha=0.7, edgecolors=None, cp_style=1, w_legend=False, outlier=True)
-    """
-    fig.set_size_inches(160.5, 80.5)
-
-    # project the known structures
-    if ftags != 'none':
-        texts = []
-        for i in range(ndict):
-            ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-            texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                 ha='center', va='center', fontsize=15, color='red'))
-            # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if adtext:
-            from adjustText import adjust_text
-            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
-                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                        ax=ax, precision=0.01,
-                        arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
-
-    plt.title('(k)PCA and clustering for: ' + prefix)
-    plt.xlabel('Princple Axis ' + str(pc1))
-    plt.ylabel('Princple Axis ' + str(pc2))
-    plt.show()
-    fig.savefig('Clustering_4_' + prefix + '.png')
+    fig_spec_dict = {
+        'outfile': outfile,
+        'show': True,
+        'title': None,
+        'xlabel': 'Principal Axis 1',
+        'ylabel': 'Principal Axis 2',
+        'xaxis': True,  'yaxis': True,
+        'remove_tick': False,
+        'rasterized': True,
+        'fontsize': 16,
+        'components':{ 
+            "first_p": {"type": 'scatter', 'clabel': colorlabel},
+            #"second_p": {"type": 'annotate', 'adtext': adtext},
+            "third_p": {"type": 'cluster', 'w_label': True, 'circle_size': 20}
+             }
+        }
+    asap_plot = Plotters(fig_spec_dict)
+    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], labels_db[::-1], []) #tags)
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='none',
+    parser.add_argument('-fmat', nargs='+', type=str,default='none',
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-kmat', type=str, default='none',
                         help='Location of kernel matrix file. You can use gen_kmat.py to compute it.')
