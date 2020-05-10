@@ -193,7 +193,7 @@ class Plot_Function_Annotate(Plot_Function_Base):
         # fill in the values
         for k, v in p_spec.items():
             if k in self.p_spec.keys():
-                self.k_spec[k] = v
+                self.p_spec[k] = v
 
         print("Using annotation plot ...")
 
@@ -209,16 +209,16 @@ class Plot_Function_Annotate(Plot_Function_Base):
         labels and z are not used for this plot style
         """
         texts = []
-        for i in range(tags):
+        for i in range(len(tags)):
             if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
                 ax.scatter(X[i, 0], X[i, 1], 
-                           marker=self.k_spec['marker'], 
-                           c=self.k_spec['markercolor'])
+                           marker=self.p_spec['marker'], 
+                           c=self.p_spec['markercolor'])
                 texts.append(ax.text(X[i, 0], X[i, 1], tags[i],
                                      ha='center', va='center', 
-                                     fontsize=self.k_spec['textsize'],
-                                     color=self.k_spec['textcolor']))
-        if self.k_spec['adtext']:
+                                     fontsize=self.p_spec['textsize'],
+                                     color=self.p_spec['textcolor']))
+        if self.p_spec['adtext']:
             """ adjust the position of the annotated text, so they don't overlap """
             from adjustText import adjust_text
             adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},

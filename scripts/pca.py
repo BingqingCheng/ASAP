@@ -114,12 +114,12 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         'rasterized': True,
         'fontsize': 16,
         'components':{ 
-            "first_p": {"type": 'scatter', 'clabel': colorlabel} #,
-            #"second_p": {"type": 'annotate', 'adtext' = adtext}
+            "first_p": {"type": 'scatter', 'clabel': colorlabel},
+            "second_p": {"type": 'annotate', 'adtext': adtext}
              }
         }
     asap_plot = Plotters(fig_spec_dict)
-    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], [])
+    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], tags)
 
 
 if __name__ == '__main__':
