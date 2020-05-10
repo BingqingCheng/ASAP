@@ -414,16 +414,33 @@ class ASAPXYZ:
         """
         remove the desciptors
         """
-        for frame in self.frames:
-            if desc_name in frame.info:
-                del frame.info[desc_name]
+        if isinstance(desc_name, list):
+            for dn in desc_name:
+                for frame in self.frames:
+                    if dn in frame.info:
+                        del frame.info[dn]
+        elif isinstance(desc_name, str):
+            for frame in self.frames:
+                if desc_name in frame.info:
+                    del frame.info[desc_name]
+        else:
+            print("Warning: Cannot parse desc_name when remove_descriptors.")
 
     def remove_atomic_descriptors(self, desc_name=None):
         """
         remove the desciptors
         """
-        for frame in self.frames:
-            del frame.arrays[desc_name]
+        if isinstance(desc_name, list):
+            for dn in desc_name:
+                for frame in self.frames:
+                    if dn in frame.arrays:
+                        del frame.arrays[dn]
+        elif isinstance(desc_name, str):
+            for frame in self.frames:
+                if desc_name in frame.arrays:
+                    del frame.arrays[desc_name]
+        else:
+            print("Warning: Cannot parse desc_name when remove_descriptors.")
 
     def write(self, filename, sbs=[]):
         """

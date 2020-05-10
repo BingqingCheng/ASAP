@@ -4,6 +4,8 @@ Functions for IO and type conversions
 
 import argparse
 import json
+import click
+import ast
 
 import numpy as np
 import random
@@ -53,6 +55,13 @@ def list2str(input_list):
         output_str += "-"
     return output_str
 
+class PythonLiteralOption(click.Option):
+
+    def type_cast_value(self, ctx, value):
+        try:
+            return ast.literal_eval(value)
+        except:
+            raise click.BadParameter(value)
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):

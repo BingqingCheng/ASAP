@@ -21,7 +21,7 @@ class Descriptors_to_Kernels:
         ----------
         k_spec_dict: dictionaries that specify which why to convert descriptors into kernel matrix
         e.g.
-        desc_spec_dict = {
+        k_spec_dict = {
         "first_kernel": {"type": 'linear', "normalize" = True},
         "second_kernel": {"type": 'cosine'},
         "third_kernel": {"type": 'polynormial', "d":3, "normalize" = True}
@@ -45,7 +45,7 @@ class Descriptors_to_Kernels:
         adding the specifications of a new kernel function
         Parameters
         ----------
-        desc_spec: a dictionary that specify which atomic descriptor to use 
+        k_spec: a dictionary that specify which atomic descriptor to use 
         """
         self.k_spec_dict[tag] = k_spec
 
