@@ -65,7 +65,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
                 except:
                     raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
 
-    colorlabel = 'use ' + str(fcolor) + ' for coloring the data points'
+    colorlabel = str(fcolor)
     if peratom:
         # print(np.shape(plotcolor_atomic))
         colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]

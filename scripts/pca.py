@@ -5,11 +5,13 @@ script for making PCA map based on precomputed design matrix
 
 import argparse
 import sys
+import os
+import numpy as np
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
 from asaplib.pca import PCA
-from asaplib.plot import *
+from asaplib.plot import Plotters, set_color_function
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, pca_d, pc1, pc2, projectatomic, plotatomic,
@@ -96,65 +98,28 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
     if projectatomic: plotcolor = plotcolor_peratom
 
-    # make plot
-    plot_styles.set_nice_font()
-    fig, ax = plt.subplots()
-    if plotatomic and not projectatomic:
-        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
-                                               clabel=None, label=None,
-                                               xaxis=True, yaxis=True,
-                                               centers=None,
-                                               psize=None,
-                                               out_file=None,
-                                               title=None,
-                                               show=False, cmap='gnuplot',
-                                               remove_tick=False,
-                                               use_perc=False,
-                                               rasterized=True,
-                                               fontsize=15,
-                                               vmax=colorscale[1],
-                                               vmin=colorscale[0])
-
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
-                                           xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
-                                           clabel=colorlabel, label=None,
-                                           xaxis=True, yaxis=True,
-                                           centers=None,
-                                           psize=None,
-                                           out_file=None,
-                                           title='PCA for: ' + prefix,
-                                           show=False, cmap='gnuplot',
-                                           remove_tick=False,
-                                           use_perc=False,
-                                           rasterized=True,
-                                           fontsize=15,
-                                           vmax=colorscale[1],
-                                           vmin=colorscale[0])
-
-    fig.set_size_inches(160.5, 80.5)
-
-    if ftags != 'none':
-        texts = []
-        for i in range(ndict):
-            if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
-                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                     ha='center', va='center', fontsize=10, color='red'))
-        if adtext:
-            from adjustText import adjust_text
-            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
-                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                        ax=ax, precision=0.01,
-                        arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
-
-    plt.show()
     if plotatomic:
-        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
+        outfile = 'PCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png'
     else:
-        fig.savefig('PCA_4_' + prefix + '-c-' + fcolor + '.png')
+        outfile = 'PCA_4_' + prefix + '-c-' + fcolor + '.png'
+
+    fig_spec_dict = {
+        'outfile': outfile,
+        'show': True,
+        'title': None,
+        'xlabel': 'Principal Axis 1',
+        'ylabel': 'Principal Axis 2',
+        'xaxis': True,  'yaxis': True,
+        'remove_tick': False,
+        'rasterized': True,
+        'fontsize': 16,
+        'components':{ 
+            "first_p": {"type": 'scatter', 'clabel': colorlabel} #,
+            #"second_p": {"type": 'annotate', 'adtext' = adtext}
+             }
+        }
+    asap_plot = Plotters(fig_spec_dict)
+    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], [])
 
 
 if __name__ == '__main__':
