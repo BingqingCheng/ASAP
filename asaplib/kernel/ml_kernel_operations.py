@@ -8,7 +8,19 @@ import numpy as np
 
 
 def normalizekernel(kernel):
-    # first normalize the kernel matrix
+    """
+    Normalize the kernel matrix
+
+    Parameters
+    ----------
+    kernel: kernel matrix in the form of a numpy array with dtype=float
+
+    Returns
+    -------
+
+    Normalized kernel.
+
+    """
     nkernel = copy.deepcopy(kernel)
     size = len(kernel)
     for i in range(size):
@@ -19,9 +31,21 @@ def normalizekernel(kernel):
 
 
 def kerneltodis(kernel):
-    # there can be many transformations between the k-matrix and the distance matrix
-    # Here we use d_ij = sqrt(2 - 2*k_ij)
-    # (k_ij is a normalized symmetric kernel)
+    """
+    There can be many transformations between the k-matrix and the distance matrix. Here we use d_ij = sqrt(2 - 2*k_ij)
+    (k_ij is a normalized symmetric kernel i.e. has had the normalize_kernel function applied to it). The input also
+    must be a valid kernel matrix i.e. the diagonal elements should be the same.
+
+    Parameters
+    ----------
+    kernel: numpy array with valid kernel matrix
+
+    Returns
+    -------
+    dis: distance matrix
+
+    """
+
     nk = normalizekernel(kernel)
     size = len(kernel)
     dis = np.zeros((size, size), dtype=np.float64)
@@ -33,17 +57,42 @@ def kerneltodis(kernel):
 
 
 def kerneltodis_linear(kernel):
-    # there can be many transformations between the k-matrix and the distance matrix
-    # Here we use d_ij = 1-k_ij
-    # (k_ij is a normalized symetric kernel)
+    """
+    There can be many transformations between the k-matrix and the distance matrix. Here we use d_ij = 1-k_ij
+    (k_ij is a normalized symmetric kernel i.e. has had the normalize_kernel function applied to it). The input also
+    must be a valid kernel matrix i.e. the diagonal elements should be the same.
+
+    Parameters
+    ----------
+    kernel: numpy array with valid kernel matrix
+
+    Returns
+    -------
+    dis: distance matrix
+
+    """
+
     nk = normalizekernel(kernel)
     dis = 1. - nk
     return dis.clip(min=0)
 
 
 def kerneltorho(kernel, delta):
-    # we compute the "density" of the data from kernel matrix
-    # delta is the charecteristic spread in similarity
+    """
+    We compute the "density" of the data from kernel matrix. Delta is the charecteristic spread in similarity
+
+    TODO: What range does delta take?
+
+    Parameters
+    ----------
+    kernel: valid kernel matrix
+    delta: characteristic spread in similarity
+
+    Returns
+    -------
+    rho: density matrix
+
+    """
 
     rho = np.zeros(len(kernel))
     allrhofromdis = np.exp((np.asmatrix(kernel) - 1.0) / delta)
