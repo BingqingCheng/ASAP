@@ -7,13 +7,12 @@ import argparse
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.compressor import fps
+from asaplib.compressor import fps, CUR_deterministic
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, kpca_d, pc1, pc2, projectatomic, plotatomic,
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, n_sparse, power, kpca_d, pc1, pc2, projectatomic, plotatomic,
-         adtext):
     """
 
     Parameters
@@ -76,7 +75,13 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if n_sparse >= n_sample:
         print("the number of representative structure is too large, please select n < ", n_sample)
     elif n_sample > 0:
-        ifps, _ = fps(desc, n_sparse, 0)
+        if sparse_mode == 'fps' or sparse_mode == 'FPS':
+            ifps, _ = fps(desc, n_sparse, 0)
+        elif sparse_mode == 'cur' or sparse_mode == 'CUR':
+            cov = np.dot(np.asmatrix(desc), np.asmatrix(desc).T)
+            ifps, _ = CUR_deterministic(cov, n_sparse)
+        else:
+            raise ValueError('Cannot find the specified sparsification mode')
     else:
         print("Not using any sparsification")
         ifps = np.range(n_sample)
@@ -186,6 +191,7 @@ if __name__ == '__main__':
                         help='Do you want to output per atom pca coordinates (True/False)?')
     parser.add_argument('--keepraw', type=str2bool, nargs='?', const=True, default=False,
                         help='Do you want to keep the high dimensional descriptor when output xyz file (True/False)?')
+    parser.add_argument('--sparsemode', type=str, default='fps', help='Sparsification method to use ([fps], [cur])')
     parser.add_argument('--n', type=int, default=0,
                         help='number of the representative samples, set negative if using no sparsification')
     parser.add_argument('--power', type=int, default=1,
@@ -203,4 +209,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.n, args.power, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.keepraw, args.sparsemode, args.n, args.d, args.pc1, args.pc2, args.projectatomic, args.plotatomic, args.adjusttext)
+
