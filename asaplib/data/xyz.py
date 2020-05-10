@@ -353,7 +353,10 @@ class ASAPXYZ:
 
         y_all = []
         try:
-            y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]])
+            #y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]]) # this doesn't work ?!
+            for i in sbs:
+                frame = self.frames[i]
+                y_all = np.append(y_all, frame.get_array(y_key))
         except:
             try:
                 for index, y in enumerate(self.get_property(y_key, extensive, sbs)):

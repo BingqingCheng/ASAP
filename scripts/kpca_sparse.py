@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Sparse KPCA with plotting
 """
@@ -11,8 +12,7 @@ from asaplib.kernel import Descriptors_to_Kernels
 from asaplib.pca import KernelPCA
 from asaplib.plot import *
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, power,
-            kpca_d, pc1, pc2, projectatomic, plotatomic, adjusttext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, sparse_mode, n_sparse, power, kpca_d, pc1, pc2, projectatomic, plotatomic, adjusttext):
 
     """
     Parameters
@@ -65,6 +65,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
+    else:
+        tags = []
 
     # sparsification
     n_sample = len(desc)
@@ -110,69 +112,34 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj))
-    if projectatomic: plotcolor = plotcolor_peratom
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, (peratom or plotatomic), projectatomic)
 
     # make plot
-    plot_styles.set_nice_font()
-    fig, ax = plt.subplots()
-    if plotatomic and not projectatomic:
-        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
-                                               clabel=None, label=None,
-                                               xaxis=True, yaxis=True,
-                                               centers=None,
-                                               psize=None,
-                                               out_file=None,
-                                               title=None,
-                                               show=False, cmap='gnuplot',
-                                               remove_tick=False,
-                                               use_perc=False,
-                                               rasterized=True,
-                                               fontsize=15,
-                                               vmax=colorscale[1],
-                                               vmin=colorscale[0])
+    if plotatomic:
+        outfile = 'KPCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png'
+    else:
+        outfile = 'KPCA_4_' + prefix + '-c-' + fcolor + '.png'
 
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [pc1, pc2]], plotcolor[::-1], fig, ax,
-                                           xlabel='Principal Axis ' + str(pc1), ylabel='Principal Axis ' + str(pc2),
-                                           clabel=colorlabel, label=None,
-                                           xaxis=True, yaxis=True,
-                                           centers=None,
-                                           psize=None,
-                                           out_file=None,
-                                           title='KPCA for: ' + prefix,
-                                           show=False, cmap='gnuplot',
-                                           remove_tick=False,
-                                           use_perc=False,
-                                           rasterized=True,
-                                           fontsize=15,
-                                           vmax=colorscale[1],
-                                           vmin=colorscale[0])
-
-    fig.set_size_inches(18.5, 10.5)
-
-    if ftags != 'none':
-        texts = []
-        for i in range(ndict):
-            if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
-                ax.scatter(proj[i, pc1], proj[i, pc2], marker='^', c='black')
-                texts.append(ax.text(proj[i, pc1], proj[i, pc2], tags[i],
-                                     ha='center', va='center', fontsize=15, color='red'))
-            # ax.annotate(tags[i], (proj[i,pc1], proj[i,pc2]))
-        if (adtext):
-            from adjustText import adjust_text
-            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
-                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                        ax=ax, precision=0.01,
-                        arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
-
+    fig_spec_dict = {
+        'outfile': outfile,
+        'show': False,
+        'title': None,
+        'xlabel': 'Principal Axis 1',
+        'ylabel': 'Principal Axis 2',
+        'xaxis': True,  'yaxis': True,
+        'remove_tick': False,
+        'rasterized': True,
+        'fontsize': 16,
+        'components':{ 
+            "first_p": {"type": 'scatter', 'clabel': colorlabel},
+            "second_p": {"type": 'annotate', 'adtext': adjusttext}
+             }
+        }
+    asap_plot = Plotters(fig_spec_dict)
+    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], tags)
+    if peratom or plotatomic and not projectatomic:
+        asap_plot.plot(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1],[],[])
     plt.show()
-    fig.savefig('KPCA_4_' + prefix + '-c-' + fcolor + '.png')
 
 
 if __name__ == '__main__':

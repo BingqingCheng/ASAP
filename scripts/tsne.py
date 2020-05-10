@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/python3
 """
 script for applying t-SNE to a precomputed design matrix. See: https://lvdmaaten.github.io/tsne/
 for getting the most out of t-SNE for your example.
@@ -15,7 +15,7 @@ from sklearn.manifold import TSNE
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.plot import set_color_function, plot_styles
+from asaplib.plot import Plotters, set_color_function
 
 
 def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, tsne_d, dim1, dim2, perplexity,
@@ -74,6 +74,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
+    else:
+        tags = []
 
     # scale & center
     if scale:
@@ -115,11 +117,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic: plotcolor = plotcolor_peratom
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, (peratom or plotatomic), projectatomic)
 
     # make plot
     plot_styles.set_nice_font()

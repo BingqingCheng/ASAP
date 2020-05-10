@@ -1,4 +1,4 @@
-#!python3
+#!/usr/bin/python3
 """
 script for applying UMAP to a precomputed design matrix. See: https://arxiv.org/abs/1802.03426 and
 https://umap-learn.readthedocs.io/en/latest/index.html
@@ -14,10 +14,10 @@ import umap
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.plot import set_color_function, plot_styles
+from asaplib.plot import Plotters, set_color_function
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, pc1, pc2,
         projectatomic, plotatomic, adtext):
     """
 
@@ -72,6 +72,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
+    else:
+        tags = []
 
     # scale & center
     if scale:
@@ -106,72 +108,34 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic: plotcolor = plotcolor_peratom
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, (peratom or plotatomic), projectatomic)
 
     # make plot
-    plot_styles.set_nice_font()
-    fig, ax = plt.subplots()
-    if plotatomic and not projectatomic:
-        # notice that we reverse the list of coordinates, in order to make the structures in the dictionary more obvious
-        fig, ax = plot_styles.plot_density_map(proj_atomic_all[::-1, [dim1, dim2]], plotcolor_peratom[::-1], fig, ax,
-                                               xlabel='Principal Axis ' + str(dim1),
-                                               ylabel='Principal Axis ' + str(dim2),
-                                               clabel=None, label=None,
-                                               xaxis=True, yaxis=True,
-                                               centers=None,
-                                               psize=None,
-                                               out_file=None,
-                                               title=None,
-                                               show=False, cmap='gnuplot',
-                                               remove_tick=False,
-                                               use_perc=False,
-                                               rasterized=True,
-                                               fontsize=15,
-                                               vmax=colorscale[1],
-                                               vmin=colorscale[0])
-
-    fig, ax = plot_styles.plot_density_map(proj[::-1, [dim1, dim2]], plotcolor[::-1], fig, ax,
-                                           xlabel='Principal Axis ' + str(dim1), ylabel='Principal Axis ' + str(dim2),
-                                           clabel=colorlabel, label=None,
-                                           xaxis=True, yaxis=True,
-                                           centers=None,
-                                           psize=None,
-                                           out_file=None,
-                                           title='UMAP for: ' + prefix,
-                                           show=False, cmap='gnuplot',
-                                           remove_tick=False,
-                                           use_perc=False,
-                                           rasterized=True,
-                                           fontsize=15,
-                                           vmax=colorscale[1],
-                                           vmin=colorscale[0])
-
-    fig.set_size_inches(160.5, 80.5)
-
-    if ftags != 'none':
-        texts = []
-        for i in range(ndict):
-            if tags[i] != 'None' and tags[i] != 'none' and tags[i] != '':
-                ax.scatter(proj[i, dim1], proj[i, dim2], marker='^', c='black')
-                texts.append(ax.text(proj[i, dim1], proj[i, dim2], tags[i],
-                                     ha='center', va='center', fontsize=10, color='red'))
-        if adtext:
-            from adjustText import adjust_text
-            adjust_text(texts, on_basemap=True,  # only_move={'points':'', 'text':'x'},
-                        expand_text=(1.01, 1.05), expand_points=(1.01, 1.05),
-                        force_text=(0.03, 0.5), force_points=(0.01, 0.25),
-                        ax=ax, precision=0.01,
-                        arrowprops=dict(arrowstyle="-", color='black', lw=1, alpha=0.8))
-
-    plt.show()
     if plotatomic:
-        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
+        outfile = 'UMAP_4_' + prefix + '-c-' + fcolor + '-plotatomic.png'
     else:
-        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '.png')
+        outfile = 'UMAP_4_' + prefix + '-c-' + fcolor + '.png'
+
+    fig_spec_dict = {
+        'outfile': outfile,
+        'show': False,
+        'title': None,
+        'xlabel': 'Principal Axis 1',
+        'ylabel': 'Principal Axis 2',
+        'xaxis': True,  'yaxis': True,
+        'remove_tick': False,
+        'rasterized': True,
+        'fontsize': 16,
+        'components':{ 
+            "first_p": {"type": 'scatter', 'clabel': colorlabel},
+            "second_p": {"type": 'annotate', 'adtext': adtext}
+             }
+        }
+    asap_plot = Plotters(fig_spec_dict)
+    asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], tags)
+    if peratom or plotatomic and not projectatomic:
+        asap_plot.plot(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1],[],[])
+    plt.show()
 
 
 if __name__ == '__main__':
