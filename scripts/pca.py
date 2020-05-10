@@ -7,6 +7,7 @@ import argparse
 import sys
 import os
 import numpy as np
+from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
@@ -69,6 +70,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
+    else:
+        tags = []
 
     # the main thing
     pca = PCA(pca_d, scale)
@@ -92,11 +95,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic: plotcolor = plotcolor_peratom
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, (peratom or plotatomic), projectatomic)
 
     if plotatomic:
         outfile = 'PCA_4_' + prefix + '-c-' + fcolor + '-plotatomic.png'
@@ -105,7 +104,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     fig_spec_dict = {
         'outfile': outfile,
-        'show': True,
+        'show': False,
         'title': None,
         'xlabel': 'Principal Axis 1',
         'ylabel': 'Principal Axis 2',
@@ -120,7 +119,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         }
     asap_plot = Plotters(fig_spec_dict)
     asap_plot.plot(proj[::-1, [pc1, pc2]], plotcolor[::-1], [], tags)
-
+    if peratom or plotatomic and not projectatomic:
+        asap_plot.plot(proj_atomic_all[::-1, [pc1, pc2]], plotcolor_peratom[::-1],[],[])
+    plt.show()
 
 if __name__ == '__main__':
 

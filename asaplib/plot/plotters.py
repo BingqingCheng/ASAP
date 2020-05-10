@@ -257,6 +257,8 @@ class Plot_Function_Scatter(Plot_Function_Base):
 
         print("Using scatter plot ...")
 
+        self.cb = None
+
     def create(self, fig, ax, X, z, labels=[], tags=[]):
         """
         Plots a 2D scatter map given x,y coordinates and a color for
@@ -276,7 +278,9 @@ class Plot_Function_Scatter(Plot_Function_Base):
 
         # automatically adjust the marker size according the number of samples
         if self.p_spec['psize'] == None:
-            self.p_spec['psize'] = 200*200/len(X)
+            psize = 200*200/len(X)
+        else:
+            psize = self.p_spec['psize']
 
         if self.p_spec['use_perc']:
             n_sample = len(x)
@@ -289,37 +293,39 @@ class Plot_Function_Scatter(Plot_Function_Base):
             # plot typical
             axscatter = ax.scatter(x[typical], y[typical], c=z[typical], 
                                cmap=self.p_spec['cmap'], 
-                               s=self.p_spec['psize'], 
+                               s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'])
             # plot bot outliers
             ax.scatter(x[bot_outliers], y[bot_outliers], c=self.p_spec['outlier_bottom_color'], 
                                cmap=self.p_spec['cmap'], 
-                               s=self.p_spec['psize'], 
+                               s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'])
             # plot top outliers
             ax.scatter(x[top_outliers], y[top_outliers], c=self.p_spec['outlier_top_color'], 
                                cmap=self.p_spec['cmap'], 
-                               s=self.p_spec['psize'], 
+                               s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'])
 
-            if self.p_spec['clabel'] is not None: cb = fig.colorbar(axscatter)
+            if self.p_spec['clabel'] is not None and self.cb is None: 
+                cb = fig.colorbar(axscatter)
 
         else:
             axscatter = ax.scatter(x, y, c=z, 
                                cmap=self.p_spec['cmap'], 
-                               s=self.p_spec['psize'], 
+                               s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'],
                                vmax=self.p_spec['vmax'],
                                vmin=self.p_spec['vmin'])
 
-            if self.p_spec['clabel'] is not None: cb = fig.colorbar(axscatter)
+            if self.p_spec['clabel'] is not None and self.cb is None: 
+                self.cb = fig.colorbar(axscatter)
 
         if self.p_spec['clabel'] is not None:
-            cb.set_label(label=self.p_spec['clabel'], labelpad=10)
+            self.cb.set_label(label=self.p_spec['clabel'], labelpad=10)
 
         return fig, ax
 

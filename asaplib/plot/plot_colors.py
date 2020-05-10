@@ -8,7 +8,7 @@ import numpy as np
 from asaplib.data import ASAPXYZ
 
 
-def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False):
+def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False, project_atomic=False):
 
     plotcolor = []
     plotcolor_atomic = []
@@ -29,7 +29,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
             plotcolor = loadcolor
         print('load file: ' + fcolor + ' for color schemes')
 
-        if peratom:
+        if peratom or project_atomic:
             if asapxyz is None:
                 raise IOError('Need the xyz so that we know the number of atoms in each frame')
             elif asapxyz.get_num_frames() != len(plotcolor):
@@ -51,7 +51,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
             # we use the index as the color scheme
             plotcolor = np.arange(asapxyz.get_num_frames())
             fcolor = 'sample index'
-            if peratom:
+            if peratom or project_atomic:
                 for index, natomnow in enumerate(asapxyz.get_natom_list()):
                     plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
         else:
@@ -66,13 +66,16 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
                     raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
 
     colorlabel = str(fcolor)
-    if peratom:
+    if peratom and not project_atomic:
         # print(np.shape(plotcolor_atomic))
         colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
         return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
+    elif project_atomic:
+        colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
+        return np.asarray(plotcolor_atomic), [], colorlabel, colorscale
     else:
         colorscale = [None, None]
-        return plotcolor, colorlabel, colorscale
+        return plotcolor, [], colorlabel, colorscale
 
 
 class COLOR_PALETTE:
