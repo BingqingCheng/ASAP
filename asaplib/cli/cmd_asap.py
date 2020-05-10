@@ -9,7 +9,6 @@ import click
 from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ
-from asaplib.hypers import universal_soap_hyper
 from asaplib.plot import Plotters, set_color_function
 from asaplib.io import ConvertStrToList
 
@@ -128,31 +127,40 @@ def gen_desc(ctx, in_file, fxyz, prefix, tag,
 @click.option('--crossover/--no-crossover', 
               help='If to included the crossover of atomic types.', 
               show_default=True, default=False)
+@click.option('--universal_soap', '--usoap', '--u',
+              type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False), 
+              help='Try out our universal SOAP parameters.', 
+              show_default=True, default='none')
 @click.pass_context
 @atomic_to_global_desc_options
 def soap(ctx, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf,
-         kernel_type, zeta, element_wise):
+         kernel_type, zeta, element_wise, universal_soap):
     """Generate SOAP descriptors"""
-    soap_spec = {
-        'soap1': {
-            'type': 'SOAP',
-            'cutoff': cutoff,
-            'n': nmax,
-            'l': lmax,
-            'atom_gaussian_width': atom_gaussian_width,
-            'rbf': rbf,
-            'crossover': crossover
+    if universal_soap != 'none':
+        from asaplib.hypers import universal_soap_hyper
+        global_species = ctx.obj['asapxyz'].get_global_species()
+        soap_spec = universal_soap_hyper(global_species, universal_soap, dump=True)
+    else:
+        soap_spec = {
+            'soap1': {
+                'type': 'SOAP',
+                'cutoff': cutoff,
+                'n': nmax,
+                'l': lmax,
+                'atom_gaussian_width': atom_gaussian_width,
+                'rbf': rbf,
+                'crossover': crossover
+            }
         }
-    }
     # The specification for the kernels
     kernel_spec = dict(set_kernel(kernel_type, element_wise, zeta))
     # The specification for the descriptor
-    desc_spec = {
-        'soap': {
-            'atomic_descriptor': soap_spec,
-            'kernel_function': kernel_spec,
-        }
-    }
+    desc_spec = {}
+    for k, v in soap_spec.items():
+        desc_spec[k] = {
+                'atomic_descriptor': dict({k: v}),
+                'kernel_function': kernel_spec}
+
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], desc_spec, ctx.obj['desc_settings'])
 
@@ -322,6 +330,40 @@ def pca(ctx, scale, dimension, axes):
     proj = pca.fit_transform(ctx.obj['design_matrix'])
     if ctx.obj['map_info']['peratom']:
         proj_atomic = pca.transform(ctx.obj['design_matrix_atomic'])
+    else:
+        proj_atomic = None
+
+    fig_spec = ctx.obj['fig_spec_dict']
+    plotcolor = ctx.obj['map_info']['color']
+    plotcolor_atomic = ctx.obj['map_info']['color_atomic']
+    annotate = ctx.obj['map_info']['annotate']
+    # plot
+    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
+    # output 
+    outfilename = ctx.obj['fig_spec_dict']['outfile']
+    outmode =  ctx.obj['fig_spec_dict']['outmode']
+    map_save(outfilename, outmode, ctx.obj['asapxyz'], proj, proj_atomic)
+
+@map.command('umap')
+@click.pass_context
+@d_reduce_options
+def umap(ctx, scale, dimension, axes):
+    """UMAP"""
+    from asaplib.pca import PCA
+    map_name = "umap-d-"+str(dimension)
+
+    # scale & center
+    if scale:
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        desc = scaler.transform(ctx.obj['design_matrix'])  # normalizing the features
+    else:
+        desc = ctx.obj['design_matrix']
+
+    reducer = umap.UMAP()
+    proj = reducer.fit_transform(desc)
+    if ctx.obj['map_info']['peratom']:
+        proj_atomic = reducer.transform(ctx.obj['design_matrix_atomic'])
     else:
         proj_atomic = None
 

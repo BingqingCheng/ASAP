@@ -30,9 +30,9 @@ a system with boron (5) and germanium (32).
 def universal_soap_hyper(global_species, fsoap_param, dump=True):
 
     if fsoap_param == 'smart' or fsoap_param == 'Smart' or fsoap_param == 'SMART':
-        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2)
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.2, soap_n=8, soap_l=4)
     elif fsoap_param == 'minimal' or fsoap_param == 'Minimal' or fsoap_param == 'MINIMAL':
-        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=1, scalerange=1.5, soap_n=4, soap_l=4)
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=1, scalerange=1.2, soap_n=6, soap_l=3)
     elif fsoap_param == 'longrange' or fsoap_param == 'Longrange' or fsoap_param == 'LONGRANGE':
         soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.5)
     else:
@@ -43,7 +43,7 @@ def universal_soap_hyper(global_species, fsoap_param, dump=True):
             json.dump(soap_js, jd, cls=NpEncoder)
     return soap_js
 
-def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=6, soap_l=6, sharpness=1.0, verbose=False):
+def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=8, soap_l=4, sharpness=1.0, verbose=False):
     """
     Parameters
     ----------
@@ -66,10 +66,10 @@ def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=6, 
         print(Zs, "range of bond lengths", shortest_bond, longest_bond)
 
     # factor between shortest bond and shortest cutoff threshold
-    factor_inner = 1.8 * scalerange
-    rcut_min = factor_inner * shortest_bond
+    factor_inner = 1.3 * scalerange
+    rcut_min = max(2.0, factor_inner * shortest_bond)
     # factor between longest bond and longest cutoff threshold
-    factor_outer = 3.0 * scalerange
+    factor_outer = 1.3 * scalerange
     rcut_max = factor_outer * longest_bond
     if verbose:
         print("Considering minimum and maximum cutoff", rcut_min, rcut_max)
@@ -79,7 +79,10 @@ def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=6, 
     # first soap cutoff is just the rcut_min
     r_cut = rcut_min
     g_width = r_cut / 8.0 / sharpness
-    hypers['soap' + str(num_soap)] = {'species': Zs, 'cutoff': float(round_sigfigs(r_cut, 2)), 'n': soap_n, 'l': soap_l,
+    hypers['soap' + str(num_soap)] = {'type': 'SOAP',
+                                      'species': Zs, 
+                                      'cutoff': float(round_sigfigs(r_cut, 2)), 
+                                      'n': soap_n, 'l': soap_l,
                                       'atom_gaussian_width': float(round_sigfigs(g_width, 2))}
 
     if multisoap >= 2:
@@ -89,7 +92,11 @@ def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=6, 
             num_soap += 1
             r_cut *= rcut_ratio
             g_width = r_cut / 8.0 / sharpness
-            hypers['soap' + str(num_soap)] = {"species": Zs, 'cutoff': float(round_sigfigs(r_cut, 2)), 'n': soap_n,
-                                              'l': soap_l, 'atom_gaussian_width': float(round_sigfigs(g_width, 2))}
+            hypers['soap' + str(num_soap)] = {'type': 'SOAP',
+                                              "species": Zs, 
+                                              'cutoff': float(round_sigfigs(r_cut, 2)), 
+                                              'n': soap_n,
+                                              'l': soap_l, 
+                                              'atom_gaussian_width': float(round_sigfigs(g_width, 2))}
 
     return hypers
