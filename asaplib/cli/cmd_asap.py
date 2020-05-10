@@ -349,18 +349,18 @@ def pca(ctx, scale, dimension, axes):
 @d_reduce_options
 def umap(ctx, scale, dimension, axes):
     """UMAP"""
-    from asaplib.pca import PCA
+    from umap import UMAP
     map_name = "umap-d-"+str(dimension)
 
     # scale & center
     if scale:
         from sklearn.preprocessing import StandardScaler
         scaler = StandardScaler()
-        desc = scaler.transform(ctx.obj['design_matrix'])  # normalizing the features
+        desc = scaler.fit_transform(ctx.obj['design_matrix'])  # normalizing the features
     else:
         desc = ctx.obj['design_matrix']
 
-    reducer = umap.UMAP()
+    reducer = UMAP()
     proj = reducer.fit_transform(desc)
     if ctx.obj['map_info']['peratom']:
         proj_atomic = reducer.transform(ctx.obj['design_matrix_atomic'])

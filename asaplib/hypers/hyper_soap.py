@@ -69,7 +69,7 @@ def gen_default_soap_hyperparameters(Zs, multisoap=2, scalerange=1.0, soap_n=8, 
     factor_inner = 1.3 * scalerange
     rcut_min = max(2.0, factor_inner * shortest_bond)
     # factor between longest bond and longest cutoff threshold
-    factor_outer = 1.3 * scalerange
+    factor_outer = 1.5 * scalerange
     rcut_max = factor_outer * longest_bond
     if verbose:
         print("Considering minimum and maximum cutoff", rcut_min, rcut_max)
