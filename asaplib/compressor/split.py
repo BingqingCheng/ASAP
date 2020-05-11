@@ -35,7 +35,7 @@ def exponential_split(xmin, xmax, n=5):
         X[i] = int(np.exp(lmin + dl * i))
     return X
 
-def random_train_test_split(n_sample, r, seed=0):
+def random_split(n_sample, r, seed=0):
     """
     Obtain train/test indexes with a test ratio 
 
