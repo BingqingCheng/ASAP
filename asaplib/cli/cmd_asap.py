@@ -8,7 +8,7 @@ import numpy as np
 import click
 from matplotlib import pyplot as plt
 
-from asaplib.data import ASAPXYZ
+from asaplib.data import ASAPXYZ, Design_Matrix
 from asaplib.plot import Plotters, set_color_function
 from asaplib.io import ConvertStrToList
 
@@ -24,37 +24,39 @@ def desc_options(f):
     """Create common options for a descriptor command"""
     f = click.option('--peratom', 
                      help='Save the per-atom local descriptors.',
-                     default=False, is_flag=True)(f)
+                     show_default=True, default=False, is_flag=True)(f)
     f = click.option('--tag',
                      help='Tag for the descriptor output.',
                      default='ASAP')(f)
-    f = click.option('--prefix', '--p',
+    f = click.option('--prefix', '-p',
                      help='Prefix to be used for the output XYZ file.', 
-                     default='ASAP')(f)
+                     default='ASAP-desc')(f)
     f = click.option('--periodic/--no-periodic', 
                      help='Is the system periodic? If not specified, will infer from the XYZ file.',
                      default=True)(f)
-    f = click.option('--stride', '--s',
+    f = click.option('--stride', '-s',
                      help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
                      default=1)(f)
-    f = click.option('--fxyz', '--f', 
-                     type=click.Path('r'), help='Input XYZ file')(f)
+    f = click.option('--fxyz', '-f', 
+                     type=click.Path('r'), 
+                     help='Input XYZ file',
+                     default='ASAP.xyz')(f)
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
                      help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
 
 def atomic_to_global_desc_options(f):
     """Create common options for global descriptors constructed based on atomic fingerprints """
-    f = click.option('--kernel_type', '--k',
+    f = click.option('--kernel_type', '-k',
                      help='type of operations to get global descriptors from the atomic soap vectors, e.g. \
                           [average], [sum], [moment_avg], [moment_sum].',
-                     default='average', type=str)(f)
-    f = click.option('--zeta', '--z', 
+                     show_default=True, default='average', type=str)(f)
+    f = click.option('--zeta', '-z', 
                      help='Moments to take when converting atomic descriptors to global ones.',
                      default=1, type=int)(f)
-    f = click.option('--element_wise', '--e', 
+    f = click.option('--element_wise', '-e', 
                      help='element-wise operation to get global descriptors from the atomic soap vectors',
-                     default=False, is_flag=True)(f)
+                     show_default=True, default=False, is_flag=True)(f)
     return f
 
 def set_kernel(kernel_type, element_wise, zeta):
@@ -127,7 +129,7 @@ def gen_desc(ctx, in_file, fxyz, prefix, tag,
 @click.option('--crossover/--no-crossover', 
               help='If to included the crossover of atomic types.', 
               show_default=True, default=False)
-@click.option('--universal_soap', '--usoap', '--u',
+@click.option('--universal_soap', '--usoap', '-u',
               type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False), 
               help='Try out our universal SOAP parameters.', 
               show_default=True, default='none')
@@ -140,6 +142,9 @@ def soap(ctx, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf,
         from asaplib.hypers import universal_soap_hyper
         global_species = ctx.obj['asapxyz'].get_global_species()
         soap_spec = universal_soap_hyper(global_species, universal_soap, dump=True)
+        for k in soap_spec.keys():
+            soap_spec[k]['rbf'] = rbf
+            soap_spec[k]['crossover'] = crossover
     else:
         soap_spec = {
             'soap1': {
@@ -208,25 +213,26 @@ def map_setup_options(f):
     f = click.option('--project_atomic', 
                      help='Build map based on atomic descriptors instead of global ones.',
                      default=False, is_flag=True)(f)
-    f = click.option('--output', '--o', type=click.Choice(['xyz', 'matrix'], case_sensitive=False), 
+    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix'], case_sensitive=False), 
                      help='Output file format.',
                      default='xyz')(f)
-    f = click.option('--prefix', '--p', 
-                      help='Prefix for the output png.', default='ASAP')(f)
-    f = click.option('--annotate', '--a',
+    f = click.option('--prefix', '-p', 
+                      help='Prefix for the output png.', default='ASAP-lowD')(f)
+    f = click.option('--annotate', '-a',
                      help='Location of tags to annotate the samples.',
                      default='none', type=str)(f)
-    f = click.option('--color_column',
+    f = click.option('--color_column', '-ccol',
                      help='The column number used in the color file. Starts from 0.',
                      default=0)(f)
-    f = click.option('--color', "--c",
+    f = click.option('--color', '-c',
                      help='Location of a file or name of the properties in the XYZ file. \
                      Used to color the scatter plot for all samples (N floats).',
                      default='none', type=str)(f)
-    f = click.option('--fxyz', '--f', 
+    f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
-                     help='Location of descriptor matrix file or name of the descriptors in ase xyz file.')(f)
-    f = click.option('--design_matrix', '--dm', cls=ConvertStrToList, default=[],
+                     help='Input XYZ file',
+                     default='ASAP.xyz')(f)
+    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
                      help='Location of descriptor matrix file or name of the tags in ase xyz file\
                            the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
@@ -251,25 +257,8 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
 
-    # try to read the xyz file
-    if fxyz != 'none':
-        ctx.obj['asapxyz'] = ASAPXYZ(fxyz)
-        if project_atomic:
-            _, ctx.obj['design_matrix'] = asapxyz.get_descriptors(design_matrix, True)
-        else:
-            ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = ctx.obj['asapxyz'].get_descriptors(design_matrix, peratom)
-    else:
-        ctx.obj['asapxyz'] = None
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-        output = 'matrix'
-    # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(design_matrix[0]):
-        try:
-            ctx.obj['design_matrix'] = np.genfromtxt(design_matrix[0], dtype=float)
-            print("loaded the descriptor matrix from file: ", design_matrix[0])
-        except:
-            raise ValueError('Cannot load the descriptor matrix from file')
-    #print(ctx.obj['design_matrix'])
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom)
+    if ctx.obj['asapxyz'] is None: output = 'matrix'
 
     # remove the raw descriptors
     if not keepraw:
@@ -303,7 +292,28 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                         'vmin': colorscale[0], 'vmax': colorscale[0]},
             "second_p": {"type": 'annotate', 'adtext': adjusttext}
              }
-        }   
+        }
+
+def read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom):
+    # try to read the xyz file
+    if fxyz != 'none':
+        asapxyz = ASAPXYZ(fxyz)
+        if project_atomic:
+            _, dm = asapxyz.get_descriptors(design_matrix, True)
+            dm_atomic = []
+        else:
+            dm, dm_atomic = asapxyz.get_descriptors(design_matrix, peratom)
+    else:
+        asapxyz = None
+        print("Did not provide the xyz file. We can only output descriptor matrix.")
+    # we can also load the descriptor matrix from a standalone file
+    if os.path.isfile(design_matrix[0]):
+        try:
+            dm = np.genfromtxt(design_matrix[0], dtype=float)
+            print("loaded the descriptor matrix from file: ", design_matrix[0])
+        except:
+            raise ValueError('Cannot load the descriptor matrix from file')
+    return asapxyz, dm, dm_atomic
 
 def d_reduce_options(f):
     """Create common options for dimensionality reduction"""
@@ -341,7 +351,7 @@ def pca(ctx, scale, dimension, axes):
     map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
     # output 
     outfilename = ctx.obj['fig_spec_dict']['outfile']
-    outmode =  ctx.obj['fig_spec_dict']['outmode']
+    outmode =  ctx.obj['map_info']['outmode']
     map_save(outfilename, outmode, ctx.obj['asapxyz'], proj, proj_atomic)
 
 @map.command('umap')
@@ -375,7 +385,7 @@ def umap(ctx, scale, dimension, axes):
     map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
     # output 
     outfilename = ctx.obj['fig_spec_dict']['outfile']
-    outmode =  ctx.obj['fig_spec_dict']['outmode']
+    outmode =  ctx.obj['map_info']['outmode']
     map_save(outfilename, outmode, ctx.obj['asapxyz'], proj, proj_atomic)
 
 def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name):
@@ -401,3 +411,63 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic):
         if proj_atomic is not None:
             asapxyz.set_atomic_descriptors(proj_atomic_all, map_name)
         asapxyz.write(foutput)
+
+def fit_setup_options(f):
+    """Create common options for making 2D maps of the data set"""
+    f = click.option('--test_ratio', '--test', '-t', type=float, 
+              help='Test ratio.', 
+              show_default=True, default=0.05)(f)
+    f = click.option('--prefix', '-p', 
+                      help='Prefix for the output.', default='ASAP-fit')(f)
+    f = click.option('--y', '-y',
+                     help='Location of a file or name of the properties in the XYZ file',
+                     default='none', type=str)(f)
+    f = click.option('--fxyz', '-f', 
+                     type=click.Path('r'), 
+                     help='Input XYZ file',
+                     default='ASAP.xyz')(f)
+    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
+                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
+                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
+    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
+                     help='The state file that includes a dictionary-like specifications of fits to use.')(f)
+    return f
+
+@asap.group('fit')
+@click.pass_context
+@fit_setup_options
+def fit(ctx, in_file, fxyz, design_matrix, y, prefix, test_ratio):
+    """
+    Fit a machine learning model to the design matrix and labels.
+    This command function evaluated before the specific ones,
+    we setup the general stuff here, such as read the files.
+    """
+    ctx.obj['fit_prefix'] = prefix
+    if in_file:
+        print('')
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+
+    asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, False, False)
+
+    try:
+        y_all = np.genfromtxt(y, dtype=float)
+    except:
+        y_all = asapxyz.get_property(y)
+
+    ctx.obj['dm'] = Design_Matrix(desc, y_all, True, test_ratio)
+
+@fit.command('ridge')
+@click.option('--sigma', '-s', type=float, 
+              help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.', 
+              default=0.001)
+@click.pass_context
+def ridge(ctx, sigma):
+    """Ridge Regression"""
+    from asaplib.fit import RidgeRegression
+    rr = RidgeRegression(sigma)
+    # fit the model
+    ctx.obj['dm'].compute_fit(rr, 'ridge_regression', store_results=True, plot=True)
+    plt.show()
+    plt.savefig(ctx.obj['fit_prefix']+"RR.png")
+

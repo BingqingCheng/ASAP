@@ -46,7 +46,7 @@ class Plotters:
             raise ValueError("Didn't specify any options to do plots. Use `components` key to do so.")
 
         self.fig_spec = {
-        'size': [160.5, 80.5],
+        'size': [20, 10],
         'outfile': None,
         'show': True,
         'title': None,
