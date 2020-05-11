@@ -18,7 +18,7 @@ from asaplib.data import ASAPXYZ, Design_Matrix
 from asaplib.fit import RidgeRegression
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
-
+from matplotlib import pyplot as plt
 
 def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats):
     """
@@ -74,12 +74,14 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     rr = RidgeRegression(sigma)
 
     # fit the model
-    dm.compute_fit(rr, 'ridge_regression')
+    dm.compute_fit(rr, 'ridge_regression', store_results=True, plot=True)
 
     # learning curve
-    dm.compute_learning_curve(rr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42, verbose=False)
-
-    # make plot
+    if lc_points > 1:
+        lc_scores = dm.compute_learning_curve(rr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42, verbose=False)
+        # make plot
+        lc_scores.plot_learning_curve()
+    plt.show()
 
 if __name__ == '__main__':
 

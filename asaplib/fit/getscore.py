@@ -39,6 +39,20 @@ class LC_SCOREBOARD():
             Ntrains.append(Ntrain)
         return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1)
 
+    def plot_learning_curve(self, sc_name='RMSE'):
+        """plot the learning curve"""
+        from matplotlib import pyplot as plt
+        lc_results = self.fetch(sc_name)
+       
+        fig, ax = plt.subplots()
+        ax.errorbar(lc_results[:,0], lc_results[:,1], yerr=lc_results[:,2], linestyle='-', uplims=True, lolims=True)
+        ax.set_title('Learning curve')
+        ax.set_xlabel('Number of training samples')
+        ax.set_ylabel('Test {}'.format(sc_name))
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        return fig, ax
+
 def get_score(ypred, y):
     scores = {}
     for k, func in score_func.items():

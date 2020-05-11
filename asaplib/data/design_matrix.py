@@ -123,7 +123,7 @@ class Design_Matrix:
         else:
             return self.X_train[self.sbs], []
 
-    def compute_fit(self, learner, tag=None, store_results=True):
+    def compute_fit(self, learner, tag=None, store_results=True, plot=True):
         """
         Fit the design matrix X and the values y using a learner
 
@@ -145,6 +145,17 @@ class Design_Matrix:
         if store_results:
             y_pred, y_pred_test, fit_error = learner.get_train_test_error(self.X_train[self.sbs], self.y_train[self.sbs], self.X_test, self.y_test, verbose=True, return_pred=True)
             fit_result_now = {tag:{"y_pred": y_pred, "y_pred_test": y_pred_test, "error": fit_error}}
+
+        if plot:
+            from matplotlib import pyplot as plt
+            fig, ax = plt.subplots()
+            ax.plot(self.y_train[self.sbs], y_pred, 'b.', label='train')
+            ax.plot(self.y_test, y_pred_test, 'r.', label='test')
+            ax.legend()
+            ax.set_title('Fits using: '+str(tag))
+            ax.set_xlabel('actual y')
+            ax.set_ylabel('predicted y')
+            return fig, ax
 
     def compute_learning_curve(self, learner, tag=None, lc_points=8, lc_repeats=8, randomseed=42, verbose=True):
         """
@@ -187,5 +198,6 @@ class Design_Matrix:
 
         self.lc_by_learner.update({tag:lc_scores})
         if verbose: print("LC results: ", {tag:lc_scores.fetch_all()})
+        return lc_scores
 
 

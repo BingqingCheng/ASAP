@@ -132,7 +132,7 @@ class ShuffleSplit(_ShuffleSplit):
 
 
 class LCSplit(with_metaclass(ABCMeta)):
-    def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size="default", random_state=None, **cvargs):
+    def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size=None, random_state=None, **cvargs):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):
             raise ValueError("Number of repetitions or training set sizes must be an iterable.")
 
