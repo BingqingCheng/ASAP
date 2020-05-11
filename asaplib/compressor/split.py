@@ -35,7 +35,7 @@ def exponential_split(xmin, xmax, n=5):
         X[i] = int(np.exp(lmin + dl * i))
     return X
 
-def random_train_test_split(n_sample, r):
+def random_train_test_split(n_sample, r, seed=0):
     """
     Obtain train/test indexes with a test ratio 
 
@@ -48,6 +48,12 @@ def random_train_test_split(n_sample, r):
     -------
     train_list, test_list: train/test indexes
     """
+
+    if r==0.0:
+        return range(n_sample), []
+
+    np.random.seed(seed)
+
     all_list = np.arange(n_sample)
     randomchoice = np.random.rand(n_sample)
     test_member_mask = (randomchoice < r)
@@ -59,7 +65,7 @@ def random_train_test_split(n_sample, r):
 
     return train_list, test_list
 
-def kernel_random_split(X, y, r=0.05):
+def kernel_random_split(X, y, r=0.05, seed=0):
     """
 
     Parameters
@@ -74,6 +80,8 @@ def kernel_random_split(X, y, r=0.05):
     y_train, y_test: train/test labels
     train_list, test_list: train/test indexes
     """
+
+    np.random.seed(seed)
 
     if X.shape[0] != X.shape[1]:
         raise ValueError('Kernel matrix is not square')
