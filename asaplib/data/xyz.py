@@ -8,6 +8,7 @@ from ase.io import read, write
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
 
+
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
         """extended xyz class
@@ -65,7 +66,8 @@ class ASAPXYZ:
 
         self.total_natoms = np.sum(self.natom_list)
         self.max_atoms = max(self.natom_list)
-        self.global_species = np.unique(all_species)
+        # Keep things in plain python for serialisation
+        self.global_species = np.unique(all_species).tolist()
         print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
               ', a total of ', str(self.total_natoms), 'atoms',
@@ -98,7 +100,7 @@ class ASAPXYZ:
 
         if mode == 'yaml':
             with open(filename+'-descriptor-acronyms.yaml', 'w') as yd:
-                ydump(self.tag_to_acronym, yd, sort_keys=True, Dumper=Dumper)
+                ydump(self.tag_to_acronym, yd, sort_keys=True)
         else:
             with open(filename+'-descriptor-acronyms.json', 'w') as jd:
                 json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
@@ -115,7 +117,7 @@ class ASAPXYZ:
             desc_spec_dict[element]['periodic'] = self.periodic
             desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
-    def compute_atomic_descriptors(self, desc_spec_list={}, sbs=[], tag=None):
+    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -145,7 +147,7 @@ class ASAPXYZ:
             self.atomic_desc[i].update(atomic_desc.create(frame))
 
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag] =  atomic_desc.pack()
+        self.computed_desc_dict[tag] =  atomic_desc.desc_spec_dict
 
     def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None):
         """
@@ -192,7 +194,7 @@ class ASAPXYZ:
             if keep_atomic:
                 self.atomic_desc[i].update(atomic_desc_dict_now)
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag] = global_desc.pack()
+        self.computed_desc_dict[tag] = global_desc.desc_spec_dict
 
     def fetch_computed_descriptors(self, desc_dict_keys=[], sbs=[]):
         """
