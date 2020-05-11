@@ -35,19 +35,44 @@ def exponential_split(xmin, xmax, n=5):
         X[i] = int(np.exp(lmin + dl * i))
     return X
 
+def random_train_test_split(n_sample, r):
+    """
+    Obtain train/test indexes with a test ratio 
+
+    Parameters
+    ----------
+    n_sample: integer giving the number of samples
+    r: float, test ratio
+
+    Returns: 
+    -------
+    train_list, test_list: train/test indexes
+    """
+    all_list = np.arange(n_sample)
+    randomchoice = np.random.rand(n_sample)
+    test_member_mask = (randomchoice < r)
+    train_list = all_list[~test_member_mask]
+    test_list = all_list[test_member_mask]
+
+    if len(test_list) < 1:
+        raise ValueError("No test set selected. Increase sample size and/or test ratio.")
+
+    return train_list, test_list
 
 def kernel_random_split(X, y, r=0.05):
     """
 
     Parameters
     ----------
-    X
-    y
-    r
+    X: array-like, shape=[n_samples,n_desc], kernel matrix
+    y: array-like, shape=[n_samples], labels
+    r: float, test ratio
 
     Returns
     -------
-
+    X_train, X_test: train/test kernel matrix
+    y_train, y_test: train/test labels
+    train_list, test_list: train/test indexes
     """
 
     if X.shape[0] != X.shape[1]:
