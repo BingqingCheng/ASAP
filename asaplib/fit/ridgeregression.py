@@ -24,11 +24,11 @@ class RidgeRegression(RegressorBase):
         y : array-like, shape=[n_samples]
         Input points.
         """
-        print("a total of ", np.shape(X), "column")
+        #print("a total of ", np.shape(X), "column")
 
         # calculate covariance matrix
         COV = np.dot(X.T, X)
-        print("computing covariance matrix with shape:", np.shape(COV))
+        #print("computing covariance matrix with shape:", np.shape(COV))
 
         reg = np.eye(COV.shape[0]) * self.jitter
         # self.coninv = np.linalg.inv(COV+reg)

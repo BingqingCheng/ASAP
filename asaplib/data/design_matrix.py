@@ -8,9 +8,10 @@ import json
 from ..io import randomString,  NpEncoder
 from ..compressor import random_split,exponential_split, LCSplit, ShuffleSplit
 from ..compressor import fps, CUR_deterministic
+from ..fit import LC_SCOREBOARD
 
 class Design_Matrix:
-    def __init__(self, X=[], y=[], whiten=True, testratio=0, randomseed=42, z=[], tags=[]):
+    def __init__(self, X=[], y=[], whiten=True, test_ratio=0, random_seed=42, z=[], tags=[]):
         """extended design matrix class
 
         Parameters
@@ -28,27 +29,30 @@ class Design_Matrix:
         # sanity checks
         if len(y) > 0 and len(X) != len(y):
             raise ValueError('Length of the labels y is not the same as the design matrix X')
-          
+        
         if whiten:
             X = self._whiten(X)
 
+        self.n_sample = len(X)
+        self.test_ratio = test_ratio
+        self.random_seed = random_seed
+
         # We do a train/test split already here, to ensure the subsequent analysis is prestine
-        self.train_list, self.test_list = random_split(n_sample, testratio, randomseed)
-        self.X_train = X[train_list]
-        self.X_test = X[test_list]
-        self.nsamples = len(X)
+        self.train_list, self.test_list = random_split(self.n_sample, test_ratio, random_seed)
+        self.X_train = X[self.train_list]
+        self.X_test = X[self.test_list]
         self.n_train = len(self.X_train)
         self.n_test = len(self.X_test)
 
         if len(y) > 0:
-            self.y_train = y[train_list]
-            self.y_test = y[test_list]
+            self.y_train = y[self.train_list]
+            self.y_test = y[self.test_list]
         if len(z) > 0:
-            self.z_train = z[train_list]
-            self.z_test = z[test_list]
+            self.z_train = z[self.train_list]
+            self.z_test = z[self.test_list]
         if len(tags) > 0:
-            self.tags_train = tags[train_list]
-            self.tags_test = tags[test_list]
+            self.tags_train = tags[self.train_list]
+            self.tags_test = tags[self.test_list]
 
         # this stores the index of representative data
         self.sbs = range(self.n_train)
@@ -71,6 +75,12 @@ class Design_Matrix:
             return X_bias
         else:
             return X
+
+    def save_state(self, filename):
+         with open(filename+'-fit-errors.json', 'w') as jd:
+                 json.dump(self.fit_error_by_learner, jd, sort_keys=True, cls=NpEncoder)
+         with open(filename+'-lc.json', 'w') as jd:
+                 json.dump(self.lc_by_learner, jd, sort_keys=True, cls=NpEncoder)
 
     def sparsify(self, n_sparse=0, sparse_mode='fps'):
         """
@@ -120,19 +130,23 @@ class Design_Matrix:
         Parameters
         ----------
         learner: object. a learner object, e.g. RidgeRegression
-                 needs to have .fit(), .predict(), .get_train_test_error() methods
+                 needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods
         tag: str. The name of this learner
         """
+        # sanity checks
+        if len(self.y_train) < 1 or len(self.X_train) != len(self.y_train):
+            raise ValueError('Length of the labels y is not the same as the design matrix X')
+
         if tag is None: tag = randomString(6)
 
         # fit the model
-        learner.fit(X_train, y_train)
+        learner.fit(self.X_train[self.sbs], self.y_train[self.sbs])
 
         if store_results:
-            y_pred, y_pred_test, fit_error = learner.get_train_test_error(X_train, y_train, X_test, y_test, verbose=True, return_pred=True)
-            self.fit_error_by_learner.update(tag:{"y_pred": y_pred, "y_pred_test": y_pred_test, "error": fit_error})
+            y_pred, y_pred_test, fit_error = learner.get_train_test_error(self.X_train[self.sbs], self.y_train[self.sbs], self.X_test, self.y_test, verbose=True, return_pred=True)
+            fit_result_now = {tag:{"y_pred": y_pred, "y_pred_test": y_pred_test, "error": fit_error}}
 
-    def compute_learning_curve(self, learner, tag=None, lc_points=8, lc_repeats=8, store_results=True):
+    def compute_learning_curve(self, learner, tag=None, lc_points=8, lc_repeats=8, randomseed=42, verbose=True):
         """
         Fit the learning curve using a learner
 
@@ -141,7 +155,7 @@ class Design_Matrix:
         lc_points: int, the number of points on the learning curve
         lc_repeats: the number of sub-samples to take when compute the learning curve
         learner: object. a learner object, e.g. RidgeRegression
-                 needs to have .fit(), .predict(), .get_train_test_error() methods
+                 needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods
         tag: str. The name of this learner
         """
         if tag is None: tag = randomString(6)
@@ -153,18 +167,25 @@ class Design_Matrix:
             print("The number sub-samples to take when compute the learning curve < 1. Skip computing learning curve")
             return
 
-        train_sizes = exponential_split(20, n_train - n_test, lc_points)
+        # set lower and upper bound of the LC
+        train_sizes = exponential_split(max(20,self.n_train//1000), len(self.sbs), lc_points)
         print("Learning curves using train sizes: ", train_sizes)
-        lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
-        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
+        lc_stats = lc_repeats * np.ones(lc_points-1, dtype=int)
+        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes[:-1], test_size=None, random_state=randomseed)
 
         lc_scores = LC_SCOREBOARD(train_sizes)
-        for lctrain, _ in lc.split(y_train):
+        for lctrain, _ in lc.split(self.X_train[self.sbs]):
             Ntrain = len(lctrain)
-            lc_X_train = X_train[lctrain, :]
-            lc_y_train = y_train[lctrain]
+            lc_X_train = self.X_train[self.sbs][lctrain, :]
+            lc_y_train = self.y_train[self.sbs][lctrain]
             # here we always use the same test set
-            _, lc_score_now = rr.fit_predict_error(lc_X_train, lc_y_train, X_test, y_test)
+            _, lc_score_now = learner.fit_predict_error(lc_X_train, lc_y_train, self.X_test, self.y_test)
             lc_scores.add_score(Ntrain, lc_score_now)
+        # for the whole data set
+        _, lc_score_now = learner.fit_predict_error(self.X_train[self.sbs], self.y_train[self.sbs], self.X_test, self.y_test)
+        lc_scores.add_score(self.n_train, lc_score_now)
+
+        self.lc_by_learner.update({tag:lc_scores})
+        if verbose: print("LC results: ", {tag:lc_scores.fetch_all()})
 
 

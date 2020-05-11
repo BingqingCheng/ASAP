@@ -14,8 +14,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from asaplib.compressor import exponential_split, LCSplit, ShuffleSplit
-from asaplib.data import ASAPXYZ
-from asaplib.fit import RidgeRegression, LC_SCOREBOARD
+from asaplib.data import ASAPXYZ, Design_Matrix
+from asaplib.fit import RidgeRegression
 from asaplib.io import str2bool
 from asaplib.plot import plot_styles
 
@@ -66,91 +66,20 @@ def main(fmat, fxyz, fy, prefix, scale, test_ratio, sigma, lc_points, lc_repeats
     except:
         y_all = asapxyz.get_property(fy)
 
-    if len(y_all) != len(desc):
-        raise ValueError('Length of the vector of properties is not the same as number of samples')
-
-    # scale & center
-    if scale:
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        print(scaler.fit(desc))
-        desc = scaler.transform(desc)  # normalizing the features
-    # add bias
-    desc_bias = np.ones((np.shape(desc)[0], np.shape(desc)[1] + 1))
-    desc_bias[:, 1:] = desc
-    #print(np.shape(desc_bias))
-    # train test split
-    if test_ratio > 0:
-        X_train, X_test, y_train, y_test = train_test_split(desc_bias, y_all, test_size=test_ratio, random_state=42)
-    else:
-        X_train = X_test = desc_bias
-        y_train = y_test = y_all
-
-    # TODO: add sparsification
+    dm = Design_Matrix(X=desc, y=y_all, whiten=True, test_ratio=test_ratio)
 
     # if sigma is not set...
     if sigma < 0:
-        sigma = 0.001 * np.std(y_train)
-
+        sigma = 0.001 * np.std(y_all)
     rr = RidgeRegression(sigma)
-    # fit the model
-    rr.fit(X_train, y_train)
 
-    y_pred, y_pred_test, fit_error = rr.get_train_test_error(X_train, y_train, X_test, y_test, verbose=True, return_pred=True)
-    with open("RR_train_test_errors_4_" + prefix + ".json", 'w') as fp:
-        json.dump(fit_error, fp)
+    # fit the model
+    dm.compute_fit(rr, 'ridge_regression')
 
     # learning curve
-    # decide train sizes
-    n_train = len(X_train)
-    n_test = len(X_test)
-    if lc_points > 1:
-        train_sizes = exponential_split(20, n_train - n_test, lc_points)
-        print("Learning curves using train sizes: ", train_sizes)
-        lc_stats = lc_repeats * np.ones(lc_points, dtype=int)
-        lc = LCSplit(ShuffleSplit, n_repeats=lc_stats, train_sizes=train_sizes, test_size=n_test, random_state=10)
-
-        lc_scores = LC_SCOREBOARD(train_sizes)
-        for lctrain, _ in lc.split(y_train):
-            Ntrain = len(lctrain)
-            lc_X_train = X_train[lctrain, :]
-            lc_y_train = y_train[lctrain]
-            # here we always use the same test set
-            _, lc_score_now = rr.fit_predict_error(lc_X_train, lc_y_train, X_test, y_test)
-            lc_scores.add_score(Ntrain, lc_score_now)
-
-        sc_name = 'RMSE' #     MAE, RMSE, SUP, R2, CORR
-        lc_results = lc_scores.fetch(sc_name)
-        np.savetxt("RR_learning_curve_4_" + prefix + ".dat",lc_results)
+    dm.compute_learning_curve(rr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42, verbose=False)
 
     # make plot
-    plot_styles.set_nice_font()
-
-    if lc_points > 1:
-        fig = plt.figure(figsize=(8 * 2.1, 8))
-        ax = fig.add_subplot(121)
-    else:
-        fig = plt.figure(figsize=(8, 8))
-        ax = fig.add_subplot(111)
-    ax.plot(y_train, y_pred, 'b.', label='train')
-    ax.plot(y_test, y_pred_test, 'r.', label='test')
-    ax.legend()
-    ax.set_title('Ridge regression for: ' + fy)
-    ax.set_xlabel('actual y')
-    ax.set_ylabel('predicted y')
-
-    if lc_points > 1:
-        ax2 = fig.add_subplot(122)
-        ax2.errorbar(lc_results[:,0], lc_results[:,1], yerr=lc_results[:,2], linestyle='', uplims=True, lolims=True)
-        ax2.set_title('Learning curve')
-        ax2.set_xlabel('Number of training samples')
-        ax2.set_ylabel('Test {}'.format(sc_name))
-        ax2.set_xscale('log')
-        ax2.set_yscale('log')
-
-    plt.show()
-    fig.savefig('RR_4_' + prefix + '.png')
-
 
 if __name__ == '__main__':
 
