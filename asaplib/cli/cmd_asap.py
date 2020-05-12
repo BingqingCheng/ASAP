@@ -8,6 +8,7 @@ import numpy as np
 import click
 from matplotlib import pyplot as plt
 
+from .func_asap import *
 from asaplib.data import ASAPXYZ, Design_Matrix
 from asaplib.reducedim import Dimension_Reducers
 from asaplib.plot import Plotters, set_color_function
@@ -59,19 +60,6 @@ def atomic_to_global_desc_options(f):
                      help='element-wise operation to get global descriptors from the atomic soap vectors',
                      show_default=True, default=False, is_flag=True)(f)
     return f
-
-def set_kernel(kernel_type, element_wise, zeta):
-    """
-    setting up the kernel function that is used to convert atomic descriptors into global descriptors for a structure.
-    At the moment only one single kernel function can be used.
-    """
-    kernel_func = {'kernel': {
-        'kernel_type': kernel_type, # [average], [sum], [moment_average], [moment_sum]
-        'element_wise': element_wise,
-    }}
-    if kernel_type == 'moment_average' or kernel_type == 'moment_sum':
-        kernel_func['zeta'] = zeta
-    return kernel_func
 
 @asap.group('gen_desc')
 @click.pass_context
@@ -185,21 +173,6 @@ def run(ctx):
     """ Running analysis using input files """
     output_desc(ctx.obj['asapxyz'], ctx.obj['desc_spec'], ctx.obj['desc_settings'])
 
-def output_desc(asapxyz, desc_spec, desc_settings):
-    """
-    Compute and save the descritptors
-    """
-    # compute the descripitors
-    tag = desc_settings['tag']
-    peratom = desc_settings['peratom']
-    prefix = desc_settings['prefix']
-    asapxyz.compute_global_descriptors(desc_spec_dict=desc_spec,
-                                       sbs=[],
-                                       keep_atomic=peratom,
-                                       tag=tag)
-    asapxyz.write(prefix)
-    asapxyz.save_state(tag)
-
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
     f = click.option('--adjusttext/--no-adjusttext', 
@@ -295,33 +268,12 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
              }
         }
 
-def read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom):
-    # try to read the xyz file
-    if fxyz != 'none':
-        asapxyz = ASAPXYZ(fxyz)
-        if project_atomic:
-            _, dm = asapxyz.get_descriptors(design_matrix, True)
-            dm_atomic = []
-        else:
-            dm, dm_atomic = asapxyz.get_descriptors(design_matrix, peratom)
-    else:
-        asapxyz = None
-        print("Did not provide the xyz file. We can only output descriptor matrix.")
-    # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(design_matrix[0]):
-        try:
-            dm = np.genfromtxt(design_matrix[0], dtype=float)
-            print("loaded the descriptor matrix from file: ", design_matrix[0])
-        except:
-            raise ValueError('Cannot load the descriptor matrix from file')
-    return asapxyz, dm, dm_atomic
-
 def d_reduce_options(f):
     """Create common options for dimensionality reduction"""
     f = click.option('--axes', nargs=2, type=click.Tuple([int, int]),
                      help='Plot the projection along which projection axes.',
                      default=[0,1])(f)
-    f = click.option('--dimension', '--d',
+    f = click.option('--dimension', '-d',
                      help='Number of the dimensions to keep in the output XYZ file.',
                      default=10)(f)
     f = click.option('--scale/--no-scale', 
@@ -339,6 +291,35 @@ def pca(ctx, scale, dimension, axes):
                    'type': 'PCA', 
                    'parameter':{"n_components": dimension, "scalecenter": scale}}
                   }
+    map_process(ctx.obj, reduce_dict, axes, map_name)
+
+@map.command('skpca')
+@click.option('--n_sparse', '-n', type=int, 
+              help='number of the representative samples, set negative if using no sparsification', 
+              show_default=True, default=10)
+@click.option('--sparse_mode', '-s',
+              type=click.Choice(['random', 'cur', 'fps'], case_sensitive=False), 
+              help='Sparsification method to use.', 
+              show_default=True, default='linear')
+@click.option('--kernel_parameter', '-kp', type=float, 
+              help='Parameter used in the kernel function.', 
+              default=None)
+@click.option('--kernel', '-k',
+              type=click.Choice(['linear', 'polynomial', 'cosine'], case_sensitive=False), 
+              help='Kernel function for converting design matrix to kernel matrix.', 
+              show_default=True, default='linear')
+@click.pass_context
+@d_reduce_options
+def skpca(ctx, scale, dimension, axes, 
+          kernel, kernel_parameter, sparse_mode, n_sparse):
+    """Sparse Kernel Principal Component Analysis"""
+    map_name = "skpca-d-"+str(dimension)
+    if scale:
+        reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
+    reduce_dict['skpca'] = {"type": 'SPARSE_KPCA', 
+                            'parameter':{"n_components": dimension, 
+                                         "sparse_mode": sparse_mode, "n_sparse": n_sparse,
+                                "kernel": {"first_kernel": {"type": kernel, "d": kernel_parameter}}}}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
 @map.command('umap')
@@ -367,51 +348,6 @@ def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
                           }}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
-def map_process(obj, reduce_dict, axes, map_name):
-    """
-    process the dimensionality reduction command
-    """
-    # project
-    dreducer = Dimension_Reducers(reduce_dict)
-    proj = dreducer.fit_transform(obj['design_matrix'])
-    if obj['map_info']['peratom']:
-        proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
-    else:
-        proj_atomic = None
-    # plot
-    fig_spec = obj['fig_spec_dict']
-    plotcolor = obj['map_info']['color']
-    plotcolor_atomic = obj['map_info']['color_atomic']
-    annotate = obj['map_info']['annotate']
-    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
-    # output 
-    outfilename = obj['fig_spec_dict']['outfile']
-    outmode = obj['map_info']['outmode']
-    map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic)
-
-def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name):
-    """
-    Make plots
-    """
-    asap_plot = Plotters(fig_spec)
-    asap_plot.plot(proj[::-1, axes], plotcolor[::-1], [], annotate)
-    if proj_atomic is not None:
-        asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
-    plt.show()
-
-def map_save(foutput, outmode, asapxyz, proj, proj_atomic):
-    """
-    Save the low-D projections
-    """
-    if outmode == 'matrix':
-        np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-        if proj_atomic is not None:
-            np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header=map_name)
-    if outmode == 'xyz':
-        asapxyz.set_descriptors(proj, 'pca_coord')
-        if proj_atomic is not None:
-            asapxyz.set_atomic_descriptors(proj_atomic_all, map_name)
-        asapxyz.write(foutput)
 
 def fit_setup_options(f):
     """Create common options for making 2D maps of the data set"""
