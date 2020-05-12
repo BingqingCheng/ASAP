@@ -19,7 +19,7 @@ class Descriptors_to_Kernels:
         Object handing the specification and the computation of atomic descriptors
         Parameters
         ----------
-        k_spec_dict: dictionaries that specify which why to convert descriptors into kernel matrix
+        k_spec_dict: dictionaries that specify which way to convert descriptors into kernel matrix
         e.g.
         k_spec_dict = {
         "first_kernel": {"type": 'linear', "normalize" = True},

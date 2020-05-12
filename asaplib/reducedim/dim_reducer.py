@@ -8,7 +8,7 @@ import umap
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 
-from .ml_kpca import KernelPCA
+from .sparse_kpca import SPARSE_KPCA
 from .ml_pca import PCA
 from ..io import NpEncoder
 
@@ -80,9 +80,9 @@ class Dimension_Reducers:
         elif dreduce_spec["type"] == "PCA":
             print ("Using PCA ...")
             return PCA(**dreduce_spec['parameter'])
-        elif dreduce_spec["type"] == "KPCA_SPARSE":
+        elif dreduce_spec["type"] == "SPARSE_KPCA":
             print ("Using kernel PCA (sparsified) ...")
-            return KernelPCA(**dreduce_spec['parameter'])
+            return SPARSE_KPCA(**dreduce_spec['parameter'])
         elif dreduce_spec["type"] == "UMAP":
             """https://umap-learn.readthedocs.io/en/latest/api.html#umap.umap_.UMAP.fit_transform"""
             print ("Using UMAP ...")
