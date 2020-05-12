@@ -246,11 +246,13 @@ def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_o
     desc_by_species = {}
     for species in global_species:
         atomic_desc_by_species = [atomic_desc[i] for i,at in enumerate(atomic_numbers) if at==species]
-        if average_over_natom:
+        if average_over_natom and len(atomic_desc_by_species) > 0:
             # normalize by the number of atoms
             desc_by_species[species] = np.mean(atomic_desc_by_species, axis=0)
-        else:
+        elif len(atomic_desc_by_species) > 0:
             desc_by_species[species] = np.sum(atomic_desc_by_species, axis=0)
+        else:
+            desc_by_species[species] = 0
         #print(np.shape(atomic_desc),len(atomic_desc))
 
     desc_len = np.shape(atomic_desc)[1]
