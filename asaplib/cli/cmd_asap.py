@@ -7,6 +7,8 @@ from yaml import full_load as yload
 import numpy as np
 import click
 from matplotlib import pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 
 from .func_asap import *
 from asaplib.data import ASAPXYZ, Design_Matrix
@@ -300,7 +302,7 @@ def pca(ctx, scale, dimension, axes):
 @click.option('--sparse_mode', '-s',
               type=click.Choice(['random', 'cur', 'fps'], case_sensitive=False), 
               help='Sparsification method to use.', 
-              show_default=True, default='linear')
+              show_default=True, default='fps')
 @click.option('--kernel_parameter', '-kp', type=float, 
               help='Parameter used in the kernel function.', 
               default=None)
