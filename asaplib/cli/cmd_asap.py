@@ -348,6 +348,46 @@ def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
                           }}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
+@map.command('tsne')
+@click.option('--metric', type=str, 
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html', 
+              show_default=True, default='euclidean')
+@click.option('--learning_rate', '-l', type=float, 
+              help='The learning rate is usually in the range [10.0, 1000.0].', 
+              show_default=True, default=200.0)
+@click.option('--early_exaggeration', '-e', type=float, 
+              help='Controls how tight natural clusters in the original space are in the embedded space.', 
+              show_default=True, default=12.0)
+@click.option('--perplexity', '-p', type=float, 
+              help='The perplexity is related to the number of nearest neighbors that is used in other manifold learning algorithms. \
+                  Larger datasets usually require a larger perplexity. \
+               Consider selecting a value between 5 and 50. \
+               Different values can result in significanlty different results.', 
+              show_default=True, default=30.0)
+@click.option('--pca/--no-pca', 
+                     help='Preprocessing the data using PCA with dimension 50. Recommended.',
+                     default=True)
+@click.pass_context
+@d_reduce_options
+def tsne(ctx, pca, scale, dimension, axes, 
+          perplexity, early_exaggeration, learning_rate, metric):
+    """t-SNE"""
+    map_name = "tsne-d-"+str(dimension)
+
+    if pca:
+        # pre-process with PCA if dim > 50
+        # suggested here: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+        reduce_dict= {"preprocessing":{"type": 'PCA', 'parameter':{"n_components": 50, "scalecenter": scale}}}
+    elif scale:
+        reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
+    reduce_dict['tsne'] = {'type': 'TSNE', 'parameter':
+                           {'perplexity': perplexity, 
+                            'early_exaggeration': early_exaggeration,
+                            'learning_rate': learning_rate,
+                            'metric': metric
+                          }}
+    map_process(ctx.obj, reduce_dict, axes, map_name)
 
 def fit_setup_options(f):
     """Create common options for making 2D maps of the data set"""
