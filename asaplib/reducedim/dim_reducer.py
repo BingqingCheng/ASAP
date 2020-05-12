@@ -6,6 +6,7 @@ import json
 from copy import copy
 import umap
 from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
 
 from .ml_kpca import KernelPCA
 from .ml_pca import PCA
@@ -22,6 +23,7 @@ class Dimension_Reducers:
         we can perform a list of D-reduction sequentially.
         e.g.
         dreduce_spec_dict = {
+        "preprocessing": {"type": 'SCALE', 'parameter': None},
         "reduce2_umap": {"type": 'UMAP', 'parameter': {"n_components": 10, "n_neighbors": 10, "metric":'euclidean'}}
         }
         e.g.
@@ -72,17 +74,20 @@ class Dimension_Reducers:
         """
         if "type" not in dreduce_spec.keys():
             raise ValueError("Did not specify the type of the dimensionality reducer.")
-        if dreduce_spec["type"] == "PCA":
+        elif dreduce_spec["type"] == "SCALE":
+            print ("Using standard scaling of the data ...")
+            return StandardScaler()
+        elif dreduce_spec["type"] == "PCA":
             print ("Using PCA ...")
             return PCA(**dreduce_spec['parameter'])
-        if dreduce_spec["type"] == "KPCA":
-            print ("Using kernel PCA ...")
+        elif dreduce_spec["type"] == "KPCA_SPARSE":
+            print ("Using kernel PCA (sparsified) ...")
             return KernelPCA(**dreduce_spec['parameter'])
-        if dreduce_spec["type"] == "UMAP":
+        elif dreduce_spec["type"] == "UMAP":
             """https://umap-learn.readthedocs.io/en/latest/api.html#umap.umap_.UMAP.fit_transform"""
             print ("Using UMAP ...")
             return umap.UMAP(**dreduce_spec['parameter'])
-        if dreduce_spec["type"] == "TSNE":
+        elif dreduce_spec["type"] == "TSNE":
             print ("Using t-sne ...")
             """https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html"""
             return TSNE(**dreduce_spec['parameter'])

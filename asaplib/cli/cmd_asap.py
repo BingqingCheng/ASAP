@@ -9,6 +9,7 @@ import click
 from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ, Design_Matrix
+from asaplib.reducedim import Dimension_Reducers
 from asaplib.plot import Plotters, set_color_function
 from asaplib.io import ConvertStrToList
 
@@ -333,60 +334,60 @@ def d_reduce_options(f):
 @d_reduce_options
 def pca(ctx, scale, dimension, axes):
     """Principal Component Analysis"""
-    from asaplib.pca import PCA
     map_name = "pca-d-"+str(dimension)
-
-    pca = PCA(dimension, scale)
-    proj = pca.fit_transform(ctx.obj['design_matrix'])
-    if ctx.obj['map_info']['peratom']:
-        proj_atomic = pca.transform(ctx.obj['design_matrix_atomic'])
-    else:
-        proj_atomic = None
-
-    fig_spec = ctx.obj['fig_spec_dict']
-    plotcolor = ctx.obj['map_info']['color']
-    plotcolor_atomic = ctx.obj['map_info']['color_atomic']
-    annotate = ctx.obj['map_info']['annotate']
-    # plot
-    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
-    # output 
-    outfilename = ctx.obj['fig_spec_dict']['outfile']
-    outmode =  ctx.obj['map_info']['outmode']
-    map_save(outfilename, outmode, ctx.obj['asapxyz'], proj, proj_atomic)
+    reduce_dict = {'pca': {
+                   'type': 'PCA', 
+                   'parameter':{"n_components": dimension, "scalecenter": scale}}
+                  }
+    map_process(ctx.obj, reduce_dict, axes, map_name)
 
 @map.command('umap')
+@click.option('--n_neighbors', '-nn', type=int, 
+              help='Controls how UMAP balances local versus global structure in the data.', 
+              show_default=True, default=10)
+@click.option('--min_dist', '-md', type=float, 
+              help='controls how tightly UMAP is allowed to pack points together.', 
+              show_default=True, default=0.1)
+@click.option('--metric', type=str, 
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://umap-learn.readthedocs.io/en/latest/parameters.html#metric', 
+              show_default=True, default='euclidean')
 @click.pass_context
 @d_reduce_options
-def umap(ctx, scale, dimension, axes):
+def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
     """UMAP"""
-    from umap import UMAP
     map_name = "umap-d-"+str(dimension)
-
-    # scale & center
     if scale:
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        desc = scaler.fit_transform(ctx.obj['design_matrix'])  # normalizing the features
-    else:
-        desc = ctx.obj['design_matrix']
+        reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
+    reduce_dict['umap'] = {'type': 'UMAP', 'parameter':
+                           {'n_components': dimension, 
+                            'n_neighbors': n_neighbors,
+                            'min_dist': min_dist,
+                            'metric': metric
+                          }}
+    map_process(ctx.obj, reduce_dict, axes, map_name)
 
-    reducer = UMAP()
-    proj = reducer.fit_transform(desc)
-    if ctx.obj['map_info']['peratom']:
-        proj_atomic = reducer.transform(ctx.obj['design_matrix_atomic'])
+def map_process(obj, reduce_dict, axes, map_name):
+    """
+    process the dimensionality reduction command
+    """
+    # project
+    dreducer = Dimension_Reducers(reduce_dict)
+    proj = dreducer.fit_transform(obj['design_matrix'])
+    if obj['map_info']['peratom']:
+        proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
     else:
         proj_atomic = None
-
-    fig_spec = ctx.obj['fig_spec_dict']
-    plotcolor = ctx.obj['map_info']['color']
-    plotcolor_atomic = ctx.obj['map_info']['color_atomic']
-    annotate = ctx.obj['map_info']['annotate']
     # plot
+    fig_spec = obj['fig_spec_dict']
+    plotcolor = obj['map_info']['color']
+    plotcolor_atomic = obj['map_info']['color_atomic']
+    annotate = obj['map_info']['annotate']
     map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
     # output 
-    outfilename = ctx.obj['fig_spec_dict']['outfile']
-    outmode =  ctx.obj['map_info']['outmode']
-    map_save(outfilename, outmode, ctx.obj['asapxyz'], proj, proj_atomic)
+    outfilename = obj['fig_spec_dict']['outfile']
+    outmode = obj['map_info']['outmode']
+    map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic)
 
 def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name):
     """
