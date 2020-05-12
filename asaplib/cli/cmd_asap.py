@@ -469,5 +469,4 @@ def ridge(ctx, sigma):
     # fit the model
     ctx.obj['dm'].compute_fit(rr, 'ridge_regression', store_results=True, plot=True)
     plt.show()
-    plt.savefig(ctx.obj['fit_prefix']+"RR.png")
 

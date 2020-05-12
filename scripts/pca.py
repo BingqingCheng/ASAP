@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.pca import PCA
+from asaplib.reducedim import Dimension_Reducers
 from asaplib.plot import Plotters, set_color_function
 
 
@@ -73,11 +73,25 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     else:
         tags = []
 
-    # the main thing
-    pca = PCA(pca_d, scale)
-    proj = pca.fit_transform(desc)
+
+    reduce_dict = { "pca": 
+                   {"type": 'PCA', 'parameter':{"n_components": pca_d, "scalecenter": scale}}
+                  }
+    """
+    reduce_dict = { "umap": 
+                   {"type": 'UMAP', 'parameter':{"n_components": pca_d, "n_neighbors": 10}}
+                  }    
+
+    reduce_dict = {
+        "reduce1_pca": {"type": 'PCA', 'parameter':{"n_components": 20, "scalecenter":True}},
+        "reduce2_tsne": {"type": 'TSNE', 'parameter': {"n_components": 2, "perplexity":20}}
+        }
+    """
+    dreducer = Dimension_Reducers(reduce_dict)
+
+    proj = dreducer.fit_transform(desc)
     if peratom or plotatomic and not projectatomic:
-        proj_atomic_all = pca.transform(desc_atomic)
+        proj_atomic_all = dreducer.transform(desc_atomic)
 
     # save
     if output == 'matrix':
