@@ -182,7 +182,7 @@ class KernelPCA:
 
         """
 
-        assert np.n_components(kmat) == 2
+        assert np.ndim(kmat) == 2
         assert np.isreal(kmat).all()
 
         if square:
