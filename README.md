@@ -6,6 +6,24 @@
 Automatic Selection And Prediction tools for materials and molecules
 
 #
+
+Type asap and use the sub-commands for various tasks.
+
+e.g. in the folder ./tests/
+
+to generate SOAP descriptors:
+
+`asap gen_desc --fxyz small_molecules-1000.xyz soap`
+
+for columb matrix:
+
+`asap gen_desc -f small_molecules-1000.xyz --no-periodic cm`
+
+for pca map:
+
+`asap map -f small_molecules-SOAP.xyz -dm [SOAP-n4-l3-c1.9-g0.23] -c dft_formation_energy_per_atom_in_eV pca`
+
+#
 python 3
 
 Installation:
@@ -29,28 +47,12 @@ pip3 install --upgrade pip
 python3 -m pip install --user somepackage    .or.    pip3 install --user somepackage
 
 #
-In the directory ./scripts/ you can find a selection of python tools:
+In the directory ./scripts/ and ./tools/ you can find a selection of other python tools:
 
-* gen_FCHL19_rep.py: generate FCHL representation for each frame and each atomic environment.
-
-* gen_soap_descriptors.py: generate soap descriptors for each frame and each atomic environment.
-
-* gen_soap_kmat.py: computes kernel matrix between different structures if multiple frames are provides, or the kernel matrix between atomic environments in a structure if only one frame is the input.
 
 * frame_select.py: select a subset of the xyz frames based on random or farthest point sampling selection.
-
-* pca.py: does principle component analysis in the space of vectors of descriptors, and makes plots.
-
-* kpca.py: does principle component analysis on the kernel matrix and makes plots.
 
 * kernel_density_estimate.py: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
 
 * clustering.py: does clustering tasks based on the kernel matrix, does plotting as well.
 
-* ridge_regression.py: quick ridge regression, with train/test split and optional learning curve.
-
-* krr.py: quick kernel ridge regression, with train/test split, sparsification and optional learning curve.
-
-#
-TODOs:
-* add a class of methods to compute kernel matrix from basis functions
