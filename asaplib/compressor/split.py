@@ -6,7 +6,7 @@ import collections
 from abc import ABCMeta
 
 import numpy as np
-from sklearn.externals.six import with_metaclass
+#from sklearn.externals.six import with_metaclass
 from sklearn.model_selection._split import KFold as _KFold
 from sklearn.model_selection._split import ShuffleSplit as _ShuffleSplit
 from sklearn.utils import check_random_state
@@ -131,7 +131,8 @@ class ShuffleSplit(_ShuffleSplit):
         return params
 
 
-class LCSplit(with_metaclass(ABCMeta)):
+#class LCSplit(with_metaclass(ABCMeta)):
+class LCSplit():
     def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size=None, random_state=None, **cvargs):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):
             raise ValueError("Number of repetitions or training set sizes must be an iterable.")
