@@ -19,7 +19,7 @@ import numpy as np
 from dscribe.descriptors import SOAP
 
 from asaplib.io import str2bool
-from asaplib.pca import KernelPCA
+from asaplib.reducedim import KernelPCA
 
 
 def main(xyz_filename, output_filename=None, cutoff=3., n_max=6, l_max=6, zeta=2.0,

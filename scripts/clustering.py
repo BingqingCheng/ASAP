@@ -13,7 +13,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
-from asaplib.pca import PCA, KernelPCA
+from asaplib.reducedim import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
 from asaplib.io import NpEncoder
