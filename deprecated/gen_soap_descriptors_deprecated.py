@@ -4,9 +4,9 @@ import os
 import sys
 
 import numpy as np
-from ase.io import read, write
 from dscribe.descriptors import SOAP
 
+from asaplib.data import ASAPXYZ
 from asaplib.hypers import universal_soap_hyper
 from asaplib.io import str2bool
 from asaplib.kernel import Atomic_2_Global_Descriptor_By_Species
@@ -20,7 +20,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     Parameters
     ----------
     fxyz: string giving location of xyz file
-    dictxyz: string giving location of xyz file that is used as a dictionary
     prefix: string giving the filename prefix
     output: [xyz]: append the SOAP descriptors to extended xyz file; [mat] output as a standlone matrix
     fsoap_param: use (possibly multiple sets) of SOAP descriptors using parameters specified in fsoap_param file (json format)
@@ -34,30 +33,9 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
     soap_periodic: string (True or False) indicating whether the system is periodic
     stride: compute descriptor each X frames
     """
-    fframes = []
-    dictframes = []
 
     # read frames
-    if fxyz is not None:
-        fframes = read(fxyz, slice(0, None, stride))
-        nfframes = len(fframes)
-        print("read xyz file:", fxyz, ", a total of", nfframes, "frames")
-    # read frames in the dictionary
-    if dictxyz is not None:
-        dictframes = read(dictxyz, ':')
-        ndictframes = len(dictframes)
-        print("read xyz file used for a dictionary:", dictxyz, ", a total of",
-              ndictframes, "frames")
-
-    frames = dictframes + fframes
-    nframes = len(frames)
-    global_species = []
-    for frame in frames:
-        global_species.extend(frame.get_atomic_numbers())
-        if not soap_periodic:
-            frame.set_pbc([False, False, False])
-    global_species = np.unique(global_species)
-    print("a total of", nframes, "frames, with elements: ", global_species)
+    asapxyz = ASAPXYZ(fxyz)
 
     if fsoap_param is not None:
         import json
@@ -92,11 +70,6 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
                                  sigma=soap_g, rbf="gto", crossover=False, average=False, periodic=soap_periodic)]
         foutput = prefix + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
         desc_name = "SOAP" + "-n" + str(soap_n) + "-l" + str(soap_l) + "-c" + str(soap_rcut) + "-g" + str(soap_g)
-
-    # prepare for the output
-    if os.path.isfile(foutput + ".xyz"): os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
-    if os.path.isfile(foutput + ".desc"): os.rename(foutput + ".desc", "bck." + foutput + ".desc")
-
     for i, frame in enumerate(frames):
         fnow = soap_desc_atomic[0].create(frame, n_jobs=8)
 
@@ -109,21 +82,15 @@ def main(fxyz, dictxyz, prefix, output, peratom, fsoap_param, soap_rcut, soap_g,
         elif element_wise == False:
             frame.info[desc_name+'-'+kernel_type] = Atomic_2_Global_Descriptor_By_Species(fnow, [], [], kernel_type, zeta_list)
         else:
-            frame.info[desc_name+'-'+kernel_type+'-elementwise-'] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species, kernel_type, zeta_list)
+            frame.info[desc_name+'-'+kernel_type+'-elementwise'] = Atomic_2_Global_Descriptor_By_Species(fnow, frame.get_atomic_numbers(), global_species, kernel_type, zeta_list)
 
         # save
         if output == 'matrix':
-            with open(foutput + ".desc", "ab") as f:
-                np.savetxt(f, frame.info[desc_name][None])
+            asapxyz.write_descriptor_matrix(desc_name, desc_name)
             if peratom or nframes == 1:
-                with open(foutput + ".atomic-desc", "ab") as fatomic:
-                    np.savetxt(fatomic, fnow)
+                asapxyz.write_atomic_descriptor_matrix(desc_name, desc_name)
         elif output == 'xyz':
-            # output per-atom info
-            if peratom:
-                frame.new_array(desc_name, fnow)
-            # write xyze
-            write(foutput + ".xyz", frame, append=True)
+           asapxyz.write(foutput)
         else:
             raise ValueError('Cannot find the output format')
 

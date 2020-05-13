@@ -3,6 +3,8 @@ Tools for doing kernel PCA on environmental similarity
 e.g.
 kNN = np.genfromtxt(prefix+".k",skip_header=1)
 proj = KernelPCA(kpca_d).fit_transform(kNN)
+
+KernelPCA with precomputed kernel for now only!!!!!!!!!!!!
 """
 
 import numpy as np
@@ -10,17 +12,17 @@ import scipy.linalg as salg
 
 
 class KernelPCA:
-    def __init__(self, ndim=2):
+    def __init__(self, n_components=2):
         """KernelPCA with precomputed kernel for now only
 
         Parameters
         ----------
-        ndim : int, default=2
+        n_components : int, default=2
             number of dimensions to project to
         """
 
         # essential
-        self.ndim = ndim
+        self.n_components = n_components
 
         # kernel and projection related properties
         self.vectors = None
@@ -104,7 +106,7 @@ class KernelPCA:
         self.colmean, self.mean, self.center_kmat = self.center_square(kmat)
 
         # calculation, ordering in descending order and scale by sqrt(lambda)
-        self._lambdas, self._alphas = salg.eigh(self.center_kmat, eigvals=(self._m - self.ndim, self._m - 1))
+        self._lambdas, self._alphas = salg.eigh(self.center_kmat, eigvals=(self._m - self.n_components, self._m - 1))
         self._lambdas = np.flipud(self._lambdas)
         self._alphas = np.fliplr(self._alphas) / np.sqrt(self._lambdas)
 
@@ -150,7 +152,7 @@ class KernelPCA:
 
         Returns
         -------
-        projected_vectors: numpy.array, shape=(L,ndim)
+        projected_vectors: numpy.array, shape=(L,n_components)
             projections of the given kernel wrt. the training kernel
         """
         if not self._fitted:

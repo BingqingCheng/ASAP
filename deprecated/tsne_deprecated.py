@@ -1,7 +1,7 @@
-#!python3
+#!/usr/bin/python3
 """
-script for applying UMAP to a precomputed design matrix. See: https://arxiv.org/abs/1802.03426 and
-https://umap-learn.readthedocs.io/en/latest/index.html
+script for applying t-SNE to a precomputed design matrix. See: https://lvdmaaten.github.io/tsne/
+for getting the most out of t-SNE for your example.
 """
 
 import argparse
@@ -10,22 +10,23 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import umap
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.plot import set_color_function, plot_styles
+from asaplib.plot import Plotters, set_color_function
 
 
-def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, umap_d, dim1, dim2,
-        projectatomic, plotatomic, adtext):
+def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw, scale, tsne_d, dim1, dim2, perplexity,
+         projectatomic, plotatomic, adtext):
     """
 
     Parameters
     ----------
     fmat: Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.
     fxyz: Location of xyz file for reading the properties.
-    ftags: Location of tags for the first M samples. Plot the tags on the umap.
+    ftags: Location of tags for the first M samples. Plot the tags on the t-SNE map.
     fcolor: Location of a file or name of the tags in ase xyz file. It should contain properties for all samples (N floats) used to color the scatterplot'
     colorscol: The column number of the properties used for the coloring. Starts from 0.
     prefix: Filename prefix, default is ASAP
@@ -33,10 +34,11 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     peratom: Whether to output per atom t-SNE coordinates (True/False)
     keepraw: Whether to keep the high dimensional descriptor when output is an xyz file (True/False)
     scale: Scale the coordinates (True/False). Scaling highly recommanded.
-    umap_d: Dimension of the embedded space.
+    tsne_d: Dimension of the embedded space.
     dim1: Plot the projection along which principle axes
     dim2: Plot the projection along which principle axes
     projectatomic: build the projection using the (big) atomic descriptor matrix
+    perplexity: Perplexity setting for t-SNE: Typical values between 5 and 50.
     plotatomic: Plot the PCA coordinates of all atomic environments (True/False)
     adtext: Whether to adjust the texts (True/False)
 
@@ -45,7 +47,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     """
 
-    foutput = prefix + "-pca-d" + str(umap_d)
+    foutput = prefix + "-pca-d" + str(tsne_d)
     use_atomic_desc = (peratom or plotatomic or projectatomic)
 
     # try to read the xyz file
@@ -58,9 +60,9 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         print("Did not provide the xyz file. We can only output descriptor matrix.")
         output = 'matrix'
     # we can also load the descriptor matrix from a standalone file
-    if os.path.isfile(fmat):
+    if os.path.isfile(fmat[0]):
         try:
-            desc = np.genfromtxt(fmat, dtype=float)
+            desc = np.genfromtxt(fmat[0], dtype=float)
             print("loaded the descriptor matrix from file: ", fmat)
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
@@ -72,6 +74,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")[:]
         ndict = len(tags)
+    else:
+        tags = []
 
     # scale & center
     if scale:
@@ -81,18 +85,25 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         print(scaler.fit(desc))
         desc = scaler.transform(desc)  # normalizing the features
 
-    # fit UMAP
+    # fit t-SNE
 
-    reducer = umap.UMAP()
-    proj = reducer.fit_transform(desc)
+    if desc.shape[1] >= 50:
+        # pre-process with PCA if dim > 50
+        # suggested here: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+
+        pca = PCA(n_components=50)
+        desc = pca.fit_transform(desc)
+        print('Shape of processed descriptor matrix after applying PCA is {}'.format(desc.shape))
+
+    tsne = TSNE(n_components=tsne_d, perplexity=perplexity)
+    proj = tsne.fit_transform(desc)
     if peratom or plotatomic and not projectatomic:
-        proj_atomic_all = reducer.transform(desc_atomic)
+        raise NotImplementedError
+        #proj_atomic_all = tsne.transform(desc_atomic)
 
     # save
     if output == 'matrix':
         np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
-        if peratom:  
-            np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header='low D coordinates of samples')
     if output == 'xyz':
         if os.path.isfile(foutput + ".xyz"):
             os.rename(foutput + ".xyz", "bck." + foutput + ".xyz")
@@ -106,11 +117,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         asapxyz.write(foutput)
 
     # color scheme
-    if plotatomic or projectatomic:
-        plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, True)
-    else:
-        plotcolor, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, len(proj), False)
-    if projectatomic: plotcolor = plotcolor_peratom
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(fcolor, asapxyz, colorscol, 0, (peratom or plotatomic), projectatomic)
 
     # make plot
     plot_styles.set_nice_font()
@@ -141,7 +148,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
                                            centers=None,
                                            psize=None,
                                            out_file=None,
-                                           title='UMAP for: ' + prefix,
+                                           title='t-SNE for: ' + prefix,
                                            show=False, cmap='gnuplot',
                                            remove_tick=False,
                                            use_perc=False,
@@ -169,15 +176,15 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
 
     plt.show()
     if plotatomic:
-        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
+        fig.savefig('t-SNE_4_' + prefix + '-c-' + fcolor + '-plotatomic.png')
     else:
-        fig.savefig('UMAP_4_' + prefix + '-c-' + fcolor + '.png')
+        fig.savefig('t-SNE_4_' + prefix + '-c-' + fcolor + '.png')
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-fmat', type=str, default='ASAP_desc',
+    parser.add_argument('-fmat', nargs='+', type=str, required=True,
                         help='Location of descriptor matrix file or name of the tags in ase xyz file. You can use gen_descriptors.py to compute it.')
     parser.add_argument('-fxyz', type=str, default='none', help='Location of xyz file for reading the properties.')
     parser.add_argument('-tags', type=str, default='none',
@@ -197,6 +204,7 @@ if __name__ == '__main__':
     parser.add_argument('--d', type=int, default=2, help='number of embedded dimensions to keep')
     parser.add_argument('--dim1', type=int, default=0, help='Plot the projection along which principle axes')
     parser.add_argument('--dim2', type=int, default=1, help='Plot the projection along which principle axes')
+    parser.add_argument('--perp', type=int, default=30, help='Perplexity value for t-SNE. Typical values between 5 and 50.')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Building the UMAP projection based on atomic descriptors instead of global ones (True/False)')
     parser.add_argument('--plotatomic', type=str2bool, nargs='?', const=True, default=False,
@@ -210,4 +218,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.fxyz, args.tags, args.colors, args.colorscolumn, args.prefix, args.output, args.peratom,
-         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.projectatomic, args.plotatomic, args.adjusttext)
+         args.keepraw, args.scale, args.d, args.dim1, args.dim2, args.perp, args.projectatomic, args.plotatomic, args.adjusttext)

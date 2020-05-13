@@ -11,17 +11,17 @@ from sklearn.preprocessing import StandardScaler
 
 
 class PCA:
-    def __init__(self, ndim=2, scalecenter=True):
+    def __init__(self, n_components=2, scalecenter=True):
         """PCA with precomputed descriptor matrix
 
         Parameters
         ----------
-        ndim : int, default=2
+        n_components : int, default=2
             number of dimensions to project to
         """
 
         # essential
-        self.ndim = ndim
+        self.n_components = n_components
         # options for scale and center the descriptor matrix
         self.scalecenter = scalecenter
         self.scaler = None
@@ -82,12 +82,12 @@ class PCA:
         print("computing covariance matrix with shape:", np.shape(COV))
 
         print("  And now we build a projection ")
-        eval, evec = salg.eigh(COV, eigvals=(len(COV) - self.ndim, len(COV) - 1))
+        eval, evec = salg.eigh(COV, eigvals=(len(COV) - self.n_components, len(COV) - 1))
         eval = np.flipud(eval)
         evec = np.fliplr(evec)
 
         self.pvec = evec.copy()
-        for i in range(self.ndim):
+        for i in range(self.n_components):
             self.pvec[:, i] *= 1. / np.sqrt(eval[i])
         print("Done, super quick. ")
 
@@ -104,7 +104,7 @@ class PCA:
 
         Returns
         -------
-        projected_vectors: numpy.array, shape=(L,ndim)
+        projected_vectors: numpy.array, shape=(L,n_components)
             projections of the design matrix on low dimension
         """
         if not self._fitted:
@@ -125,7 +125,7 @@ class PCA:
 
         Returns
         -------
-        projected_vectors: numpy.array, shape=(L,ndim)
+        projected_vectors: numpy.array, shape=(L,n_components)
             projections of the design matrix on low dimension
 
         """
