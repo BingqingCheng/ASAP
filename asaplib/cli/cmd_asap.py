@@ -22,16 +22,12 @@ def asap(ctx):
     """The command line tool of Automatic Selection And Prediction tools for materials and molecules (ASAP)"""
     # Configure, make sure we have a dict object
     ctx.ensure_object(dict)
+    ctx.obj['data'] = {}
+    ctx.obj['descriptors'] = {}
+    ctx.obj['output'] = {}
 
-
-def desc_options(f):
-    """Create common options for a descriptor command"""
-    f = click.option('--peratom', 
-                     help='Save the per-atom local descriptors.',
-                     show_default=True, default=False, is_flag=True)(f)
-    f = click.option('--tag',
-                     help='Tag for the descriptor output.',
-                     default='ASAP')(f)
+def io_options(f):
+    """Create common options for I/O files"""
     f = click.option('--prefix', '-p',
                      help='Prefix to be used for the output XYZ file.', 
                      default='ASAP-desc')(f)
@@ -44,9 +40,37 @@ def desc_options(f):
     f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
                      help='Input XYZ file',
-                     default='ASAP.xyz')(f)
+                     default=None)(f)
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
                      help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
+    return f
+
+@asap.group('gen_desc')
+@click.pass_context
+@io_options
+def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
+    """
+    Descriptor generation command
+    This command function evaluated before the descriptor specific ones,
+    we setup the general stuff here, such as read the files.
+    """
+
+    if in_file:
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+        ctx.obj.update(load_in_file(in_file))
+
+    if fxyz is not None:
+        ctx.obj['data']['fxyz'] = fxyz
+        ctx.obj['data']['stride'] = stride
+        ctx.obj['data']['periodic'] = periodic
+    ctx.obj['output']['prefix'] = prefix
+
+def desc_options(f):
+    """Create common options for computing descriptors"""
+    f = click.option('--tag',
+                     help='Tag for the descriptors.',
+                     default='cmd-desc')(f)
     return f
 
 def atomic_to_global_desc_options(f):
@@ -61,45 +85,10 @@ def atomic_to_global_desc_options(f):
     f = click.option('--element_wise', '-e', 
                      help='element-wise operation to get global descriptors from the atomic soap vectors',
                      show_default=True, default=False, is_flag=True)(f)
+    f = click.option('--peratom', '-pa',
+                     help='Save the per-atom local descriptors.',
+                     show_default=True, default=False, is_flag=True)(f)
     return f
-
-@asap.group('gen_desc')
-@click.pass_context
-@desc_options
-def gen_desc(ctx, in_file, fxyz, prefix, tag, 
-             peratom, stride, periodic):
-    """
-    Descriptor generation command
-    This command function evaluated before the descriptor specific ones,
-    we setup the general stuff here, such as read the files.
-    """
-
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        # TODO: write a proper parser function!
-        with open(in_file, 'r') as stream:
-            try:
-                state_str = yload(stream)
-            except:
-                state_str = json.load(stream)
-        state = {}
-        for k,s in state_str.items():
-            if isinstance(s, str):
-                state[k] = json.loads(s)
-            else:
-                state[k] = s
-                
-        if fxyz == None:
-           fxyz = state['data']['fxyz']
-        ctx.obj['desc_spec'] = state['descriptors']
-
-    ctx.obj['asapxyz'] = ASAPXYZ(fxyz, stride, periodic)
-    ctx.obj['desc_settings'] = {
-        'tag': tag,
-        'prefix': prefix,
-        'peratom': peratom,
-    }
 
 @gen_desc.command('soap')
 @click.option('--cutoff', '-c', type=float, 
@@ -123,60 +112,69 @@ def gen_desc(ctx, in_file, fxyz, prefix, tag,
 @click.option('--universal_soap', '--usoap', '-u',
               type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False), 
               help='Try out our universal SOAP parameters.', 
-              show_default=True, default='none')
+              show_default=True, default='minimal')
 @click.pass_context
+@desc_options
 @atomic_to_global_desc_options
-def soap(ctx, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf,
-         kernel_type, zeta, element_wise, universal_soap):
+def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, universal_soap,
+         kernel_type, zeta, element_wise, peratom):
     """Generate SOAP descriptors"""
+    # load up the xyz
+    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
+ 
     if universal_soap != 'none':
         from asaplib.hypers import universal_soap_hyper
         global_species = ctx.obj['asapxyz'].get_global_species()
-        soap_spec = universal_soap_hyper(global_species, universal_soap, dump=True)
-        for k in soap_spec.keys():
-            soap_spec[k]['rbf'] = rbf
-            soap_spec[k]['crossover'] = crossover
+        soap_spec = universal_soap_hyper(global_species, universal_soap, dump=False)
     else:
-        soap_spec = {
-            'soap1': {
-                'type': 'SOAP',
-                'cutoff': cutoff,
-                'n': nmax,
-                'l': lmax,
-                'atom_gaussian_width': atom_gaussian_width,
-                'rbf': rbf,
-                'crossover': crossover
-            }
-        }
+        soap_spec = {'soap1': {'type': 'SOAP',
+                               'cutoff': cutoff,
+                               'n': nmax,
+                               'l': lmax,
+                               'atom_gaussian_width': atom_gaussian_width}}
+    for k in soap_spec.keys():
+        soap_spec[k]['rbf'] = rbf
+        soap_spec[k]['crossover'] = crossover
     # The specification for the kernels
     kernel_spec = dict(set_kernel(kernel_type, element_wise, zeta))
     # The specification for the descriptor
     desc_spec = {}
     for k, v in soap_spec.items():
-        desc_spec[k] = {
-                'atomic_descriptor': dict({k: v}),
-                'kernel_function': kernel_spec}
-
+        desc_spec[k] = {'atomic_descriptor': dict({k: v}),
+                        'kernel_function': kernel_spec}
+    # specify descriptors using the cmd line tool
+    ctx.obj['descriptors'][tag] = desc_spec
+    print(ctx.obj['descriptors'])
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], desc_spec, ctx.obj['desc_settings'])
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'], peratom)
 
 @gen_desc.command('cm')
 @click.pass_context
-def cm(ctx):
+@desc_options
+def cm(ctx, tag):
     """Generate the Coulomb Matrix descriptors"""
+    # load up the xyz
+    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
     # The specification for the descriptor
-    desc_spec = {'cm': {'type': "CM"}}
+    ctx.obj['descriptors'][tag] = {'cm':{'type': "CM"}}
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], desc_spec, ctx.obj['desc_settings'])
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
 
 @gen_desc.command('run')
 @click.pass_context
 def run(ctx):
     """ Running analysis using input files """
-    output_desc(ctx.obj['asapxyz'], ctx.obj['desc_spec'], ctx.obj['desc_settings'])
+    # load up the xyz
+    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
+    # Compute the save the descriptors
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
 
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
+    f = click.option('--style', '-s',
+                     type=click.Choice(['default','journal'], case_sensitive=False), 
+                     help='Style of the plot.', 
+                     show_default=True, default='default')(f)
     f = click.option('--adjusttext/--no-adjusttext', 
                      help='Adjust the annotation texts so they do not overlap.',
                      default=False)(f)
@@ -184,7 +182,7 @@ def map_setup_options(f):
                      help='Keep the high dimensional descriptor when output XYZ file.',
                      default=False)(f)
     f = click.option('--peratom', 
-                     help='Save the per-atom local descriptors.',
+                     help='Save the per-atom projection.',
                      default=False, is_flag=True)(f)
     f = click.option('--project_atomic', 
                      help='Build map based on atomic descriptors instead of global ones.',
@@ -207,7 +205,7 @@ def map_setup_options(f):
     f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
                      help='Input XYZ file',
-                     default='ASAP.xyz')(f)
+                     default=None)(f)
     f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
                      help='Location of descriptor matrix file or name of the tags in ase xyz file\
                            the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
@@ -221,7 +219,7 @@ def map_setup_options(f):
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
          project_atomic, peratom, keepraw,
          color, color_column,
-         annotate, adjusttext):
+         annotate, adjusttext, style):
     """
     Making 2D maps using dimensionality reduction.
     This command function evaluated before the specific ones,
@@ -229,9 +227,9 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     """
 
     if in_file:
-        print('')
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
+        raise NotImplementedError
 
     ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom)
     if ctx.obj['asapxyz'] is None: output = 'matrix'
@@ -244,31 +242,33 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     # color scheme
     plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, project_atomic)
     ctx.obj['map_info'] =  { 'color': plotcolor, 
-                              'color_atomic': plotcolor_peratom,
-                              'peratom': peratom,
-                              'annotate': [],
-                              'outmode': output,
-                              'keepraw': keepraw
+                             'color_atomic': plotcolor_peratom,
+                             'peratom': peratom,
+                             'annotate': [],
+                             'outmode': output,
+                             'keepraw': keepraw
                            }
     if annotate != 'none':
         ctx.obj['plot_info']['annotate'] = np.loadtxt(annotate, dtype="str")[:] 
 
-    ctx.obj['fig_spec_dict'] = {
-        'outfile': prefix,
-        'show': False,
-        'title': None,
-        'xlabel': 'Principal Axis 1',
-        'ylabel': 'Principal Axis 2',
-        'xaxis': True,  'yaxis': True,
-        'remove_tick': False,
-        'rasterized': True,
-        'fontsize': 16,
-        'components':{ 
-            "first_p": {"type": 'scatter', 'clabel': colorlabel, 
-                        'vmin': colorscale[0], 'vmax': colorscale[0]},
-            "second_p": {"type": 'annotate', 'adtext': adjusttext}
-             }
-        }
+
+    ctx.obj['fig_spec_dict'] = { 'outfile': prefix,
+                                 'show': False,
+                                 'title': None,
+                                 'components':{ 
+                                  "first_p": {"type": 'scatter', 'clabel': colorlabel, 
+                                  'vmin': colorscale[0], 'vmax': colorscale[0]},
+                                  "second_p": {"type": 'annotate', 'adtext': adjusttext}}
+                                }
+
+    if style == 'journal':
+        ctx.obj['fig_spec_dict'].update({'xlabel': None, 'ylabel': None,
+                                         'xaxis': False,  'yaxis': False,
+                                         'remove_tick': True,
+                                         'rasterized': True,
+                                         'fontsize': 16,
+                                         'size': [8, 6]
+                                         })
 
 def d_reduce_options(f):
     """Create common options for dimensionality reduction"""
@@ -422,10 +422,11 @@ def fit(ctx, in_file, fxyz, design_matrix, y, prefix, test_ratio):
     we setup the general stuff here, such as read the files.
     """
     ctx.obj['fit_prefix'] = prefix
+
     if in_file:
-        print('')
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
+        raise NotImplementedError
 
     asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, False, False)
 

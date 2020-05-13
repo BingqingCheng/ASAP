@@ -13,6 +13,22 @@ from asaplib.reducedim import Dimension_Reducers
 from asaplib.plot import Plotters, set_color_function
 from asaplib.io import ConvertStrToList
 
+"""for loading in_file"""
+def load_in_file(in_file):
+    """Here goes the routine to compute the descriptors according to the state file(s)"""
+    with open(in_file, 'r') as stream:
+        try:
+            state_str = yload(stream)
+        except:
+            state_str = json.load(stream)
+    state = {}
+    for k,s in state_str.items():
+        if isinstance(s, str):
+            state[k] = json.loads(s)
+        else:
+            state[k] = s
+    return state
+
 """for gen_desc"""
 def set_kernel(kernel_type, element_wise, zeta):
     """
@@ -27,20 +43,18 @@ def set_kernel(kernel_type, element_wise, zeta):
         kernel_func['zeta'] = zeta
     return kernel_func
 
-def output_desc(asapxyz, desc_spec, desc_settings):
+def output_desc(asapxyz, desc_spec, prefix, peratom=False):
     """
     Compute and save the descriptors
     """
-    # compute the descripitors
-    tag = desc_settings['tag']
-    peratom = desc_settings['peratom']
-    prefix = desc_settings['prefix']
-    asapxyz.compute_global_descriptors(desc_spec_dict=desc_spec,
+    for tag, desc in desc_spec.items():
+        # compute the descripitors
+        asapxyz.compute_global_descriptors(desc_spec_dict=desc,
                                        sbs=[],
                                        keep_atomic=peratom,
                                        tag=tag)
     asapxyz.write(prefix)
-    asapxyz.save_state(tag)
+    asapxyz.save_state(prefix)
 
 """ for maps and fits """
 def read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom):

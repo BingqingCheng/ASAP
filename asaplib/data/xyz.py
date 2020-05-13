@@ -35,6 +35,7 @@ class ASAPXYZ:
 
         # record the state of the computation, e.g. which descriptors have been computed
         self.computed_desc_dict = {'data' : {'fxyz': fxyz} }
+        self.computed_desc_dict = {'descriptors' : {} }
         # the conversion between tag of the descriptors and their acronyms
         self.tag_to_acronym = {'global':{}, 'atomic':{}}
 
@@ -194,7 +195,7 @@ class ASAPXYZ:
             if keep_atomic:
                 self.atomic_desc[i].update(atomic_desc_dict_now)
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag] = global_desc.desc_spec_dict
+        self.computed_desc_dict['descriptors'][tag] = global_desc.desc_spec_dict
 
     def fetch_computed_descriptors(self, desc_dict_keys=[], sbs=[]):
         """
