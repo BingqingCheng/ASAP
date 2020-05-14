@@ -194,6 +194,9 @@ def map_setup_options(f):
     f = click.option('--annotate', '-a',
                      help='Location of tags to annotate the samples.',
                      default='none', type=str)(f)
+    f = click.option('--color_from_zero', '-c0',
+                     help='Set the minimum to zero and only plot the excess.',
+                     show_default=True, default=False, is_flag=True)(f)
     f = click.option('--color_label', '-clab',
                      help='The label for the color bar.',
                      default=None)(f)
@@ -220,7 +223,7 @@ def map_setup_options(f):
 @map_setup_options
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
          project_atomic, peratom, keepraw,
-         color, color_column, color_label,
+         color, color_column, color_label, color_from_zero,
          annotate, adjusttext, style):
     """
     Making 2D maps using dimensionality reduction.
@@ -242,7 +245,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         ctx.obj['asapxyz'].remove_atomic_descriptors(design_matrix)
 
     # color scheme
-    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, project_atomic)
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, project_atomic, color_from_zero)
     if color_label is not None: colorlabel = color_label
 
     ctx.obj['map_info'] =  { 'color': plotcolor, 

@@ -8,7 +8,7 @@ import numpy as np
 from asaplib.data import ASAPXYZ
 
 
-def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False, project_atomic=False):
+def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False, project_atomic=False, color_from_zero=False):
 
     plotcolor = []
     plotcolor_atomic = []
@@ -66,6 +66,11 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
                     plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
                 except:
                     raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
+
+    if color_from_zero:
+        # set the min to zero
+        plotcolor -= np.ones(len(plotcolor))*np.nanmin(plotcolor)
+        plotcolor_atomic -= np.ones(len(plotcolor_atomic))*np.nanmin(plotcolor)
 
     colorlabel = str(fcolor)
     if peratom and not project_atomic:

@@ -4,7 +4,6 @@ Wrappers to do plots
 
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib import ticker
 
 from .plot_styles import *
 
@@ -242,6 +241,7 @@ class Plot_Function_Scatter(Plot_Function_Base):
         'cmap': 'gnuplot',
         'alpha': 1.0, # color transparency
         'clabel': None, # label of the colorbar
+        'cbar_format':'%1.0f',
         'use_perc': False, # mark the top/bottom ourliers
         'outlier_top_fraction': 0.05, # the fraction of the top ourliers
         'outlier_top_color': 'yellow', # color used to make the top ourliers
@@ -319,10 +319,8 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                vmin=self.p_spec['vmin'])
 
         if self.p_spec['clabel'] is not None and self.cb is None: 
-            self.cb = fig.colorbar(axscatter, format='%1.1f')
-            tick_locator = ticker.MaxNLocator(nbins=5)
-            self.cb.locator = tick_locator
-            self.cb.update_ticks()
+            self.cb = fig.colorbar(axscatter, format=self.p_spec['cbar_format'])
+            self.cb.ax.locator_params(nbins=5)
         if self.p_spec['clabel'] is not None:
             self.cb.set_label(label=self.p_spec['clabel'], labelpad=10)
 
