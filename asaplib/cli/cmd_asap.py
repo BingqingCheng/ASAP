@@ -393,6 +393,12 @@ def tsne(ctx, pca, scale, dimension, axes,
 
 def fit_setup_options(f):
     """Create common options for making 2D maps of the data set"""
+    f = click.option('--lc_points', '-lcp', type=int, 
+              help='the number of sub-samples to take when compute the learning curve', 
+              show_default=True, default=8)(f)
+    f = click.option('--learning_curve', '-lc', type=int, 
+              help='the number of points on the learning curve, <= 1 means no learning curve', 
+              show_default=True, default=-1)(f)
     f = click.option('--test_ratio', '--test', '-t', type=float, 
               help='Test ratio.', 
               show_default=True, default=0.05)(f)
@@ -415,13 +421,18 @@ def fit_setup_options(f):
 @asap.group('fit')
 @click.pass_context
 @fit_setup_options
-def fit(ctx, in_file, fxyz, design_matrix, y, prefix, test_ratio):
+def fit(ctx, in_file, fxyz, design_matrix, y, prefix, 
+       test_ratio, learning_curve, lc_points):
     """
     Fit a machine learning model to the design matrix and labels.
     This command function evaluated before the specific ones,
     we setup the general stuff here, such as read the files.
     """
-    ctx.obj['fit_prefix'] = prefix
+    ctx.obj['fit_options'] = {"prefix": prefix,
+                              "learning_curve": learning_curve,
+                              "lc_points": lc_points,
+                              "test_ratio": test_ratio
+                             }
 
     if in_file:
         # Here goes the routine to compute the descriptors according to the
@@ -448,5 +459,9 @@ def ridge(ctx, sigma):
     rr = RidgeRegression(sigma)
     # fit the model
     ctx.obj['dm'].compute_fit(rr, 'ridge_regression', store_results=True, plot=True)
+    if ctx.obj['fit_options']["learning_curve"] > 1:
+        ctx.obj['dm'].compute_learning_curve(rr, 'ridge_regression', ctx.obj['fit_options']["learning_curve"], ctx.obj['fit_options']["lc_points"], randomseed=42, verbose=False)
+ 
+    ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     plt.show()
 

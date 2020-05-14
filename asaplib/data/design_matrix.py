@@ -4,6 +4,7 @@ Class for storing and handling design matrices
 
 import numpy as np
 import json
+from yaml import dump as ydump
 
 from ..io import randomString,  NpEncoder
 from ..compressor import random_split,exponential_split, LCSplit, ShuffleSplit
@@ -76,11 +77,17 @@ class Design_Matrix:
         else:
             return X
 
-    def save_state(self, filename):
-         with open(filename+'-fit-errors.json', 'w') as jd:
-                 json.dump(self.fit_error_by_learner, jd, sort_keys=True, cls=NpEncoder)
-         with open(filename+'-lc.json', 'w') as jd:
-                 json.dump(self.lc_by_learner, jd, sort_keys=True, cls=NpEncoder)
+    def save_state(self, filename, mode='yaml'):
+        if mode == 'yaml':
+            with open(filename+'-fit-errors.yaml', 'w') as yd:
+                ydump(self.fit_error_by_learner, yd, sort_keys=True)
+            with open(filename+'-lc.yaml', 'w') as yd:
+                ydump(self.lc_by_learner, yd, sort_keys=True)
+        else:
+            with open(filename+'-fit-errors.json', 'w') as jd:
+                json.dump(self.fit_error_by_learner, jd, sort_keys=True, cls=NpEncoder)
+            with open(filename+'-lc.json', 'w') as jd:
+                json.dump(self.lc_by_learner, jd, sort_keys=True, cls=NpEncoder)
 
     def sparsify(self, n_sparse=0, sparse_mode='fps'):
         """
@@ -144,7 +151,7 @@ class Design_Matrix:
 
         if store_results:
             y_pred, y_pred_test, fit_error = learner.get_train_test_error(self.X_train[self.sbs], self.y_train[self.sbs], self.X_test, self.y_test, verbose=True, return_pred=True)
-            fit_result_now = {tag:{"y_pred": y_pred, "y_pred_test": y_pred_test, "error": fit_error}}
+            self.fit_error_by_learner[tag] = {"error": fit_error}
 
         if plot:
             from matplotlib import pyplot as plt
@@ -196,7 +203,7 @@ class Design_Matrix:
         _, lc_score_now = learner.fit_predict_error(self.X_train[self.sbs], self.y_train[self.sbs], self.X_test, self.y_test)
         lc_scores.add_score(self.n_train, lc_score_now)
 
-        self.lc_by_learner.update({tag:lc_scores})
+        self.lc_by_learner.update({tag:lc_scores.fetch_all()})
         if verbose: print("LC results: ", {tag:lc_scores.fetch_all()})
         return lc_scores
 

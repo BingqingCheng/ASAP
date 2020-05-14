@@ -36,8 +36,8 @@ class LC_SCOREBOARD():
             var -= avg ** 2.
             avg_scores.append(avg)
             avg_scores_error.append(np.sqrt(var))
-            Ntrains.append(Ntrain)
-        return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1)
+            Ntrains.append(int(Ntrain))
+        return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1).tolist()
 
     def plot_learning_curve(self, sc_name='RMSE'):
         """plot the learning curve"""
@@ -66,24 +66,24 @@ def get_r2(y_pred, y):
     denominator = (weight * (y - np.average(
         y, axis=0, weights=sample_weight)) ** 2).sum(axis=0, dtype=np.float64)
     output_scores = 1 - (numerator / denominator)
-    return np.mean(output_scores)
+    return np.mean(output_scores).tolist()
 
 
 def get_mae(ypred, y):
-    return np.mean(np.abs(ypred - y))
+    return np.mean(np.abs(ypred - y)).tolist()
 
 
 def get_rmse(ypred, y):
-    return np.sqrt(np.mean((ypred - y) ** 2))
+    return np.sqrt(np.mean((ypred - y) ** 2)).tolist()
 
 
 def get_sup(ypred, y):
-    return np.amax(np.abs((ypred - y)))
+    return np.amax(np.abs((ypred - y))).tolist()
 
 
 def get_spearman(ypred, y):
     corr, _ = spearmanr(ypred, y)
-    return corr
+    return corr.tolist()
 
 score_func = dict(
     MAE=get_mae,
