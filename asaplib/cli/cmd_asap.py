@@ -186,7 +186,7 @@ def map_setup_options(f):
     f = click.option('--project_atomic', 
                      help='Build map based on atomic descriptors instead of global ones.',
                      default=False, is_flag=True)(f)
-    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix'], case_sensitive=False), 
+    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False), 
                      help='Output file format.',
                      default='xyz')(f)
     f = click.option('--prefix', '-p', 
@@ -287,7 +287,7 @@ def d_reduce_options(f):
                      help='Number of the dimensions to keep in the output XYZ file.',
                      default=10)(f)
     f = click.option('--scale/--no-scale', 
-                     help='Standard scaling of the coordinates. Recommended.',
+                     help='Standard scaling of the coordinates.',
                      default=True)(f)
     return f
 

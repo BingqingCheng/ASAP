@@ -272,23 +272,16 @@ class ASAPXYZ:
         atomic_desc = []
 
         # load from xyz file
-        if self.nframes > 1:
-            try:
-                # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-                desc = np.column_stack(np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
-                print("Use descriptor matrix with shape: ", np.shape(desc))
-                # for the atomic descriptors
-                if use_atomic_desc:
-                    atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
-                    print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
-            except:
-                pass
-        else:
-            # only one frame
-            try:
-                desc = np.column_stack(self.frames[0].get_array(desc_name) for desc_name in desc_name_list)
-            except:
-                ValueError('Cannot read the descriptor matrix from single frame')
+        try:
+            # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
+            desc = np.column_stack(np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
+            print("Use descriptor matrix with shape: ", np.shape(desc))
+            # for the atomic descriptors
+            if use_atomic_desc:
+                atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
+                print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
+        except:
+            raise ValueError("Cannot find the specified descriptors from xyz")
 
         return desc, atomic_desc
 

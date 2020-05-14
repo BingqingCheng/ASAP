@@ -123,10 +123,12 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
             np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
         if proj_atomic is not None:
             np.savetxt(foutput + "-atomic.coord", proj_atomic, fmt='%4.8f', header=map_name)
-    if outmode == 'xyz':
+    elif outmode == 'xyz':
         if proj is not None:
             asapxyz.set_descriptors(proj, map_name)
         if proj_atomic is not None:
             asapxyz.set_atomic_descriptors(proj_atomic, map_name)
         asapxyz.write(foutput)
+    else:
+        pass
 
