@@ -144,7 +144,6 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
                         'kernel_function': kernel_spec}
     # specify descriptors using the cmd line tool
     ctx.obj['descriptors'][tag] = desc_spec
-    print(ctx.obj['descriptors'])
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'], peratom)
 
@@ -195,6 +194,9 @@ def map_setup_options(f):
     f = click.option('--annotate', '-a',
                      help='Location of tags to annotate the samples.',
                      default='none', type=str)(f)
+    f = click.option('--color_label', '-clab',
+                     help='The label for the color bar.',
+                     default=None)(f)
     f = click.option('--color_column', '-ccol',
                      help='The column number used in the color file. Starts from 0.',
                      default=0)(f)
@@ -218,7 +220,7 @@ def map_setup_options(f):
 @map_setup_options
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
          project_atomic, peratom, keepraw,
-         color, color_column,
+         color, color_column, color_label,
          annotate, adjusttext, style):
     """
     Making 2D maps using dimensionality reduction.
@@ -241,8 +243,11 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
 
     # color scheme
     plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, project_atomic)
+    if color_label is not None: colorlabel = color_label
+
     ctx.obj['map_info'] =  { 'color': plotcolor, 
                              'color_atomic': plotcolor_peratom,
+                             'project_atomic': project_atomic,
                              'peratom': peratom,
                              'annotate': [],
                              'outmode': output,
@@ -316,6 +321,7 @@ def skpca(ctx, scale, dimension, axes,
           kernel, kernel_parameter, sparse_mode, n_sparse):
     """Sparse Kernel Principal Component Analysis"""
     map_name = "skpca-d-"+str(dimension)
+    reduce_dict = {}
     if scale:
         reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
     reduce_dict['skpca'] = {"type": 'SPARSE_KPCA', 
@@ -340,6 +346,7 @@ def skpca(ctx, scale, dimension, axes,
 def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
     """UMAP"""
     map_name = "umap-d-"+str(dimension)
+    reduce_dict = {}
     if scale:
         reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
     reduce_dict['umap'] = {'type': 'UMAP', 'parameter':
@@ -376,7 +383,7 @@ def tsne(ctx, pca, scale, dimension, axes,
           perplexity, early_exaggeration, learning_rate, metric):
     """t-SNE"""
     map_name = "tsne-d-"+str(dimension)
-
+    reduce_dict = {}
     if pca:
         # pre-process with PCA if dim > 50
         # suggested here: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html

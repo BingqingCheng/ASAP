@@ -445,7 +445,7 @@ class ASAPXYZ:
         else:
             print("Warning: Cannot parse desc_name when remove_descriptors.")
 
-    def write(self, filename, sbs=[]):
+    def write(self, filename, sbs=[], save_acronym=False):
         """
         write the selected frames or all the frames to a xyz file
 
@@ -468,7 +468,8 @@ class ASAPXYZ:
             write(str(filename) + ".xyz", self.frames[i], append=True)
 
         # this acronym state file lets us know how the descriptors correspond to the outputs in the xyz file
-        self.save_descriptor_acronym_state(filename)
+        if save_acronym:
+            self.save_descriptor_acronym_state(filename)
 
     def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment=''):
         """

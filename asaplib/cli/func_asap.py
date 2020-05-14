@@ -95,13 +95,16 @@ def map_process(obj, reduce_dict, axes, map_name):
     plotcolor = obj['map_info']['color']
     plotcolor_atomic = obj['map_info']['color_atomic']
     annotate = obj['map_info']['annotate']
-    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name)
+    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes)
     # output 
     outfilename = obj['fig_spec_dict']['outfile']
     outmode = obj['map_info']['outmode']
-    map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic)
+    if obj['map_info']['project_atomic']:
+        map_save(outfilename, outmode, obj['asapxyz'], None, proj, map_name)
+    else:
+        map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name)
 
-def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes, map_name):
+def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes):
     """
     Make plots
     """
@@ -111,17 +114,19 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate,
         asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
     plt.show()
 
-def map_save(foutput, outmode, asapxyz, proj, proj_atomic):
+def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
     """
     Save the low-D projections
     """
     if outmode == 'matrix':
-        np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
+        if proj is not None:
+            np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
         if proj_atomic is not None:
-            np.savetxt(foutput + "-atomic.coord", proj_atomic_all, fmt='%4.8f', header=map_name)
+            np.savetxt(foutput + "-atomic.coord", proj_atomic, fmt='%4.8f', header=map_name)
     if outmode == 'xyz':
-        asapxyz.set_descriptors(proj, 'pca_coord')
+        if proj is not None:
+            asapxyz.set_descriptors(proj, map_name)
         if proj_atomic is not None:
-            asapxyz.set_atomic_descriptors(proj_atomic_all, map_name)
+            asapxyz.set_atomic_descriptors(proj_atomic, map_name)
         asapxyz.write(foutput)
 

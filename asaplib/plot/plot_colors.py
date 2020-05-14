@@ -32,11 +32,13 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
         if peratom or project_atomic:
             if asapxyz is None:
                 raise IOError('Need the xyz so that we know the number of atoms in each frame')
-            elif asapxyz.get_num_frames() != len(plotcolor):
-                raise ValueError('Length of the xyz trajectory is not the same as number of colors in the fcolor file')
-            else:
+            elif asapxyz.get_num_frames() == len(plotcolor):
                 for index, natomnow in enumerate(asapxyz.get_natom_list()):
                     plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
+            elif asapxyz.get_total_natoms() == len(plotcolor):
+                plotcolor_atomic = plotcolor
+            else:
+                raise ValueError('Length of the xyz trajectory is not the same as number of colors in the fcolor file')
 
     elif n_samples > 0 and (fcolor == None or fcolor == 'none' or fcolor == 'Index' or fcolor == 'index') and peratom == False:
         # we use the index as the color scheme
