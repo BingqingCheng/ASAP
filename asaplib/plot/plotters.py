@@ -4,6 +4,7 @@ Wrappers to do plots
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib import ticker
 
 from .plot_styles import *
 
@@ -308,10 +309,6 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'])
-
-            if self.p_spec['clabel'] is not None and self.cb is None: 
-                cb = fig.colorbar(axscatter)
-
         else:
             axscatter = ax.scatter(x, y, c=z, 
                                cmap=self.p_spec['cmap'], 
@@ -321,9 +318,11 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                vmax=self.p_spec['vmax'],
                                vmin=self.p_spec['vmin'])
 
-            if self.p_spec['clabel'] is not None and self.cb is None: 
-                self.cb = fig.colorbar(axscatter)
-
+        if self.p_spec['clabel'] is not None and self.cb is None: 
+            self.cb = fig.colorbar(axscatter, format='%1.1f')
+            tick_locator = ticker.MaxNLocator(nbins=5)
+            self.cb.locator = tick_locator
+            self.cb.update_ticks()
         if self.p_spec['clabel'] is not None:
             self.cb.set_label(label=self.p_spec['clabel'], labelpad=10)
 
