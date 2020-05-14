@@ -112,7 +112,7 @@ def atomic_to_global_desc_options(f):
 @click.option('--universal_soap', '--usoap', '-u',
               type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False), 
               help='Try out our universal SOAP parameters.', 
-              show_default=True, default='minimal')
+              show_default=True, default='none')
 @click.pass_context
 @desc_options
 @atomic_to_global_desc_options
