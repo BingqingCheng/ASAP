@@ -308,7 +308,7 @@ def pca(ctx, scale, dimension, axes):
               help='number of the representative samples, set negative if using no sparsification', 
               show_default=True, default=10)
 @click.option('--sparse_mode', '-s',
-              type=click.Choice(['random', 'cur', 'fps'], case_sensitive=False), 
+              type=click.Choice(['random', 'cur', 'fps', 'sequential'], case_sensitive=False), 
               help='Sparsification method to use.', 
               show_default=True, default='fps')
 @click.option('--kernel_parameter', '-kp', type=float, 

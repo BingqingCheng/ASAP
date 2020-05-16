@@ -241,7 +241,7 @@ class Plot_Function_Scatter(Plot_Function_Base):
         'cmap': 'gnuplot',
         'alpha': 1.0, # color transparency
         'clabel': None, # label of the colorbar
-        'cbar_format':'%0.1f',
+        'cbar_format':'%1.0f',
         'use_perc': False, # mark the top/bottom ourliers
         'outlier_top_fraction': 0.05, # the fraction of the top ourliers
         'outlier_top_color': 'yellow', # color used to make the top ourliers

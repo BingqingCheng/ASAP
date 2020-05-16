@@ -69,11 +69,13 @@ class SPARSE_KPCA:
                 self.sbs, _ = CUR_deterministic(cov, self.n_sparse)
             elif self.sparse_mode == 'random' or self.sparse_mode == 'RANDOM' or self.sparse_mode == 'Random':
                 _, self.sbs = random_split(len(desc), self.n_sparse/n_sample)
+            elif self.sparse_mode == 'sequential' or self.sparse_mode == 'Sequential':
+                self.sbs = range(self.n_sparse)
             else:
                 raise NotImplementedError("Do not recognize the selected sparsification mode. Use ([cur], [fps], [random]).")
         else:
             print("Not using any sparsification")
-            self.sbs = np.range(n_sample)
+            self.sbs = range(n_sample)
 
         self.desc_sbs = desc[self.sbs]
 

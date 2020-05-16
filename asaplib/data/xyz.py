@@ -8,7 +8,6 @@ from ase.io import read, write
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
 
-
 class ASAPXYZ:
     def __init__(self, fxyz=None, stride=1, periodic=True):
         """extended xyz class
@@ -311,6 +310,9 @@ class ASAPXYZ:
                     y_all.append(len(frame.get_positions()))
                 elif y_key == 'index' or y_key == 'Index' or y_key == None:
                     y_all.append(i)
+                elif isinstance(y_key, int) and int(y_key) in self.global_species:
+                    # count the number of atoms of this specified chemical element
+                    y_all.append(frame.get_atomic_numbers().tolist().count(int(y_key)))
                 elif extensive:
                     y_all.append(frame.info[y_key] / len(frame.get_positions()))
                 else:
