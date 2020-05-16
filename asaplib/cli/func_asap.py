@@ -84,12 +84,19 @@ def map_process(obj, reduce_dict, axes, map_name):
     process the dimensionality reduction command
     """
     # project
-    dreducer = Dimension_Reducers(reduce_dict)
-    proj = dreducer.fit_transform(obj['design_matrix'])
-    if obj['map_info']['peratom']:
-        proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
+    if reduce_dict['type'] == 'RAW':
+        proj = obj['design_matrix']
+        if obj['map_info']['peratom']: 
+            proj_atomic = obj['design_matrix_atomic']
+        else:
+            proj_atomic = None
     else:
-        proj_atomic = None
+        dreducer = Dimension_Reducers(reduce_dict)
+        proj = dreducer.fit_transform(obj['design_matrix'])
+        if obj['map_info']['peratom']:
+            proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
+        else:
+            proj_atomic = None
     # plot
     fig_spec = obj['fig_spec_dict']
     plotcolor = obj['map_info']['color']

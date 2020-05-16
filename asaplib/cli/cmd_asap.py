@@ -291,6 +291,17 @@ def d_reduce_options(f):
                      default=True)(f)
     return f
 
+@map.command('raw')
+@click.pass_context
+@d_reduce_options
+def raw(ctx, scale, dimension, axes):
+    """Just plot the raw coordinates"""
+    map_name = "raw-d-"+str(dimension)
+    reduce_dict = {
+                   'type': 'RAW', 
+                   'parameter':{"n_components": dimension, "scalecenter": scale}}
+    map_process(ctx.obj, reduce_dict, axes, map_name)
+
 @map.command('pca')
 @click.pass_context
 @d_reduce_options
