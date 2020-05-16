@@ -84,7 +84,7 @@ def map_process(obj, reduce_dict, axes, map_name):
     process the dimensionality reduction command
     """
     # project
-    if reduce_dict['type'] == 'RAW':
+    if 'type' in reduce_dict.keys() and reduce_dict['type'] == 'RAW':
         proj = obj['design_matrix']
         if obj['map_info']['peratom']: 
             proj_atomic = obj['design_matrix_atomic']
