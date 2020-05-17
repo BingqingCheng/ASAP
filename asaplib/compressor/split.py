@@ -6,7 +6,7 @@ import collections
 from abc import ABCMeta
 
 import numpy as np
-from sklearn.externals.six import with_metaclass
+#from sklearn.externals.six import with_metaclass
 from sklearn.model_selection._split import KFold as _KFold
 from sklearn.model_selection._split import ShuffleSplit as _ShuffleSplit
 from sklearn.utils import check_random_state
@@ -35,20 +35,53 @@ def exponential_split(xmin, xmax, n=5):
         X[i] = int(np.exp(lmin + dl * i))
     return X
 
+def random_split(n_sample, r, seed=0):
+    """
+    Obtain train/test indexes with a test ratio 
 
-def kernel_random_split(X, y, r=0.05):
+    Parameters
+    ----------
+    n_sample: integer giving the number of samples
+    r: float, test ratio
+
+    Returns: 
+    -------
+    train_list, test_list: train/test indexes
+    """
+
+    if r==0.0:
+        return range(n_sample), []
+
+    np.random.seed(seed)
+
+    all_list = np.arange(n_sample)
+    randomchoice = np.random.rand(n_sample)
+    test_member_mask = (randomchoice < r)
+    train_list = all_list[~test_member_mask]
+    test_list = all_list[test_member_mask]
+
+    if len(test_list) < 1:
+        raise ValueError("No test set selected. Increase sample size and/or test ratio.")
+
+    return train_list, test_list
+
+def kernel_random_split(X, y, r=0.05, seed=0):
     """
 
     Parameters
     ----------
-    X
-    y
-    r
+    X: array-like, shape=[n_samples,n_desc], kernel matrix
+    y: array-like, shape=[n_samples], labels
+    r: float, test ratio
 
     Returns
     -------
-
+    X_train, X_test: train/test kernel matrix
+    y_train, y_test: train/test labels
+    train_list, test_list: train/test indexes
     """
+
+    np.random.seed(seed)
 
     if X.shape[0] != X.shape[1]:
         raise ValueError('Kernel matrix is not square')
@@ -98,8 +131,9 @@ class ShuffleSplit(_ShuffleSplit):
         return params
 
 
-class LCSplit(with_metaclass(ABCMeta)):
-    def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size="default", random_state=None, **cvargs):
+#class LCSplit(with_metaclass(ABCMeta)):
+class LCSplit():
+    def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size=None, random_state=None, **cvargs):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):
             raise ValueError("Number of repetitions or training set sizes must be an iterable.")
 

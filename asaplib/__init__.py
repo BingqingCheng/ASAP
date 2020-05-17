@@ -1,1 +1,1 @@
-__all__ = ['cluster', 'data', 'io', 'kde', 'kernel', 'pca', 'plot', 'fit', 'compressor', 'util']
+__all__ = ['cluster', 'data', 'descriptors','io', 'kde', 'kernel', 'reducedim', 'plot', 'fit', 'compressor', 'util']

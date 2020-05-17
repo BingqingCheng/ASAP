@@ -1,1 +1,0 @@
-{"firstsoap": {"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}, "secondsoap": {"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.1, "n": 4, "l": 4}}
