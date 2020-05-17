@@ -57,13 +57,13 @@ def output_desc(asapxyz, desc_spec, prefix, peratom=False):
     asapxyz.save_state(prefix)
 
 """ for maps and fits """
-def read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom):
+def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
+    dm = []; dm_atomic = []
     # try to read the xyz file
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
-        if project_atomic:
+        if use_atomic_descriptors:
             _, dm = asapxyz.get_descriptors(design_matrix, True)
-            dm_atomic = []
         else:
             dm, dm_atomic = asapxyz.get_descriptors(design_matrix, peratom)
     else:
@@ -138,4 +138,28 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
         asapxyz.write(foutput)
     else:
         pass
+
+""" for clustering """
+def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
+    """handle clustering operations"""
+    prefix = cluster_options['prefix']
+
+    from asaplib.cluster import DBCluster
+    do_clustering = DBCluster(trainer)
+    do_clustering.fit(design_matrix)
+
+    do_clustering.save_state(prefix)
+
+    labels_db = do_clustering.get_cluster_labels()
+    if cluster_options['savexyz']:
+        if asapxyz is not None and cluster_options['use_atomic_descriptors']:
+            asapxyz.set_atomic_descriptors(labels_db, prefix+'_cluster_label')
+        elif asapxyz is not None:
+            asapxyz.set_descriptors(labels_db, prefix+'_cluster_label')
+        asapxyz.write(prefix)
+    if cluster_options['savetxt']: 
+        np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
+               header='index cluster_label', fmt='%d %d')
+
+    # TODO: allow plotting options!
 

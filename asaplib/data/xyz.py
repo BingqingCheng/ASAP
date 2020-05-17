@@ -405,7 +405,7 @@ class ASAPXYZ:
         atom_index = 0
         for i, frame in enumerate(self.frames):
             natomnow = self.natom_list[i]
-            frame.new_array(atomic_desc_name, atomic_desc[atom_index:atom_index + natomnow, :])
+            frame.new_array(atomic_desc_name, np.array(atomic_desc)[atom_index:atom_index + natomnow])
             atom_index += natomnow
 
     def remove_descriptors(self, desc_name=None):

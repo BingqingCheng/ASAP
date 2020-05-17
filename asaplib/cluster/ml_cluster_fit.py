@@ -5,12 +5,15 @@ Density-based Clustering Algorithms
 from matplotlib import pyplot as plt
 import numpy as np
 import scipy as sp
+import json
+from yaml import dump as ydump
+from yaml import Dumper
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 
 from .ml_cluster_base import ClusterBase, FitClusterBase
-
+from ..io import NpEncoder
 
 class DBCluster(ClusterBase):
     """
@@ -59,10 +62,17 @@ class DBCluster(ClusterBase):
 
     def pack(self):
         """return all the info"""
-        state = dict(trainer=self.trainer.name, trainer_params=self.trainer.pack(), labels=self.labels,
+        state = dict(trainer=self.trainer.name, trainer_params=self.trainer.pack(), labels=self.labels.tolist(),
                      n_clusters=self.n_clusters, n_noise=self.n_noise)
         return state
 
+    def save_state(self, filename, mode='json'):
+         if mode == 'yaml':
+             with open(filename+'-clustering-state.yaml', 'w') as yd:
+                 ydump(self.pack(), yd, sort_keys=True, Dumper=Dumper)
+         else:
+             with open(filename+'-clustering-state.json', 'w') as jd:
+                 json.dump(self.pack(), jd, sort_keys=True, cls=NpEncoder)
 
 class sklearn_DB(FitClusterBase):
 

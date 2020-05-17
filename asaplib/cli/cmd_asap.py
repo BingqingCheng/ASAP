@@ -29,14 +29,8 @@ def asap(ctx):
 def io_options(f):
     """Create common options for I/O files"""
     f = click.option('--prefix', '-p',
-                     help='Prefix to be used for the output XYZ file.', 
-                     default='ASAP-desc')(f)
-    f = click.option('--periodic/--no-periodic', 
-                     help='Is the system periodic? If not specified, will infer from the XYZ file.',
-                     default=True)(f)
-    f = click.option('--stride', '-s',
-                     help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
-                     default=1)(f)
+                     help='Prefix to be used for the output file.', 
+                     default=None)(f)
     f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
                      help='Input XYZ file',
@@ -44,8 +38,28 @@ def io_options(f):
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
                      help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
+def dm_io_options(f):
+    """common options for reading a design matrices, used for map, fit, kde, clustering, etc."""
+    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
+                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
+                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
+    f = click.option('--use_atomic_descriptors', '--use_atomic', '-ua',
+                     help='Use atomic descriptors instead of global ones.',
+                     default=False, is_flag=True)(f)
+    return f
+def km_io_options(f):
+    """common options for reading a kernel matrices, can be used for map, fit, kde, clustering, etc."""
+    f = click.option('--kernel_matrix', '-km', default='none',
+                     help='Location of a kernel matrix file')(f)
+    return f
 
 @asap.group('gen_desc')
+@click.option('--stride', '-s',
+                     help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
+                     default=1)
+@click.option('--periodic/--no-periodic', 
+                     help='Is the system periodic? If not specified, will infer from the XYZ file.',
+                     default=True)
 @click.pass_context
 @io_options
 def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
@@ -60,6 +74,7 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
         # state file(s)
         ctx.obj.update(load_in_file(in_file))
 
+    if prefix is None: prefix = "ASAP-desc"
     if fxyz is not None:
         ctx.obj['data']['fxyz'] = fxyz
         ctx.obj['data']['stride'] = stride
@@ -170,30 +185,29 @@ def run(ctx):
 
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
-    f = click.option('--style', '-s',
-                     type=click.Choice(['default','journal'], case_sensitive=False), 
-                     help='Style of the plot.', 
-                     show_default=True, default='default')(f)
-    f = click.option('--adjusttext/--no-adjusttext', 
-                     help='Adjust the annotation texts so they do not overlap.',
-                     default=False)(f)
     f = click.option('--keepraw/--no-keepraw', 
                      help='Keep the high dimensional descriptor when output XYZ file.',
                      default=False)(f)
     f = click.option('--peratom', 
                      help='Save the per-atom projection.',
                      default=False, is_flag=True)(f)
-    f = click.option('--project_atomic', 
-                     help='Build map based on atomic descriptors instead of global ones.',
-                     default=False, is_flag=True)(f)
     f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False), 
                      help='Output file format.',
                      default='xyz')(f)
-    f = click.option('--prefix', '-p', 
-                      help='Prefix for the output png.', default='ASAP-lowD')(f)
+    f = click.option('--adjusttext/--no-adjusttext', 
+                     help='Adjust the annotation texts so they do not overlap.',
+                     default=False)(f)
     f = click.option('--annotate', '-a',
                      help='Location of tags to annotate the samples.',
                      default='none', type=str)(f)
+    f = click.option('--style', '-s',
+                     type=click.Choice(['default','journal'], case_sensitive=False), 
+                     help='Style of the plot.', 
+                     show_default=True, default='default')(f)
+    return f
+
+def color_setup_options(f):
+    """Create common options for handing color scales"""
     f = click.option('--color_from_zero', '-c0',
                      help='Set the minimum to zero and only plot the excess.',
                      show_default=True, default=False, is_flag=True)(f)
@@ -207,22 +221,16 @@ def map_setup_options(f):
                      help='Location of a file or name of the properties in the XYZ file. \
                      Used to color the scatter plot for all samples (N floats).',
                      default='none', type=str)(f)
-    f = click.option('--fxyz', '-f', 
-                     type=click.Path('r'), 
-                     help='Input XYZ file',
-                     default=None)(f)
-    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
-                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
-                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
-    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
-                     help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
 
 @asap.group('map')
 @click.pass_context
+@io_options
+@dm_io_options
 @map_setup_options
+@color_setup_options
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
-         project_atomic, peratom, keepraw,
+         use_atomic_descriptors, peratom, keepraw,
          color, color_column, color_label, color_from_zero,
          annotate, adjusttext, style):
     """
@@ -235,8 +243,8 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
         raise NotImplementedError
-
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, project_atomic, peratom)
+    if prefix is None: prefix = "ASAP-lowD-map"
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom)
     if ctx.obj['asapxyz'] is None: output = 'matrix'
 
     # remove the raw descriptors
@@ -245,12 +253,12 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         ctx.obj['asapxyz'].remove_atomic_descriptors(design_matrix)
 
     # color scheme
-    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, project_atomic, color_from_zero)
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, color_from_zero)
     if color_label is not None: colorlabel = color_label
 
     ctx.obj['map_info'] =  { 'color': plotcolor, 
                              'color_atomic': plotcolor_peratom,
-                             'project_atomic': project_atomic,
+                             'project_atomic': use_atomic_descriptors,
                              'peratom': peratom,
                              'annotate': [],
                              'outmode': output,
@@ -274,8 +282,8 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                                          'xaxis': False,  'yaxis': False,
                                          'remove_tick': True,
                                          'rasterized': True,
-                                         'fontsize': 16,
-                                         'size': [8, 6]
+                                         'fontsize': 9,
+                                         'size': [8, 4]
                                          })
 
 def d_reduce_options(f):
@@ -423,56 +431,52 @@ def fit_setup_options(f):
     f = click.option('--test_ratio', '--test', '-t', type=float, 
               help='Test ratio.', 
               show_default=True, default=0.05)(f)
-    f = click.option('--prefix', '-p', 
-                      help='Prefix for the output.', default='ASAP-fit')(f)
     f = click.option('--y', '-y',
                      help='Location of a file or name of the properties in the XYZ file',
                      default='none', type=str)(f)
-    f = click.option('--fxyz', '-f', 
-                     type=click.Path('r'), 
-                     help='Input XYZ file',
-                     default='ASAP.xyz')(f)
-    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
-                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
-                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
-    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
-                     help='The state file that includes a dictionary-like specifications of fits to use.')(f)
     return f
 
 @asap.group('fit')
 @click.pass_context
+@io_options
+@dm_io_options
 @fit_setup_options
-def fit(ctx, in_file, fxyz, design_matrix, y, prefix, 
+def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix, 
        test_ratio, learning_curve, lc_points):
     """
     Fit a machine learning model to the design matrix and labels.
     This command function evaluated before the specific ones,
     we setup the general stuff here, such as read the files.
     """
-    ctx.obj['fit_options'] = {"prefix": prefix,
-                              "learning_curve": learning_curve,
-                              "lc_points": lc_points,
-                              "test_ratio": test_ratio
-                             }
 
     if in_file:
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
         raise NotImplementedError
+    if prefix is None: prefix = "ASAP-fit"
 
-    asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, False, False)
+    ctx.obj['fit_options'] = {"prefix": prefix,
+                              "learning_curve": learning_curve,
+                              "lc_points": lc_points,
+                              "test_ratio": test_ratio
+                             }
+    asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
 
     try:
         y_all = np.genfromtxt(y, dtype=float)
     except:
-        y_all = asapxyz.get_property(y)
+        if use_atomic_descriptors:
+            y_all = asapxyz.get_atomic_property(y)
+        else:
+            y_all = asapxyz.get_property(y)
+    #print(y_all)
 
     ctx.obj['dm'] = Design_Matrix(desc, y_all, True, test_ratio)
 
 @fit.command('ridge')
 @click.option('--sigma', '-s', type=float, 
               help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.', 
-              default=0.001)
+              default=0.0001)
 @click.pass_context
 def ridge(ctx, sigma):
     """Ridge Regression"""
@@ -485,4 +489,93 @@ def ridge(ctx, sigma):
  
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     plt.show()
+
+def cluster_setup_options(f):
+    """Create common options for doing clustering analysis"""
+#    f = click.option('--plot/--no-plot', 
+#                     help='Plot a map that embeds the clustering results.',
+#                     default=True)(f)
+    f = click.option('--savexyz/--no-savexyz', 
+                     help='Save the clustering results to the xyz file',
+                     default=True)(f)
+    f = click.option('--savetxt/--no-savetxt', 
+                     help='Save the clustering results to the txt file',
+                     default=False)(f)
+    return f
+
+@asap.group('cluster')
+@click.pass_context
+@io_options
+@dm_io_options
+@km_io_options
+@cluster_setup_options
+def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix, 
+            prefix, savexyz, savetxt):
+    """
+    Clustering using the design matrix.
+    This command function evaluated before the specific ones,
+    we setup the general stuff here, such as read the files.
+    """
+
+    if in_file:
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+        raise NotImplementedError
+    if prefix is None: prefix = "ASAP-cluster"
+
+    ctx.obj['cluster_options'] = {'prefix': prefix,
+                                  #'plot': plot, TODO: to be added!
+                                  'savexyz': savexyz,
+                                  'savetxt': savetxt,
+                                  'use_atomic_descriptors': use_atomic_descriptors  }
+
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+
+    if kernel_matrix != 'none':
+        try:
+            kNN = np.genfromtxt(kernel_matrix, dtype=float)
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
+            from asaplib.kernel import kerneltodis
+            ctx.obj['design_matrix'] =  kerneltodis(kNN)
+        except:
+            raise ValueError('Cannot load the coordinates')
+
+@cluster.command('fdb')
+@click.pass_context
+def fdb(ctx):
+    """FDB"""
+    from asaplib.cluster import DBCluster, LAIO_DB
+    trainer = LAIO_DB()
+    
+    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+
+
+@cluster.command('dbscan')
+@click.option('--metric', type=str, 
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html', 
+              show_default=True, default='euclidean')
+@click.option('--min_samples', '-ms', type=int, 
+              help='The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.', 
+              show_default=True, default=5)
+@click.option('--eps', '-e', type=float, 
+              help='The maximum distance between two samples for one to be considered as in the neighborhood of the other.', 
+              default=None)
+@click.pass_context
+def dbscan(ctx, metric, min_samples, eps):
+    """DBSCAN"""
+    from asaplib.cluster import sklearn_DB
+    if eps is None:
+        from scipy.spatial.distance import cdist
+        desc = ctx.obj['design_matrix']
+        # we compute the characteristic bandwidth of the data
+        # first select a subset of structures (20)
+        sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
+        # the characteristic bandwidth of the data
+        eps = np.percentile(cdist(desc[sbs], desc, metric), 100*10./len(desc))
+
+    trainer = sklearn_DB(eps, min_samples, metric)
+
+    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+
 
