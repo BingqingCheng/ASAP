@@ -374,10 +374,11 @@ class LAIO_DB(FitClusterBase):
 
     def pack(self):
         """
-        Return the cutoff distance, self.dc, for data points to contribute to the local density
+        Return dictionary containing the cutoff distance, self.dc, for data points to contribute to the local density
         of another data point as well as self.dens_cut, the density threshold for defining a cluster.
         """
-        return self.dc, self.dens_cut
+        state = dict(deltamin=self.dc, rhomin=self.dens_cut)
+        return state
 
 
 """

@@ -4,19 +4,13 @@ TODO: Module-level description
 """
 
 import argparse
-import os
 import sys
-import json
 
-import matplotlib.pyplot as plt
-import numpy as np
 from scipy.spatial.distance import cdist
 
-from asaplib.data import ASAPXYZ
 from asaplib.reducedim import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
-from asaplib.io import NpEncoder
 from asaplib.plot import *
 from asaplib.io import str2bool
 
@@ -72,10 +66,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         try:
             kNN = np.genfromtxt(kmat, dtype=float)
             print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
-            desc =  kerneltodis(kNN)
+            desc = kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
-
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -115,10 +108,10 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    if  fmat != 'none':
+    if fmat != 'none':
         pca = PCA(dimension, True)
         proj = pca.fit_transform(desc)
-    elif  kmat != 'none':
+    elif kmat != 'none':
         proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
