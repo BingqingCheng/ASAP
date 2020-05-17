@@ -237,11 +237,11 @@ class Plot_Function_Scatter(Plot_Function_Base):
         self.p_spec = {
         'psize': None,
         'rasterized': True,
-        'fontsize': 16,
+        'fontsize': 12,
         'cmap': 'gnuplot',
         'alpha': 1.0, # color transparency
         'clabel': None, # label of the colorbar
-        'cbar_format':'%1.0f',
+        'cbar_format':'%1.1f',
         'use_perc': False, # mark the top/bottom ourliers
         'outlier_top_fraction': 0.05, # the fraction of the top ourliers
         'outlier_top_color': 'yellow', # color used to make the top ourliers
@@ -322,7 +322,7 @@ class Plot_Function_Scatter(Plot_Function_Base):
             self.cb = fig.colorbar(axscatter, format=self.p_spec['cbar_format'])
             self.cb.ax.locator_params(nbins=5)
         if self.p_spec['clabel'] is not None:
-            self.cb.set_label(label=self.p_spec['clabel'], labelpad=10)
+            self.cb.set_label(label=self.p_spec['clabel'], labelpad=1)
 
         return fig, ax
 
