@@ -5,7 +5,7 @@
 # ASAP 
 Automatic Selection And Prediction tools for materials and molecules
 
-#
+# Basic usage
 
 Type asap and use the sub-commands for various tasks.
 
@@ -23,7 +23,8 @@ for pca map:
 
 `asap map -f small_molecules-SOAP.xyz -dm [SOAP-n4-l3-c1.9-g0.23] -c dft_formation_energy_per_atom_in_eV pca`
 
-#
+# Installation & requirements
+
 python 3
 
 Installation:
@@ -45,7 +46,13 @@ pip3 install --upgrade pip
 
 python3 -m pip install --user somepackage    .or.    pip3 install --user somepackage
 
-#
+# How to add your own atomic or global descriptors
+
+* To add a new atomic descriptor, add a new `Atomic_Descriptor` class in the asaplib/descriptors/atomic_descriptors.py. As long as it has a `__init__()` and a `create()` method, it should be competitable with the ASAP code. The `create()` method takes an ASE Atoms object as input (see: [ASE](https://wiki.fysik.dtu.dk/ase/ase/atoms.html))
+
+* To add a new global descriptor, add a new `Global_Descriptor` class in the asaplib/descriptors/global_descriptors.py. As long as it has a `__init__()` and a `create()` method, it is fine. The `create()` method also takes the Atoms object as input.
+
+# Additional tools
 In the directory ./scripts/ and ./tools/ you can find a selection of other python tools:
 
 
