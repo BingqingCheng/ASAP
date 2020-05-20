@@ -26,7 +26,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install ./
-        conda install rdkit==2019.09.2
+        conda install rdkit
 #    - name: Lint with flake8
 #      run: |
 #        # stop the build if there are Python syntax errors or undefined names
