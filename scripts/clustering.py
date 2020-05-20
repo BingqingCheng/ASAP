@@ -8,6 +8,7 @@ import sys
 
 from scipy.spatial.distance import cdist
 
+from asaplib.data import ASAPXYZ
 from asaplib.reducedim import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
@@ -15,7 +16,7 @@ from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
+def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic):
 
     """
 
@@ -33,7 +34,6 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     pc2: int, default is 1, which principle axis to plot the projection on
     algorithm: the algorithm for density-based clustering options are: ([dbscan], [fdb])
     projectatomic: build the projection using the (big) atomic descriptor matrix
-    adtext: Whether to adjust the text (True/False)
 
     Returns
     -------
@@ -169,8 +169,6 @@ if __name__ == '__main__':
                         help='the algorithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
-    parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
-                        help='Do you want to adjust the texts (True/False)?')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -178,4 +176,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
-         args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
+         args.pc1, args.pc2, args.algo, args.projectatomic)
