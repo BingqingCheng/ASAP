@@ -16,6 +16,7 @@ from asaplib.reducedim import Dimension_Reducers
 from asaplib.plot import Plotters, set_color_function
 from asaplib.io import ConvertStrToList
 
+
 @click.group('asap')
 @click.pass_context
 def asap(ctx):
@@ -25,6 +26,7 @@ def asap(ctx):
     ctx.obj['data'] = {}
     ctx.obj['descriptors'] = {}
     ctx.obj['output'] = {}
+
 
 def io_options(f):
     """Create common options for I/O files"""
@@ -38,6 +40,8 @@ def io_options(f):
     f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
                      help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
+
+
 def dm_io_options(f):
     """common options for reading a design matrices, used for map, fit, kde, clustering, etc."""
     f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
@@ -47,11 +51,14 @@ def dm_io_options(f):
                      help='Use atomic descriptors instead of global ones.',
                      default=False, is_flag=True)(f)
     return f
+
+
 def km_io_options(f):
     """common options for reading a kernel matrices, can be used for map, fit, kde, clustering, etc."""
     f = click.option('--kernel_matrix', '-km', default='none',
                      help='Location of a kernel matrix file')(f)
     return f
+
 
 @asap.group('gen_desc')
 @click.option('--stride', '-s',
@@ -81,12 +88,14 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
         ctx.obj['data']['periodic'] = periodic
     ctx.obj['output']['prefix'] = prefix
 
+
 def desc_options(f):
     """Create common options for computing descriptors"""
     f = click.option('--tag',
                      help='Tag for the descriptors.',
                      default='cmd-desc')(f)
     return f
+
 
 def atomic_to_global_desc_options(f):
     """Create common options for global descriptors constructed based on atomic fingerprints """
@@ -104,6 +113,7 @@ def atomic_to_global_desc_options(f):
                      help='Save the per-atom local descriptors.',
                      show_default=True, default=False, is_flag=True)(f)
     return f
+
 
 @gen_desc.command('soap')
 @click.option('--cutoff', '-c', type=float, 
@@ -162,6 +172,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'], peratom)
 
+
 @gen_desc.command('cm')
 @click.pass_context
 @desc_options
@@ -174,6 +185,7 @@ def cm(ctx, tag):
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
 
+
 @gen_desc.command('run')
 @click.pass_context
 def run(ctx):
@@ -182,6 +194,7 @@ def run(ctx):
     ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
+
 
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
@@ -206,6 +219,7 @@ def map_setup_options(f):
                      show_default=True, default='default')(f)
     return f
 
+
 def color_setup_options(f):
     """Create common options for handing color scales"""
     f = click.option('--color_from_zero', '-c0',
@@ -222,6 +236,7 @@ def color_setup_options(f):
                      Used to color the scatter plot for all samples (N floats).',
                      default='none', type=str)(f)
     return f
+
 
 @asap.group('map')
 @click.pass_context
@@ -286,6 +301,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                                          'size': [8, 4]
                                          })
 
+
 def d_reduce_options(f):
     """Create common options for dimensionality reduction"""
     f = click.option('--axes', nargs=2, type=click.Tuple([int, int]),
@@ -299,6 +315,7 @@ def d_reduce_options(f):
                      default=True)(f)
     return f
 
+
 @map.command('raw')
 @click.pass_context
 @d_reduce_options
@@ -309,6 +326,7 @@ def raw(ctx, scale, dimension, axes):
                    'type': 'RAW', 
                    'parameter':{"n_components": dimension, "scalecenter": scale}}
     map_process(ctx.obj, reduce_dict, axes, map_name)
+
 
 @map.command('pca')
 @click.pass_context
@@ -321,6 +339,7 @@ def pca(ctx, scale, dimension, axes):
                    'parameter':{"n_components": dimension, "scalecenter": scale}}
                   }
     map_process(ctx.obj, reduce_dict, axes, map_name)
+
 
 @map.command('skpca')
 @click.option('--n_sparse', '-n', type=int, 
@@ -352,6 +371,7 @@ def skpca(ctx, scale, dimension, axes,
                                 "kernel": {"first_kernel": {"type": kernel, "d": kernel_parameter}}}}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
+
 @map.command('umap')
 @click.option('--n_neighbors', '-nn', type=int, 
               help='Controls how UMAP balances local versus global structure in the data.', 
@@ -378,6 +398,7 @@ def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
                             'metric': metric
                           }}
     map_process(ctx.obj, reduce_dict, axes, map_name)
+
 
 @map.command('tsne')
 @click.option('--metric', type=str, 
@@ -420,6 +441,7 @@ def tsne(ctx, pca, scale, dimension, axes,
                           }}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
+
 def fit_setup_options(f):
     """Create common options for making 2D maps of the data set"""
     f = click.option('--lc_points', '-lcp', type=int, 
@@ -435,6 +457,7 @@ def fit_setup_options(f):
                      help='Location of a file or name of the properties in the XYZ file',
                      default='none', type=str)(f)
     return f
+
 
 @asap.group('fit')
 @click.pass_context
@@ -473,6 +496,7 @@ def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
 
     ctx.obj['dm'] = Design_Matrix(desc, y_all, True, test_ratio)
 
+
 @fit.command('ridge')
 @click.option('--sigma', '-s', type=float, 
               help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.', 
@@ -490,6 +514,7 @@ def ridge(ctx, sigma):
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     plt.show()
 
+
 def cluster_setup_options(f):
     """Create common options for doing clustering analysis"""
 #    f = click.option('--plot/--no-plot', 
@@ -502,6 +527,7 @@ def cluster_setup_options(f):
                      help='Save the clustering results to the txt file',
                      default=False)(f)
     return f
+
 
 @asap.group('cluster')
 @click.pass_context
@@ -539,6 +565,7 @@ def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_ma
             ctx.obj['design_matrix'] =  kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
+
 
 @cluster.command('fdb')
 @click.pass_context

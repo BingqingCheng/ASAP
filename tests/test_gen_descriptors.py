@@ -65,10 +65,12 @@ def main(fxyz, prefix):
     asapxyz.write(prefix)
     asapxyz.save_state(tag)
 
+
 def test_gen(tmpdir):
     """Test the generation using pytest"""
     inp_file = os.path.join(os.path.split(__file__)[0], 'small_molecules-1000.xyz')
     main(inp_file, str(tmpdir / 'ASAP-test'))
+
 
 if __name__ == '__main__':
 
