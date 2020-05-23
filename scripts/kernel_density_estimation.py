@@ -12,7 +12,7 @@ import numpy as np
 
 from asaplib.data import ASAPXYZ
 from asaplib.io import str2bool
-from asaplib.kde import KDE
+from asaplib.kde import KDE_internal, KDE_scipy, KDE_sklearn
 from asaplib.plot import plot_styles
 
 
@@ -53,14 +53,13 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
         ndict = len(tags)
 
     proj = np.asmatrix(desc)[:, 0:dimension]
-    density_model = KDE()
+    density_model = KDE_internal() # KDE_sklearn(bandwidth=1) # KDE_scipy()
     # fit density model to data
     try:
         density_model.fit(proj)
     except:
         raise RuntimeError('KDE did not work. Try smaller dimension.')
 
-    sigma_kij = density_model.bandwidth
     rho = density_model.evaluate_density(proj)
     # save the density
     np.savetxt(prefix + "-kde.dat", np.transpose([np.arange(len(rho)), rho]),
@@ -68,7 +67,7 @@ def main(fmat, fxyz, ftags, prefix, dimension, pc1, pc2, adtext):
 
     # color scheme
     plotcolor = rho
-    colorlabel = 'Log of densities for every point (bandwith $\sigma(k_{ij})$ =' + "{:4.0e}".format(sigma_kij) + ' )'
+    colorlabel = 'Log of density for every point'
     [plotcolormin, plotcolormax] = [np.min(plotcolor), np.max(plotcolor)]
 
     # make plot
