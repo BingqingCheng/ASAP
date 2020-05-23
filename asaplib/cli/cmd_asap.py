@@ -22,9 +22,28 @@ def asap(ctx):
     """The command line tool of Automatic Selection And Prediction tools for materials and molecules (ASAP)"""
     # Configure, make sure we have a dict object
     ctx.ensure_object(dict)
+    """ stores the input data, with keys ['fxyz'], ['stride'], [periodic] """
     ctx.obj['data'] = {}
+    """ stores the ASAPXYZ object """
+    ctx.obj['asapxyz']  = None
+    """ stores a np matrix used as the design matrix """
+    ctx.obj['designmatrix']  = None
+    """ stores a Design_Matrix object """
+    ctx.obj['dm']  = None
+    """ stores the specifications of descriptors. i.e. {tag: {desc_spec}} """
     ctx.obj['descriptors'] = {}
-    ctx.obj['output'] = {}
+    """stores the specifications of generating descriptor options"""
+    ctx.obj['desc_options'] = {}
+    """stores the specifications of clustering options"""
+    ctx.obj['cluster_options'] = {}
+    """stores the specifications of kde options"""
+    ctx.obj['kde_options'] = {}
+    """stores the specifications of fit options"""
+    ctx.obj['fit_options'] = {}
+    """stores the specifications of dimensionality reduction map"""
+    ctx.obj['map_options'] = {}
+    """stores the specifications of the output figure"""
+    ctx.obj['fig_options'] = {}
 
 def io_options(f):
     """Create common options for I/O files"""
@@ -92,7 +111,7 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
         ctx.obj['data']['fxyz'] = fxyz
         ctx.obj['data']['stride'] = stride
         ctx.obj['data']['periodic'] = periodic
-    ctx.obj['output']['prefix'] = prefix
+    ctx.obj['desc_options']['prefix'] = prefix
 
 def desc_options(f):
     """Create common options for computing descriptors"""
@@ -173,7 +192,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # specify descriptors using the cmd line tool
     ctx.obj['descriptors'][tag] = desc_spec
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'], peratom)
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], peratom)
 
 @gen_desc.command('cm')
 @click.pass_context
@@ -185,7 +204,7 @@ def cm(ctx, tag):
     # The specification for the descriptor
     ctx.obj['descriptors'][tag] = {'cm':{'type': "CM"}}
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'])
 
 @gen_desc.command('run')
 @click.pass_context
@@ -194,7 +213,162 @@ def run(ctx):
     # load up the xyz
     ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['output']['prefix'])
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'])
+
+@asap.group('cluster')
+@click.pass_context
+@io_options
+@dm_io_options
+@km_io_options
+@output_setup_options
+def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
+            prefix, savexyz, savetxt):
+    """
+    Clustering using the design matrix.
+    This command function evaluated before the specific ones,
+    we setup the general stuff here, such as read the files.
+    """
+
+    if in_file:
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+        raise NotImplementedError
+    if prefix is None: prefix = "ASAP-cluster"
+
+    ctx.obj['cluster_options'] = {'prefix': prefix,
+                                  #'plot': plot, TODO: to be added!
+                                  'savexyz': savexyz,
+                                  'savetxt': savetxt,
+                                  'use_atomic_descriptors': use_atomic_descriptors  }
+
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+
+    if kernel_matrix != 'none':
+        try:
+            kNN = np.genfromtxt(kernel_matrix, dtype=float)
+            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
+            from asaplib.kernel import kerneltodis
+            ctx.obj['design_matrix'] =  kerneltodis(kNN)
+        except:
+            raise ValueError('Cannot load the coordinates')
+
+@cluster.command('fdb')
+@click.pass_context
+def fdb(ctx):
+    """FDB"""
+    from asaplib.cluster import DBCluster, LAIO_DB
+    trainer = LAIO_DB()
+    
+    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+
+
+@cluster.command('dbscan')
+@click.option('--metric', type=str,
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html',
+              show_default=True, default='euclidean')
+@click.option('--min_samples', '-ms', type=int,
+              help='The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.',
+              show_default=True, default=5)
+@click.option('--eps', '-e', type=float,
+              help='The maximum distance between two samples for one to be considered as in the neighborhood of the other.',
+              default=None)
+@click.pass_context
+def dbscan(ctx, metric, min_samples, eps):
+    """DBSCAN"""
+    from asaplib.cluster import sklearn_DB
+    if eps is None:
+        from scipy.spatial.distance import cdist
+        desc = ctx.obj['design_matrix']
+        # we compute the characteristic bandwidth of the data
+        # first select a subset of structures (20)
+        sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
+        # the characteristic bandwidth of the data
+        eps = np.percentile(cdist(desc[sbs], desc, metric), 100*10./len(desc))
+
+    trainer = sklearn_DB(eps, min_samples, metric)
+
+    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+
+@asap.group('kde')
+@click.pass_context
+@io_options
+@dm_io_options
+@output_setup_options
+def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
+            prefix, savexyz, savetxt):
+    """
+    Kernel density estimation using the design matrix.
+    This command function evaluated before the specific ones,
+    we setup the general stuff here, such as read the files.
+    """
+
+    if in_file:
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+        raise NotImplementedError
+    if prefix is None: prefix = "ASAP-kde"
+
+    ctx.obj['kde_options'] = {'prefix': prefix,
+                                  #'plot': plot, TODO: to be added!
+                                  'savexyz': savexyz,
+                                  'savetxt': savetxt,
+                                  'use_atomic_descriptors': use_atomic_descriptors  }
+
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+
+@kde.command('kde_internal')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=8)
+@click.pass_context
+def kde_internal(ctx, dimension):
+    """Internal implementation of KDE"""
+    from asaplib.kde import KDE_internal
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_internal()
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+
+@kde.command('kde_scipy')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=50)
+@click.option('--bw_method', '-bw', type=str,
+              help='This can be ‘scott’, ‘silverman’, a scalar constant or a callable.',
+              show_default=False, default=None)
+@click.pass_context
+def kde_scipy(ctx, bw_method, dimension):
+    """Scipy implementation of KDE"""
+    from asaplib.kde import KDE_scipy
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_scipy(bw_method)
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+
+@kde.command('kde_sklearn')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=50)
+@click.option('--metric', type=str,
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://scikit-learn.org/stable/modules/density.html#kernel-density-estimation',
+              show_default=True, default='euclidean')
+@click.option('--algorithm', type=click.Choice(['kd_tree','ball_tree','auto'], case_sensitive=False),
+              help='Algorithm to use',
+              show_default=True, default='auto')
+@click.option('--kernel', type=click.Choice(['gaussian','tophat','epanechnikov','exponential','linear','cosine'], case_sensitive=False),
+              help='Kernel to use',
+              show_default=True, default='gaussian')
+@click.option('--bandwidth', '-bw', type=float,
+              help='Bandwidth of the kernel',
+              show_default=True, default=1)
+@click.pass_context
+def kde_scipy(ctx, dimension, bandwidth, algorithm, kernel, metric):
+    """Scikit-learn implementation of KDE"""
+    from asaplib.kde import KDE_sklearn
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_sklearn(bandwidth=bandwidth, algorithm=algorithm, kernel=kernel, metric=metric)
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+
 
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
@@ -272,7 +446,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, color_from_zero)
     if color_label is not None: colorlabel = color_label
 
-    ctx.obj['map_info'] =  { 'color': plotcolor, 
+    ctx.obj['map_options'] =  { 'color': plotcolor,
                              'color_atomic': plotcolor_peratom,
                              'project_atomic': use_atomic_descriptors,
                              'peratom': peratom,
@@ -281,10 +455,10 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                              'keepraw': keepraw
                            }
     if annotate != 'none':
-        ctx.obj['plot_info']['annotate'] = np.loadtxt(annotate, dtype="str")[:] 
+        ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
 
-    ctx.obj['fig_spec_dict'] = { 'outfile': prefix,
+    ctx.obj['fig_options'] = { 'outfile': prefix,
                                  'show': False,
                                  'title': None,
                                  'size': [8*aspect_ratio, 8],
@@ -295,7 +469,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                                 }
 
     if style == 'journal':
-        ctx.obj['fig_spec_dict'].update({'xlabel': None, 'ylabel': None,
+        ctx.obj['fig_options'].update({'xlabel': None, 'ylabel': None,
                                          'xaxis': False,  'yaxis': False,
                                          'remove_tick': True,
                                          'rasterized': True,
@@ -506,157 +680,3 @@ def ridge(ctx, sigma):
  
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     plt.show()
-
-@asap.group('cluster')
-@click.pass_context
-@io_options
-@dm_io_options
-@km_io_options
-@output_setup_options
-def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix, 
-            prefix, savexyz, savetxt):
-    """
-    Clustering using the design matrix.
-    This command function evaluated before the specific ones,
-    we setup the general stuff here, such as read the files.
-    """
-
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
-    if prefix is None: prefix = "ASAP-cluster"
-
-    ctx.obj['cluster_options'] = {'prefix': prefix,
-                                  #'plot': plot, TODO: to be added!
-                                  'savexyz': savexyz,
-                                  'savetxt': savetxt,
-                                  'use_atomic_descriptors': use_atomic_descriptors  }
-
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
-
-    if kernel_matrix != 'none':
-        try:
-            kNN = np.genfromtxt(kernel_matrix, dtype=float)
-            print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
-            from asaplib.kernel import kerneltodis
-            ctx.obj['design_matrix'] =  kerneltodis(kNN)
-        except:
-            raise ValueError('Cannot load the coordinates')
-
-@cluster.command('fdb')
-@click.pass_context
-def fdb(ctx):
-    """FDB"""
-    from asaplib.cluster import DBCluster, LAIO_DB
-    trainer = LAIO_DB()
-    
-    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
-
-
-@cluster.command('dbscan')
-@click.option('--metric', type=str, 
-              help='controls how distance is computed in the ambient space of the input data. \
-                    See: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html', 
-              show_default=True, default='euclidean')
-@click.option('--min_samples', '-ms', type=int, 
-              help='The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.', 
-              show_default=True, default=5)
-@click.option('--eps', '-e', type=float, 
-              help='The maximum distance between two samples for one to be considered as in the neighborhood of the other.', 
-              default=None)
-@click.pass_context
-def dbscan(ctx, metric, min_samples, eps):
-    """DBSCAN"""
-    from asaplib.cluster import sklearn_DB
-    if eps is None:
-        from scipy.spatial.distance import cdist
-        desc = ctx.obj['design_matrix']
-        # we compute the characteristic bandwidth of the data
-        # first select a subset of structures (20)
-        sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
-        # the characteristic bandwidth of the data
-        eps = np.percentile(cdist(desc[sbs], desc, metric), 100*10./len(desc))
-
-    trainer = sklearn_DB(eps, min_samples, metric)
-
-    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
-
-@asap.group('kde')
-@click.pass_context
-@io_options
-@dm_io_options
-@output_setup_options
-def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
-            prefix, savexyz, savetxt):
-    """
-    Kernel density estimation using the design matrix.
-    This command function evaluated before the specific ones,
-    we setup the general stuff here, such as read the files.
-    """
-
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
-    if prefix is None: prefix = "ASAP-kde"
-
-    ctx.obj['kde_options'] = {'prefix': prefix,
-                                  #'plot': plot, TODO: to be added!
-                                  'savexyz': savexyz,
-                                  'savetxt': savetxt,
-                                  'use_atomic_descriptors': use_atomic_descriptors  }
-
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
-
-@kde.command('kde_internal')
-@click.option('--dimension', '-d', type=int,
-              help='The number of the first D dimensions to keep when doing KDE.',
-              show_default=True, default=8)
-@click.pass_context
-def kde_internal(ctx, dimension):
-    """Internal implementation of KDE"""
-    from asaplib.kde import KDE_internal
-    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
-    density_model = KDE_internal()
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
-
-@kde.command('kde_scipy')
-@click.option('--dimension', '-d', type=int,
-              help='The number of the first D dimensions to keep when doing KDE.',
-              show_default=True, default=50)
-@click.option('--bw_method', '-bw', type=str,
-              help='This can be ‘scott’, ‘silverman’, a scalar constant or a callable.',
-              show_default=False, default=None)
-@click.pass_context
-def kde_scipy(ctx, bw_method, dimension):
-    """Scipy implementation of KDE"""
-    from asaplib.kde import KDE_scipy
-    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
-    density_model = KDE_scipy(bw_method)
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
-
-@kde.command('kde_sklearn')
-@click.option('--dimension', '-d', type=int,
-              help='The number of the first D dimensions to keep when doing KDE.',
-              show_default=True, default=50)
-@click.option('--metric', type=str,
-              help='controls how distance is computed in the ambient space of the input data. \
-                    See: https://scikit-learn.org/stable/modules/density.html#kernel-density-estimation',
-              show_default=True, default='euclidean')
-@click.option('--algorithm', type=click.Choice(['kd_tree','ball_tree','auto'], case_sensitive=False),
-              help='Algorithm to use',
-              show_default=True, default='auto')
-@click.option('--kernel', type=click.Choice(['gaussian','tophat','epanechnikov','exponential','linear','cosine'], case_sensitive=False),
-              help='Kernel to use',
-              show_default=True, default='gaussian')
-@click.option('--bandwidth', '-bw', type=float,
-              help='Bandwidth of the kernel',
-              show_default=True, default=1)
-@click.pass_context
-def kde_scipy(ctx, dimension, bandwidth, algorithm, kernel, metric):
-    """Scikit-learn implementation of KDE"""
-    from asaplib.kde import KDE_sklearn
-    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
-    density_model = KDE_sklearn(bandwidth=bandwidth, algorithm=algorithm, kernel=kernel, metric=metric)
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])

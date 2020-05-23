@@ -60,7 +60,7 @@ def output_desc(asapxyz, desc_spec, prefix, peratom=False):
 def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
     dm = []; dm_atomic = []
     # try to read the xyz file
-    if fxyz != 'none':
+    if fxyz is not None and fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         if use_atomic_descriptors:
             _, dm = asapxyz.get_descriptors(design_matrix, True)
@@ -86,27 +86,27 @@ def map_process(obj, reduce_dict, axes, map_name):
     # project
     if 'type' in reduce_dict.keys() and reduce_dict['type'] == 'RAW':
         proj = obj['design_matrix']
-        if obj['map_info']['peratom']: 
+        if obj['map_options']['peratom']:
             proj_atomic = obj['design_matrix_atomic']
         else:
             proj_atomic = None
     else:
         dreducer = Dimension_Reducers(reduce_dict)
         proj = dreducer.fit_transform(obj['design_matrix'])
-        if obj['map_info']['peratom']:
+        if obj['map_options']['peratom']:
             proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
         else:
             proj_atomic = None
     # plot
-    fig_spec = obj['fig_spec_dict']
-    plotcolor = obj['map_info']['color']
-    plotcolor_atomic = obj['map_info']['color_atomic']
-    annotate = obj['map_info']['annotate']
+    fig_spec = obj['fig_options']
+    plotcolor = obj['map_options']['color']
+    plotcolor_atomic = obj['map_options']['color_atomic']
+    annotate = obj['map_options']['annotate']
     map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes)
     # output 
-    outfilename = obj['fig_spec_dict']['outfile']
-    outmode = obj['map_info']['outmode']
-    if obj['map_info']['project_atomic']:
+    outfilename = obj['fig_options']['outfile']
+    outmode = obj['map_options']['outmode']
+    if obj['map_options']['project_atomic']:
         map_save(outfilename, outmode, obj['asapxyz'], None, proj, map_name)
     else:
         map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name)
@@ -151,10 +151,10 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
     do_clustering.save_state(prefix)
 
     labels_db = do_clustering.get_cluster_labels()
-    if cluster_options['savexyz']:
-        if asapxyz is not None and cluster_options['use_atomic_descriptors']:
+    if cluster_options['savexyz'] and asapxyz is not None:
+        if cluster_options['use_atomic_descriptors']:
             asapxyz.set_atomic_descriptors(labels_db, prefix+'_cluster_label')
-        elif asapxyz is not None:
+        else:
             asapxyz.set_descriptors(labels_db, prefix+'_cluster_label')
         asapxyz.write(prefix)
     if cluster_options['savetxt']: 
@@ -178,9 +178,9 @@ def kde_process(asapxyz, density_model, proj, kde_options):
     if kde_options['savetxt']:
         np.savetxt(prefix + "-kde.dat", np.transpose([np.arange(len(rho)), rho]),
                header='index log_of_kernel_density_estimation', fmt='%d %4.8f')
-    if kde_options['savexyz']:
-        if asapxyz is not None and kde_options['use_atomic_descriptors']:
+    if kde_options['savexyz'] and asapxyz is not None:
+        if kde_options['use_atomic_descriptors']:
             asapxyz.set_atomic_descriptors(rho, density_model.get_acronym())
-        elif asapxyz is not None:
+        else:
             asapxyz.set_descriptors(rho, density_model.get_acronym())
         asapxyz.write(prefix)
