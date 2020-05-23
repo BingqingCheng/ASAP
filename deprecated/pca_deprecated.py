@@ -50,7 +50,8 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
     if fxyz != 'none':
         asapxyz = ASAPXYZ(fxyz)
         desc, desc_atomic = asapxyz.get_descriptors(fmat, use_atomic_desc)
-        if projectatomic: desc = desc_atomic.copy()
+        if projectatomic:
+            desc = desc_atomic.copy()
     else:
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
@@ -74,7 +75,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         tags = []
 
 
-    reduce_dict = { "pca": 
+    reduce_dict = { "pca":
                    {"type": 'PCA', 'parameter':{"n_components": pca_d, "scalecenter": scale}}
                   }
     """
@@ -126,7 +127,7 @@ def main(fmat, fxyz, ftags, fcolor, colorscol, prefix, output, peratom, keepraw,
         'remove_tick': False,
         'rasterized': True,
         'fontsize': 16,
-        'components':{ 
+        'components':{
             "first_p": {"type": 'scatter', 'clabel': colorlabel},
             "second_p": {"type": 'annotate', 'adtext': adtext}
              }

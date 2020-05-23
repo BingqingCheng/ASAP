@@ -1,3 +1,3 @@
 """
-Command-line interface sub-package 
+Command-line interface sub-package
 """

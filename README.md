@@ -33,7 +33,7 @@ python3 setup.py install --user
 
 Requirements:
 
-+ numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click
++ numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click rdkit pytest
 
 Add-Ons:
 + (for finding symmetries of crystals) spglib 

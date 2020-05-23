@@ -29,6 +29,7 @@ def load_in_file(in_file):
             state[k] = s
     return state
 
+
 """for gen_desc"""
 def set_kernel(kernel_type, element_wise, zeta):
     """
@@ -43,6 +44,7 @@ def set_kernel(kernel_type, element_wise, zeta):
         kernel_func['zeta'] = zeta
     return kernel_func
 
+
 def output_desc(asapxyz, desc_spec, prefix, peratom=False):
     """
     Compute and save the descriptors
@@ -55,6 +57,7 @@ def output_desc(asapxyz, desc_spec, prefix, peratom=False):
                                        tag=tag)
     asapxyz.write(prefix)
     asapxyz.save_state(prefix)
+
 
 """ for maps and fits """
 def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
@@ -77,6 +80,7 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
         except:
             raise ValueError('Cannot load the descriptor matrix from file')
     return asapxyz, dm, dm_atomic
+
 
 """for maps"""
 def map_process(obj, reduce_dict, axes, map_name):
@@ -111,6 +115,7 @@ def map_process(obj, reduce_dict, axes, map_name):
     else:
         map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name)
 
+
 def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes):
     """
     Make plots
@@ -120,6 +125,7 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate,
     if proj_atomic is not None:
         asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
     plt.show()
+
 
 def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
     """
@@ -138,6 +144,7 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
         asapxyz.write(foutput)
     else:
         pass
+
 
 """ for clustering """
 def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
@@ -162,4 +169,3 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
                header='index cluster_label', fmt='%d %d')
 
     # TODO: allow plotting options!
-

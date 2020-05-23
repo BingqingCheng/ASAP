@@ -1,11 +1,17 @@
 """
 Methods and functions to compute global desciptors
 """
-import numpy as np
+
 import json
+
+import numpy as np
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
+
 from ..io import NpEncoder, randomString
 from .atomic_to_global import Atomic_2_Global_Descriptors
 from .atomic_descriptors import Atomic_Descriptors
+
 
 class Global_Descriptors:
     def __init__(self, desc_spec_dict={}):
@@ -107,19 +113,24 @@ class Global_Descriptors:
             #atomic_desc_dict.update(atomic_desc_dict_new)
         return global_desc_dict, atomic_desc_dict
 
+
 class Global_Descriptor_Base:
     def __init__(self, desc_spec):
         self._is_atomic = False
         self.acronym = ""
         pass
+
     def is_atomic(self):
         return self._is_atomic
+
     def get_acronym(self):
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
         return self.acronym
+
     def create(self, frame):
         # return the dictionaries for global descriptors and atomic descriptors (if any)
         return {'acronym': self.acronym, 'descriptors': []}, {}
+
 
 class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -148,7 +159,6 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
 
         if "atomic_descriptor" not in desc_spec.keys() or "kernel_function" not in desc_spec.keys():
             raise ValueError("Need to specify both atomic descriptors and kernel functions to used")
-
 
         self.atomic_desc_spec = desc_spec['atomic_descriptor']
         self.kernel_spec = desc_spec['kernel_function']
@@ -218,7 +228,6 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
         if 'periodic' in desc_spec.keys() and desc_spec['periodic'] == True:
             raise ValueError("Coulomb Matrix cannot be used for periodic systems")
 
-
         self.cm = CoulombMatrix(self.max_atoms)
         print("Using CoulombMatrix ...")
         # make an acronym
@@ -242,3 +251,40 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
             raise ValueError('the size of the system is larger than the max_atoms of the CM descriptor')
         # notice that we return an empty dictionary for "atomic descriptors"
         return {'acronym': self.acronym, 'descriptors': self.cm.create(frame, n_jobs=8)}, {}
+
+
+class FingerprintDescriptor:
+    def __init__(self, smiles_list):
+        """
+
+        Parameters
+        ----------
+        smiles_list: A list of molecule SMILES to compute Morgan fingerprints for
+        """
+        self.smiles_list = smiles_list
+        self.acronym = "MF"
+
+    def get_acronym(self):
+        """
+
+        Returns
+        -------
+
+        self.acronym: The acronym for the descriptor (str)
+
+        """
+        return self.acronym
+
+    def create(self):
+        """
+
+        Returns
+        -------
+
+        """
+
+        rdkit_mols = [MolFromSmiles(smiles) for smiles in self.smiles_list]
+        fingerprints = [GetMorganFingerprintAsBitVect(mol, 2, nBits=512) for mol in rdkit_mols]
+        fingerprints = np.asarray(fingerprints)
+
+        return {'acronym': self.acronym, 'descriptors': fingerprints}

@@ -4,24 +4,19 @@ TODO: Module-level description
 """
 
 import argparse
-import os
 import sys
-import json
 
-import matplotlib.pyplot as plt
-import numpy as np
 from scipy.spatial.distance import cdist
 
 from asaplib.data import ASAPXYZ
 from asaplib.reducedim import PCA, KernelPCA
 from asaplib.kernel import kerneltodis
 from asaplib.cluster import DBCluster, sklearn_DB, LAIO_DB
-from asaplib.io import NpEncoder
 from asaplib.plot import *
 from asaplib.io import str2bool
 
 
-def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic, adtext):
+def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2, algorithm, projectatomic):
 
     """
 
@@ -39,7 +34,6 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     pc2: int, default is 1, which principle axis to plot the projection on
     algorithm: the algorithm for density-based clustering options are: ([dbscan], [fdb])
     projectatomic: build the projection using the (big) atomic descriptor matrix
-    adtext: Whether to adjust the text (True/False)
 
     Returns
     -------
@@ -72,10 +66,9 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
         try:
             kNN = np.genfromtxt(kmat, dtype=float)
             print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
-            desc =  kerneltodis(kNN)
+            desc = kerneltodis(kNN)
         except:
             raise ValueError('Cannot load the coordinates')
-        
 
     if ftags != 'none':
         tags = np.loadtxt(ftags, dtype="str")
@@ -105,7 +98,7 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
 
     labels_db = do_clustering.get_cluster_labels()
     n_clusters = do_clustering.get_n_cluster()
-    
+
     if asapxyz is not None and projectatomic:
         asapxyz.set_atomic_descriptors(labels_db, 'cluster_label')
     elif asapxyz is not None:
@@ -115,14 +108,14 @@ def main(fmat, kmat, fxyz, ftags, prefix, fcolor, colorscol, dimension, pc1, pc2
     np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    if  fmat != 'none':
+    if fmat != 'none':
         pca = PCA(dimension, True)
         proj = pca.fit_transform(desc)
-    elif  kmat != 'none':
+    elif kmat != 'none':
         proj = KernelPCA(dimension).fit_transform(kNN)
 
     # color scheme
-    if fcolor == 'cluster_label': 
+    if fcolor == 'cluster_label':
         plotcolor = labels_db
         colorlabel = 'cluster_label'
     else:
@@ -176,8 +169,6 @@ if __name__ == '__main__':
                         help='the algorithm for density-based clustering ([dbscan], [fdb])')
     parser.add_argument('--projectatomic', type=str2bool, nargs='?', const=True, default=False,
                         help='Building the KPCA projection based on atomic descriptors instead of global ones (True/False)')
-    parser.add_argument('--adjusttext', type=str2bool, nargs='?', const=True, default=False,
-                        help='Do you want to adjust the texts (True/False)?')
 
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -185,4 +176,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args.fmat, args.kmat, args.fxyz, args.tags, args.prefix, args.colors, args.colorscolumn, args.d,
-         args.pc1, args.pc2, args.algo, args.projectatomic, args.adjusttext)
+         args.pc1, args.pc2, args.algo, args.projectatomic)
