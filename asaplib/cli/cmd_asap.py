@@ -140,7 +140,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     if universal_soap != 'none':
         from asaplib.hypers import universal_soap_hyper
         global_species = ctx.obj['asapxyz'].get_global_species()
-        soap_spec = universal_soap_hyper(global_species, universal_soap, dump=False)
+        soap_spec = universal_soap_hyper(global_species, universal_soap, dump=True)
     else:
         soap_spec = {'soap1': {'type': 'SOAP',
                                'cutoff': cutoff,
@@ -200,6 +200,9 @@ def map_setup_options(f):
     f = click.option('--annotate', '-a',
                      help='Location of tags to annotate the samples.',
                      default='none', type=str)(f)
+    f = click.option('--aspect_ratio', '-ar',
+                      help='Aspect ratio of the plot',
+                      show_default=True, default=2, type=float)(f)
     f = click.option('--style', '-s',
                      type=click.Choice(['default','journal'], case_sensitive=False), 
                      help='Style of the plot.', 
@@ -232,7 +235,7 @@ def color_setup_options(f):
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
          use_atomic_descriptors, peratom, keepraw,
          color, color_column, color_label, color_from_zero,
-         annotate, adjusttext, style):
+         annotate, adjusttext, style, aspect_ratio):
     """
     Making 2D maps using dimensionality reduction.
     This command function evaluated before the specific ones,
@@ -271,6 +274,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     ctx.obj['fig_spec_dict'] = { 'outfile': prefix,
                                  'show': False,
                                  'title': None,
+                                 'size': [8*aspect_ratio, 8],
                                  'components':{ 
                                   "first_p": {"type": 'scatter', 'clabel': colorlabel, 
                                   'vmin': colorscale[0], 'vmax': colorscale[0]},
@@ -282,8 +286,8 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                                          'xaxis': False,  'yaxis': False,
                                          'remove_tick': True,
                                          'rasterized': True,
-                                         'fontsize': 9,
-                                         'size': [8, 4]
+                                         'fontsize': 12,
+                                         'size': [4*aspect_ratio, 4]
                                          })
 
 def d_reduce_options(f):

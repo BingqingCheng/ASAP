@@ -46,7 +46,7 @@ class Plotters:
             raise ValueError("Didn't specify any options to do plots. Use `components` key to do so.")
 
         self.fig_spec = {
-        'size': [20, 10],
+        'size': [16, 8],
         'outfile': None,
         'show': True,
         'title': None,
@@ -155,7 +155,8 @@ class Plotters:
 
         # touch ups
         if self.fig_spec['remove_tick']:
-            self.ax.tick_params(labelbottom='off', labelleft='off')
+            self.ax.tick_params(axis='both', which='both', bottom=False, top=False, 
+                               labelbottom=False, right=False, left=False, labelleft=False)
         if self.fig_spec['xaxis'] is not True:
             self.ax.set_xticklabels([])
         if self.fig_spec['yaxis'] is not True:
@@ -241,7 +242,7 @@ class Plot_Function_Scatter(Plot_Function_Base):
         'cmap': 'gnuplot',
         'alpha': 1.0, # color transparency
         'clabel': None, # label of the colorbar
-        'cbar_format':'%1.1f',
+        'cbar_format': None, #'%1.1f',
         'use_perc': False, # mark the top/bottom ourliers
         'outlier_top_fraction': 0.05, # the fraction of the top ourliers
         'outlier_top_color': 'yellow', # color used to make the top ourliers
@@ -318,6 +319,14 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                vmax=self.p_spec['vmax'],
                                vmin=self.p_spec['vmin'])
 
+        if self.p_spec['cbar_format'] is None:
+            color_spread = np.std(z)
+            if color_spread > 2:
+                self.p_spec['cbar_format'] = '%d'
+            elif color_spread > 0.1:
+                self.p_spec['cbar_format'] = '%1.1f'
+            else:
+                self.p_spec['cbar_format'] = '%1.1e'
         if self.p_spec['clabel'] is not None and self.cb is None: 
             self.cb = fig.colorbar(axscatter, format=self.p_spec['cbar_format'])
             self.cb.ax.locator_params(nbins=5)

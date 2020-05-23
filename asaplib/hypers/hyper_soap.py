@@ -14,8 +14,8 @@ Automatically generate the hyperparameters of SOAP descriptors for arbitrary ele
     * maximum bond length (from equilibrium bond length in lowest energy 2D or 3D structure)
     * minimal bond length (from shortest bond length of any equilibrium structure, including dimer)
   * Apply a scaling for these length scales
-    * largest soap cutoff = maximum bond length * 3.0
-    * smallest soap cutoff = minimal bond length * 1.8
+    * largest soap cutoff = maximum bond length * 1.3
+    * smallest soap cutoff = minimal bond length * 1.3
     * Add other cutoffs in between if requires more sets of SOAP descriptors 
     * The atom sigma is the `cutoff / 8`, divided by an optional `sharpness` factor
 
@@ -30,11 +30,11 @@ a system with boron (5) and germanium (32).
 def universal_soap_hyper(global_species, fsoap_param, dump=True):
 
     if fsoap_param == 'smart' or fsoap_param == 'Smart' or fsoap_param == 'SMART':
-        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.2, soap_n=8, soap_l=4)
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.2, soap_n=8, soap_l=4, sharpness=1.0)
     elif fsoap_param == 'minimal' or fsoap_param == 'Minimal' or fsoap_param == 'MINIMAL':
-        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=1, scalerange=0.85, soap_n=4, soap_l=3)
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=1, scalerange=0.85, soap_n=4, soap_l=3, sharpness=1.0)
     elif fsoap_param == 'longrange' or fsoap_param == 'Longrange' or fsoap_param == 'LONGRANGE':
-        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.5)
+        soap_js = gen_default_soap_hyperparameters(list(global_species), multisoap=2, scalerange=1.8, soap_n=8, soap_l=4, sharpness=1.2)
     else:
         raise IOError('Did not specify soap parameters. You can use [smart/minimal/longrange].')
     print(soap_js)

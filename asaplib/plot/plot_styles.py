@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 from .plot_colors import COLOR_PALETTE
 
 
-def set_nice_font(size=18, usetex=False):
-    font = {'family': 'serif', 'size': size}
+def set_nice_font(usetex=False):
+    font = {'family': 'serif'}
     plt.rc('font', **font)
     if usetex is True:
         plt.rc('text', usetex=True)
