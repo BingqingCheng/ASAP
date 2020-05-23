@@ -163,3 +163,24 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
 
     # TODO: allow plotting options!
 
+""" for KDE """
+def kde_process(asapxyz, density_model, proj, kde_options):
+    """handle kernel density estimation operations"""
+    # fit density model to data
+    try:
+        density_model.fit(proj)
+    except:
+        raise RuntimeError('KDE did not work. Try smaller dimension may help.')
+
+    rho = density_model.evaluate_density(proj)
+    prefix = kde_options['prefix']
+    # save the density
+    if kde_options['savetxt']:
+        np.savetxt(prefix + "-kde.dat", np.transpose([np.arange(len(rho)), rho]),
+               header='index log_of_kernel_density_estimation', fmt='%d %4.8f')
+    if kde_options['savexyz']:
+        if asapxyz is not None and kde_options['use_atomic_descriptors']:
+            asapxyz.set_atomic_descriptors(rho, density_model.get_acronym())
+        elif asapxyz is not None:
+            asapxyz.set_descriptors(rho, density_model.get_acronym())
+        asapxyz.write(prefix)

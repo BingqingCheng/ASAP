@@ -53,6 +53,19 @@ def km_io_options(f):
                      help='Location of a kernel matrix file')(f)
     return f
 
+def output_setup_options(f):
+    """Create common options for output results from clustering/KDE analysis"""
+#    f = click.option('--plot/--no-plot',
+#                     help='Plot a map that embeds the results.',
+#                     default=True)(f)
+    f = click.option('--savexyz/--no-savexyz',
+                     help='Save the results to the xyz file',
+                     default=True)(f)
+    f = click.option('--savetxt/--no-savetxt',
+                     help='Save the results to the txt file',
+                     default=False)(f)
+    return f
+
 @asap.group('gen_desc')
 @click.option('--stride', '-s',
                      help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
@@ -494,25 +507,12 @@ def ridge(ctx, sigma):
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     plt.show()
 
-def cluster_setup_options(f):
-    """Create common options for doing clustering analysis"""
-#    f = click.option('--plot/--no-plot', 
-#                     help='Plot a map that embeds the clustering results.',
-#                     default=True)(f)
-    f = click.option('--savexyz/--no-savexyz', 
-                     help='Save the clustering results to the xyz file',
-                     default=True)(f)
-    f = click.option('--savetxt/--no-savetxt', 
-                     help='Save the clustering results to the txt file',
-                     default=False)(f)
-    return f
-
 @asap.group('cluster')
 @click.pass_context
 @io_options
 @dm_io_options
 @km_io_options
-@cluster_setup_options
+@output_setup_options
 def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix, 
             prefix, savexyz, savetxt):
     """
@@ -582,4 +582,81 @@ def dbscan(ctx, metric, min_samples, eps):
 
     cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
 
+@asap.group('kde')
+@click.pass_context
+@io_options
+@dm_io_options
+@output_setup_options
+def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
+            prefix, savexyz, savetxt):
+    """
+    Kernel density estimation using the design matrix.
+    This command function evaluated before the specific ones,
+    we setup the general stuff here, such as read the files.
+    """
 
+    if in_file:
+        # Here goes the routine to compute the descriptors according to the
+        # state file(s)
+        raise NotImplementedError
+    if prefix is None: prefix = "ASAP-kde"
+
+    ctx.obj['kde_options'] = {'prefix': prefix,
+                                  #'plot': plot, TODO: to be added!
+                                  'savexyz': savexyz,
+                                  'savetxt': savetxt,
+                                  'use_atomic_descriptors': use_atomic_descriptors  }
+
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+
+@kde.command('kde_internal')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=8)
+@click.pass_context
+def kde_internal(ctx, dimension):
+    """Internal implementation of KDE"""
+    from asaplib.kde import KDE_internal
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_internal()
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+
+@kde.command('kde_scipy')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=50)
+@click.option('--bw_method', '-bw', type=str,
+              help='This can be ‘scott’, ‘silverman’, a scalar constant or a callable.',
+              show_default=False, default=None)
+@click.pass_context
+def kde_scipy(ctx, bw_method, dimension):
+    """Scipy implementation of KDE"""
+    from asaplib.kde import KDE_scipy
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_scipy(bw_method)
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+
+@kde.command('kde_sklearn')
+@click.option('--dimension', '-d', type=int,
+              help='The number of the first D dimensions to keep when doing KDE.',
+              show_default=True, default=50)
+@click.option('--metric', type=str,
+              help='controls how distance is computed in the ambient space of the input data. \
+                    See: https://scikit-learn.org/stable/modules/density.html#kernel-density-estimation',
+              show_default=True, default='euclidean')
+@click.option('--algorithm', type=click.Choice(['kd_tree','ball_tree','auto'], case_sensitive=False),
+              help='Algorithm to use',
+              show_default=True, default='auto')
+@click.option('--kernel', type=click.Choice(['gaussian','tophat','epanechnikov','exponential','linear','cosine'], case_sensitive=False),
+              help='Kernel to use',
+              show_default=True, default='gaussian')
+@click.option('--bandwidth', '-bw', type=float,
+              help='Bandwidth of the kernel',
+              show_default=True, default=1)
+@click.pass_context
+def kde_scipy(ctx, dimension, bandwidth, algorithm, kernel, metric):
+    """Scikit-learn implementation of KDE"""
+    from asaplib.kde import KDE_sklearn
+    proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
+    density_model = KDE_sklearn(bandwidth=bandwidth, algorithm=algorithm, kernel=kernel, metric=metric)
+    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
