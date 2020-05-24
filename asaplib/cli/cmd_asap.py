@@ -611,7 +611,7 @@ def kernelridge(ctx, sigma, kernel, kernel_parameter, sparse_mode, n_sparse):
     from asaplib.fit import SPARSE_KRR_Wrapper, KRRSparse
     k_spec = {"first_kernel": {"type": kernel, "d": kernel_parameter}}
     krr = KRRSparse(0., None, sigma)
-    skrr = SPARSE_KRR_Wrapper(k_spec, krr, sparse_mode="fps", n_sparse=n_sparse)
+    skrr = SPARSE_KRR_Wrapper(k_spec, krr, sparse_mode=sparse_mode, n_sparse=n_sparse)
     # fit the model
     ctx.obj['dm'].compute_fit(skrr, 'skrr', store_results=True, plot=True)
     if ctx.obj['fit_options']["learning_curve"] > 1:
