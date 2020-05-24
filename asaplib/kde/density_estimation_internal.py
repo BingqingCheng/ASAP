@@ -64,7 +64,7 @@ class KDE_internal(Kernel_Density_Base):
         self.nn_dist = nn_dist
         self.kernel = kernel  # epanechnikov other option
 
-        self.acronym = 'kde'
+        self.acronym = 'kde_internal'
 
     def fit(self, X):
 
