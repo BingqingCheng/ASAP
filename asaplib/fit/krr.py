@@ -1,5 +1,6 @@
 """
-adapted from Felix Musil's ml_tools
+NOTE: These methods operate directly on the kernel matrix!!!
+some functions are adapted from Felix Musil's ml_tools
 """
 
 import numpy as np
@@ -69,9 +70,11 @@ class KRRSparse(RegressorBase):
         # Weights of the krr model
         self.alpha = None
         self.jitter = jitter
-        self.delta = delta  # variance of the prior
+        self.delta = None  # variance of the prior
         self.sigma = sigma  # noise
         self._fitted = False
+        if self.jitter is None:
+            self.jitter = 10e-20
 
     def fit(self, kMM, kNM, y):
         '''N train structures, M sparsified representative structures '''
@@ -80,6 +83,12 @@ class KRRSparse(RegressorBase):
 
         # if (kMM.shape[0] != kMM.shape[1]):# or kMM.shape[0] != kNM.shape[1] or kNM.shape[0] != y.shape[0]):
         # raise ValueError('Shape of the kernel matrix is not consistent!')
+
+        if self.delta is None:
+            self.delta = np.std(y) / (np.trace(kMM) / len(kMM))
+
+        if self.sigma is None:
+            self.sigma = 0.001 * np.std(y)
 
         sparseK = kMM * self.delta * self.sigma ** 2 + np.dot(kNM.T, kNM) * self.delta ** 2
         sparseY = np.dot(kNM.T, y)
@@ -107,7 +116,6 @@ class KRRSparse(RegressorBase):
 
     def set_params(self, params, deep=True):
         self.jitter = params['jitter']
-        self.delta = params['delta']
         self.sigma = params['sigma']
         self.alpha = None
 

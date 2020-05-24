@@ -11,14 +11,13 @@ from .ml_kpca import KernelPCA
 class SPARSE_KPCA:
     def __init__(self, n_components=2, kernel={}, sparse_mode="fps", n_sparse=None):
         """
-        Object handing the specification and the computation of atomic descriptors
         Parameters
         ----------
         n_components : int, default=2
             number of dimensions to project to
 
         kernel: dictionaries that specify which way to convert descriptors into kernel matrix
-                     See ../kernel/kernel_transforms.py
+                     See ../kernel/kernel_transforms.py`
         e.g.
         kernel = {
         "first_kernel": {"type": 'linear', "normalize": True}
@@ -40,7 +39,7 @@ class SPARSE_KPCA:
         self.n_sparse = n_sparse
         self.kernel = kernel
 
-        if self.n_sparse > 0:
+        if self.n_sparse is None or self.n_sparse > 0:
             self.sparsifier = Sparsifier(self.sparse_mode)
         else:
             self.sparsifier = None
@@ -110,8 +109,8 @@ class SPARSE_KPCA:
         if not self._fitted:
             raise RuntimeError("The model has not been fitted yet, please fit it and then use transform.")
 
-        kMN = self.k_transform.compute(desc_test, self.desc_sbs)
-        return self.kpca.transform(kMN)
+        kNM = self.k_transform.compute(desc_test, self.desc_sbs)
+        return self.kpca.transform(kNM)
 
     
     def fit_transform(self, desc):

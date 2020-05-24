@@ -1,8 +1,6 @@
 import numpy as np
-import json
 
 from .base import RegressorBase
-from .getscore import get_score
 
 class RidgeRegression(RegressorBase):
     _pairwise = True
