@@ -79,6 +79,29 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
     return asapxyz, dm, dm_atomic
 
 """for maps"""
+
+def figure_style_setups(prefix,
+                        colorlabel, colorscale, 
+                        style, aspect_ratio, adjusttext):
+    fig_options = { 'outfile': prefix,
+                    'show': False,
+                    'title': None,
+                    'size': [8*aspect_ratio, 8],
+                    'components':{
+                    'first_p': {'type': 'scatter', 'clabel': colorlabel,
+                                'vmin': colorscale[0], 'vmax': colorscale[1]},
+                    'second_p': {"type": 'annotate', 'adtext': adjusttext} }
+                   }
+    if style == 'journal':
+        fig_options.update({'xlabel': None, 'ylabel': None,
+                            'xaxis': False,  'yaxis': False,
+                            'remove_tick': True,
+                            'rasterized': True,
+                            'fontsize': 12,
+                            'size': [4*aspect_ratio, 4]
+                            })
+    return fig_options
+
 def map_process(obj, reduce_dict, axes, map_name):
     """
     process the dimensionality reduction command
@@ -103,7 +126,11 @@ def map_process(obj, reduce_dict, axes, map_name):
     plotcolor = obj['map_options']['color']
     plotcolor_atomic = obj['map_options']['color_atomic']
     annotate = obj['map_options']['annotate']
-    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes)
+    if 'cluster_labels' in obj.keys():
+        labels = obj['cluster_labels']
+    else:
+        labels = []
+    map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, annotate, axes)
     # output 
     outfilename = obj['fig_options']['outfile']
     outmode = obj['map_options']['outmode']
@@ -112,14 +139,14 @@ def map_process(obj, reduce_dict, axes, map_name):
     else:
         map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name)
 
-def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate, axes):
+def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, annotate, axes):
     """
     Make plots
     """
     from matplotlib import pyplot as plt
     from asaplib.plot import Plotters
     asap_plot = Plotters(fig_spec)
-    asap_plot.plot(proj[::-1, axes], plotcolor[::-1], [], annotate)
+    asap_plot.plot(proj[::-1, axes], plotcolor[::-1], labels[::-1], annotate)
     if proj_atomic is not None:
         asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
     plt.show()
@@ -166,7 +193,7 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
         np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
-    # TODO: allow plotting options!
+    return labels_db
 
 """ for KDE """
 def kde_process(asapxyz, density_model, proj, kde_options):
@@ -189,3 +216,4 @@ def kde_process(asapxyz, density_model, proj, kde_options):
         else:
             asapxyz.set_descriptors(rho, density_model.get_acronym())
         asapxyz.write(prefix)
+    return rho

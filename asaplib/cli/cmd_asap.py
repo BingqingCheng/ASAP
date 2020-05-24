@@ -149,7 +149,7 @@ def run(ctx):
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'])
 
-@asap.group('cluster')
+@asap.group('cluster', chain=True)
 @click.pass_context
 @file_input_options
 @file_output_options
@@ -164,6 +164,9 @@ def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_ma
     we setup the general stuff here, such as read the files.
     """
 
+    if not fxyz and not in_file:
+        return
+    
     if in_file:
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
@@ -171,7 +174,6 @@ def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_ma
     if prefix is None: prefix = "ASAP-cluster"
 
     ctx.obj['cluster_options'] = {'prefix': prefix,
-                                  #'plot': plot, TODO: to be added!
                                   'savexyz': savexyz,
                                   'savetxt': savetxt,
                                   'use_atomic_descriptors': use_atomic_descriptors  }
@@ -195,7 +197,7 @@ def fdb(ctx):
     from asaplib.cluster import DBCluster, LAIO_DB
     trainer = LAIO_DB()
     
-    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+    ctx.obj['cluster_labels'] = cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
 
 
 @cluster.command('dbscan')
@@ -225,9 +227,41 @@ def dbscan(ctx, metric, min_samples, eps):
 
     trainer = sklearn_DB(eps, min_samples, metric)
 
-    cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
+    ctx.obj['cluster_labels'] = cluster_process(ctx.obj['asapxyz'], trainer, ctx.obj['design_matrix'], ctx.obj['cluster_options'])
 
-@asap.group('kde')
+@cluster.command('plot_pca')
+@click.pass_context
+@map_setup_options
+@d_reduce_options
+@file_output_options
+def plot_pca(ctx, scale, dimension, axes,
+             peratom, adjusttext, annotate, aspect_ratio, style, prefix):
+    """ Plot the clustering results using a PCA map """
+    if prefix is None:
+        prefix = "clustering-pca"
+    colorlabel = "Clustering results"
+    colorscale = [None, None]
+    ctx.obj['map_options'].update({ 'color': ctx.obj['cluster_labels'],
+                             'color_atomic': [],
+                             'project_atomic': [],
+                             'peratom': False,
+                             'annotate': [],
+                             'outmode': 'none',
+                             'keepraw': True})
+    if annotate != 'none':
+        ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
+
+
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
+    ctx.obj['fig_options']['components'].update({"third_p": {"type": 'cluster', 'w_label': True, 'circle_size': 20}})
+    map_name = "clustering-pca-d-"+str(dimension)
+    reduce_dict = {'pca': {
+                   'type': 'PCA',
+                   'parameter':{"n_components": dimension, "scalecenter": scale}}
+                  }
+    map_process(ctx.obj, reduce_dict, axes, map_name)
+    
+@asap.group('kde', chain=True)
 @click.pass_context
 @file_input_options
 @file_output_options
@@ -241,6 +275,9 @@ def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
     we setup the general stuff here, such as read the files.
     """
 
+    if not fxyz and not in_file:
+        return
+        
     if in_file:
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
@@ -248,7 +285,6 @@ def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
     if prefix is None: prefix = "ASAP-kde"
 
     ctx.obj['kde_options'] = {'prefix': prefix,
-                                  #'plot': plot, TODO: to be added!
                                   'savexyz': savexyz,
                                   'savetxt': savetxt,
                                   'use_atomic_descriptors': use_atomic_descriptors  }
@@ -263,9 +299,10 @@ def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
 def kde_internal(ctx, dimension):
     """Internal implementation of KDE"""
     from asaplib.kde import KDE_internal
+    import numpy as np
     proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
     density_model = KDE_internal()
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+    ctx.obj['kde'] = kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
 
 @kde.command('kde_scipy')
 @click.option('--dimension', '-d', type=int,
@@ -281,7 +318,7 @@ def kde_scipy(ctx, bw_method, dimension):
     import numpy as np
     proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
     density_model = KDE_scipy(bw_method)
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+    ctx.obj['kde'] = kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
 
 @kde.command('kde_sklearn')
 @click.option('--dimension', '-d', type=int,
@@ -307,14 +344,45 @@ def kde_scipy(ctx, dimension, bandwidth, algorithm, kernel, metric):
     import numpy as np
     proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
     density_model = KDE_sklearn(bandwidth=bandwidth, algorithm=algorithm, kernel=kernel, metric=metric)
-    kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
+    ctx.obj['kde'] = kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
 
+@kde.command('plot_pca')
+@click.pass_context
+@map_setup_options
+@d_reduce_options
+@file_output_options
+def plot_pca(ctx, scale, dimension, axes,
+             peratom, adjusttext, annotate, aspect_ratio, style, prefix):
+    """ Plot the KDE results using a PCA map """
+    if prefix is None:
+        prefix = "kde-pca"
+    colorlabel = "Kernel density estimate (log scale)"
+    colorscale = [None, None]
+    ctx.obj['map_options'].update({ 'color': ctx.obj['kde'],
+                             'color_atomic': [],
+                             'project_atomic': [],
+                             'peratom': False,
+                             'annotate': [],
+                             'outmode': 'none',
+                             'keepraw': True})
+    if annotate != 'none':
+        ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
+
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
+    map_name = "kde-pca-d-"+str(dimension)
+    reduce_dict = {'pca': {
+                   'type': 'PCA',
+                   'parameter':{"n_components": dimension, "scalecenter": scale}}
+                  }
+    map_process(ctx.obj, reduce_dict, axes, map_name)
+    
 @asap.group('map')
 @click.pass_context
 @file_input_options
 @file_output_options
 @dm_input_options
 @map_setup_options
+@map_io_options
 @color_setup_options
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
          use_atomic_descriptors, peratom, keepraw,
@@ -326,6 +394,9 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     we setup the general stuff here, such as read the files.
     """
 
+    if not fxyz and not in_file and not design_matrix:
+        return
+    
     if in_file:
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
@@ -356,27 +427,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         import numpy as np
         ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
-
-    ctx.obj['fig_options'] = { 'outfile': prefix,
-                                 'show': False,
-                                 'title': None,
-                                 'size': [8*aspect_ratio, 8],
-                                 'components':{ 
-                                  "first_p": {"type": 'scatter', 'clabel': colorlabel, 
-                                  'vmin': colorscale[0], 'vmax': colorscale[0]},
-                                  "second_p": {"type": 'annotate', 'adtext': adjusttext}}
-                                }
-
-    if style == 'journal':
-        ctx.obj['fig_options'].update({'xlabel': None, 'ylabel': None,
-                                         'xaxis': False,  'yaxis': False,
-                                         'remove_tick': True,
-                                         'rasterized': True,
-                                         'fontsize': 12,
-                                         'size': [4*aspect_ratio, 4]
-                                         })
-
-
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
 
 @map.command('raw')
 @click.pass_context
@@ -501,6 +552,8 @@ def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
     This command function evaluated before the specific ones,
     we setup the general stuff here, such as read the files.
     """
+    if not fxyz and not in_file and not design_matrix:
+        return
 
     if in_file:
         # Here goes the routine to compute the descriptors according to the

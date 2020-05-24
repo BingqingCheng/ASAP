@@ -76,15 +76,9 @@ def atomic_to_global_desc_options(f):
 
 def map_setup_options(f):
     """Create common options for making 2D maps of the data set"""
-    f = click.option('--keepraw/--no-keepraw', 
-                     help='Keep the high dimensional descriptor when output XYZ file.',
-                     default=False)(f)
     f = click.option('--peratom', 
                      help='Save the per-atom projection.',
                      default=False, is_flag=True)(f)
-    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False), 
-                     help='Output file format.',
-                     default='xyz')(f)
     f = click.option('--adjusttext/--no-adjusttext', 
                      help='Adjust the annotation texts so they do not overlap.',
                      default=False)(f)
@@ -98,6 +92,16 @@ def map_setup_options(f):
                      type=click.Choice(['default','journal'], case_sensitive=False), 
                      help='Style of the plot.', 
                      show_default=True, default='default')(f)
+    return f
+
+def map_io_options(f):
+    """Create common options for making 2D maps of the data set"""
+    f = click.option('--keepraw/--no-keepraw',
+                     help='Keep the high dimensional descriptor when output XYZ file.',
+                     default=False)(f)
+    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False),
+                     help='Output file format.',
+                     default='xyz')(f)
     return f
 
 def color_setup_options(f):
