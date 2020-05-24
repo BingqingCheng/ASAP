@@ -8,7 +8,7 @@ from yaml import dump as ydump
 
 from ..io import randomString,  NpEncoder
 from ..compressor import random_split,exponential_split, LCSplit, ShuffleSplit
-from ..compressor import fps, CUR_deterministic
+from ..compressor import Sparsifier
 from ..fit import LC_SCOREBOARD
 
 class Design_Matrix:
@@ -89,40 +89,31 @@ class Design_Matrix:
             with open(filename+'-lc.json', 'w') as jd:
                 json.dump(self.lc_by_learner, jd, sort_keys=True, cls=NpEncoder)
 
-    def sparsify(self, n_sparse=0, sparse_mode='fps'):
+    def sparsify(self, n_sparse=None, sparse_mode='fps'):
         """
         select representative data points using the design matrix
 
         Parameters
         ----------
         n_sparse: number of representative points
-                  n_sparse < 0 means 5% of the data
-                  n_sparse == 0 means no sparsification
+                  n_sparse == None means 5% of the data
+                  n_sparse < 0 means no sparsification
         sparse_mode: str. Methods to use for sparsification [cur], [fps], [random]
         """
-        # sanity check
-        if n_sparse >= self.n_train:
-            print("the number of representative structure is too large, please select n < ", self.n_train)
+        
         # set default value of n_sparse
-        if n_sparse < 0:
+        if n_sparse is None:
             n_sparse = max(10, self.n_train // 20)
-    
-        # no sparsification
-        if n_sparse == 0:
-            self.sbs = range(self.n_train)
-            self.n_sparse = len(self.X_train)
+
+        # sparsification
+        if n_sparse > 0:
+            sparsifier = Sparsifier(sparse_mode)
+            self.sbs = sparsifier.sparsify(desc, n_sparse)
         else:
-            self.n_sparse = n_sparse
-            # sparsification
-            if sparse_mode == 'fps' or sparse_mode == 'FPS':
-                self.sbs, _ = fps(self.X_train, self.n_sparse, 0)
-            elif sparse_mode == 'cur' or sparse_mode == 'CUR':
-                cov = np.dot(np.asmatrix(self.X_train), np.asmatrix(self.X_train).T)
-                self.sbs, _ = CUR_deterministic(cov, self.n_sparse)
-            elif sparse_mode == 'random' or sparse_mode == 'RANDOM' or sparse_mode == 'Random':
-                _, self.sbs = random_split(len(self.X_train), self.n_sparse/len(self.X_train))
-            else:
-                raise NotImplementedError("Do not recognize the selected sparsification mode. Use ([cur], [fps], [random]).")
+            print("Not using any sparsification")
+            self.sbs = range(n_sample)
+
+        self.desc_sbs = desc[self.sbs]
 
     def get_sparsified_matrix(self):
         if len(self.y_train) > 0:

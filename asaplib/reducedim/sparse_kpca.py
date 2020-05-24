@@ -4,12 +4,12 @@ using sparse KPCA
 """
 
 import numpy as np
-from ..compressor import random_split, fps, CUR_deterministic
+from ..compressor import Sparsifier
 from ..kernel import Descriptors_to_Kernels
 from .ml_kpca import KernelPCA
 
 class SPARSE_KPCA:
-    def __init__(self, n_components=2, kernel={}, sparse_mode="FPS", n_sparse=None):
+    def __init__(self, n_components=2, kernel={}, sparse_mode="fps", n_sparse=None):
         """
         Object handing the specification and the computation of atomic descriptors
         Parameters
@@ -28,7 +28,8 @@ class SPARSE_KPCA:
         e.g.
         { 'k1': {"type": "polynomial", "d": power}}
 
-        sparsemode: str, default='fps', Sparsification method to use ([fps], [cur])'
+        sparsemode: str, default='fps', 
+                    possible method to use ([fps], [cur],[random],[sequential])'
         n_sparse: int, number of the representative samples, negative means no sparsification
          
         """
@@ -38,6 +39,11 @@ class SPARSE_KPCA:
         self.sparse_mode = sparse_mode
         self.n_sparse = n_sparse
         self.kernel = kernel
+
+        if self.n_sparse > 0:
+            self.sparsifier = Sparsifier(self.sparse_mode)
+        else:
+            self.sparsifier = None
 
         # object for transform design matrix to kernel matrix
         self.k_transform = Descriptors_to_Kernels(kernel)
@@ -59,20 +65,8 @@ class SPARSE_KPCA:
         if self.n_sparse is None:
             self.n_sparse = max(10, n_sample // 20)
         # sparsification
-        if self.n_sparse >= n_sample:
-            raise ValueError("the number of representative structure is too large, please select n < ", n_sample)
-        elif self.n_sparse > 0:
-            if self.sparse_mode == 'fps' or self.sparse_mode == 'FPS':
-                self.sbs, _ = fps(desc, self.n_sparse, 0)
-            elif self.sparse_mode == 'cur' or self.sparse_mode == 'CUR':
-                cov = np.dot(np.asmatrix(desc), np.asmatrix(desc).T)
-                self.sbs, _ = CUR_deterministic(cov, self.n_sparse)
-            elif self.sparse_mode == 'random' or self.sparse_mode == 'RANDOM' or self.sparse_mode == 'Random':
-                _, self.sbs = random_split(len(desc), self.n_sparse/n_sample)
-            elif self.sparse_mode == 'sequential' or self.sparse_mode == 'Sequential':
-                self.sbs = range(self.n_sparse)
-            else:
-                raise NotImplementedError("Do not recognize the selected sparsification mode. Use ([cur], [fps], [random]).")
+        if self.n_sparse > 0:
+            self.sbs = self.sparsifier.sparsify(desc, self.n_sparse)
         else:
             print("Not using any sparsification")
             self.sbs = range(n_sample)

@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Functions for making splits
 """
 
 import collections
