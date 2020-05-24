@@ -109,11 +109,6 @@ class Design_Matrix:
         if n_sparse > 0:
             sparsifier = Sparsifier(sparse_mode)
             self.sbs = sparsifier.sparsify(desc, n_sparse)
-        else:
-            print("Not using any sparsification")
-            self.sbs = range(n_sample)
-
-        self.desc_sbs = desc[self.sbs]
 
     def get_sparsified_matrix(self):
         if len(self.y_train) > 0:
