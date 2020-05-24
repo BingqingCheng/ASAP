@@ -598,3 +598,25 @@ def ridge(ctx, sigma):
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
     from matplotlib import pyplot as plt
     plt.show()
+    
+@fit.command('kernelridge')
+@click.option('--sigma', '-s', type=float,
+              help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.',
+              default=0.0001)
+@kernel_options
+@sparsification_options
+@click.pass_context
+def kernelridge(ctx, sigma, kernel, kernel_parameter, sparse_mode, n_sparse):
+    """Kernel Ridge Regression (with sparsification)"""
+    from asaplib.fit import SPARSE_KRR_Wrapper, KRRSparse
+    k_spec = {"first_kernel": {"type": kernel, "d": kernel_parameter}}
+    krr = KRRSparse(0., None, sigma)
+    skrr = SPARSE_KRR_Wrapper(k_spec, krr, sparse_mode="fps", n_sparse=n_sparse)
+    # fit the model
+    ctx.obj['dm'].compute_fit(skrr, 'skrr', store_results=True, plot=True)
+    if ctx.obj['fit_options']["learning_curve"] > 1:
+        ctx.obj['dm'].compute_learning_curve(skrr, 'skrr', ctx.obj['fit_options']["learning_curve"], ctx.obj['fit_options']["lc_points"], randomseed=42, verbose=False)
+ 
+    ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
+    from matplotlib import pyplot as plt
+    plt.show()
