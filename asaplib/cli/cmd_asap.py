@@ -1,19 +1,13 @@
 """
 Module containing the top level asap command
 """
-import os
-import json
-from yaml import full_load as yload
-import numpy as np
+#import numpy as np
 import click
-from matplotlib import pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
 
 from .func_asap import *
-from asaplib.data import ASAPXYZ, Design_Matrix
-from asaplib.reducedim import Dimension_Reducers
-from asaplib.plot import Plotters, set_color_function
+from .cmd_cli_options import *
 from asaplib.io import ConvertStrToList
 
 @click.group('asap')
@@ -45,46 +39,6 @@ def asap(ctx):
     """stores the specifications of the output figure"""
     ctx.obj['fig_options'] = {}
 
-def io_options(f):
-    """Create common options for I/O files"""
-    f = click.option('--prefix', '-p',
-                     help='Prefix to be used for the output file.', 
-                     default=None)(f)
-    f = click.option('--fxyz', '-f', 
-                     type=click.Path('r'), 
-                     help='Input XYZ file',
-                     default=None)(f)
-    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
-                     help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
-    return f
-def dm_io_options(f):
-    """common options for reading a design matrices, used for map, fit, kde, clustering, etc."""
-    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
-                     help='Location of descriptor matrix file or name of the tags in ase xyz file\
-                           the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(f)
-    f = click.option('--use_atomic_descriptors', '--use_atomic', '-ua',
-                     help='Use atomic descriptors instead of global ones.',
-                     default=False, is_flag=True)(f)
-    return f
-def km_io_options(f):
-    """common options for reading a kernel matrices, can be used for map, fit, kde, clustering, etc."""
-    f = click.option('--kernel_matrix', '-km', default='none',
-                     help='Location of a kernel matrix file')(f)
-    return f
-
-def output_setup_options(f):
-    """Create common options for output results from clustering/KDE analysis"""
-#    f = click.option('--plot/--no-plot',
-#                     help='Plot a map that embeds the results.',
-#                     default=True)(f)
-    f = click.option('--savexyz/--no-savexyz',
-                     help='Save the results to the xyz file',
-                     default=True)(f)
-    f = click.option('--savetxt/--no-savetxt',
-                     help='Save the results to the txt file',
-                     default=False)(f)
-    return f
-
 @asap.group('gen_desc')
 @click.option('--stride', '-s',
                      help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
@@ -93,7 +47,8 @@ def output_setup_options(f):
                      help='Is the system periodic? If not specified, will infer from the XYZ file.',
                      default=True)
 @click.pass_context
-@io_options
+@file_input_options
+@file_output_options
 def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
     """
     Descriptor generation command
@@ -101,6 +56,9 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
     we setup the general stuff here, such as read the files.
     """
 
+    if not fxyz and not in_file:
+        return
+        
     if in_file:
         # Here goes the routine to compute the descriptors according to the
         # state file(s)
@@ -112,30 +70,6 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
         ctx.obj['data']['stride'] = stride
         ctx.obj['data']['periodic'] = periodic
     ctx.obj['desc_options']['prefix'] = prefix
-
-def desc_options(f):
-    """Create common options for computing descriptors"""
-    f = click.option('--tag',
-                     help='Tag for the descriptors.',
-                     default='cmd-desc')(f)
-    return f
-
-def atomic_to_global_desc_options(f):
-    """Create common options for global descriptors constructed based on atomic fingerprints """
-    f = click.option('--kernel_type', '-k',
-                     help='type of operations to get global descriptors from the atomic soap vectors, e.g. \
-                          [average], [sum], [moment_avg], [moment_sum].',
-                     show_default=True, default='average', type=str)(f)
-    f = click.option('--zeta', '-z', 
-                     help='Moments to take when converting atomic descriptors to global ones.',
-                     default=1, type=int)(f)
-    f = click.option('--element_wise', '-e', 
-                     help='element-wise operation to get global descriptors from the atomic soap vectors',
-                     show_default=True, default=False, is_flag=True)(f)
-    f = click.option('--peratom', '-pa',
-                     help='Save the per-atom local descriptors.',
-                     show_default=True, default=False, is_flag=True)(f)
-    return f
 
 @gen_desc.command('soap')
 @click.option('--cutoff', '-c', type=float, 
@@ -167,7 +101,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
          kernel_type, zeta, element_wise, peratom):
     """Generate SOAP descriptors"""
     # load up the xyz
-    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
+    ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
  
     if universal_soap != 'none':
         from asaplib.hypers import universal_soap_hyper
@@ -200,7 +134,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
 def cm(ctx, tag):
     """Generate the Coulomb Matrix descriptors"""
     # load up the xyz
-    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
+    ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
     # The specification for the descriptor
     ctx.obj['descriptors'][tag] = {'cm':{'type': "CM"}}
     # Compute the save the descriptors
@@ -211,15 +145,16 @@ def cm(ctx, tag):
 def run(ctx):
     """ Running analysis using input files """
     # load up the xyz
-    ctx.obj['asapxyz'] = ASAPXYZ(ctx.obj['data']['fxyz'], ctx.obj['data']['stride'], ctx.obj['data']['periodic'])
+    ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'])
 
 @asap.group('cluster')
 @click.pass_context
-@io_options
-@dm_io_options
-@km_io_options
+@file_input_options
+@file_output_options
+@dm_input_options
+@km_input_options
 @output_setup_options
 def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
             prefix, savexyz, savetxt):
@@ -245,6 +180,7 @@ def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_ma
 
     if kernel_matrix != 'none':
         try:
+            import numpy as np
             kNN = np.genfromtxt(kernel_matrix, dtype=float)
             print("loaded kernal matrix", kmat, "with shape", np.shape(kNN))
             from asaplib.kernel import kerneltodis
@@ -282,6 +218,7 @@ def dbscan(ctx, metric, min_samples, eps):
         desc = ctx.obj['design_matrix']
         # we compute the characteristic bandwidth of the data
         # first select a subset of structures (20)
+        import numpy as np
         sbs = np.random.choice(np.asarray(range(len(desc))), 50, replace=False)
         # the characteristic bandwidth of the data
         eps = np.percentile(cdist(desc[sbs], desc, metric), 100*10./len(desc))
@@ -292,8 +229,9 @@ def dbscan(ctx, metric, min_samples, eps):
 
 @asap.group('kde')
 @click.pass_context
-@io_options
-@dm_io_options
+@file_input_options
+@file_output_options
+@dm_input_options
 @output_setup_options
 def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
             prefix, savexyz, savetxt):
@@ -340,6 +278,7 @@ def kde_internal(ctx, dimension):
 def kde_scipy(ctx, bw_method, dimension):
     """Scipy implementation of KDE"""
     from asaplib.kde import KDE_scipy
+    import numpy as np
     proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
     density_model = KDE_scipy(bw_method)
     kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
@@ -365,58 +304,16 @@ def kde_scipy(ctx, bw_method, dimension):
 def kde_scipy(ctx, dimension, bandwidth, algorithm, kernel, metric):
     """Scikit-learn implementation of KDE"""
     from asaplib.kde import KDE_sklearn
+    import numpy as np
     proj = np.asmatrix(ctx.obj['design_matrix'])[:, 0:dimension]
     density_model = KDE_sklearn(bandwidth=bandwidth, algorithm=algorithm, kernel=kernel, metric=metric)
     kde_process(ctx.obj['asapxyz'], density_model, proj, ctx.obj['kde_options'])
 
-
-def map_setup_options(f):
-    """Create common options for making 2D maps of the data set"""
-    f = click.option('--keepraw/--no-keepraw', 
-                     help='Keep the high dimensional descriptor when output XYZ file.',
-                     default=False)(f)
-    f = click.option('--peratom', 
-                     help='Save the per-atom projection.',
-                     default=False, is_flag=True)(f)
-    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False), 
-                     help='Output file format.',
-                     default='xyz')(f)
-    f = click.option('--adjusttext/--no-adjusttext', 
-                     help='Adjust the annotation texts so they do not overlap.',
-                     default=False)(f)
-    f = click.option('--annotate', '-a',
-                     help='Location of tags to annotate the samples.',
-                     default='none', type=str)(f)
-    f = click.option('--aspect_ratio', '-ar',
-                      help='Aspect ratio of the plot',
-                      show_default=True, default=2, type=float)(f)
-    f = click.option('--style', '-s',
-                     type=click.Choice(['default','journal'], case_sensitive=False), 
-                     help='Style of the plot.', 
-                     show_default=True, default='default')(f)
-    return f
-
-def color_setup_options(f):
-    """Create common options for handing color scales"""
-    f = click.option('--color_from_zero', '-c0',
-                     help='Set the minimum to zero and only plot the excess.',
-                     show_default=True, default=False, is_flag=True)(f)
-    f = click.option('--color_label', '-clab',
-                     help='The label for the color bar.',
-                     default=None)(f)
-    f = click.option('--color_column', '-ccol',
-                     help='The column number used in the color file. Starts from 0.',
-                     default=0)(f)
-    f = click.option('--color', '-c',
-                     help='Location of a file or name of the properties in the XYZ file. \
-                     Used to color the scatter plot for all samples (N floats).',
-                     default='none', type=str)(f)
-    return f
-
 @asap.group('map')
 @click.pass_context
-@io_options
-@dm_io_options
+@file_input_options
+@file_output_options
+@dm_input_options
 @map_setup_options
 @color_setup_options
 def map(ctx, in_file, fxyz, design_matrix, prefix, output,
@@ -443,6 +340,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
         ctx.obj['asapxyz'].remove_atomic_descriptors(design_matrix)
 
     # color scheme
+    from asaplib.plot import set_color_function
     plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, color_from_zero)
     if color_label is not None: colorlabel = color_label
 
@@ -455,6 +353,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                              'keepraw': keepraw
                            }
     if annotate != 'none':
+        import numpy as np
         ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
 
@@ -477,18 +376,7 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
                                          'size': [4*aspect_ratio, 4]
                                          })
 
-def d_reduce_options(f):
-    """Create common options for dimensionality reduction"""
-    f = click.option('--axes', nargs=2, type=click.Tuple([int, int]),
-                     help='Plot the projection along which projection axes.',
-                     default=[0,1])(f)
-    f = click.option('--dimension', '-d',
-                     help='Number of the dimensions to keep in the output XYZ file.',
-                     default=10)(f)
-    f = click.option('--scale/--no-scale', 
-                     help='Standard scaling of the coordinates.',
-                     default=True)(f)
-    return f
+
 
 @map.command('raw')
 @click.pass_context
@@ -514,22 +402,11 @@ def pca(ctx, scale, dimension, axes):
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
 @map.command('skpca')
-@click.option('--n_sparse', '-n', type=int, 
-              help='number of the representative samples, set negative if using no sparsification', 
-              show_default=True, default=10)
-@click.option('--sparse_mode', '-s',
-              type=click.Choice(['random', 'cur', 'fps', 'sequential'], case_sensitive=False), 
-              help='Sparsification method to use.', 
-              show_default=True, default='fps')
-@click.option('--kernel_parameter', '-kp', type=float, 
-              help='Parameter used in the kernel function.', 
-              default=None)
-@click.option('--kernel', '-k',
-              type=click.Choice(['linear', 'polynomial', 'cosine'], case_sensitive=False), 
-              help='Kernel function for converting design matrix to kernel matrix.', 
-              show_default=True, default='linear')
+
 @click.pass_context
 @d_reduce_options
+@kernel_options
+@sparsification_options
 def skpca(ctx, scale, dimension, axes, 
           kernel, kernel_parameter, sparse_mode, n_sparse):
     """Sparse Kernel Principal Component Analysis"""
@@ -611,26 +488,11 @@ def tsne(ctx, pca, scale, dimension, axes,
                           }}
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
-def fit_setup_options(f):
-    """Create common options for making 2D maps of the data set"""
-    f = click.option('--lc_points', '-lcp', type=int, 
-              help='the number of sub-samples to take when compute the learning curve', 
-              show_default=True, default=8)(f)
-    f = click.option('--learning_curve', '-lc', type=int, 
-              help='the number of points on the learning curve, <= 1 means no learning curve', 
-              show_default=True, default=-1)(f)
-    f = click.option('--test_ratio', '--test', '-t', type=float, 
-              help='Test ratio.', 
-              show_default=True, default=0.05)(f)
-    f = click.option('--y', '-y',
-                     help='Location of a file or name of the properties in the XYZ file',
-                     default='none', type=str)(f)
-    return f
-
 @asap.group('fit')
 @click.pass_context
-@io_options
-@dm_io_options
+@file_input_options
+@file_output_options
+@dm_input_options
 @fit_setup_options
 def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix, 
        test_ratio, learning_curve, lc_points):
@@ -654,6 +516,7 @@ def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
     asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
 
     try:
+        import numpy as np
         y_all = np.genfromtxt(y, dtype=float)
     except:
         if use_atomic_descriptors:
@@ -662,6 +525,7 @@ def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
             y_all = asapxyz.get_property(y)
     #print(y_all)
 
+    from asaplib.data import Design_Matrix
     ctx.obj['dm'] = Design_Matrix(desc, y_all, True, test_ratio)
 
 @fit.command('ridge')
@@ -679,4 +543,5 @@ def ridge(ctx, sigma):
         ctx.obj['dm'].compute_learning_curve(rr, 'ridge_regression', ctx.obj['fit_options']["learning_curve"], ctx.obj['fit_options']["lc_points"], randomseed=42, verbose=False)
  
     ctx.obj['dm'].save_state(ctx.obj['fit_options']['prefix'])
+    from matplotlib import pyplot as plt
     plt.show()

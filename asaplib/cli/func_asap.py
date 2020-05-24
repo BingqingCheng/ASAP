@@ -2,24 +2,16 @@
 functions used in cmd_asap.py
 """
 
-import os
-import json
-from yaml import full_load as yload
-import numpy as np
-from matplotlib import pyplot as plt
-
-from asaplib.data import ASAPXYZ, Design_Matrix
-from asaplib.reducedim import Dimension_Reducers
-from asaplib.plot import Plotters, set_color_function
-from asaplib.io import ConvertStrToList
-
 """for loading in_file"""
 def load_in_file(in_file):
     """Here goes the routine to compute the descriptors according to the state file(s)"""
+    
     with open(in_file, 'r') as stream:
         try:
+            from yaml import full_load as yload
             state_str = yload(stream)
         except:
+            import json
             state_str = json.load(stream)
     state = {}
     for k,s in state_str.items():
@@ -28,6 +20,11 @@ def load_in_file(in_file):
         else:
             state[k] = s
     return state
+
+""" for load ASAPXYZ """
+def load_asapxyz(data_spec):
+    from asaplib.data import ASAPXYZ
+    return ASAPXYZ(data_spec['fxyz'], data_spec['stride'], data_spec['periodic'])
 
 """for gen_desc"""
 def set_kernel(kernel_type, element_wise, zeta):
@@ -61,6 +58,7 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
     dm = []; dm_atomic = []
     # try to read the xyz file
     if fxyz is not None and fxyz != 'none':
+        from asaplib.data import ASAPXYZ
         asapxyz = ASAPXYZ(fxyz)
         if use_atomic_descriptors:
             _, dm = asapxyz.get_descriptors(design_matrix, True)
@@ -70,8 +68,10 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom):
         asapxyz = None
         print("Did not provide the xyz file. We can only output descriptor matrix.")
     # we can also load the descriptor matrix from a standalone file
+    import os
     if os.path.isfile(design_matrix[0]):
         try:
+            import numpy as np
             dm = np.genfromtxt(design_matrix[0], dtype=float)
             print("loaded the descriptor matrix from file: ", design_matrix[0])
         except:
@@ -91,6 +91,7 @@ def map_process(obj, reduce_dict, axes, map_name):
         else:
             proj_atomic = None
     else:
+        from asaplib.reducedim import Dimension_Reducers
         dreducer = Dimension_Reducers(reduce_dict)
         proj = dreducer.fit_transform(obj['design_matrix'])
         if obj['map_options']['peratom']:
@@ -115,6 +116,8 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, annotate,
     """
     Make plots
     """
+    from matplotlib import pyplot as plt
+    from asaplib.plot import Plotters
     asap_plot = Plotters(fig_spec)
     asap_plot.plot(proj[::-1, axes], plotcolor[::-1], [], annotate)
     if proj_atomic is not None:
@@ -126,6 +129,7 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name):
     Save the low-D projections
     """
     if outmode == 'matrix':
+        import numpy as np
         if proj is not None:
             np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
         if proj_atomic is not None:
@@ -157,7 +161,8 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
         else:
             asapxyz.set_descriptors(labels_db, prefix+'_cluster_label')
         asapxyz.write(prefix)
-    if cluster_options['savetxt']: 
+    if cluster_options['savetxt']:
+        import numpy as np 
         np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
                header='index cluster_label', fmt='%d %d')
 
