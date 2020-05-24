@@ -9,7 +9,6 @@ from .base import RegressorBase
 from .getscore import get_score
 
 class KRR(RegressorBase):
-    _pairwise = True
 
     def __init__(self, jitter):
         # Weights of the krr model
@@ -18,7 +17,7 @@ class KRR(RegressorBase):
         self.coninv = None  # inverse of the covariance matrix
         self._fitted = False
 
-    def fit(self, kernel, y):
+    def fit(self, kernel, y, kNM=[]):
         '''Train the krr model with trainKernel and trainLabel.'''
 
         reg = np.eye(kernel.shape[0]) * self.jitter
@@ -64,7 +63,6 @@ class KRR(RegressorBase):
 
 
 class KRRSparse(RegressorBase):
-    _pairwise = True
 
     def __init__(self, jitter, delta, sigma):
         # Weights of the krr model
@@ -76,7 +74,7 @@ class KRRSparse(RegressorBase):
         if self.jitter is None:
             self.jitter = 10e-20
 
-    def fit(self, kMM, kNM, y):
+    def fit(self, kMM, y, kNM):
         '''N train structures, M sparsified representative structures '''
         '''kMM: the kernel matrix of the representative structures with shape (M,M)'''
         '''kNM: the kernel matrix between the representative and the train structures with shape (N,M)'''
@@ -144,7 +142,6 @@ class KRRFastCV(RegressorBase):
     Fast cross-validation algorithms for least squares support vector machine and kernel ridge regression. 
     Pattern Recognition, 40(8), 2154-2162. https://doi.org/10.1016/j.patcog.2006.12.015
     """
-    _pairwise = True
 
     def __init__(self, jitter, delta, cv):
         self.jitter = jitter
@@ -152,7 +149,7 @@ class KRRFastCV(RegressorBase):
         self.delta = delta
         self._fitted = False
 
-    def fit(self, kernel, y):
+    def fit(self, kernel, y, kNM=[]):
         '''Fast cv scheme. Destroy kernel.'''
         np.multiply(self.delta ** 2, kernel, out=kernel)
         kernel[np.diag_indices_from(kernel)] += self.jitter
