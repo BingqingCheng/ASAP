@@ -3,9 +3,6 @@ from asaplib.io import ConvertStrToList
 
 def file_input_options(f):
     """Create common options for I/O files"""
-    f = click.option('--prefix', '-p',
-                     help='Prefix to be used for the output file.', 
-                     default=None)(f)
     f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
                      help='Input XYZ file',
