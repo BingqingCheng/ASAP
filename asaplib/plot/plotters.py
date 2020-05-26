@@ -320,8 +320,8 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                vmin=self.p_spec['vmin'])
 
         if self.p_spec['cbar_format'] is None:
-            color_spread = np.amax(z) - np.amin(z)
-            if color_spread > 4:
+            color_spread = np.nanmax(z) - np.nanmin(z)
+            if color_spread > 2:
                 self.p_spec['cbar_format'] = '%d'
             elif color_spread > 0.1:
                 self.p_spec['cbar_format'] = '%1.1f'
