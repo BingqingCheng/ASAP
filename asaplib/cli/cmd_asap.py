@@ -74,13 +74,13 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
 @gen_desc.command('soap')
 @click.option('--cutoff', '-c', type=float, 
               help='Cutoff radius', 
-              show_default=True, default=3.0)
+              show_default=False, default=None)
 @click.option('--nmax', '-n', type=int, 
               help='Maximum radial label', 
-              show_default=True, default=6)
+              show_default=False, default=None)
 @click.option('--lmax', '-l', type=int, 
               help='Maximum angular label (<= 9)', 
-              show_default=True, default=6)
+              show_default=False, default=None)
 @click.option('--rbf', type=click.Choice(['gto', 'polynomial'], case_sensitive=False), 
               help='Radial basis function', 
               show_default=True, default='gto')
@@ -103,16 +103,19 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # load up the xyz
     ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
  
-    if universal_soap != 'none':
+    if universal_soap != 'none' and cutoff is None and nmax is None and lmax is None:
         from asaplib.hypers import universal_soap_hyper
         global_species = ctx.obj['asapxyz'].get_global_species()
         soap_spec = universal_soap_hyper(global_species, universal_soap, dump=True)
-    else:
+    elif cutoff is not None and nmax is not None and lmax is not None:
         soap_spec = {'soap1': {'type': 'SOAP',
                                'cutoff': cutoff,
                                'n': nmax,
                                'l': lmax,
                                'atom_gaussian_width': atom_gaussian_width}}
+    else:
+        raise IOError("Please either use universal soap or specify the values of cutoff, n, and l.")
+
     for k in soap_spec.keys():
         soap_spec[k]['rbf'] = rbf
         soap_spec[k]['crossover'] = crossover
