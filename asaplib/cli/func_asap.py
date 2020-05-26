@@ -27,18 +27,18 @@ def load_asapxyz(data_spec):
     return ASAPXYZ(data_spec['fxyz'], data_spec['stride'], data_spec['periodic'])
 
 """for gen_desc"""
-def set_kernel(kernel_type, element_wise, zeta):
+def set_reducer(reducer_type, element_wise, zeta):
     """
-    setting up the kernel function that is used to convert atomic descriptors into global descriptors for a structure.
-    At the moment only one single kernel function can be used.
+    setting up the reducer function that is used to convert atomic descriptors into global descriptors for a structure.
+    At the moment only one single reducer function can be used.
     """
-    kernel_func = {'kernel': {
-        'kernel_type': kernel_type, # [average], [sum], [moment_average], [moment_sum]
+    reducer_func = {'reducer1': {
+        'reducer_type': reducer_type, # [average], [sum], [moment_average], [moment_sum]
         'element_wise': element_wise,
     }}
-    if kernel_type == 'moment_average' or kernel_type == 'moment_sum':
-        kernel_func['zeta'] = zeta
-    return kernel_func
+    if reducer_type == 'moment_average' or reducer_type == 'moment_sum':
+        reducer_func['zeta'] = zeta
+    return reducer_func
 
 def output_desc(asapxyz, desc_spec, prefix, peratom=False):
     """

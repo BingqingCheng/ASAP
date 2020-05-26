@@ -161,14 +161,14 @@ class ASAPXYZ:
         {"type": 'CM'}}
 
         e.g.
-        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'kernel_function': kernel_dict}}
+        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'reducer_function': reducer_dict}}
         and
         atomic_desc_dict = {
         "firstsoap": 
         {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
         }
         and
-        kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
+        reducer_dict = {'first_reducer': {'reducer_type': reducer_type,  
                           'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
@@ -269,6 +269,9 @@ class ASAPXYZ:
         # TODO: (maybe?) rename this into get_info. Need to change pca.py/kpca.py/... that uses this function
         desc = []
         atomic_desc = []
+
+        if isinstance(desc_name_list,str):
+            desc_name_list = [desc_name_list]
 
         # load from xyz file
         try:

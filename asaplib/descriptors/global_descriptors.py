@@ -26,14 +26,14 @@ class Global_Descriptors:
 
         2. First compute an atomic descriptors (e.g. SOAP, ACSF,...) and convert to global ones
         e.g.
-        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'kernel_function': kernel_dict}}
+        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'reducer_function': reducer_dict}}
         and
         atomic_desc_dict = {
         "firstsoap": 
         {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
         }
         and
-        kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
+        reducer_dict = {'first_reducer': {'reducer_type': reducer_type,  
                           'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
@@ -73,7 +73,7 @@ class Global_Descriptors:
         """
         call the specific descriptor objects
         """
-        if "atomic_descriptor" in desc_spec.keys() and "kernel_function" in desc_spec.keys():
+        if "atomic_descriptor" in desc_spec.keys() and "reducer_function" in desc_spec.keys():
             return Global_Descriptor_from_Atomic(desc_spec)
         elif "type" not in desc_spec.keys():
             raise ValueError("Did not specify the type of the descriptor.")
@@ -131,14 +131,14 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         desc_spec: dictionaries that specify which global descriptor to use.
 
         e.g.
-        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'kernel_function': kernel_dict}}
+        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'reducer_function': reducer_dict}}
         and
         atomic_desc_dict = {
         "firstsoap": 
         {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
         }
         and
-        kernel_dict = {'first_kernel': {'kernel_type': kernel_type,  
+        reducer_dict = {'first_reducer': {'reducer_type': reducer_type,  
                           'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
@@ -146,20 +146,20 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
 
         self._is_atomic = True
 
-        if "atomic_descriptor" not in desc_spec.keys() or "kernel_function" not in desc_spec.keys():
-            raise ValueError("Need to specify both atomic descriptors and kernel functions to used")
+        if "atomic_descriptor" not in desc_spec.keys() or "reducer_function" not in desc_spec.keys():
+            raise ValueError("Need to specify both atomic descriptors and reducer functions to used")
 
 
         self.atomic_desc_spec = desc_spec['atomic_descriptor']
-        self.kernel_spec = desc_spec['kernel_function']
+        self.reducer_spec = desc_spec['reducer_function']
 
         # pass down some key information
         if 'species' in desc_spec.keys():
             # add some system specific information to the list to descriptor specifications
             for element in self.atomic_desc_spec.keys():
                 self.atomic_desc_spec[element]['species'] = desc_spec['species']
-            for element in self.kernel_spec.keys():
-                self.kernel_spec[element]['species'] = desc_spec['species']
+            for element in self.reducer_spec.keys():
+                self.reducer_spec[element]['species'] = desc_spec['species']
         if 'periodic' in desc_spec.keys():
             for element in self.atomic_desc_spec.keys():
                 self.atomic_desc_spec[element]['periodic'] = desc_spec['periodic']
@@ -167,14 +167,14 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         # initialize a Atomic_Descriptors object
         self.atomic_desc = Atomic_Descriptors(self.atomic_desc_spec)
         # initialize a Atomic_2_Global_Descriptors object
-        self.atomic_2_global = Atomic_2_Global_Descriptors(self.kernel_spec)
+        self.atomic_2_global = Atomic_2_Global_Descriptors(self.reducer_spec)
         
         #print("Using Atomic_2_Global_Descriptors ...")
 
         self.acronym = "atomic-to-global-"+randomString(6)
 
     def pack(self):
-        return {'atomic_descriptor': self.atomic_desc.pack(), 'kernel_function': atomic_2_global.pack() }
+        return {'atomic_descriptor': self.atomic_desc.pack(), 'reducer_function': atomic_2_global.pack() }
 
     def create(self, frame):
         """

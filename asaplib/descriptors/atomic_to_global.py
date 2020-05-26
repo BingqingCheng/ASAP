@@ -9,13 +9,13 @@ from ..io import NpEncoder, list2str
 class Atomic_2_Global_Descriptors:
     def __init__(self, k_spec_dict):
         """
-        Object handing the kernel functions used to convert atomic descriptors into global ones
+        Object handing the reducer functions used to convert atomic descriptors into global ones
 
         Parameters
         ----------
         k_spec_dict: dictionaries that specify which atomic to global descriptor to use 
         e.g.
-        k_spec_dict = {'first_kernel': {'kernel_type': kernel_type,  
+        k_spec_dict = {'first_reducer': {'reducer_type': reducer_type,  
                           'zeta': zeta,
                           'species': species,
                           'element_wise': element_wise}}
@@ -53,15 +53,15 @@ class Atomic_2_Global_Descriptors:
         """
         call the specific descriptor objects
         """
-        if "kernel_type" not in k_spec.keys():
-            raise ValueError("Did not specify the type of the global descriptor kernel.")
-        if k_spec["kernel_type"] == "average":
+        if "reducer_type" not in k_spec.keys():
+            raise ValueError("Did not specify the type of the global descriptor reducer.")
+        if k_spec["reducer_type"] == "average":
             return Atomic_2_Global_Average(k_spec)
-        if k_spec["kernel_type"] == "sum":
+        if k_spec["reducer_type"] == "sum":
             return Atomic_2_Global_Sum(k_spec)
-        if k_spec["kernel_type"] == "moment_average":
+        if k_spec["reducer_type"] == "moment_average":
             return Atomic_2_Global_Moment_Average(k_spec)
-        if k_spec["kernel_type"] == "moment_sum":
+        if k_spec["reducer_type"] == "moment_sum":
             return Atomic_2_Global_Moment_Sum(k_spec)
         else:
             raise NotImplementedError 
@@ -89,7 +89,7 @@ class Atomic_2_Global_Descriptors:
             for element in self.k_spec_dict.keys():
                 desc_dict[atomic_desc_element][element] = {}
                 k_acronym, desc_dict[atomic_desc_element][element]['descriptors'] = self.engines[element].create(atomic_desc_now, atomic_numbers)
-                # we use a combination of the acronym of the descriptor and of the kernel function
+                # we use a combination of the acronym of the descriptor and of the reducer function
                 desc_dict[atomic_desc_element][element]['acronym'] = atomic_desc_dict[atomic_desc_element]['acronym'] + k_acronym
         return desc_dict
 
@@ -135,10 +135,10 @@ class Atomic_2_Global_Average(Atomic_2_Global_Base):
 
         super().__init__(k_spec)
  
-        if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "average":
-            raise ValueError("kernel type is not average or cannot find the type")
+        if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "average":
+            raise ValueError("reducer type is not average or cannot find the type")
 
-        print("Using Atomic_2_Global_Average kernel ...")
+        print("Using Atomic_2_Global_Average reducer ...")
 
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
@@ -153,10 +153,10 @@ class Atomic_2_Global_Sum(Atomic_2_Global_Base):
         
         super().__init__(k_spec)
 
-        if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "sum":
-            raise ValueError("kernel type is not sum or cannot find the type")
+        if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "sum":
+            raise ValueError("reducer type is not sum or cannot find the type")
 
-        print("Using Atomic_2_Global_Sum kernel ...")
+        print("Using Atomic_2_Global_Sum reducer ...")
         self.acronym += "-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):
@@ -179,15 +179,15 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
 
         super().__init__(k_spec)
 
-        if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "moment_average":
-            raise ValueError("kernel type is not moment_average or cannot find the type")
+        if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "moment_average":
+            raise ValueError("reducer type is not moment_average or cannot find the type")
 
         try:
             self.zeta = k_spec['zeta']
         except:
             raise ValueError("cannot initialize the zeta value")
 
-        print("Using Atomic_2_Global_Moment_Average kernel ...")
+        print("Using Atomic_2_Global_Moment_Average reducer ...")
         self.acronym += "-z-"+str(self.zeta)
 
     def create(self, atomic_desc, atomic_numbers=[]):
@@ -210,15 +210,15 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
 
         super().__init__(k_spec)
 
-        if "kernel_type" not in k_spec.keys() or k_spec["kernel_type"] != "moment_sum":
-            raise ValueError("kernel type is not moment_sum or cannot find the type")
+        if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "moment_sum":
+            raise ValueError("reducer type is not moment_sum or cannot find the type")
 
         try:
             self.zeta = k_spec['zeta']
         except:
             raise ValueError("cannot initialize the zeta list")
 
-        print("Using Atomic_2_Global_Moment_Sum kernel ...")
+        print("Using Atomic_2_Global_Moment_Sum reducer ...")
         self.acronym += "-z-"+str(self.zeta)+"-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):

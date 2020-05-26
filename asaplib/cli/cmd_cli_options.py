@@ -56,7 +56,7 @@ def desc_options(f):
 
 def atomic_to_global_desc_options(f):
     """Create common options for global descriptors constructed based on atomic fingerprints """
-    f = click.option('--kernel_type', '-k',
+    f = click.option('--reducer_type', '-r',
                      help='type of operations to get global descriptors from the atomic soap vectors, e.g. \
                           [average], [sum], [moment_avg], [moment_sum].',
                      show_default=True, default='average', type=str)(f)

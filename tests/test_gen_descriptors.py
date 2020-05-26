@@ -46,16 +46,16 @@ def main(fxyz, prefix):
          'normalization': "l2_each"}}
 
     kernel_js = {}
-    kernel_js['k1'] = {'kernel_type': 'moment_average',  
+    kernel_js['k1'] = {'reducer_type': 'moment_average',  
                               'zeta': 2,
                               'element_wise': False}
-    kernel_js['k2'] = {'kernel_type': 'sum',  
+    kernel_js['k2'] = {'reducer_type': 'sum',  
                               'element_wise': True}
 
     desc_spec_js = {'test_cm': {'type': "CM"},
-                    'test_soap':{'atomic_descriptor':  soap_js, 'kernel_function': kernel_js},
-                    'test_acsf':{'atomic_descriptor':  acsf_js, 'kernel_function': kernel_js},
-                    'test_k2':{'atomic_descriptor':  k2_js, 'kernel_function': kernel_js}}
+                    'test_soap':{'atomic_descriptor':  soap_js, 'reducer_function': kernel_js},
+                    'test_acsf':{'atomic_descriptor':  acsf_js, 'reducer_function': kernel_js},
+                    'test_k2':{'atomic_descriptor':  k2_js, 'reducer_function': kernel_js}}
 
     # compute the descripitors
     asapxyz.compute_global_descriptors(desc_spec_js, [], peratom, tag)

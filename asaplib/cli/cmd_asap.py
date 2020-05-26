@@ -93,12 +93,12 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
 @click.option('--universal_soap', '--usoap', '-u',
               type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False), 
               help='Try out our universal SOAP parameters.', 
-              show_default=True, default='none')
+              show_default=True, default='minimal')
 @click.pass_context
 @desc_options
 @atomic_to_global_desc_options
 def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, universal_soap,
-         kernel_type, zeta, element_wise, peratom):
+         reducer_type, zeta, element_wise, peratom):
     """Generate SOAP descriptors"""
     # load up the xyz
     ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
@@ -116,13 +116,13 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     for k in soap_spec.keys():
         soap_spec[k]['rbf'] = rbf
         soap_spec[k]['crossover'] = crossover
-    # The specification for the kernels
-    kernel_spec = dict(set_kernel(kernel_type, element_wise, zeta))
+    # The specification for the reducers
+    reducer_spec = dict(set_reducer(reducer_type, element_wise, zeta))
     # The specification for the descriptor
     desc_spec = {}
     for k, v in soap_spec.items():
         desc_spec[k] = {'atomic_descriptor': dict({k: v}),
-                        'kernel_function': kernel_spec}
+                        'reducer_function': reducer_spec}
     # specify descriptors using the cmd line tool
     ctx.obj['descriptors'][tag] = desc_spec
     # Compute the save the descriptors
