@@ -253,6 +253,25 @@ class ASAPXYZ:
                 frame.new_array(atomic_desc_dict_now[e][e2]['acronym'], atomic_desc_dict_now[e][e2]['atomic_descriptors'])
                 self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
+    def _desc_name_with_wild_card(self, desc_name_list):
+        new_desc_name = []
+        for desc_name in desc_name_list:
+            if desc_name == '*':
+                import re
+                possible_desc_prefix = [ 'SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM']
+                for key in self.frames[0].info.keys():
+                    for pre in possible_desc_prefix:
+                        if re.search(pre+'.+', key):
+                            new_desc_name.append(key)
+            elif '*' in desc_name:
+                import re
+                for key in self.frames[0].info.keys():
+                    if re.search(key.replace('*','.+'), key):
+                        new_desc_name.append(key)
+            else:
+                new_desc_name.append(desc_name)
+        return new_desc_name
+
     def get_descriptors(self, desc_name_list=[], use_atomic_desc=False):
         """ extract the descriptor array from each frame
 
@@ -273,6 +292,8 @@ class ASAPXYZ:
         if isinstance(desc_name_list,str):
             desc_name_list = [desc_name_list]
 
+        desc_name_list = self._desc_name_with_wild_card(desc_name_list)
+      
         # load from xyz file
         try:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
