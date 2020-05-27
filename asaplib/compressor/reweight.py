@@ -8,14 +8,15 @@ and we select the samples using a well-tempered distribution
 
 import numpy as np
 
-def reweight(logkde, reweight_lambda):
+def reweight(logkde, n_sparse, reweight_lambda):
 
     """
     Parameters:
     ------------
     logkde: list, type=float. The (log of) kernel density for each sample
     reweight_lambda: float, reweighting factor
-
+    n_sparse: int, number of samples to select
+    
     Return:
     ------------
     sbs: list, type=int. A list of selected samples
@@ -26,7 +27,7 @@ def reweight(logkde, reweight_lambda):
     for i in range(nframes):
         new_kde[i] = np.exp(logkde[i] / reweight_lambda) / np.exp(logkde[i])
         # compute the normalization factor so we expect to select n samples in the end
-        normalization = nkeep / np.sum(new_kde)
+        normalization = n_sparse / np.sum(new_kde)
         new_kde *= normalization
         sbs = []
         randomchoice = np.random.rand(nframes)

@@ -21,10 +21,10 @@ class Sparsifier:
 
     def _check(self, n_sparse, n_total):
         # sanity check
-        if n_sparse >= n_total:
-            print("the number of representative structure is too large, please select n < ", n_total)
+        if n_sparse > n_total:
+            print("the number of representative structure is too large, please select n <= ", n_total)
 
-    def sparsify(self, desc_or_ntotal, n_or_ratio):
+    def sparsify(self, desc_or_ntotal, n_or_ratio, sparse_param=0):
         """
         Function handing the sparsification of data
         Parameters
@@ -32,6 +32,7 @@ class Sparsifier:
         desc_or_ntotal: Either a design matrix [n_sample, n_desc],
                         or simply the total number of samples
         n_or_ratio: Either the number or the fraction of sparsified points
+        sparse_param: additional parameter that may be needed for the specific sparsifier used
 
         Returns
         ----------
@@ -57,11 +58,11 @@ class Sparsifier:
         if self.sparse_mode == 'fps':
             if not input_desc: 
                 raise ValueError("fps needs design matrix")
-            sbs, _ = fps(desc, n_sparse, 0)
+            sbs, _ = fps(desc, n_sparse, int(sparse_param))
         elif self.sparse_mode == 'cur':
             if not input_desc:
                 raise ValueError("cur needs design matrix")
-            sbs, _ = fps(desc, n_sparse, 0)
+            import numpy as np
             cov = np.dot(np.asmatrix(desc), np.asmatrix(desc).T)
             sbs, _ = CUR_deterministic(cov, n_sparse)
         elif self.sparse_mode == 'random':
