@@ -7,7 +7,25 @@ Automatic Selection And Prediction tools for materials and molecules
 
 ### Basic usage
 
-Type asap and use the sub-commands for various tasks.
+Type `asap` and use the sub-commands for various tasks.
+
+To get help string:
+
+`asap --help` .or. `asap subcommand --help` .or. `asap subcommand subcommand --help` depending which level of help you are interested in.
+
+* `asap gen_desc`: generate global or atomic descriptors based on the input [ASE](https://wiki.fysik.dtu.dk/ase/ase/atoms.html)) xyze file. 
+
+* `asap map`: make 2D plots using the specified design matrix. Currently PCA `pca`, sparsified kernel PCA `skpca`, UMAP `umap`, and t-SNE `tsne` are implemented. 
+
+* `asap cluster`: perform density based clustering. Currently supports DBSCAN `dbscan` and [Fast search of density peaks](https://science.sciencemag.org/content/344/6191/1492) `fdb`.
+
+* `asap fit`: fast fit ridge regression `ridge` or sparsified kernel ridge regression model `kernelridge` based on the input design matrix and labels.
+
+* `asap kde`: quick kernel density estimation on the design matrix. Several versions of kde available.
+
+* `asap select`: select a subset of frames using sparsification algorithms.
+
+### Quick & basic example
 
 e.g. in the folder ./tests/
 
@@ -32,11 +50,8 @@ one can use a wildcard to specify the name of all the descriptors to use for the
 or even
 
 `asap map -f small_molecules-SOAP.xyz -dm '[*]' -c dft_formation_energy_per_atom_in_eV pca`.
-To get help string:
 
-`asap --help` .or. `asap map --help` .or. `asap map soap --help` depending which level you are interested in.
 
-Another tools available for clustering `asap cluster`, kernel density estimation `asap kde`, fitting a regression model `asap fit`.
 
 ### Installation & requirements
 
@@ -46,7 +61,9 @@ Installation:
 
 python3 setup.py install --user
 
-Requirements:
+*This should automatically install any depedencies.*
+
+List of requirements:
 
 + numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click
 
@@ -55,25 +72,46 @@ Add-Ons:
 + (for annotation without overlaps) adjustText
 + The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
 
-One can use the following comments for installing the packages:
-
-pip3 install --upgrade pip
-
-python3 -m pip install --user somepackage    .or.    pip3 install --user somepackage
-
 ### How to add your own atomic or global descriptors
 
 * To add a new atomic descriptor, add a new `Atomic_Descriptor` class in the asaplib/descriptors/atomic_descriptors.py. As long as it has a `__init__()` and a `create()` method, it should be competitable with the ASAP code. The `create()` method takes an ASE Atoms object as input (see: [ASE](https://wiki.fysik.dtu.dk/ase/ase/atoms.html))
 
+We have a template class for this
+`
+class Atomic_Descriptor_Base:
+    def __init__(self, desc_spec):
+        self._is_atomic = True
+        self.acronym = ""
+        pass
+    def is_atomic(self):
+        return self._is_atomic
+    def get_acronym(self):
+        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        return self.acronym
+    def create(self, frame):
+        # notice that we return the acronym here!!!
+        return self.acronym, []
+`
+
 * To add a new global descriptor, add a new `Global_Descriptor` class in the asaplib/descriptors/global_descriptors.py. As long as it has a `__init__()` and a `create()` method, it is fine. The `create()` method also takes the Atoms object as input.
 
+The template is similar with the atomic one:
+`
+class Global_Descriptor_Base:
+    def __init__(self, desc_spec):
+        self._is_atomic = False
+        self.acronym = ""
+        pass
+    def is_atomic(self):
+        return self._is_atomic
+    def get_acronym(self):
+        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        return self.acronym
+    def create(self, frame):
+        # return the dictionaries for global descriptors and atomic descriptors (if any)
+        return {'acronym': self.acronym, 'descriptors': []}, {}
+`
+
 ### Additional tools
-In the directory ./scripts/ and ./tools/ you can find a selection of other python tools:
-
-
-* frame_select.py: select a subset of the xyz frames based on random or farthest point sampling selection.
-
-* kernel_density_estimate.py: does principle component analysis on the kernel matrix, estimates kernel density, and makes plots
-
-* clustering.py: does clustering tasks based on the kernel matrix, does plotting as well.
+In the directory ./scripts/ and ./tools/ you can find a selection of other python tools.
 
