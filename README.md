@@ -21,7 +21,22 @@ for columb matrix:
 
 for pca map:
 
-`asap map -f small_molecules-SOAP.xyz -dm [SOAP-n4-l3-c1.9-g0.23] -c dft_formation_energy_per_atom_in_eV pca`
+`asap map -f small_molecules-SOAP.xyz -dm '[SOAP-n4-l3-c1.9-g0.23]' -c dft_formation_energy_per_atom_in_eV pca`
+
+You can specify a list of descriptor vectors to include in the design matrix, e.g. `'[SOAP-n4-l3-c1.9-g0.23, SOAP-n8-l3-c5.0-g0.3]'`
+
+one can use a wildcard to specify the name of all the descriptors to use for the design matrix, e.g.
+
+`asap map -f small_molecules-SOAP.xyz -dm '[SOAP*]' -c dft_formation_energy_per_atom_in_eV pca`
+
+or even
+
+`asap map -f small_molecules-SOAP.xyz -dm '[*]' -c dft_formation_energy_per_atom_in_eV pca`.
+To get help string:
+
+`asap --help` .or. `asap map --help` .or. `asap map soap --help` depending which level you are interested in.
+
+Another tools available for clustering `asap cluster`, kernel density estimation `asap kde`, fitting a regression model `asap fit`.
 
 ### Installation & requirements
 
