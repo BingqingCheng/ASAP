@@ -46,7 +46,7 @@ class Sparsifier:
             n_total = len(desc_or_ntotal)
             input_desc = True
 
-        if isinstance(n_or_ratio, float):
+        if n_or_ratio == 1 or isinstance(n_or_ratio, float):
             n_sparse = n_total * n_or_ratio
         elif isinstance(n_or_ratio, int):
             n_sparse = n_or_ratio
