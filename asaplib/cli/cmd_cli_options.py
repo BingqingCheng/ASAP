@@ -1,14 +1,18 @@
 import click
 from asaplib.io import ConvertStrToList
 
+def state_input_options(f):
+    """Create common options for I/O files"""
+    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
+                     help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
+    return f
+
 def file_input_options(f):
     """Create common options for I/O files"""
     f = click.option('--fxyz', '-f', 
                      type=click.Path('r'), 
                      help='Input XYZ file',
                      default=None)(f)
-    f = click.option('--in_file', '--in', '-i', type=click.Path('r'),
-                     help='The state file that includes a dictionary-like specifications of descriptors to use.')(f)
     return f
 
 def file_output_options(f):
@@ -36,9 +40,6 @@ def km_input_options(f):
 
 def output_setup_options(f):
     """Create common options for output results from clustering/KDE analysis"""
-#    f = click.option('--plot/--no-plot',
-#                     help='Plot a map that embeds the results.',
-#                     default=True)(f)
     f = click.option('--savexyz/--no-savexyz',
                      help='Save the results to the xyz file',
                      default=True)(f)

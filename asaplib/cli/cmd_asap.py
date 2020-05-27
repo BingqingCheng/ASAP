@@ -39,6 +39,46 @@ def asap(ctx):
     """stores the specifications of the output figure"""
     ctx.obj['fig_options'] = {}
 
+@asap.command('select')
+@click.option('--algorithm', '--algo', '-a',
+              type=click.Choice(['random','fps','cur'], case_sensitive=False),
+              help='Sparsification algorithm to use',
+              show_default=True, default='fps')
+@click.option('--nkeep', '-n', type=int,
+              help='The number (int) or the ratio (float) of samples to keep.',
+              show_default=False, default=1)
+@click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
+              help='Location of descriptor matrix file or name of the tags in ase xyz file\
+                 the type is a list  \'[dm1, dm2]\', \
+                as we can put together simutanously several design matrix.')
+@click.pass_context
+@file_input_options
+@file_output_options
+@output_setup_options
+def select(ctx, fxyz, design_matrix,
+            algorithm, nkeep,
+            prefix, savexyz, savetxt):
+    """
+    Select a subset of frames using sparsification algorithms
+    """
+
+    if not fxyz:
+        return
+        
+    if prefix is None: prefix = "ASAP-select-"+algorithm+"-n-"+str(nkeep)
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, False, False)
+
+    from asaplib.compressor import Sparsifier
+    sparsifier = Sparsifier(algorithm)
+    sbs = sparsifier.sparsify(ctx.obj['design_matrix'], nkeep)
+    # save
+    if savetxt:
+        selection = np.zeros(asapxyz.get_num_frames(), dtype=int)
+        for i in sbs:
+            selection[i] = 1
+        np.savetxt(prefix + '.index', selection, fmt='%d')
+    if savexyz: ctx.obj['asapxyz'].write(prefix, sbs)
+    
 @asap.group('gen_desc')
 @click.option('--stride', '-s',
                      help='Read in the xyz trajectory with X stide. Default: read/compute all frames.',
@@ -47,6 +87,7 @@ def asap(ctx):
                      help='Is the system periodic? If not specified, will infer from the XYZ file.',
                      default=True)
 @click.pass_context
+@state_input_options
 @file_input_options
 @file_output_options
 def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
@@ -159,7 +200,7 @@ def run(ctx):
 @dm_input_options
 @km_input_options
 @output_setup_options
-def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
+def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
             prefix, savexyz, savetxt):
     """
     Clustering using the design matrix.
@@ -167,13 +208,8 @@ def cluster(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, kernel_ma
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz and not in_file:
+    if not fxyz:
         return
-    
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
     if prefix is None: prefix = "ASAP-cluster"
 
     ctx.obj['cluster_options'] = {'prefix': prefix,
@@ -270,7 +306,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @file_output_options
 @dm_input_options
 @output_setup_options
-def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
+def kde(ctx, fxyz, design_matrix, use_atomic_descriptors,
             prefix, savexyz, savetxt):
     """
     Kernel density estimation using the design matrix.
@@ -278,13 +314,8 @@ def kde(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors,
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz and not in_file:
+    if not fxyz:
         return
-        
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
     if prefix is None: prefix = "ASAP-kde"
 
     ctx.obj['kde_options'] = {'prefix': prefix,
@@ -387,7 +418,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @map_setup_options
 @map_io_options
 @color_setup_options
-def map(ctx, in_file, fxyz, design_matrix, prefix, output,
+def map(ctx, fxyz, design_matrix, prefix, output,
          use_atomic_descriptors, peratom, keepraw,
          color, color_column, color_label, color_from_zero,
          annotate, adjusttext, style, aspect_ratio):
@@ -397,13 +428,8 @@ def map(ctx, in_file, fxyz, design_matrix, prefix, output,
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz and not in_file and not design_matrix:
+    if not fxyz and not design_matrix:
         return
-    
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
     if prefix is None: prefix = "ASAP-lowD-map"
     ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom)
     if ctx.obj['asapxyz'] is None: output = 'matrix'
@@ -548,20 +574,15 @@ def tsne(ctx, pca, scale, dimension, axes,
 @file_output_options
 @dm_input_options
 @fit_setup_options
-def fit(ctx, in_file, fxyz, design_matrix, use_atomic_descriptors, y, prefix, 
+def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
        test_ratio, learning_curve, lc_points):
     """
     Fit a machine learning model to the design matrix and labels.
     This command function evaluated before the specific ones,
     we setup the general stuff here, such as read the files.
     """
-    if not fxyz and not in_file and not design_matrix:
+    if not fxyz and not design_matrix:
         return
-
-    if in_file:
-        # Here goes the routine to compute the descriptors according to the
-        # state file(s)
-        raise NotImplementedError
     if prefix is None: prefix = "ASAP-fit"
 
     ctx.obj['fit_options'] = {"prefix": prefix,
