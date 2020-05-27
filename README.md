@@ -31,25 +31,35 @@ e.g. in the folder ./tests/
 
 to generate SOAP descriptors:
 
-`asap gen_desc --fxyz small_molecules-1000.xyz soap`
+```bash
+asap gen_desc --fxyz small_molecules-1000.xyz soap
+```
 
 for columb matrix:
 
-`asap gen_desc -f small_molecules-1000.xyz --no-periodic cm`
+```bash
+asap gen_desc -f small_molecules-1000.xyz --no-periodic cm
+```
 
 for pca map:
 
-`asap map -f small_molecules-SOAP.xyz -dm '[SOAP-n4-l3-c1.9-g0.23]' -c dft_formation_energy_per_atom_in_eV pca`
+```bash
+asap map -f small_molecules-SOAP.xyz -dm '[SOAP-n4-l3-c1.9-g0.23]' -c dft_formation_energy_per_atom_in_eV pca
+```
 
 You can specify a list of descriptor vectors to include in the design matrix, e.g. `'[SOAP-n4-l3-c1.9-g0.23, SOAP-n8-l3-c5.0-g0.3]'`
 
 one can use a wildcard to specify the name of all the descriptors to use for the design matrix, e.g.
 
-`asap map -f small_molecules-SOAP.xyz -dm '[SOAP*]' -c dft_formation_energy_per_atom_in_eV pca`
+```bash
+asap map -f small_molecules-SOAP.xyz -dm '[SOAP*]' -c dft_formation_energy_per_atom_in_eV pca
+```
 
 or even
 
-`asap map -f small_molecules-SOAP.xyz -dm '[*]' -c dft_formation_energy_per_atom_in_eV pca`.
+```bash
+asap map -f small_molecules-SOAP.xyz -dm '[*]' -c dft_formation_energy_per_atom_in_eV pca
+```
 
 
 
