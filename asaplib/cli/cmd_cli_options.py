@@ -30,6 +30,10 @@ def dm_input_options(f):
     f = click.option('--use_atomic_descriptors', '--use_atomic', '-ua',
                      help='Use atomic descriptors instead of global ones.',
                      default=False, is_flag=True)(f)
+    f = click.option('--only_use_species', type=int,
+                     help='Only use the atomic descriptors of species with the specified atomic number.\
+                           Only makes sense if already using --use_atomic_descriptors.',
+                     default=None)(f)
     return f
 
 def km_input_options(f):

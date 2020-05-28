@@ -88,6 +88,14 @@ class ASAPXYZ:
     def get_global_species(self):
         return self.global_species
 
+    def get_natom_list_by_species(self, species_name=None):
+        if species_name is None:
+            return self.natom_list
+        elif species_name in self.global_species:
+            return [ a.get_atomic_numbers().tolist().count(species_name) for a in self.frames]
+        else:
+            raise ValueError("Cannot find the specified chemical species in the data set.")
+
     def save_state(self, filename, mode='yaml'):
          if mode == 'yaml':
              with open(filename+'-state.yaml', 'w') as yd:
@@ -254,6 +262,9 @@ class ASAPXYZ:
                 self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
     def _desc_name_with_wild_card(self, desc_name_list):
+        """
+        Use a wildcard when specifying the name of the descriptors
+        """
         new_desc_name = []
         for desc_name in desc_name_list:
             if desc_name == '*':
@@ -272,14 +283,17 @@ class ASAPXYZ:
                 new_desc_name.append(desc_name)
         return new_desc_name
 
-    def get_descriptors(self, desc_name_list=[], use_atomic_desc=False):
+    def get_descriptors(self, desc_name_list=[], use_atomic_desc=False, species_name=None):
         """ extract the descriptor array from each frame
 
         Parameters
         ----------
         desc_name_list: a list of strings, the name of the .info[] in the extended xyz file
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
-
+        species_name: int, the atomic number of the species selected.
+                      Only the desciptors of atoms of the specified specied will be returned.
+                      species_name=None means all atoms are selected.
+                      
         Returns
         -------
         desc: np.matrix
@@ -301,12 +315,21 @@ class ASAPXYZ:
             print("Use descriptor matrix with shape: ", np.shape(desc))
             # for the atomic descriptors
             if use_atomic_desc:
-                atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
+                if species_name is None:
+                    atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
+                elif species_name in self.global_species:
+                    atomic_desc = np.column_stack(np.concatenate([self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for desc_name in desc_name_list)
+                else:
+                    raise ValueError("Cannot find the specified chemical species in the data set.")
                 print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
         except:
             raise ValueError("Cannot find the specified descriptors from xyz")
 
         return desc, atomic_desc
+
+    def _get_atomic_descriptors_by_species(self, frame, desc_name, species_name=None):
+        species_index = [ i for i, s in enumerate(frame.get_atomic_numbers()) if s == species_name]
+        return frame.get_array(desc_name)[species_index]
 
     def get_property(self, y_key=None, extensive=False, sbs=[]):
         """ extract specified property from selected frames
@@ -357,14 +380,16 @@ class ASAPXYZ:
             raise ValueError('The property from the xyz file has more than one column')
         return np.array(y_all)
 
-    def get_atomic_property(self, y_key=None, extensive=False, sbs=[]):
+    def get_atomic_property(self, y_key=None, extensive=False, sbs=[], species_name=None):
         """ extract the property array from each atom
 
         Parameters
         ----------
         y_key: string_like, the name of the property in the extended xyz file
         sbs: array, integer
-
+        species_name: int, the atomic number of the species selected.
+                      Only the properties of atoms of the specified specied will be returned.
+                      species_name=None means all atoms are selected.
         Returns
         -------
         y_all: array [N_atoms]
@@ -378,7 +403,12 @@ class ASAPXYZ:
             #y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]]) # this doesn't work ?!
             for i in sbs:
                 frame = self.frames[i]
-                y_all = np.append(y_all, frame.get_array(y_key))
+                if species_name is None:
+                    y_all = np.append(y_all, frame.get_array(y_key))
+                elif species_name in self.global_species:
+                    y_all = np.append(y_all, self._get_atomic_descriptors_by_species(frame, y_key, species_name))
+                else:
+                    raise ValueError("Cannot find the specified chemical species in the data set.")
         except:
             try:
                 for index, y in enumerate(self.get_property(y_key, extensive, sbs)):
@@ -412,7 +442,7 @@ class ASAPXYZ:
         else:
             self.frames[0].new_array(desc_name, desc)
 
-    def set_atomic_descriptors(self, atomic_desc=None, atomic_desc_name=None):
+    def set_atomic_descriptors(self, atomic_desc=None, atomic_desc_name=None, species_name=None):
         """ write the descriptor array to the atom object
 
         Parameters
@@ -423,15 +453,31 @@ class ASAPXYZ:
         -------
         """
         # check if the length of the descriptor matrix is the same as the total number of atoms
-        if len(atomic_desc) != self.total_natoms:
+        if species_name is None and len(atomic_desc) != self.total_natoms:
             raise ValueError('The length of the atomic descriptor matrix is not the same as the total number of atoms.')
 
         atom_index = 0
-        for i, frame in enumerate(self.frames):
-            natomnow = self.natom_list[i]
-            frame.new_array(atomic_desc_name, np.array(atomic_desc)[atom_index:atom_index + natomnow])
-            atom_index += natomnow
 
+        if species_name is None:
+            for i, frame in enumerate(self.frames):
+                natomnow = self.natom_list[i]
+                frame.new_array(atomic_desc_name, np.array(atomic_desc)[atom_index:atom_index + natomnow])
+                atom_index += natomnow
+        else:
+            if atomic_desc.ndim == 1:
+                n_desc = 1
+            else:
+                n_desc = np.shape(atomic_desc)[1]
+            for i, frame in enumerate(self.frames):
+                array_now = np.zeros((self.natom_list[i],n_desc), dtype=float)
+                for j, s in enumerate(frame.get_atomic_numbers()):
+                    if s == species_name:
+                        array_now[j] = atomic_desc[atom_index]
+                        atom_index += 1
+                    else:
+                        array_now[j] = np.nan
+                frame.new_array(atomic_desc_name, np.array(array_now))
+            
     def remove_descriptors(self, desc_name=None):
         """
         remove the desciptors

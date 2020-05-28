@@ -144,6 +144,9 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # load up the xyz
     ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
  
+    if crossover is False:
+        print("Warning: atomic species cross terms are not included! use --crossover if you want cross terms.")
+        
     if universal_soap != 'none' and cutoff is None and nmax is None and lmax is None:
         from asaplib.hypers import universal_soap_hyper
         global_species = ctx.obj['asapxyz'].get_global_species()
@@ -200,7 +203,7 @@ def run(ctx):
 @dm_input_options
 @km_input_options
 @output_setup_options
-def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
+def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, kernel_matrix,
             prefix, savexyz, savetxt):
     """
     Clustering using the design matrix.
@@ -215,9 +218,11 @@ def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, kernel_matrix,
     ctx.obj['cluster_options'] = {'prefix': prefix,
                                   'savexyz': savexyz,
                                   'savetxt': savetxt,
-                                  'use_atomic_descriptors': use_atomic_descriptors  }
+                                  'use_atomic_descriptors': use_atomic_descriptors,
+                                  'only_use_species': only_use_species
+                                 }
 
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, False)
 
     if kernel_matrix != 'none':
         try:
@@ -283,6 +288,7 @@ def plot_pca(ctx, scale, dimension, axes,
     ctx.obj['map_options'].update({ 'color': ctx.obj['cluster_labels'],
                              'color_atomic': [],
                              'project_atomic': [],
+                             'only_use_species': ctx.obj['cluster_options']['only_use_species'],
                              'peratom': False,
                              'annotate': [],
                              'outmode': 'none',
@@ -306,7 +312,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @file_output_options
 @dm_input_options
 @output_setup_options
-def kde(ctx, fxyz, design_matrix, use_atomic_descriptors,
+def kde(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species,
             prefix, savexyz, savetxt):
     """
     Kernel density estimation using the design matrix.
@@ -319,11 +325,13 @@ def kde(ctx, fxyz, design_matrix, use_atomic_descriptors,
     if prefix is None: prefix = "ASAP-kde"
 
     ctx.obj['kde_options'] = {'prefix': prefix,
-                                  'savexyz': savexyz,
-                                  'savetxt': savetxt,
-                                  'use_atomic_descriptors': use_atomic_descriptors  }
+                              'savexyz': savexyz,
+                              'savetxt': savetxt,
+                              'use_atomic_descriptors': use_atomic_descriptors,
+                              'only_use_species': only_use_species
+                              }
 
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, False)
 
 @kde.command('kde_internal')
 @click.option('--dimension', '-d', type=int,
@@ -395,6 +403,7 @@ def plot_pca(ctx, scale, dimension, axes,
     ctx.obj['map_options'].update({ 'color': ctx.obj['kde'],
                              'color_atomic': [],
                              'project_atomic': [],
+                             'only_use_species': ctx.obj['kde_options']['only_use_species'],
                              'peratom': False,
                              'annotate': [],
                              'outmode': 'none',
@@ -419,7 +428,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @map_io_options
 @color_setup_options
 def map(ctx, fxyz, design_matrix, prefix, output,
-         use_atomic_descriptors, peratom, keepraw,
+         use_atomic_descriptors, only_use_species, peratom, keepraw,
          color, color_column, color_label, color_from_zero,
          annotate, adjusttext, style, aspect_ratio):
     """
@@ -431,7 +440,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
     if not fxyz and not design_matrix:
         return
     if prefix is None: prefix = "ASAP-lowD-map"
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, peratom)
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, peratom)
     if ctx.obj['asapxyz'] is None: output = 'matrix'
 
     # remove the raw descriptors
@@ -441,12 +450,13 @@ def map(ctx, fxyz, design_matrix, prefix, output,
 
     # color scheme
     from asaplib.plot import set_color_function
-    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, color_from_zero)
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, only_use_species, color_from_zero)
     if color_label is not None: colorlabel = color_label
 
     ctx.obj['map_options'] =  { 'color': plotcolor,
                              'color_atomic': plotcolor_peratom,
                              'project_atomic': use_atomic_descriptors,
+                             'only_use_species': only_use_species,
                              'peratom': peratom,
                              'annotate': [],
                              'outmode': output,
@@ -574,7 +584,7 @@ def tsne(ctx, pca, scale, dimension, axes,
 @file_output_options
 @dm_input_options
 @fit_setup_options
-def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
+def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, prefix,
        test_ratio, learning_curve, lc_points):
     """
     Fit a machine learning model to the design matrix and labels.
@@ -590,7 +600,7 @@ def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, y, prefix,
                               "lc_points": lc_points,
                               "test_ratio": test_ratio
                              }
-    asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, False)
+    asapxyz, desc, _ = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, False)
 
     try:
         import numpy as np
