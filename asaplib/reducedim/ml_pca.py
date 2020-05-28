@@ -47,7 +47,7 @@ class PCA:
         print(self.scaler.fit(desc))
         return self.scaler.transform(desc)
 
-    def centering(desc):
+    def centering(self, desc):
         # calculate the mean of each column
         M_desc = np.mean(desc.T, axis=1)
         # center columns by subtracting column means
