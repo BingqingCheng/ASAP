@@ -61,7 +61,7 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species,
         from asaplib.data import ASAPXYZ
         asapxyz = ASAPXYZ(fxyz)
         if use_atomic_descriptors:
-            _, dm = asapxyz.get_descriptors(design_matrix, True, only_use_species)
+            dm = asapxyz.get_atomic_descriptors(design_matrix, only_use_species)
         else:
             dm, dm_atomic = asapxyz.get_descriptors(design_matrix, peratom)
     else:

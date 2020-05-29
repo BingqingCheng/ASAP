@@ -310,7 +310,6 @@ class ASAPXYZ:
         desc: np.matrix
         atomic_desc: np.matrix
         """
-        # TODO: (maybe?) rename this into get_info. Need to change pca.py/kpca.py/... that uses this function
         desc = []
         atomic_desc = []
 
@@ -324,21 +323,49 @@ class ASAPXYZ:
         try:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
             desc = np.column_stack(np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
-            print("Use descriptor matrix with shape: ", np.shape(desc))
-            # for the atomic descriptors
+            print("Use global descriptor matrix with shape: ", np.shape(desc))
+            # get the atomic descriptors with the same name
             if use_atomic_desc:
-                if species_name is None:
-                    atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
-                elif species_name in self.global_species:
-                    atomic_desc = np.column_stack(np.concatenate([self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for desc_name in desc_name_list)
-                else:
-                    raise ValueError("Cannot find the specified chemical species in the data set.")
-                print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
+                self.get_atomic_descriptors(desc_name_list, species_name)
         except:
             raise ValueError("Cannot find the specified descriptors from xyz")
 
         return desc, atomic_desc
 
+    def get_atomic_descriptors(self, desc_name_list=[], species_name=None):
+        """ extract the descriptor array from each frame
+
+        Parameters
+        ----------
+        desc_name_list: a list of strings, the name of the .info[] in the extended xyz file
+        species_name: int, the atomic number of the species selected.
+                        Only the desciptors of atoms of the specified specied will be returned.
+                    species_name=None means all atoms are selected.
+                         
+        Returns
+        -------
+        atomic_desc: np.matrix
+        """
+        if isinstance(desc_name_list,str):
+            desc_name_list = [desc_name_list]
+
+        desc_name_list = self._desc_name_with_wild_card(desc_name_list, True)
+        print("Find the following atomic descriptor names that match the specifications: ", desc_name_list)
+    
+        # load from xyz file
+        try:
+            if species_name is None:
+                atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
+            elif species_name in self.global_species:
+                atomic_desc = np.column_stack(np.concatenate([self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for desc_name in desc_name_list)
+            else:
+                raise ValueError("Cannot find the specified chemical species in the data set.")
+            print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
+        except:
+            raise ValueError("Cannot find the specified atomic descriptors from xyz")
+
+        return atomic_desc
+           
     def _get_atomic_descriptors_by_species(self, frame, desc_name, species_name=None):
         species_index = [ i for i, s in enumerate(frame.get_atomic_numbers()) if s == species_name]
         return frame.get_array(desc_name)[species_index]
