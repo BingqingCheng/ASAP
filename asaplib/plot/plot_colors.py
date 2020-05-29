@@ -8,7 +8,20 @@ import numpy as np
 from asaplib.data import ASAPXYZ
 
 
-def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, peratom=False, project_atomic=False, color_from_zero=False):
+def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, 
+              peratom=False, project_atomic=False, use_atomic_species=None, color_from_zero=False):
+    """ obtain the essential informations to define the colors of data points
+    Parameters
+    ----------
+    fcolor: str, the name of the file or the tag in the xyz to define the colors
+    asapxyz: ASAPXYZ object, (optional)
+    colorscol: int, (optional). if the color file has more than one column, which column to use
+    n_samples: int, (optional). The number of data points
+    peratom: bool, return atomic color
+    project_atomic: the samples are atomic descriptors
+    use_atomic_species: int, the atomic number of the selected species
+    color_from_zero: bool, set the min color to zero
+    """
 
     plotcolor = []
     plotcolor_atomic = []
@@ -33,7 +46,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
             if asapxyz is None:
                 raise IOError('Need the xyz so that we know the number of atoms in each frame')
             elif asapxyz.get_num_frames() == len(plotcolor):
-                for index, natomnow in enumerate(asapxyz.get_natom_list()):
+                for index, natomnow in enumerate(asapxyz.get_natom_list_by_species(use_atomic_species)):
                     plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
             elif asapxyz.get_total_natoms() == len(plotcolor):
                 plotcolor_atomic = plotcolor
@@ -54,7 +67,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
             plotcolor = np.arange(asapxyz.get_num_frames())
             fcolor = 'sample index'
             if peratom or project_atomic:
-                for index, natomnow in enumerate(asapxyz.get_natom_list()):
+                for index, natomnow in enumerate(asapxyz.get_natom_list_by_species(use_atomic_species)):
                     plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
         else:
             try:
@@ -63,7 +76,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, pe
                 raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
             if peratom or project_atomic:
                 try:
-                    plotcolor_atomic = asapxyz.get_atomic_property(fcolor)
+                    plotcolor_atomic = asapxyz.get_atomic_property(fcolor, use_atomic_species)
                 except:
                     raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')
 
