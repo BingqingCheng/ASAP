@@ -445,6 +445,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
 
     # remove the raw descriptors
     if not keepraw:
+        print("Remove raw desciptors..")
         ctx.obj['asapxyz'].remove_descriptors(design_matrix)
         ctx.obj['asapxyz'].remove_atomic_descriptors(design_matrix)
 
@@ -489,6 +490,8 @@ def pca(ctx, scale, dimension, axes):
                    'type': 'PCA', 
                    'parameter':{"n_components": dimension, "scalecenter": scale}}
                   }
+    if scale:
+        print("Perform standard scaling of the design matrix. To turn it off use `--no-scale`")
     map_process(ctx.obj, reduce_dict, axes, map_name)
 
 @map.command('skpca')
@@ -503,6 +506,7 @@ def skpca(ctx, scale, dimension, axes,
     map_name = "skpca-d-"+str(dimension)
     reduce_dict = {}
     if scale:
+        print("Perform standard scaling of the design matrix. To turn it off use `--no-scale`")
         reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
     reduce_dict['skpca'] = {"type": 'SPARSE_KPCA', 
                             'parameter':{"n_components": dimension, 
@@ -528,6 +532,7 @@ def umap(ctx, scale, dimension, axes, n_neighbors, min_dist, metric):
     map_name = "umap-d-"+str(dimension)
     reduce_dict = {}
     if scale:
+        print("Perform standard scaling of the design matrix. To turn it off use `--no-scale`")
         reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
     reduce_dict['umap'] = {'type': 'UMAP', 'parameter':
                            {'n_components': dimension, 
@@ -569,6 +574,7 @@ def tsne(ctx, pca, scale, dimension, axes,
         # suggested here: https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
         reduce_dict= {"preprocessing":{"type": 'PCA', 'parameter':{"n_components": 50, "scalecenter": scale}}}
     elif scale:
+        print("Perform standard scaling of the design matrix. To turn it off use `--no-scale`")
         reduce_dict = {"preprocessing": {"type": 'SCALE', 'parameter': None}}
     reduce_dict['tsne'] = {'type': 'TSNE', 'parameter':
                            {'perplexity': perplexity, 

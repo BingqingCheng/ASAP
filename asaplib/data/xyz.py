@@ -261,24 +261,35 @@ class ASAPXYZ:
                 frame.new_array(atomic_desc_dict_now[e][e2]['acronym'], atomic_desc_dict_now[e][e2]['atomic_descriptors'])
                 self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
-    def _desc_name_with_wild_card(self, desc_name_list):
+    def _desc_name_with_wild_card(self, desc_name_list, atomic_desc=False):
         """
         Use a wildcard when specifying the name of the descriptors
         """
         new_desc_name = []
         for desc_name in desc_name_list:
+            #print("desc_name", desc_name)
             if desc_name == '*':
                 import re
                 possible_desc_prefix = [ 'SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM']
-                for key in self.frames[0].info.keys():
-                    for pre in possible_desc_prefix:
-                        if re.search(pre+'.+', key):
-                            new_desc_name.append(key)
+                for pre in possible_desc_prefix:
+                    if atomic_desc:
+                        for key in self.frames[0].arrays.keys():
+                            if re.search(pre+'.+', key):
+                                new_desc_name.append(key)
+                    else:
+                        for key in self.frames[0].info.keys():
+                            if re.search(pre+'.+', key):
+                                new_desc_name.append(key)
             elif '*' in desc_name:
                 import re
-                for key in self.frames[0].info.keys():
-                    if re.search(key.replace('*','.+'), key):
-                        new_desc_name.append(key)
+                if atomic_desc:
+                    for key in self.frames[0].arrays.keys():
+                        if re.search(key.replace('*','.+'), key):
+                            new_desc_name.append(key)
+                else:
+                    for key in self.frames[0].info.keys():
+                        if re.search(key.replace('*','.+'), key):
+                            new_desc_name.append(key)
             else:
                 new_desc_name.append(desc_name)
         return new_desc_name
@@ -307,7 +318,8 @@ class ASAPXYZ:
             desc_name_list = [desc_name_list]
 
         desc_name_list = self._desc_name_with_wild_card(desc_name_list)
-      
+        print("Find the following descriptor names that match the specifications: ", desc_name_list)
+ 
         # load from xyz file
         try:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
@@ -478,37 +490,38 @@ class ASAPXYZ:
                         array_now[j] = np.nan
                 frame.new_array(atomic_desc_name, np.array(array_now))
             
-    def remove_descriptors(self, desc_name=None):
+    def remove_descriptors(self, desc_name_list=[]):
         """
         remove the desciptors
         """
-        if isinstance(desc_name, list):
-            for dn in desc_name:
-                for frame in self.frames:
-                    if dn in frame.info:
-                        del frame.info[dn]
-        elif isinstance(desc_name, str):
-            for frame in self.frames:
-                if desc_name in frame.info:
-                    del frame.info[desc_name]
-        else:
-            print("Warning: Cannot parse desc_name when remove_descriptors.")
+        if isinstance(desc_name_list,str):
+            desc_name_list = [desc_name_list]
 
-    def remove_atomic_descriptors(self, desc_name=None):
+        desc_name_list = self._desc_name_with_wild_card(desc_name_list)
+        print("removing the global descriptors from output xyz with the names: ", desc_name_list)
+
+        for dn in desc_name_list:
+            for frame in self.frames:
+                if dn in frame.info:
+                    del frame.info[dn]
+                else:
+                    print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+
+    def remove_atomic_descriptors(self, desc_name_list=[]):
         """
         remove the desciptors
         """
-        if isinstance(desc_name, list):
-            for dn in desc_name:
-                for frame in self.frames:
-                    if dn in frame.arrays:
-                        del frame.arrays[dn]
-        elif isinstance(desc_name, str):
+        if isinstance(desc_name_list,str):
+            desc_name_list = [desc_name_list]
+        desc_name_list = self._desc_name_with_wild_card(desc_name_list, True)
+        print("removing the atomic descriptors from output xyz with the names: ", desc_name_list)
+
+        for dn in desc_name_list:
             for frame in self.frames:
-                if desc_name in frame.arrays:
-                    del frame.arrays[desc_name]
-        else:
-            print("Warning: Cannot parse desc_name when remove_descriptors.")
+                if dn in frame.arrays:
+                    del frame.arrays[dn]
+                else:
+                    print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
     def write(self, filename, sbs=[], save_acronym=False):
         """
