@@ -127,3 +127,6 @@ class Global_Descriptor_Base:
 ### Additional tools
 In the directory ./scripts/ and ./tools/ you can find a selection of other python tools.
 
+### Tab completion
+Tab completion can be enabled by sourcing the `asap_completion.sh` script in the ./scripts/ directory. 
+If a conda environment is used, you can copy this file to `$CONDA_PREFIX/etc/conda/activate.d/` to automatically load the completion upon environment activation.
