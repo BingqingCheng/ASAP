@@ -62,7 +62,7 @@ def select(ctx, fxyz, design_matrix,
     Select a subset of frames using sparsification algorithms
     """
 
-    if not fxyz:
+    if not fxyz and not design_matrix[0]:
         return
         
     if prefix is None: prefix = "ASAP-select-"+algorithm+"-n-"+str(nkeep)
@@ -211,7 +211,7 @@ def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, 
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz:
+    if not fxyz and not design_matrix[0]:
         return
     if prefix is None: prefix = "ASAP-cluster"
 
@@ -320,7 +320,7 @@ def kde(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species,
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz:
+    if not fxyz and design_matrix[0]:
         return
     if prefix is None: prefix = "ASAP-kde"
 
@@ -437,7 +437,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
     we setup the general stuff here, such as read the files.
     """
 
-    if not fxyz and not design_matrix:
+    if not fxyz and not design_matrix[0]:
         return
     if prefix is None: prefix = "ASAP-lowD-map"
     ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, peratom)
@@ -597,7 +597,7 @@ def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, p
     This command function evaluated before the specific ones,
     we setup the general stuff here, such as read the files.
     """
-    if not fxyz and not design_matrix:
+    if not fxyz and not design_matrix[0]:
         return
     if prefix is None: prefix = "ASAP-fit"
 
@@ -622,7 +622,7 @@ def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, p
     ctx.obj['dm'] = Design_Matrix(desc, y_all, True, test_ratio)
 
 @fit.command('ridge')
-@click.option('--sigma', '-s', type=float, 
+@click.option('--sigma', type=float, 
               help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.', 
               default=0.0001)
 @click.pass_context
@@ -640,7 +640,7 @@ def ridge(ctx, sigma):
     plt.show()
     
 @fit.command('kernelridge')
-@click.option('--sigma', '-s', type=float,
+@click.option('--sigma', type=float,
               help='the noise level of the signal. Also the regularizer that improves the stablity of matrix inversion.',
               default=0.0001)
 @kernel_options
