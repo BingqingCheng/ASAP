@@ -532,7 +532,8 @@ class ASAPXYZ:
                 if dn in frame.info:
                     del frame.info[dn]
                 else:
-                    print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+                    pass
+                    #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
     def remove_atomic_descriptors(self, desc_name_list=[]):
         """
@@ -548,7 +549,8 @@ class ASAPXYZ:
                 if dn in frame.arrays:
                     del frame.arrays[dn]
                 else:
-                    print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+                    pass
+                    #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
     def write(self, filename, sbs=[], save_acronym=False):
         """
