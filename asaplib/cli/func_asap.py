@@ -40,7 +40,7 @@ def set_reducer(reducer_type, element_wise, zeta):
         reducer_func['zeta'] = zeta
     return reducer_func
 
-def output_desc(asapxyz, desc_spec, prefix, peratom=False):
+def output_desc(asapxyz, desc_spec, prefix, peratom=False, N_processes=8):
     """
     Compute and save the descriptors
     """
@@ -49,7 +49,8 @@ def output_desc(asapxyz, desc_spec, prefix, peratom=False):
         asapxyz.compute_global_descriptors(desc_spec_dict=desc,
                                        sbs=[],
                                        keep_atomic=peratom,
-                                       tag=tag)
+                                       tag=tag,
+                                       n_process=N_processes)
     asapxyz.write(prefix)
     asapxyz.save_state(prefix)
 

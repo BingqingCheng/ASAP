@@ -59,6 +59,13 @@ def desc_options(f):
                      default='cmd-desc')(f)
     return f
 
+def para_options(f):
+    """Create common options for parallellization"""
+    f = click.option('--number_processes', '--nprocess', '-np', type=int,
+                     help='Number of processes when compute the descriptors in parrallel.',
+                     show_default=True, default=8)(f)
+    return f
+
 def atomic_to_global_desc_options(f):
     """Create common options for global descriptors constructed based on atomic fingerprints """
     f = click.option('--reducer_type', '-r',

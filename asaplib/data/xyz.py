@@ -4,6 +4,7 @@ from yaml import dump as ydump
 from yaml import Dumper
 import numpy as np
 from ase.io import read, write
+#from joblib import Parallel, delayed
 
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
@@ -157,7 +158,7 @@ class ASAPXYZ:
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  atomic_desc.desc_spec_dict
 
-    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None, n_process = 8):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -194,13 +195,34 @@ class ASAPXYZ:
         # business! Intialize a Global_Descriptors object
         global_desc = Global_Descriptors(desc_spec_dict)
 
-        for i in sbs:
-            frame = self.frames[i]
-            # compute atomic descriptor
-            desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
-            self.global_desc[i].update(desc_dict_now)
-            if keep_atomic:
-                self.atomic_desc[i].update(atomic_desc_dict_now)
+        # serial computation
+        if n_process == 1:
+            for i in sbs:
+                frame = self.frames[i]
+                # compute atomic descriptor
+                desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
+                self.global_desc[i].update(desc_dict_now)
+                if keep_atomic:
+                    self.atomic_desc[i].update(atomic_desc_dict_now)
+        elif n_process >= 2:
+            from joblib import Parallel, delayed
+            n_eval, n_remain = divmod(len(sbs), n_process)
+            for k in range(n_eval):
+                index_eval = list(sbs[k*n_process:(k+1)*n_process])
+                desc_dict_now = Parallel(n_jobs=n_process)(delayed(global_desc.compute)(self.frames[i]) for i in index_eval)
+                for ei, i in enumerate(index_eval):
+                    self.global_desc[i].update(desc_dict_now[ei][0])
+                    if keep_atomic:
+                        self.atomic_desc[i].update(desc_dict_now[ei][1])
+            index_eval = list(sbs[-n_remain:])
+            desc_dict_now = Parallel(n_jobs=n_remain)(delayed(global_desc.compute)(self.frames[i]) for i in index_eval)
+            for ei, i in enumerate(index_eval):
+                self.global_desc[i].update(desc_dict_now[ei][0])
+                if keep_atomic:
+                    self.atomic_desc[i].update(desc_dict_now[ei][1])
+        else:
+            raise ValueError("Please set the number of processes to be a positive integer.")
+
         # we mark down that this descriptor has been computed
         self.computed_desc_dict['descriptors'][tag] = global_desc.desc_spec_dict
 

@@ -90,7 +90,8 @@ def select(ctx, fxyz, design_matrix,
 @state_input_options
 @file_input_options
 @file_output_options
-def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
+@para_options
+def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic, number_processes):
     """
     Descriptor generation command
     This command function evaluated before the descriptor specific ones,
@@ -111,6 +112,7 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic):
         ctx.obj['data']['stride'] = stride
         ctx.obj['data']['periodic'] = periodic
     ctx.obj['desc_options']['prefix'] = prefix
+    ctx.obj['desc_options']['N_processes'] = number_processes
 
 @gen_desc.command('soap')
 @click.option('--cutoff', '-c', type=float, 
@@ -173,7 +175,7 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # specify descriptors using the cmd line tool
     ctx.obj['descriptors'][tag] = desc_spec
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], peratom)
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], peratom, ctx.obj['desc_options']['N_processes'])
 
 @gen_desc.command('cm')
 @click.pass_context
@@ -185,7 +187,7 @@ def cm(ctx, tag):
     # The specification for the descriptor
     ctx.obj['descriptors'][tag] = {'cm':{'type': "CM"}}
     # Compute the save the descriptors
-    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'])
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], False, ctx.obj['desc_options']['N_processes'])
 
 @gen_desc.command('run')
 @click.pass_context
