@@ -101,7 +101,7 @@ def map_io_options(f):
     f = click.option('--keepraw/--no-keepraw',
                      help='Keep the high dimensional descriptor when output XYZ file.',
                      default=False)(f)
-    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none'], case_sensitive=False),
+    f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none', 'chemiscope'], case_sensitive=False),
                      help='Output file format.',
                      default='xyz')(f)
     return f

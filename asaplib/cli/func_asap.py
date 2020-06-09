@@ -162,12 +162,17 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_nam
             np.savetxt(foutput + ".coord", proj, fmt='%4.8f', header='low D coordinates of samples')
         if proj_atomic is not None:
             np.savetxt(foutput + "-atomic.coord", proj_atomic, fmt='%4.8f', header=map_name)
-    elif outmode == 'xyz':
+    elif outmode in ('xyz', 'chemiscope'):
         if proj is not None:
             asapxyz.set_descriptors(proj, map_name)
         if proj_atomic is not None:
             asapxyz.set_atomic_descriptors(proj_atomic, map_name, species_name)
-        asapxyz.write(foutput)
+        if outmode == 'xyz':
+            asapxyz.write(foutput)
+        else:
+            # If we write atomic projection assume we want to show them
+            cutoff = 3.5 if proj_atomic else None
+            asapxyz.write_chemiscope(foutput, cutoff=cutoff)
     else:
         pass
 
