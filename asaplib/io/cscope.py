@@ -186,31 +186,42 @@ def write_chemiscope_input(filename,
                 }})
         return
 
+    def _extend_value(from_frames, name, value):
+        """Extend the entry in from_frames, create the entry if not exists"""
+        if name in from_frames:
+            from_frames[name]['values'].extend(value)
+        else:
+            from_frames.update(
+                {name: {
+                    'target': 'atom',
+                    'values': list(value)
+                }})
+        return
+
+
     for frame in frames:
         for name, value in frame.info.items():
             if isinstance(value, (list, tuple, np.ndarray)):
                 for idx, _value in enumerate(value):
-                    _name = name + f'-{idx}'
-                    _append_value(from_frames, _name, value[idx])
+                    _name = name + f'[{idx}]'
+                    _append_value(from_frames, _name, _value)
             else:
                 _append_value(from_frames, name, value)
 
     # target: atom properties
-    # TODO Identify and save atomic projectors in the INFO
-    from_frames.update({
-        name: {
-            'target': 'atom',
-            'values': value
-        }
-        for name, value in frames[0].arrays.items()
-        if name not in IGNORED_ASE_ARRAYS
-    })
-    for frame in frames[1:]:
+    has_atomic = False
+    for frame in frames:
         for name, value in frame.arrays.items():
             if name in IGNORED_ASE_ARRAYS:
                 continue
-            from_frames[name]['values'] = np.concatenate(
-                [from_frames[name]['values'], value])
+            has_atomic = True
+            if len(value.shape) > 1:
+                # Iterate over the columns
+                for idx, _value in enumerate(value.T):
+                    _name = 'atomic-' + name + f'[{idx}]'
+                    _extend_value(from_frames, _name, _value)
+            else:
+                _extend_value(from_frames, name, value)
 
     for name, value in from_frames.items():
         properties.update(_linearize(name, value))
@@ -218,7 +229,7 @@ def write_chemiscope_input(filename,
     data['properties'] = properties
     data['structures'] = [_frame_to_json(frame) for frame in frames]
 
-    if cutoff is not None:
+    if cutoff is not None and has_atomic:
         data['environments'] = _generate_environments(frames, cutoff)
 
     if filename.endswith(".gz"):

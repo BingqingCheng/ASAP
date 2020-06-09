@@ -578,7 +578,7 @@ class ASAPXYZ:
         if save_acronym:
             self.save_descriptor_acronym_state(filename)
 
-    def write_chemiscope(self, filename, sbs=None, save_acronym=False):
+    def write_chemiscope(self, filename, sbs=None, save_acronym=False, cutoff=None):
         """
         write the selected frames or all the frames to ChemiScope JSON
 
@@ -586,6 +586,7 @@ class ASAPXYZ:
         ----------
         filename: str
         sbs: array, integer
+        cutoff: generate cutoff for atomic environments, set to None to disable atomic environments
         """
 
         from asaplib.io.cscope import write_chemiscope_input
@@ -605,7 +606,8 @@ class ASAPXYZ:
         if save_acronym:
             self.save_descriptor_acronym_state(filename)
 
-        write_chemiscope_input(filename + '.json.gz', self.frames)
+        # Disable atomic environments if there isn't any data
+        write_chemiscope_input(filename + '.json.gz', self.frames, cutoff=cutoff)
 
     def write_descriptor_matrix(self, filename, desc_name_list, sbs=[], comment=''):
         """

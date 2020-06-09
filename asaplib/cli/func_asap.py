@@ -170,7 +170,9 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_nam
         if outmode == 'xyz':
             asapxyz.write(foutput)
         else:
-            asapxyz.write_chemiscope(foutput)
+            # If we write atomic projection assume we want to show them
+            cutoff = 3.5 if proj_atomic else None
+            asapxyz.write_chemiscope(foutput, cutoff=cutoff)
     else:
         pass
 
