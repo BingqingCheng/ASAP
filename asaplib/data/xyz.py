@@ -127,7 +127,7 @@ class ASAPXYZ:
             desc_spec_dict[element]['periodic'] = self.periodic
             desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
-    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None):
+    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None, n_process = 1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -155,11 +155,24 @@ class ASAPXYZ:
         for i in sbs:
             frame = self.frames[sbs]
             self.atomic_desc[i].update(atomic_desc.create(frame))
+        # serial computation
+        if n_process == 1:
+            for i in tqdm(sbs):
+                frame = self.frames[i]
+                # compute atomic descriptor
+                self.atomic_desc[i].update(atomic_desc.create(frame))
+        # parallel computation
+        elif n_process >= 2:
+            results = Parallel(n_jobs=n_process, verbose=1)(delayed(atomic_desc.compute)(self.frames[i]) for i in sbs)
+            for i, atomic_desc_dict_now in enumerate(results):
+                self.atomic_desc[i].update(atomic_desc_dict_now)
+        else:
+            raise ValueError("Please set the number of processes to be a positive integer.")
 
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  atomic_desc.desc_spec_dict
 
-    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None, n_process = 8):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None, n_process = 1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -205,6 +218,7 @@ class ASAPXYZ:
                 self.global_desc[i].update(desc_dict_now)
                 if keep_atomic:
                     self.atomic_desc[i].update(atomic_desc_dict_now)
+        # parallel computation
         elif n_process >= 2:
             results = Parallel(n_jobs=n_process, verbose=1)(delayed(global_desc.compute)(self.frames[i]) for i in sbs)
             for i, (desc_dict_now, atomic_desc_dict_now) in enumerate(results):
