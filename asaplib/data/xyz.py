@@ -214,12 +214,13 @@ class ASAPXYZ:
                     self.global_desc[i].update(desc_dict_now[ei][0])
                     if keep_atomic:
                         self.atomic_desc[i].update(desc_dict_now[ei][1])
-            index_eval = list(sbs[-n_remain:])
-            desc_dict_now = Parallel(n_jobs=n_remain)(delayed(global_desc.compute)(self.frames[i]) for i in index_eval)
-            for ei, i in enumerate(index_eval):
-                self.global_desc[i].update(desc_dict_now[ei][0])
-                if keep_atomic:
-                    self.atomic_desc[i].update(desc_dict_now[ei][1])
+            if n_remain > 0:
+                index_eval = list(sbs[-n_remain:])
+                desc_dict_now = Parallel(n_jobs=n_process)(delayed(global_desc.compute)(self.frames[i]) for i in index_eval)
+                for ei, i in enumerate(index_eval):
+                    self.global_desc[i].update(desc_dict_now[ei][0])
+                    if keep_atomic:
+                        self.atomic_desc[i].update(desc_dict_now[ei][1])
         else:
             raise ValueError("Please set the number of processes to be a positive integer.")
 
