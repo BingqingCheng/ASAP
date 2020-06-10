@@ -12,7 +12,7 @@ from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
 
 class ASAPXYZ:
-    def __init__(self, fxyz=None, stride=1, periodic=True):
+    def __init__(self, fxyz=None, stride=1, periodic=True, fileformat=None):
         """extended xyz class
 
         Parameters
@@ -33,6 +33,11 @@ class ASAPXYZ:
         # essential
         self.stride = stride
         self.periodic = periodic
+        if fileformat is not None:
+            import ast
+            self.fileformat = ast.literal_eval(fileformat)
+        else:
+            self.fileformat = {}
 
         # store the xyz file
         self.frames = None
@@ -57,9 +62,9 @@ class ASAPXYZ:
             if isinstance(self.fxyz, (tuple, list)):
                 self.frames = []
                 for f in self.fxyz:
-                    self.frames += read(f, slice(0, None, self.stride))
+                    self.frames += read(f, slice(0, None, self.stride), **self.fileformat)
             else: 
-                self.frames = read(self.fxyz, slice(0, None, self.stride))
+                self.frames = read(self.fxyz, slice(0, None, self.stride), **self.fileformat)
         except:
             raise ValueError('Exception occurred when loading the input file')
 
