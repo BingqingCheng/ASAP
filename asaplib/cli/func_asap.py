@@ -24,7 +24,7 @@ def load_in_file(in_file):
 """ for load ASAPXYZ """
 def load_asapxyz(data_spec):
     from asaplib.data import ASAPXYZ
-    return ASAPXYZ(data_spec['fxyz'], data_spec['stride'], data_spec['periodic'])
+    return ASAPXYZ(data_spec['fxyz'], data_spec['stride'], data_spec['periodic'], data_spec['fxyz_format'])
 
 """for gen_desc"""
 def set_reducer(reducer_type, element_wise, zeta):

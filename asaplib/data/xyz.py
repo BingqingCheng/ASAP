@@ -4,6 +4,7 @@ import json
 from yaml import dump as ydump
 from yaml import Dumper
 import numpy as np
+from ase import Atoms
 from ase.io import read, write
 from tqdm.auto import tqdm
 from joblib import Parallel, delayed
@@ -128,6 +129,29 @@ class ASAPXYZ:
         else:
             with open(filename+'-descriptor-acronyms.json', 'w') as jd:
                 json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
+
+    def symmetrise(self, sbs=[], symprec=1e-2):
+        import spglib
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+        for i in sbs:
+            frame = self.frames[i]
+            frame.info['space_group'] = spglib.get_spacegroup(frame, symprec=symprec)
+
+    def standardize(self, sbs=[], symprec=1e-2):
+        """
+        reduce to primitive cell
+        """
+        import spglib
+        if len(sbs) == 0:
+            sbs = range(self.nframes)
+        for i in sbs:
+            frame = self.frames[i]
+            lattice, scaled_positions, numbers = spglib.standardize_cell(frame,
+                                                                     to_primitive=1,
+                                                                     no_idealize=1,
+                                                                     symprec=symprec)
+            self.frames[i] = Atoms(numbers=numbers, cell=lattice, scaled_positions=scaled_positions, pbc=frame.get_pbc())
 
     def _add_info_to_desc_spec(self, desc_spec_dict):
         """
@@ -593,7 +617,7 @@ class ASAPXYZ:
                     pass
                     #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
-    def write(self, filename, sbs=[], save_acronym=False):
+    def write(self, filename, sbs=[], save_acronym=False, wrap_output=True):
         """
         write the selected frames or all the frames to a xyz file
 
@@ -611,6 +635,7 @@ class ASAPXYZ:
             os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
 
         for i in sbs:
+            if wrap_output: self.frames[i].wrap()
             self._write_computed_descriptors_to_xyz(self.global_desc[i], self.frames[i])
             self._write_computed_atomic_descriptors_to_xyz(self.atomic_desc[i], self.frames[i])
             write(str(filename) + ".xyz", self.frames[i], append=True)
@@ -619,7 +644,7 @@ class ASAPXYZ:
         if save_acronym:
             self.save_descriptor_acronym_state(filename)
 
-    def write_chemiscope(self, filename, sbs=None, save_acronym=False, cutoff=None):
+    def write_chemiscope(self, filename, sbs=None, save_acronym=False, cutoff=None, wrap_output=False):
         """
         write the selected frames or all the frames to ChemiScope JSON
 
@@ -640,6 +665,7 @@ class ASAPXYZ:
             os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
 
         for i in sbs:
+            if wrap_output: self.frames[i].wrap()
             self._write_computed_descriptors_to_xyz(self.global_desc[i], self.frames[i])
             self._write_computed_atomic_descriptors_to_xyz(self.atomic_desc[i], self.frames[i])
 

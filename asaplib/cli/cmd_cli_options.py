@@ -18,6 +18,15 @@ def file_input_options(f):
                      default=None)(f)
     return f
 
+def file_input_format_options(f):
+    """Create common options for I/O files"""
+    f = click.option('--fxyz_format',
+                     type=str,
+                     help='Additional info for the input file format. e.g.\
+                          {"format":"lammps-data","units":"metal","style":"full"}',
+                     default=None)(f)
+    return f
+
 def file_output_options(f):
     """Create common options for I/O files"""
     f = click.option('--prefix', '-p',
