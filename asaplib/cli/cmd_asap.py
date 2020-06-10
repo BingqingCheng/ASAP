@@ -89,9 +89,10 @@ def select(ctx, fxyz, design_matrix,
 @click.pass_context
 @state_input_options
 @file_input_options
+@file_input_format_options
 @file_output_options
 @para_options
-def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic, number_processes):
+def gen_desc(ctx, in_file, fxyz, fxyz_format, prefix, stride, periodic, number_processes):
     """
     Descriptor generation command
     This command function evaluated before the descriptor specific ones,
@@ -109,6 +110,7 @@ def gen_desc(ctx, in_file, fxyz, prefix, stride, periodic, number_processes):
     if prefix is None: prefix = "ASAP-desc"
     if fxyz is not None:
         ctx.obj['data']['fxyz'] = fxyz
+        ctx.obj['data']['fxyz_format'] = fxyz_format
         ctx.obj['data']['stride'] = stride
         ctx.obj['data']['periodic'] = periodic
     ctx.obj['desc_options']['prefix'] = prefix
