@@ -62,7 +62,6 @@ class ASAPXYZ:
                 self.frames = read(self.fxyz, slice(0, None, self.stride))
         except:
             raise ValueError('Exception occurred when loading the input file')
-        print(self.frames)
 
         self.nframes = len(self.frames)
         all_species = []
