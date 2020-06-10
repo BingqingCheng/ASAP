@@ -27,7 +27,9 @@ To get help string:
 
 ### Quick & basic example
 
-e.g. in the folder ./tests/
+The first step for a machine-learning analysis or visualization is to generate a "design matrix" made from either global descriptors or atomic descriptors. To do this, we supply `asap gen_desc` with an input file that contains the atomic coordintes. Many formats are supported; anything can be read using [ase.io](https://wiki.fysik.dtu.dk/ase/ase/io/io.html) is supported. You can use a wildcard to specify the list of input files that matches the pattern (e.g. `POSCAR*`, `H*`, or `*.cif`).
+
+As a quick example, in the folder ./tests/
 
 to generate SOAP descriptors:
 
@@ -41,7 +43,9 @@ for columb matrix:
 asap gen_desc -f small_molecules-1000.xyz --no-periodic cm
 ```
 
-for pca map:
+After generating the descriptors, one can make a two-dimensional map (`asap map`), or regression model (`asap fit`), or clustering (`asap cluster`), or select a subset of frames (`asap select`), or do a clustering analysis (`asap cluster`), or estimate the probablity of observing each sample (`asap kde`).
+
+For instance, to make a pca map:
 
 ```bash
 asap map -f small_molecules-SOAP.xyz -dm '[SOAP-n4-l3-c1.9-g0.23]' -c dft_formation_energy_per_atom_in_eV pca
