@@ -644,7 +644,7 @@ class ASAPXYZ:
         if save_acronym:
             self.save_descriptor_acronym_state(filename)
 
-    def write_chemiscope(self, filename, sbs=None, save_acronym=False, cutoff=None, wrap_output=False):
+    def write_chemiscope(self, filename, sbs=None, save_acronym=False, cutoff=None, wrap_output=True):
         """
         write the selected frames or all the frames to ChemiScope JSON
 
