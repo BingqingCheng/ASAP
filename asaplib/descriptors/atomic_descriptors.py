@@ -155,7 +155,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
     def create(self, frame):
         # notice that we return the acronym here!!!
-        return self.acronym, self.soap.create(frame, n_jobs=8)
+        return self.acronym, self.soap.create(frame, n_jobs=1)
 
 
 class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
@@ -214,7 +214,7 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
 
     def create(self, frame):
         # notice that we return the acronym here!!!
-        return self.acronym, self.acsf.create(frame, n_jobs=8)
+        return self.acronym, self.acsf.create(frame, n_jobs=1)
 
 class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -287,7 +287,7 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
 
     def create(self, frame):
         # notice that we return the acronym here!!!
-        return self.acronym, self.lmbtr.create(frame, n_jobs=8)
+        return self.acronym, self.lmbtr.create(frame, n_jobs=1)
 
 class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
     def __init__(self, desc_spec):

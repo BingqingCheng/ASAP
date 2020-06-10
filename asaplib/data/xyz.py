@@ -1,9 +1,12 @@
 import os
+import glob
 import json
 from yaml import dump as ydump
 from yaml import Dumper
 import numpy as np
 from ase.io import read, write
+from tqdm.auto import tqdm
+from joblib import Parallel, delayed
 
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
@@ -19,9 +22,15 @@ class ASAPXYZ:
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
         stride: int, the stride when reading the xyz file
         """
-
+        # compile a list of matching xyz files
+        # in fact they don't strictly need to be xyz format, anything that can be read by ASE is fine
+        # a list of possible file formats: https://wiki.fysik.dtu.dk/ase/ase/io/io.html
+        if '*' in fxyz:
+            self.fxyz = glob.glob(fxyz)
+            print("Find matching input files with coordinates: ", self.fxyz)
+        else:
+            self.fxyz = fxyz
         # essential
-        self.fxyz = fxyz
         self.stride = stride
         self.periodic = periodic
 
@@ -43,14 +52,17 @@ class ASAPXYZ:
         # this is for the atomic ones
         self.atomic_desc = {}
 
-        if not os.path.isfile(self.fxyz):
-            raise IOError('Cannot find the xyz file.')
-
         # try to read the xyz file
         try:
-            self.frames = read(self.fxyz, slice(0, None, self.stride))
+            if isinstance(self.fxyz, (tuple, list)):
+                self.frames = []
+                for f in self.fxyz:
+                    self.frames += read(f, slice(0, None, self.stride))
+            else: 
+                self.frames = read(self.fxyz, slice(0, None, self.stride))
         except:
-            raise ValueError('Exception occurred when loading the xyz file')
+            raise ValueError('Exception occurred when loading the input file')
+        print(self.frames)
 
         self.nframes = len(self.frames)
         all_species = []
@@ -125,7 +137,7 @@ class ASAPXYZ:
             desc_spec_dict[element]['periodic'] = self.periodic
             desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
-    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None):
+    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None, n_process = 1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -153,11 +165,24 @@ class ASAPXYZ:
         for i in sbs:
             frame = self.frames[sbs]
             self.atomic_desc[i].update(atomic_desc.create(frame))
+        # serial computation
+        if n_process == 1:
+            for i in tqdm(sbs):
+                frame = self.frames[i]
+                # compute atomic descriptor
+                self.atomic_desc[i].update(atomic_desc.create(frame))
+        # parallel computation
+        elif n_process >= 2:
+            results = Parallel(n_jobs=n_process, verbose=1)(delayed(atomic_desc.compute)(self.frames[i]) for i in sbs)
+            for i, atomic_desc_dict_now in enumerate(results):
+                self.atomic_desc[i].update(atomic_desc_dict_now)
+        else:
+            raise ValueError("Please set the number of processes to be a positive integer.")
 
         # we mark down that this descriptor has been computed
         self.computed_desc_dict[tag] =  atomic_desc.desc_spec_dict
 
-    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None, n_process = 1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -194,13 +219,25 @@ class ASAPXYZ:
         # business! Intialize a Global_Descriptors object
         global_desc = Global_Descriptors(desc_spec_dict)
 
-        for i in sbs:
-            frame = self.frames[i]
-            # compute atomic descriptor
-            desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
-            self.global_desc[i].update(desc_dict_now)
-            if keep_atomic:
-                self.atomic_desc[i].update(atomic_desc_dict_now)
+        # serial computation
+        if n_process == 1:
+            for i in tqdm(sbs):
+                frame = self.frames[i]
+                # compute atomic descriptor
+                desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
+                self.global_desc[i].update(desc_dict_now)
+                if keep_atomic:
+                    self.atomic_desc[i].update(atomic_desc_dict_now)
+        # parallel computation
+        elif n_process >= 2:
+            results = Parallel(n_jobs=n_process, verbose=1)(delayed(global_desc.compute)(self.frames[i]) for i in sbs)
+            for i, (desc_dict_now, atomic_desc_dict_now) in enumerate(results):
+                self.global_desc[i].update(desc_dict_now)
+                if keep_atomic:
+                    self.atomic_desc[i].update(atomic_desc_dict_now)
+        else:
+            raise ValueError("Please set the number of processes to be a positive integer.")
+
         # we mark down that this descriptor has been computed
         self.computed_desc_dict['descriptors'][tag] = global_desc.desc_spec_dict
 
