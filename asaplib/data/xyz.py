@@ -1,4 +1,5 @@
 import os
+import glob
 import json
 from yaml import dump as ydump
 from yaml import Dumper
@@ -21,9 +22,15 @@ class ASAPXYZ:
         use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
         stride: int, the stride when reading the xyz file
         """
-
+        # compile a list of matching xyz files
+        # in fact they don't strictly need to be xyz format, anything that can be read by ASE is fine
+        # a list of possible file formats: https://wiki.fysik.dtu.dk/ase/ase/io/io.html
+        if '*' in fxyz:
+            self.fxyz = glob.glob(fxyz)
+            print("Find matching input files with coordinates: ", self.fxyz)
+        else:
+            self.fxyz = fxyz
         # essential
-        self.fxyz = fxyz
         self.stride = stride
         self.periodic = periodic
 
@@ -45,14 +52,17 @@ class ASAPXYZ:
         # this is for the atomic ones
         self.atomic_desc = {}
 
-        if not os.path.isfile(self.fxyz):
-            raise IOError('Cannot find the xyz file.')
-
         # try to read the xyz file
         try:
-            self.frames = read(self.fxyz, slice(0, None, self.stride))
+            if isinstance(self.fxyz, (tuple, list)):
+                self.frames = []
+                for f in self.fxyz:
+                    self.frames += read(f, slice(0, None, self.stride))
+            else: 
+                self.frames = read(self.fxyz, slice(0, None, self.stride))
         except:
-            raise ValueError('Exception occurred when loading the xyz file')
+            raise ValueError('Exception occurred when loading the input file')
+        print(self.frames)
 
         self.nframes = len(self.frames)
         all_species = []

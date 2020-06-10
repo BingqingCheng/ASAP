@@ -10,8 +10,11 @@ def state_input_options(f):
 def file_input_options(f):
     """Create common options for I/O files"""
     f = click.option('--fxyz', '-f', 
-                     type=click.Path('r'), 
-                     help='Input XYZ file',
+                     type=str, 
+                     help='Input file that contains XYZ coordinates.\
+                           See a list of possible input formats:\
+                          https://wiki.fysik.dtu.dk/ase/ase/io/io.html\
+                          If a wildcard * is used, all files matching the pattern is read.',
                      default=None)(f)
     return f
 
@@ -63,7 +66,7 @@ def para_options(f):
     """Create common options for parallellization"""
     f = click.option('--number_processes', '--nprocess', '-np', type=int,
                      help='Number of processes when compute the descriptors in parrallel.',
-                     show_default=True, default=8)(f)
+                     show_default=True, default=1)(f)
     return f
 
 def atomic_to_global_desc_options(f):
