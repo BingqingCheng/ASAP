@@ -66,7 +66,7 @@ def select(ctx, fxyz, design_matrix,
         return
         
     if prefix is None: prefix = "ASAP-select-"+algorithm+"-n-"+str(nkeep)
-    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, False, False)
+    ctx.obj['asapxyz'], ctx.obj['design_matrix'], _ = read_xyz_n_dm(fxyz, design_matrix, False, False, False)
 
     from asaplib.compressor import Sparsifier
     sparsifier = Sparsifier(algorithm)
