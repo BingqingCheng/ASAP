@@ -349,11 +349,11 @@ class ASAPXYZ:
                 import re
                 if atomic_desc:
                     for key in self.frames[0].arrays.keys():
-                        if re.search(key.replace('*','.+'), key):
+                        if re.search(desc_name.replace('*','.+'), key):
                             new_desc_name.append(key)
                 else:
                     for key in self.frames[0].info.keys():
-                        if re.search(key.replace('*','.+'), key):
+                        if re.search(desc_name.replace('*','.+'), key):
                             new_desc_name.append(key)
             else:
                 new_desc_name.append(desc_name)
