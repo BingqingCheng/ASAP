@@ -9,7 +9,7 @@ from asaplib.data import ASAPXYZ
 
 
 def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0, 
-              peratom=False, project_atomic=False, use_atomic_species=None, color_from_zero=False):
+              peratom=False, project_atomic=False, use_atomic_species=None, color_from_zero=False, extensive=False):
     """ obtain the essential informations to define the colors of data points
     Parameters
     ----------
@@ -21,6 +21,7 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0,
     project_atomic: the samples are atomic descriptors
     use_atomic_species: int, the atomic number of the selected species
     color_from_zero: bool, set the min color to zero
+    extensive: bool, normalize the quatity by number of atoms
     """
 
     plotcolor = []
@@ -71,12 +72,12 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0,
                     plotcolor_atomic = np.append(plotcolor_atomic, plotcolor[index] * np.ones(natomnow))
         else:
             try:
-                plotcolor = asapxyz.get_property(fcolor)
+                plotcolor = asapxyz.get_property(fcolor, extensive)
             except:
                 raise ValueError('Cannot find the specified property from the xyz file for the color scheme')
             if peratom or project_atomic:
                 try:
-                    plotcolor_atomic = asapxyz.get_atomic_property(fcolor, False, [], use_atomic_species)
+                    plotcolor_atomic = asapxyz.get_atomic_property(fcolor, extensive, [], use_atomic_species)
                     #print(np.shape(plotcolor_atomic))
                 except:
                     raise ValueError('Cannot find the specified atomic property from the xyz file for the color scheme')

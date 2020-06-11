@@ -127,6 +127,9 @@ def map_io_options(f):
 
 def color_setup_options(f):
     """Create common options for handing color scales"""
+    f = click.option('--normalized_by_size', '-nbs',
+                     help='Normalize the quantity used for color function by the number of atoms in each frame.',
+                     show_default=True, default=False, is_flag=True)(f)
     f = click.option('--color_from_zero', '-c0',
                      help='Set the minimum to zero and only plot the excess.',
                      show_default=True, default=False, is_flag=True)(f)

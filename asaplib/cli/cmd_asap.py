@@ -433,7 +433,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @color_setup_options
 def map(ctx, fxyz, design_matrix, prefix, output,
          use_atomic_descriptors, only_use_species, peratom, keepraw,
-         color, color_column, color_label, color_from_zero,
+         color, color_column, color_label, color_from_zero, normalized_by_size,
          annotate, adjusttext, style, aspect_ratio):
     """
     Making 2D maps using dimensionality reduction.
@@ -446,7 +446,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
     if prefix is None: prefix = "ASAP-lowD-map"
     ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, peratom)
     if ctx.obj['asapxyz'] is None: output = 'matrix'
-
+    print(len(ctx.obj['design_matrix_atomic']))
     # remove the raw descriptors
     if not keepraw:
         print("Remove raw desciptors..")
@@ -455,7 +455,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
 
     # color scheme
     from asaplib.plot import set_color_function
-    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, only_use_species, color_from_zero)
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, only_use_species, color_from_zero, normalized_by_size)
     if color_label is not None: colorlabel = color_label
 
     ctx.obj['map_options'] =  { 'color': plotcolor,
