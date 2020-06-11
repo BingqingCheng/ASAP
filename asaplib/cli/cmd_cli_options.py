@@ -169,6 +169,9 @@ def fit_setup_options(f):
     f = click.option('--test_ratio', '--test', '-t', type=float, 
               help='Test ratio.', 
               show_default=True, default=0.05)(f)
+    f = click.option('--normalized_by_size', '-nbs',
+                     help='Normalize y by the number of atoms in each frame.',
+                     show_default=True, default=False, is_flag=True)(f)
     f = click.option('--y', '-y',
                      help='Location of a file or name of the properties in the XYZ file',
                      default='none', type=str)(f)

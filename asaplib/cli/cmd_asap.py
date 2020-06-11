@@ -594,7 +594,7 @@ def tsne(ctx, pca, scale, dimension, axes,
 @file_output_options
 @dm_input_options
 @fit_setup_options
-def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, prefix,
+def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, normalized_by_size, prefix,
        test_ratio, learning_curve, lc_points):
     """
     Fit a machine learning model to the design matrix and labels.
@@ -617,9 +617,9 @@ def fit(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, y, p
         y_all = np.genfromtxt(y, dtype=float)
     except:
         if use_atomic_descriptors:
-            y_all = asapxyz.get_atomic_property(y)
+            y_all = asapxyz.get_atomic_property(y, normalized_by_size)
         else:
-            y_all = asapxyz.get_property(y)
+            y_all = asapxyz.get_property(y, normalized_by_size)
     #print(y_all)
 
     from asaplib.data import Design_Matrix
