@@ -391,7 +391,7 @@ class ASAPXYZ:
             print("Use global descriptor matrix with shape: ", np.shape(desc))
             # get the atomic descriptors with the same name
             if use_atomic_desc:
-                self.get_atomic_descriptors(desc_name_list, species_name)
+                atomic_desc = self.get_atomic_descriptors(desc_name_list, species_name)
         except:
             raise ValueError("Cannot find the specified descriptors from xyz")
 
