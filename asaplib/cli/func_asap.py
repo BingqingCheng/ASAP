@@ -119,6 +119,7 @@ def map_process(obj, reduce_dict, axes, map_name):
         dreducer = Dimension_Reducers(reduce_dict)
         proj = dreducer.fit_transform(obj['design_matrix'])
         if obj['map_options']['peratom']:
+            print("Project atomic design matrix with No. of samples:", len(obj['design_matrix_atomic']))
             proj_atomic = dreducer.transform(obj['design_matrix_atomic'])
         else:
             proj_atomic = None
