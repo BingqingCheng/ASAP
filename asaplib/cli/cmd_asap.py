@@ -179,6 +179,42 @@ def soap(ctx, tag, cutoff, nmax, lmax, atom_gaussian_width, crossover, rbf, univ
     # Compute the save the descriptors
     output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], peratom, ctx.obj['desc_options']['N_processes'])
 
+@gen_desc.command('acsf')
+@click.option('--cutoff', '-c', type=float,
+              help='Cutoff radius',
+              show_default=False, default=None)
+@click.option('--universal_acsf', '--uacsf', '-u',
+              type=click.Choice(['none','smart','minimal', 'longrange'], case_sensitive=False),
+              help='Try out our universal ACSF parameters.',
+              show_default=True, default='minimal')
+@click.pass_context
+@desc_options
+@atomic_to_global_desc_options
+def acsf(ctx, tag, cutoff, universal_acsf,
+    reducer_type, zeta, element_wise, peratom):
+    """Generate ACSF descriptors"""
+    # load up the xyz
+    ctx.obj['asapxyz'] = load_asapxyz(ctx.obj['data'])
+            
+    from asaplib.hypers import universal_acsf_hyper
+    global_species = ctx.obj['asapxyz'].get_global_species()
+    if cutoff is not None:
+        acsf_spec = universal_acsf_hyper(global_species, cutoff, dump=True, verbose=False)
+    else:
+        acsf_spec = universal_acsf_hyper(global_species, universal_acsf, dump=True, verbose=False)
+            
+    # The specification for the reducers
+    reducer_spec = dict(set_reducer(reducer_type, element_wise, zeta))
+    # The specification for the descriptor
+    desc_spec= {'acsf':{'atomic_descriptor': acsf_spec,
+                        'reducer_function': reducer_spec}
+                }
+    # specify descriptors using the cmd line tool
+    ctx.obj['descriptors'][tag] = desc_spec
+    # Compute the save the descriptors
+    output_desc(ctx.obj['asapxyz'], ctx.obj['descriptors'], ctx.obj['desc_options']['prefix'], peratom, ctx.obj['desc_options']['N_processes'])
+
+
 @gen_desc.command('cm')
 @click.pass_context
 @desc_options
