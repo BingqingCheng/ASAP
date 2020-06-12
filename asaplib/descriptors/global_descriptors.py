@@ -79,6 +79,8 @@ class Global_Descriptors:
             raise ValueError("Did not specify the type of the descriptor.")
         if desc_spec["type"] == "CM":
             return Global_Descriptor_CM(desc_spec)
+        elif desc_spec["type"] == "MORGAN":
+            return Global_Descriptor_Morgan(desc_spec)
         else:
             raise NotImplementedError 
 
@@ -241,4 +243,54 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
         if len(frame.get_positions()) > self.max_atoms:
             raise ValueError('the size of the system is larger than the max_atoms of the CM descriptor')
         # notice that we return an empty dictionary for "atomic descriptors"
-        return {'acronym': self.acronym, 'descriptors': self.cm.create(frame, n_jobs=8)}, {}
+        return {'acronym': self.acronym, 'descriptors': self.cm.create(frame, n_jobs=1)}, {}
+        
+        
+class Global_Descriptor_Morgan(Global_Descriptor_Base):
+    def __init__(self, desc_spec):
+    
+        if "type" not in desc_spec.keys() or desc_spec["type"] != "MORGAN":
+            raise ValueError("Type is not MORGAN or cannot find the type of the descriptor")
+
+        # defaults
+        if "length" in desc_spec.keys():
+            self.length = desc_spec["length"]
+        else:
+            self.length = 1024
+            
+        if "radius" in desc_spec.keys():
+            self.radius = desc_spec["radius"]
+        else:
+            self.radius = 3
+
+        if 'periodic' in desc_spec.keys() and desc_spec['periodic'] == True:
+            raise ValueError("Morgan Fingerprints cannot be used for periodic systems")
+
+        print("Using Morgan Fingerprints ...")
+        # make an acronym
+        self.acronym = "MORGAN"
+        
+    def _get_smiles(self, frame):
+        if "smiles" in frame.info:
+            #print(frame.info['smiles'])
+            return frame.info['smiles']
+        elif "SMILES" in frame.info:
+            return frame.info['SMILES']
+        else:
+            raise ValueError('Cannot parse the smile string from the frame.info.')
+
+    def create(self, frame):
+        """
+        Returns
+        -------
+        """
+        
+        from rdkit.Chem import MolFromSmiles
+        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
+
+        smiles = self._get_smiles(frame)
+        mol = MolFromSmiles(smiles)
+        fps = GetMorganFingerprintAsBitVect(mol, radius=self.radius, nBits=self.length)
+        fps = np.array(fps, dtype='float64')
+            
+        return {'acronym': self.acronym, 'descriptors': fps}
