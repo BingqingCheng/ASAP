@@ -484,7 +484,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
     if ctx.obj['asapxyz'] is None: output = 'matrix'
     print(len(ctx.obj['design_matrix_atomic']))
     # remove the raw descriptors
-    if not keepraw:
+    if not keepraw and ctx.obj['asapxyz'] is not None:
         print("Remove raw desciptors..")
         ctx.obj['asapxyz'].remove_descriptors(design_matrix)
         ctx.obj['asapxyz'].remove_atomic_descriptors(design_matrix)

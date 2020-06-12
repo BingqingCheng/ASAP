@@ -393,7 +393,7 @@ class ASAPXYZ:
             if use_atomic_desc:
                 atomic_desc = self.get_atomic_descriptors(desc_name_list, species_name)
         except:
-            raise ValueError("Cannot find the specified descriptors from xyz")
+            print("Cannot find the specified descriptors from xyz")
 
         return desc, atomic_desc
 
@@ -411,6 +411,9 @@ class ASAPXYZ:
         -------
         atomic_desc: np.matrix
         """
+
+        atomic_desc = []
+
         if isinstance(desc_name_list,str):
             desc_name_list = [desc_name_list]
 
@@ -427,7 +430,7 @@ class ASAPXYZ:
                 raise ValueError("Cannot find the specified chemical species in the data set.")
             print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
         except:
-            raise ValueError("Cannot find the specified atomic descriptors from xyz")
+            print("Cannot find the specified atomic descriptors from xyz")
 
         return atomic_desc
            
