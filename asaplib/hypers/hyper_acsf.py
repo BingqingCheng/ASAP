@@ -39,16 +39,19 @@ def universal_acsf_hyper(global_species, facsf_param, dump=True, verbose=True):
         acsf_js = gen_default_acsf_hyperparameters(list(global_species), scalerange=0.85, sharpness=1.0)
     elif facsf_param == 'longrange' or facsf_param == 'Longrange' or facsf_param == 'LONGRANGE':
         acsf_js = gen_default_acsf_hyperparameters(list(global_species),scalerange=1.8, sharpness=1.2)
+    elif isinstance(facsf_param, float):
+        acsf_js = gen_default_acsf_hyperparameters(list(global_species),scalerange=1.0, sharpness=1.0, cutoff=facsf_param)
     else:
-        raise IOError('Did not specify acsf parameters. You can use [smart/minimal/longrange].')
+        raise IOError('Did not specify acsf parameters. You can use [smart/minimal/longrange] or set an explicit cutoff.')
         
-    if verbose:  print(acsf_js)
+    if verbose:  
+        print(acsf_js)
     if dump:
         with open('smart-acsf-parameters', 'w') as jd:
             json.dump(acsf_js, jd, cls=NpEncoder)
     return acsf_js
 
-def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=False):
+def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=False, cutoff=None):
     """
     Parameters
     ----------
@@ -59,8 +62,7 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
     verbose: type=bool, default=False, more descriptions of what has been done.
     """
 
-    # check if the element is in the look up table
-    # print(type(Zs))
+    # check if the element is in the look up table 
     for Z in Zs:
         if str(Z) not in uni_length_scales:
             raise RuntimeError("key Z {} not present in length_scales table".format(Z))
@@ -70,7 +72,8 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
         print(Zs, "range of bond lengths", shortest_bond, longest_bond)
         
     # cutoffs & shortest length
-    cutoff = max(float(round_sigfigs(longest_bond * 1.3 * float(scalerange), 2)),2.0)
+    if cutoff is None:
+        cutoff = max(float(round_sigfigs(longest_bond * 1.3 * float(scalerange), 2)),2.0)
     rmin = shortest_bond
     N = min(int(sharpness*(cutoff-rmin)/0.5), 5)
     if verbose:
@@ -113,9 +116,9 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
                             _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), 1])
                             _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), -1])
                             
-    acsf_js = {'type': 'ACSF',
+    acsf_js = { 'acsf-'+str(cutoff):{'type': 'ACSF',
     'cutoff': 2.0,
     'g2_params': _2_body_params,
-    'g4_params': _3_body_params }
+    'g4_params': _3_body_params }}
 
     return acsf_js
