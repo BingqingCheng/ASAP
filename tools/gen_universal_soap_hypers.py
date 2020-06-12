@@ -9,20 +9,7 @@ from asaplib.io import str2bool
 """
 Automatically generate the hyperparameters of SOAP descriptors for arbitrary elements and combinations.
 
-## Heuristics:
-  * Get the length scales of the system from
-    * maximum bond length (from equilibrium bond length in lowest energy 2D or 3D structure)
-    * minimal bond length (from shortest bond length of any equilibrium structure, including dimer)
-  * Apply a scaling for these length scales
-    * largest soap cutoff = maximum bond length * 2.5
-    * smallest soap cutoff = minimal bond length * 2.0
-    * Add other cutoffs in between if requires more sets of SOAP descriptors 
-    * The atom sigma is the `cutoff / 8`, divided by an optional `sharpness` factor
-
-## Depedency: uses 'auto_length_scales.json' to read in length scales.
-
 ## Example
-
 The command 
 gen_universal_soap_hypers.py --Zs 5 32
 will return length scales needed to define the SOAP descriptors for 
@@ -33,7 +20,7 @@ a system with boron (5) and germanium (32). The output is
 
 
 def main(Zs, soap_n, soap_l, multisoap, sharpness, scalerange, verbose, outfile):
-    hypers = gen_default_soap_hyperparameters(Zs, soap_n, soap_l, multisoap, sharpness, scalerange, verbose)
+    hypers = gen_default_soap_hyperparameters(Zs, multisoap=multisoap, scalerange=scalerange, soap_n=soap_n, soap_l=soap_l, sharpness=sharpness, verbose=verbose)
 
     # output
     if outfile == 'none':
@@ -52,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument("--multisoap", type=int, help="How many set of SOAP descriptors do you want to use?", default=2)
     parser.add_argument("--sharpness", type=float,
                         help="sharpness factor for atom_gaussian_width, scaled to heuristic for GAP", default=1.0)
-    parser.add_argument("--range", type=float, help="the range of the SOAP cutoffs, scaled to heuristic for GAP",
+    parser.add_argument("--scalerange", type=float, help="the range of the SOAP cutoffs, scaled to heuristic for GAP",
                         default=1.0)
     parser.add_argument("--verbose", type=str2bool, nargs='?', const=True, default=False,
                         help="more descriptions of what has been done")
@@ -60,4 +47,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args.Zs, args.n, args.l, args.multisoap, args.sharpness, args.range, args.verbose, args.output)
+    main(args.Zs, args.n, args.l, args.multisoap, args.sharpness, args.scalerange, args.verbose, args.output)
