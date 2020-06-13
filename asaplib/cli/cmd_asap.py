@@ -469,7 +469,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @color_setup_options
 def map(ctx, fxyz, design_matrix, prefix, output,
          use_atomic_descriptors, only_use_species, peratom, keepraw,
-         color, color_column, color_label, color_from_zero, normalized_by_size,
+         color, color_column, color_label, colormap, color_from_zero, normalized_by_size,
          annotate, adjusttext, style, aspect_ratio):
     """
     Making 2D maps using dimensionality reduction.
@@ -507,7 +507,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
         import numpy as np
         ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
-    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, colormap, style, aspect_ratio, adjusttext)
 
 @map.command('raw')
 @click.pass_context

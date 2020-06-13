@@ -80,9 +80,9 @@ class Plotters:
         self.fig.set_size_inches(self.fig_spec['size'][0], self.fig_spec['size'][1])
         # titles
         if self.fig_spec['xlabel'] is not None:
-            self.ax.set_xlabel(self.fig_spec['xlabel'], fontsize=self.fig_spec['fontsize'])
+            self.ax.set_xlabel(self.fig_spec['xlabel'], fontsize=self.fig_spec['fontsize'], labelpad=-3)
         if self.fig_spec['ylabel'] is not None:
-            self.ax.set_ylabel(self.fig_spec['ylabel'], fontsize=self.fig_spec['fontsize'])
+            self.ax.set_ylabel(self.fig_spec['ylabel'], fontsize=self.fig_spec['fontsize'], labelpad=-3)
         if self.fig_spec['title'] is not None:
             self.ax.set_title(self.fig_spec['title'], fontsize=self.fig_spec['fontsize'])
 
@@ -311,13 +311,27 @@ class Plot_Function_Scatter(Plot_Function_Base):
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'])
         else:
+            # check if the labels are discrete
+            discrete_label = True
+            for iz in z: 
+                if not np.equal(np.mod(iz, 1), 0): discrete_label = False
+            if discrete_label:
+                print("Use discrete colormap ......")
+                cmap = plt.cm.get_cmap(self.p_spec['cmap'], int(np.max(z)-np.min(z)) + 1)
+                vmin = np.min(z) - 0.5
+                vmax = np.max(z) + 0.5
+            else:
+                cmap = self.p_spec['cmap']
+                vmin = self.p_spec['vmin']
+                vmax = self.p_spec['vmax']
+
             axscatter = ax.scatter(x, y, c=z, 
-                               cmap=self.p_spec['cmap'], 
+                               cmap=cmap, 
                                s=psize, 
                                alpha=self.p_spec['alpha'],
                                rasterized=self.p_spec['rasterized'],
-                               vmax=self.p_spec['vmax'],
-                               vmin=self.p_spec['vmin'])
+                               vmax=vmax,
+                               vmin=vmin)
 
         if self.p_spec['cbar_format'] is None:
             color_spread = np.nanmax(z) - np.nanmin(z)

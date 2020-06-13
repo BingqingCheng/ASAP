@@ -82,14 +82,15 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species,
 """for maps"""
 
 def figure_style_setups(prefix,
-                        colorlabel, colorscale, 
+                        colorlabel, colorscale, colormap,
                         style, aspect_ratio, adjusttext):
     fig_options = { 'outfile': prefix,
                     'show': False,
                     'title': None,
                     'size': [8*aspect_ratio, 8],
+                    'cmap': colormap,
                     'components':{
-                    'first_p': {'type': 'scatter', 'clabel': colorlabel,
+                    'first_p': {'type': 'scatter', 'clabel': colorlabel, 
                                 'vmin': colorscale[0], 'vmax': colorscale[1]},
                     'second_p': {"type": 'annotate', 'adtext': adjusttext} }
                    }

@@ -335,7 +335,7 @@ class ASAPXYZ:
             #print("desc_name", desc_name)
             if desc_name == '*':
                 import re
-                possible_desc_prefix = [ 'SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM']
+                possible_desc_prefix = [ 'SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM', 'pca', 'skpca', 'umap', 'tsne']
                 for pre in possible_desc_prefix:
                     if atomic_desc:
                         for key in self.frames[0].arrays.keys():
