@@ -281,6 +281,8 @@ class ASAPXYZ:
         -------
         desc: np.matrix [n_frame, n_desc]
         """
+        if len(sbs) == 0:
+            sbs = list(range(self.nframes))
         return np.row_stack([self._parse_computed_descriptors_singleframe(desc_dict_keys, i) for i in sbs])
 
     def _parse_computed_descriptors_singleframe(self, desc_dict_keys=[], i=0):
@@ -494,7 +496,7 @@ class ASAPXYZ:
         ----------
         y_key: string_like, the name of the property in the extended xyz file
         sbs: array, integer
-        species_name: int, the atomic number of the species selected.
+        specie: int, the atomic number of the species selected.
                       Only the properties of atoms of the specified specied will be returned.
                       species_name=None means all atoms are selected.
         Returns
