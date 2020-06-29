@@ -114,7 +114,7 @@ class TestKPCA(object):
                                       [5.94284391e+00, -3.76656875e-02, -3.89980823e-02, -1.01837158e-01]],
                                      dtype="float32")
 
-    def assert_kernels_not_changed(self, tol=1e-5):
+    def assert_kernels_not_changed(self, tol=5e-4):
         assert_array_almost_equal(self.K_tr, self.K_tr_save, tol=tol)
         assert_array_almost_equal(self.K_test, self.K_test_save, tol=tol)
 
@@ -138,7 +138,7 @@ class TestKPCA(object):
         center_new = KernelPCA.center_square(self.K_tr)[2]
         center_old = self.fixcenter(self.K_tr)
         self.assert_kernels_not_changed()
-        assert_array_almost_equal(center_new, center_old, tol=1e-5)
+        assert_array_almost_equal(center_new, center_old, tol=5e-4)
 
         # check the method used for the projections
         k = KernelPCA(4)
@@ -146,7 +146,7 @@ class TestKPCA(object):
         # copy needed, because the class is doing that elsewhere
         # noinspection PyProtectedMember
         center_method_for_tests = k._center_test_kmat(self.K_tr.copy())
-        assert_array_almost_equal(center_method_for_tests, center_old, tol=1e-5)
+        assert_array_almost_equal(center_method_for_tests, center_old, tol=5e-4)
 
     def test_fit_and_transform(self):
         # init & fit
