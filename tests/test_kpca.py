@@ -138,7 +138,7 @@ class TestKPCA(object):
         center_new = KernelPCA.center_square(self.K_tr)[2]
         center_old = self.fixcenter(self.K_tr)
         self.assert_kernels_not_changed()
-        assert_array_almost_equal(center_new, center_old, tol=5e-4)
+        assert_array_almost_equal(center_new, center_old, tol=5e-3)
 
         # check the method used for the projections
         k = KernelPCA(4)
@@ -146,7 +146,7 @@ class TestKPCA(object):
         # copy needed, because the class is doing that elsewhere
         # noinspection PyProtectedMember
         center_method_for_tests = k._center_test_kmat(self.K_tr.copy())
-        assert_array_almost_equal(center_method_for_tests, center_old, tol=5e-4)
+        assert_array_almost_equal(center_method_for_tests, center_old, tol=5e-3)
 
     def test_fit_and_transform(self):
         # init & fit
@@ -162,12 +162,12 @@ class TestKPCA(object):
         self.assert_kernels_not_changed()
 
         # check result
-        assert_array_almost_equal(pvec_train, self.ref_pvec_train, tol=5e-4)
+        assert_array_almost_equal(pvec_train, self.ref_pvec_train, tol=5e-3)
 
         # transform the test
         pvec_test = kpca_obj.transform(self.K_test)
         self.assert_kernels_not_changed()
-        assert_array_almost_equal(pvec_test, self.ref_pvec_test, tol=5e-4)
+        assert_array_almost_equal(pvec_test, self.ref_pvec_test, tol=5e-3)
 
     def test_fit_transform(self):
         # init, fit & transform
@@ -179,12 +179,12 @@ class TestKPCA(object):
         self.assert_local_errors(kpca_obj)
 
         # check result
-        assert_array_almost_equal(pvec_train, self.ref_pvec_train, 5e-4)
+        assert_array_almost_equal(pvec_train, self.ref_pvec_train, 5e-3)
 
         # transform the test
         pvec_test = kpca_obj.transform(self.K_test)
         self.assert_kernels_not_changed()
-        assert_array_almost_equal(pvec_test, self.ref_pvec_test, tol=5e-4)
+        assert_array_almost_equal(pvec_test, self.ref_pvec_test, tol=5e-3)
 
     def assert_local_errors(self, kpca_obj):
         # fixme: adthe shape and tye errors as well
