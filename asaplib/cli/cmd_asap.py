@@ -491,7 +491,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
 
     # color scheme
     from asaplib.plot import set_color_function
-    plotcolor, plotcolor_peratom, colorlabel, colorscale, external_data = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, only_use_species, color_from_zero, normalized_by_size)
+    plotcolor, plotcolor_peratom, colorlabel, colorscale = set_color_function(color, ctx.obj['asapxyz'], color_column, 0, peratom, use_atomic_descriptors, only_use_species, color_from_zero, normalized_by_size)
     if color_label is not None: colorlabel = color_label
 
     ctx.obj['map_options'] =  { 'color': plotcolor,
@@ -501,8 +501,7 @@ def map(ctx, fxyz, design_matrix, prefix, output,
                              'peratom': peratom,
                              'annotate': [],
                              'outmode': output,
-                             'keepraw': keepraw,
-                             'external_data': external_data,
+                             'keepraw': keepraw
                            }
     if annotate != 'none':
         import numpy as np

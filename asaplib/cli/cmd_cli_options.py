@@ -141,7 +141,7 @@ def color_setup_options(f):
                      default=None)(f)
     f = click.option('--color_column', '-ccol',
                      help='The column number used in the color file. Starts from 0.',
-                     default='0')(f)
+                     default=0)(f)
     f = click.option('--color', '-c',
                      help='Location of a file or name of the properties in the XYZ file. \
                      Used to color the scatter plot for all samples (N floats).',
