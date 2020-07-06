@@ -165,10 +165,6 @@ def write_chemiscope_input(filename,
         data['meta']['name'] = filename
 
     properties = {}
-    if extra is not None:
-        for name, value in extra.items():
-            properties.update(_linearize(name, value))
-
     # Read properties coming from the ase.Atoms objects
     from_frames = {}
 
@@ -225,6 +221,11 @@ def write_chemiscope_input(filename,
 
     for name, value in from_frames.items():
         properties.update(_linearize(name, value))
+
+    # Write extras - possibly overrides the internal properties
+    if extra is not None:
+        for name, value in extra.items():
+            properties.update(_linearize(name, value))
 
     data['properties'] = properties
     data['structures'] = [_frame_to_json(frame) for frame in frames]

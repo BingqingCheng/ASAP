@@ -4,6 +4,7 @@ Color functions
 
 import os
 import numpy as np
+import pandas as pd
 
 from asaplib.data import ASAPXYZ
 
@@ -30,17 +31,27 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0,
 
     # if there is a file named "fcolor", we load it for the color scheme
     if os.path.isfile(fcolor):
-        # load the column=colorscol for color functions
-        try:
-            loadcolor = np.genfromtxt(fcolor, dtype=float)
-        except:
-            raise IOError('Error in loading fcolor files for the color scheme')
+
+        if fcolor.endswith('.csv'):
+            print("Reading as CSV - first row will be used as the header.")
+            loadcolor = pd.read_csv(fcolor)
+        else:
+            # load the column=colorscol for color functions
+            try:
+                loadcolor = pd.DataFrame(np.genfromtxt(fcolor, dtype=float))
+            except:
+                raise IOError('Error in loading fcolor files for the color scheme')
 
         # print(np.shape(loadcolor))
-        if colorscol > 0 or len(np.shape(loadcolor)) > 1:
-            plotcolor = loadcolor[:, colorscol]
+        if colorscol != '0' or len(loadcolor.columns) > 1:
+            # Convert to integer if possible (for data without header)
+            try:
+                colorscol = int(colorscol)
+            except ValueError:
+                pass
+            plotcolor = loadcolor[colorscol].values.astype(float)
         else:
-            plotcolor = loadcolor
+            plotcolor = loadcolor.values[:, 0]
         print('load file: ' + fcolor + ' for color schemes')
 
         if peratom or project_atomic:
@@ -91,13 +102,13 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0,
     if peratom and not project_atomic:
         # print(np.shape(plotcolor_atomic))
         colorscale = [np.nanmin(plotcolor_atomic), np.nanmax(plotcolor_atomic)]
-        return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale
+        return plotcolor, np.asarray(plotcolor_atomic), colorlabel, colorscale, loadcolor
     elif project_atomic:
         colorscale = [None, None]
-        return np.asarray(plotcolor_atomic), [], colorlabel, colorscale
+        return np.asarray(plotcolor_atomic), [], colorlabel, colorscale, loadcolor
     else:
         colorscale = [None, None]
-        return plotcolor, [], colorlabel, colorscale
+        return plotcolor, [], colorlabel, colorscale, loadcolor
 
 
 class COLOR_PALETTE:
