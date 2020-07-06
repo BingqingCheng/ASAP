@@ -138,11 +138,10 @@ def map_process(obj, reduce_dict, axes, map_name):
     outfilename = obj['fig_options']['outfile']
     outmode = obj['map_options']['outmode']
     species_name = obj['map_options']['only_use_species']
-    external_data = obj['map_options']['external_data']
     if obj['map_options']['project_atomic']:
         map_save(outfilename, outmode, obj['asapxyz'], None, proj, map_name, species_name)
     else:
-        map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name, species_name, external_data)
+        map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name, species_name)
 
 def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, annotate, axes):
     """
@@ -156,7 +155,7 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, a
         asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
     plt.show()
 
-def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_name, external_data=None):
+def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_name):
     """
     Save the low-D projections
     """
@@ -176,11 +175,7 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_nam
         else:
             # If we write atomic projection assume we want to show them
             cutoff = 3.5 if proj_atomic else None
-            if external_data is not None:
-                extra = {str(colname): external_data[colname].values for colname in external_data.columns}
-            else:
-                extra = None
-            asapxyz.write_chemiscope(foutput, cutoff=cutoff, extra=extra)
+            asapxyz.write_chemiscope(foutput, cutoff=cutoff)
     else:
         pass
 
