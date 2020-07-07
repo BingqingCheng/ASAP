@@ -467,7 +467,7 @@ def plot_pca(ctx, scale, dimension, axes,
 @map_setup_options
 @map_io_options
 @color_setup_options
-def map(ctx, fxyz, design_matrix, prefix, output,
+def map(ctx, fxyz, design_matrix, prefix, output, extra_properties,
          use_atomic_descriptors, only_use_species, peratom, keepraw,
          color, color_column, color_label, colormap, color_from_zero, normalized_by_size,
          annotate, adjusttext, style, aspect_ratio):
@@ -481,6 +481,11 @@ def map(ctx, fxyz, design_matrix, prefix, output,
         return
     if prefix is None: prefix = "ASAP-lowD-map"
     ctx.obj['asapxyz'], ctx.obj['design_matrix'], ctx.obj['design_matrix_atomic'] = read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, peratom)
+
+    # Read additional properties
+    if extra_properties:
+        ctx.obj['asapxyz'].load_properties(extra_properties)
+
     if ctx.obj['asapxyz'] is None: output = 'matrix'
     print(len(ctx.obj['design_matrix_atomic']))
     # remove the raw descriptors

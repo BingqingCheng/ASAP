@@ -123,6 +123,8 @@ def map_io_options(f):
     f = click.option('--output', '-o', type=click.Choice(['xyz', 'matrix', 'none', 'chemiscope'], case_sensitive=False),
                      help='Output file format.',
                      default='xyz')(f)
+    f = click.option('--extra-properties', '-ep', type=click.Path(exists=True),
+                     help='Additional properties to be read for each frmae in CSV format.')(f)
     return f
 
 def color_setup_options(f):
