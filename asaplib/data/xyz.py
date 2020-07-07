@@ -8,6 +8,7 @@ from ase import Atoms
 from ase.io import read, write
 from tqdm.auto import tqdm
 from joblib import Parallel, delayed
+import pandas as pd
 
 from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
@@ -621,6 +622,24 @@ class ASAPXYZ:
                 else:
                     pass
                     #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+
+    def load_properties(self, filename, header='infer', prefix='X', **kwargs):
+        """
+        Load properties from a CSV file
+
+        Read in the CSV file and save the columns to the `info` dictionary of the
+        frames.
+
+        Parameters
+        ----------
+        filename: (str) Name of the CSV file.
+        header: Row number of the header. Defaults to use the first row unless explicit
+          names for the columns are given
+        """
+        data = pd.read_csv(filename, header=header, prefix=prefix, **kwargs)
+
+        for frame, (_, row) in zip(self.frames, data.iterrows()):
+            frame.info.update(row.to_dict())
 
     def write(self, filename, sbs=[], save_acronym=False, wrap_output=True):
         """
