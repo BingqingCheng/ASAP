@@ -277,7 +277,7 @@ def cluster(ctx, fxyz, design_matrix, use_atomic_descriptors, only_use_species, 
 @cluster.command('fdb')
 @click.pass_context
 def fdb(ctx):
-    """FDB"""
+    """Clustering by fast search and find of density peaks (FDB)"""
     from asaplib.cluster import DBCluster, LAIO_DB
     trainer = LAIO_DB()
     
@@ -297,7 +297,7 @@ def fdb(ctx):
               default=None)
 @click.pass_context
 def dbscan(ctx, metric, min_samples, eps):
-    """DBSCAN"""
+    """Density-based spatial clustering of applications with noise (DBSCAN)"""
     from asaplib.cluster import sklearn_DB
     if eps is None:
         from scipy.spatial.distance import cdist
@@ -320,7 +320,7 @@ def dbscan(ctx, metric, min_samples, eps):
 @file_output_options
 def plot_pca(ctx, scale, dimension, axes,
              peratom, adjusttext, annotate, aspect_ratio, style, prefix):
-    """ Plot the clustering results using a PCA map """
+    """ Plot the clustering results using a PCA map. Only use this command after fdb or dbscan.  """
     if prefix is None:
         prefix = "clustering-pca"
     colorlabel = "Clustering results"
@@ -337,7 +337,7 @@ def plot_pca(ctx, scale, dimension, axes,
         ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
 
-    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, 'gnuplot', style, aspect_ratio, adjusttext)
     ctx.obj['fig_options']['components'].update({"third_p": {"type": 'cluster', 'w_label': True, 'circle_size': 20}})
     map_name = "clustering-pca-d-"+str(dimension)
     reduce_dict = {'pca': {
