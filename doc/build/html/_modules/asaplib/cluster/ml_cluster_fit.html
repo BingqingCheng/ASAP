@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.cluster.ml_cluster_fit &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.cluster.ml_cluster_fit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.cluster.ml_cluster_fit</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Density-based Clustering Algorithms</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">dump</span> <span class="k">as</span> <span class="n">ydump</span>
+<span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">Dumper</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">DBSCAN</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">silhouette_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+
+<span class="kn">from</span> <span class="nn">.ml_cluster_base</span> <span class="kn">import</span> <span class="n">ClusterBase</span><span class="p">,</span> <span class="n">FitClusterBase</span>
+<span class="kn">from</span> <span class="nn">..io</span> <span class="kn">import</span> <span class="n">NpEncoder</span>
+
+<div class="viewcode-block" id="DBCluster"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster">[docs]</a><span class="k">class</span> <span class="nc">DBCluster</span><span class="p">(</span><span class="n">ClusterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performing clustering using density based clustering algorithm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_pairwise</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">trainer</span>
+        <span class="c1"># cluster labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># number of clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># number of noise points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_noise</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DBCluster.fit"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dmatrix</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;fit the clustering model, assume input of NxN distance matrix or Nxm coordinates&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+        <span class="c1"># Number of clusters in labels, ignoring noise if present.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_noise</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Estimated number of clusters: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Estimated number of noise points: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_noise</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">silscore</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;precomputed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">silscore</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Silhouette Coefficient: </span><span class="si">%0.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">silscore</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DBCluster.get_cluster_labels"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.get_cluster_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_cluster_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;return the label of the samples in the list of index&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DBCluster.get_n_cluster"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.get_n_cluster">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span></div>
+
+<div class="viewcode-block" id="DBCluster.get_n_noise"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.get_n_noise">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_noise</span></div>
+
+<div class="viewcode-block" id="DBCluster.pack"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return all the info&quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">trainer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">trainer_params</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">pack</span><span class="p">(),</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                     <span class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">n_noise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_noise</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="DBCluster.save_state"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.DBCluster.save_state">[docs]</a>    <span class="k">def</span> <span class="nf">save_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
+         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;yaml&#39;</span><span class="p">:</span>
+             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;-clustering-state.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">yd</span><span class="p">:</span>
+                 <span class="n">ydump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">(),</span> <span class="n">yd</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">)</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;-clustering-state.json&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">jd</span><span class="p">:</span>
+                 <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">(),</span> <span class="n">jd</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">NpEncoder</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="sklearn_DB"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.sklearn_DB">[docs]</a><span class="k">class</span> <span class="nc">sklearn_DB</span><span class="p">(</span><span class="n">FitClusterBase</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html</span>
+<span class="sd">    eps : float, optional</span>
+<span class="sd">        The maximum distance between two samples for one to be considered as in the neighborhood of the other.</span>
+<span class="sd">        This is not a maximum bound on the distances of points within a cluster.</span>
+<span class="sd">        This is the most important DBSCAN parameter to choose appropriately for your dataset and distance function.</span>
+
+<span class="sd">    min_samples : int, optional</span>
+<span class="sd">        The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.</span>
+<span class="sd">        This includes the point itself.</span>
+
+<span class="sd">    metric : string, or callable</span>
+<span class="sd">        The metric to use when calculating distance between instances in a feature array.</span>
+<span class="sd">        If metric is a string or callable, it must be one of the options allowed by sklearn.metrics.pairwise_distances for its metric parameter.</span>
+<span class="sd">        If metric is “precomputed”, X is assumed to be a distance matrix and must be square.</span>
+<span class="sd">        X may be a sparse matrix, in which case only “nonzero” elements may be considered neighbors for DBSCAN.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_pairwise</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metrictype</span><span class="o">=</span><span class="s1">&#39;precomputed&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;DBSCAN&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metrictype</span>  <span class="c1"># e.g. &#39;euclidean&#39;</span>
+        <span class="c1"># distance metric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
+        <span class="c1"># The number of samples in a neighborhood for a point to be considered as a core point.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples</span> <span class="o">=</span> <span class="n">min_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="sklearn_DB.fit"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.sklearn_DB.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dmatrix</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_samples</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span></div>
+
+<div class="viewcode-block" id="sklearn_DB.pack"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.sklearn_DB.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return all the info&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="LAIO_DB"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB">[docs]</a><span class="k">class</span> <span class="nc">LAIO_DB</span><span class="p">(</span><span class="n">FitClusterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clustering by fast search and find of density peaks, Rodriguez and Laio (2014).</span>
+
+<span class="sd">    https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf</span>
+
+<span class="sd">    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$</span>
+<span class="sd">    $$ \delta_i\,=\,\min_{j:\rho_j&gt;\rho_i}(d_{ij})$$</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distances</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dens_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mf">2.0</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        distances: numpy array of distances between data points and their neighbours of shape (Nele, n_neigh_comp)</span>
+<span class="sd">        where Nele is the number of data points and n_neigh_comp is the number of neighbours to consider.</span>
+
+<span class="sd">        indices: numpy array of shape (Nele, n_neigh_comp) where row i gives the indices of the neighbours for data point i</span>
+
+<span class="sd">        dens_type: The type of density to compute. Can be &#39;exp&#39; (exponential) or None (linear)</span>
+
+<span class="sd">        dc: float giving the cutoff distance beyond which data points don&#39;t contribute to the local density computation</span>
+<span class="sd">        of another datapoint.</span>
+
+<span class="sd">        percent: Criterion for choosing dc, int from 0-100, typically chosen such that the average number of neighbours</span>
+<span class="sd">        is 1-2% of the total number of points in the dataset. Default is 2%.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;LAIO_DB&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dens_type</span> <span class="o">=</span> <span class="n">dens_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc</span> <span class="o">=</span> <span class="n">dc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">percent</span> <span class="o">=</span> <span class="n">percent</span>
+
+        <span class="c1"># numpy array of shape (Nele,) where the densities of the data points expressed in terms of the number of data</span>
+        <span class="c1"># points within the cutoff distance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dens</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># numpy array of shape (Nele,) of the distances to the nearest data point to i</span>
+        <span class="c1"># possessing a higher local density.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># numpy array of shape (Nele,) where the ith entry gives the index of the nearest neighbour with</span>
+        <span class="c1"># higher density than data point i.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_neigh</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Unused currently</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decision_graph</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Clusters must lie at a distance greater than self.delta_cut (float) apart to be designated as independent</span>
+        <span class="c1"># clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_cut</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If a &quot;cluster&quot; has a density smaller than self.dens_cut (float) it is discarded as noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># numpy array of shape (Nele, ) giving the cluster (int from 0 to N) each data point belongs to.</span>
+        <span class="c1"># Clusters are labelled by density. Cluster 0 has the highest density and cluster N has the smallest density.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># numpy array of shape (N,) giving the indices of the N cluster centres.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_indices</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># numpy array of shape (Nele,) where halo points are designated as -1 and otherwise are assigned to their</span>
+        <span class="c1"># respective cluster centres</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">halo</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LAIO_DB.get_dc"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_dc">[docs]</a>    <span class="k">def</span> <span class="nf">get_dc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the cutoff distance given the data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: The data array of shape (Nele, proj_dim) where N is the number of data points and proj_dim is the number of</span>
+<span class="sd">        projected components of the kernel matrix.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.dc, the cutoff distance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Nele</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># The number of neighbours to consider is dictated by the percent parameter provided (default is 2% of the</span>
+        <span class="c1"># total data points.</span>
+        <span class="n">n_neigh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">percent</span><span class="o">/</span><span class="mf">100.</span><span class="o">*</span><span class="n">Nele</span><span class="p">)</span>
+
+        <span class="c1"># Compute with 4 times the recommended percentage of neighbours in order that we may re-estimate the percent</span>
+        <span class="c1"># value supplied (rper) based on the data.</span>
+        <span class="n">n_neigh_comp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">percent</span><span class="o">/</span><span class="mf">100.</span><span class="o">*</span><span class="n">Nele</span><span class="p">)</span>
+        <span class="n">neigh</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neigh_comp</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># The cutoff distance dc is the average distance (averaged over all data points) of the &quot;0.02*Nele&quot;th neighbour</span>
+        <span class="n">dc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[:,</span> <span class="n">n_neigh</span><span class="p">])</span>
+
+        <span class="c1"># To store the local densities of each data point</span>
+        <span class="n">dens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="c1"># We update dc based on a re-estimated percentage rper. Stop when rper is close to self.percent</span>
+        <span class="k">while</span> <span class="n">tt</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">:</span>
+            <span class="n">dc</span> <span class="o">=</span> <span class="n">dc</span><span class="o">*</span><span class="n">factor</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nele</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">dens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">[(</span><span class="n">a</span> <span class="o">&lt;=</span> <span class="n">dc</span><span class="p">)])</span>
+            <span class="n">rper</span> <span class="o">=</span> <span class="mf">100.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">dens</span><span class="p">)</span><span class="o">/</span><span class="n">Nele</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="n">rper</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">percent</span> <span class="o">-</span> <span class="mf">1.</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+                <span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span><span class="o">/</span><span class="mf">1.001</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">factor</span> <span class="o">=</span> <span class="n">factor</span><span class="o">*</span><span class="mf">1.001</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc</span> <span class="o">=</span> <span class="n">dc</span></div>
+
+<div class="viewcode-block" id="LAIO_DB.get_decision_graph"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_decision_graph">[docs]</a>    <span class="k">def</span> <span class="nf">get_decision_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">fplot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method currently doesn&#39;t produce the decision graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: numpy array of shape (Nele, proj_dim).</span>
+<span class="sd">        fplot: Boolean indicating whether or not to plot the decision graph</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Nele</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Nele</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_dc</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># check compatibility between the provided cutoff distance and the provided distance matrix</span>
+            <span class="n">n_neigh_comp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">10.</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">percent</span><span class="o">/</span><span class="mf">100.</span><span class="o">*</span><span class="n">Nele</span><span class="p">)</span>
+            <span class="n">neigh</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neigh_comp</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[:,</span> <span class="n">n_neigh_comp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dc too big for being included within the&quot;</span><span class="p">,</span> <span class="mf">10.</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">percent</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%  o</span><span class="s2">f data, consider using a &quot;</span>
+                                                                                    <span class="s2">&quot;small dc or augment the percent &quot;</span>
+                                                                                    <span class="s2">&quot;parameter&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nele</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">[(</span><span class="n">a</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens_type</span> <span class="o">==</span> <span class="s1">&#39;exp&#39;</span><span class="p">:</span>  <span class="c1"># Density is no longer number but exponential</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nele</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dc</span>  <span class="c1"># distances expressed as a fraction of the cutoff distance</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># The densities computed by this class or not log densities. Log densities are returned by the KDE class.</span>
+
+        <span class="c1"># self.dens_cut = 0.2 * np.mean(np.log(self.dens)) + 0.8 * np.min(np.log(self.dens))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_cut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_neigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">imax</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># holds index of data point with highest local density</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">higher_dens_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[((</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">indices</span> <span class="o">!=</span> <span class="n">i</span><span class="p">))]</span>
+            <span class="n">higher_dens_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[((</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">indices</span> <span class="o">!=</span> <span class="n">i</span><span class="p">))]</span>
+            <span class="k">if</span> <span class="n">higher_dens_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">cdist</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])],</span> <span class="n">higher_dens_data</span><span class="p">))</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ref_neigh</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">higher_dens_indices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
+                <span class="n">imax</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">[</span><span class="n">imax</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">)</span><span class="o">*</span><span class="mf">1.05</span>
+
+        <span class="c1"># Plot kernel density on x-axis and delta_to_neigh (point of higher density) on the y-axis</span>
+
+        <span class="k">if</span> <span class="n">fplot</span><span class="p">:</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">)],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_cut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta_cut</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">)],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Decision Graph&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;rho&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;delta&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LAIO_DB.get_assignation"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_assignation">[docs]</a>    <span class="k">def</span> <span class="nf">get_assignation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: numpy array of shape (Nele, proj_dim) where proj_dim gives the number of dimensions the kernel matrix is</span>
+<span class="sd">              projected to</span>
+<span class="sd">        Returns: self.halo numpy array of shape (Nele, ) where halo points are designated as -1 and otherwise are</span>
+<span class="sd">        assigned to their respective cluster centres.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ordered_by_dens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">)</span>  <span class="c1"># data points in descending order of density</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">center_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="n">ncluster</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span class="c1"># trick to iterate through the ordered_by_dens array</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">ordered_by_dens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_to_neigh</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta_cut</span><span class="p">):</span>
+                <span class="n">ncluster</span> <span class="o">=</span> <span class="n">ncluster</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncluster</span>
+                <span class="n">center_label</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncluster</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># the assigned cluster is the cluster the closest neighbour of higher density belongs to</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_neigh</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+                <span class="n">center_label</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[(</span><span class="n">center_label</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="c1"># border points is a binary array, 1 if data point has a neighbour that has been assigned a different cluster</span>
+        <span class="c1"># centre and 0 otherwise.</span>
+        <span class="n">border_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">halo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:][(</span><span class="bp">self</span><span class="o">.</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc</span><span class="p">)]:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                    <span class="n">border_points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">halo_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ncluster</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncluster</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># Extract the densities of a cluster&#39;s border points</span>
+            <span class="n">dens_of_border_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dens</span><span class="p">[((</span><span class="n">border_points</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span> <span class="o">==</span> <span class="n">i</span><span class="p">))]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dens_of_border_points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># if a cluster has no border points then it has no halo points.</span>
+                <span class="n">halo_cutoff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">halo_cutoff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dens_of_border_points</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">halo</span><span class="p">[</span><span class="n">indices</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">dens</span> <span class="o">&lt;</span> <span class="n">halo_cutoff</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">])]]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">halo</span></div>
+
+<div class="viewcode-block" id="LAIO_DB.fit"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the center labels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: numpy array of shape (Nele, proj_dim) where proj_dim is the number of components the kernel matrix has been</span>
+<span class="sd">              projected to.</span>
+<span class="sd">        rho: densities, default is None since the DP.py module computes the densities itself.</span>
+<span class="sd">        Returns: cluster_labels: numpy array of shape (Nele,) giving the cluster (int from 0 to N) each data point</span>
+<span class="sd">        belongs to. Halo points are designated as -1.</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_dc</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_decision_graph</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">cluster_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_assignation</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cluster_labels</span></div>
+
+<div class="viewcode-block" id="LAIO_DB.pack"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.LAIO_DB.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return dictionary containing the cutoff distance, self.dc, for data points to contribute to the local density</span>
+<span class="sd">        of another data point as well as self.dens_cut, the density threshold for defining a cluster.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">deltamin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dc</span><span class="p">,</span> <span class="n">rhomin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dens_cut</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Legacy Code below for old Fast Search and Find of Density Peaks class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="old_LAIO"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.old_LAIO">[docs]</a><span class="k">class</span> <span class="nc">old_LAIO</span><span class="p">(</span><span class="n">FitClusterBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Laio Clustering scheme</span>
+<span class="sd">    Clustering by fast search and find of density peaks</span>
+<span class="sd">    https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf</span>
+
+<span class="sd">    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$ i.e. the local density of data point x_i</span>
+<span class="sd">    $$ \delta_i\,=\,\min_{j:\rho_j&gt;\rho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="c1">#    A summary of laio clustering algorithm:</span>
+<span class="c1">#    1. First do a kernel density estimation (rho_i) for each data point i</span>
+<span class="c1">#    2. For each data point i, compute the distance (delta_i) between i and j,</span>
+<span class="c1">#       j is the closet data point that has a density higher then i, i.e. rho(j) &gt; rho(i).</span>
+<span class="c1">#    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)</span>
+<span class="c1">#    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:</span>
+<span class="c1">#       i) rho({cl}) &gt; rhomin</span>
+<span class="c1">#       ii) delta({cl}) &gt; delta_min</span>
+<span class="c1">#       one needs to set the two parameters rhomin and delta_min.</span>
+<span class="c1">#    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.</span>
+<span class="c1"># one needs to set two parameters:</span>
+
+    <span class="n">_pairwise</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deltamin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rhomin</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param deltamin: the lower bound on the distance between two cluster centres</span>
+<span class="sd">        :param rhomin: The lower bound in kernel density, if the density of a cluster is lower</span>
+<span class="sd">                       than this threshold, this &quot;cluster&quot; will be discarded as noise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span> <span class="o">=</span> <span class="n">deltamin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span> <span class="o">=</span> <span class="n">rhomin</span>
+
+<div class="viewcode-block" id="old_LAIO.fit"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.old_LAIO.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dmatrix</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dmatrix: The distance matrix of shape (Nele, Nele)</span>
+<span class="sd">        rho: The log densities of the points of shape (Nele,)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">rho</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;for fdb it is better to compute kernel density first&#39;</span><span class="p">)</span>
+
+        <span class="n">delta</span><span class="p">,</span> <span class="n">nneigh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_delta</span><span class="p">(</span><span class="n">dmatrix</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
+
+        <span class="c1">#  if there&#39;s no input values for rhomin and deltamin, we use simple heuristics</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span> <span class="o">=</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.8</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="c1">#here we make the decision graph</span>
+        <span class="c1">#x axis (rho) is the kernel density for each data point</span>
+        <span class="c1">#y axis (delta) is the distance to the nearest higher density points</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="nb">min</span><span class="p">(</span><span class="n">rho</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">rho</span><span class="p">)],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span><span class="p">],</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">delta</span><span class="p">)],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;rho&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;delta&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="n">nclust</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># cluster index</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># numpy array of -1&#39;s</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span> <span class="ow">and</span> <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span><span class="p">:</span>
+                <span class="n">nclust</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">cl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">nclust</span>
+
+        <span class="c1"># Assignment</span>
+        <span class="n">ordrho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">rho</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Indices of data points in descending order of local density</span>
+        <span class="n">rho_ord</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">ordrho</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">cl</span><span class="p">[</span><span class="n">ordrho</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">cl</span><span class="p">[</span><span class="n">ordrho</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">cl</span><span class="p">[</span><span class="n">nneigh</span><span class="p">[</span><span class="n">ordrho</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span>
+        <span class="k">return</span> <span class="n">cl</span></div>
+
+<div class="viewcode-block" id="old_LAIO.estimate_delta"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.old_LAIO.estimate_delta">[docs]</a>    <span class="k">def</span> <span class="nf">estimate_delta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">rho</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For each data point i, compute the distance (delta_i) between i and j,</span>
+<span class="sd">        j is the closest data point that has a density higher then i, i.e. rho(j) &gt; rho(i).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dist: distance matrix of shape (Nele, Nele)</span>
+<span class="sd">        rho: log densities for each data point array of shape (Nele,)</span>
+
+<span class="sd">        Returns: delta: numpy array of distances to nearest cluster centre for each datapoint.</span>
+<span class="sd">                 nneight: numpy array giving the index of the nearest cluster centre.</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">rho</span><span class="o">*</span><span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">nneigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)):</span>
+            <span class="c1">#  for data i, find all points that have higher density</span>
+            <span class="n">js</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rho</span> <span class="o">&gt;</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1">#  if there&#39;s no j&#39;s that have higher density than i, we set delta_i to be a large distance</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">js</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">nneigh</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># find the nearest j that has higher density then i</span>
+                <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">js</span><span class="p">])</span>
+                <span class="n">nneigh</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">js</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">js</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">delta</span><span class="p">,</span> <span class="n">nneigh</span></div>
+
+<div class="viewcode-block" id="old_LAIO.pack"><a class="viewcode-back" href="../../../asaplib.cluster.html#asaplib.cluster.ml_cluster_fit.old_LAIO.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;return all the info&#39;&#39;&#39;</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">deltamin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">deltamin</span><span class="p">,</span> <span class="n">rhomin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rhomin</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

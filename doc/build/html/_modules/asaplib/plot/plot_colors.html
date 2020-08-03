@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.plot.plot_colors &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.plot.plot_colors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.plot.plot_colors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Color functions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">asaplib.data</span> <span class="kn">import</span> <span class="n">ASAPXYZ</span>
+
+
+<div class="viewcode-block" id="set_color_function"><a class="viewcode-back" href="../../../asaplib.plot.html#asaplib.plot.plot_colors.set_color_function">[docs]</a><span class="k">def</span> <span class="nf">set_color_function</span><span class="p">(</span><span class="n">fcolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">asapxyz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorscol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> 
+              <span class="n">peratom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">project_atomic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_atomic_species</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_from_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extensive</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; obtain the essential informations to define the colors of data points</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fcolor: str, the name of the file or the tag in the xyz to define the colors</span>
+<span class="sd">    asapxyz: ASAPXYZ object, (optional)</span>
+<span class="sd">    colorscol: int, (optional). if the color file has more than one column, which column to use</span>
+<span class="sd">    n_samples: int, (optional). The number of data points</span>
+<span class="sd">    peratom: bool, return atomic color</span>
+<span class="sd">    project_atomic: the samples are atomic descriptors</span>
+<span class="sd">    use_atomic_species: int, the atomic number of the selected species</span>
+<span class="sd">    color_from_zero: bool, set the min color to zero</span>
+<span class="sd">    extensive: bool, normalize the quatity by number of atoms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">plotcolor</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">colorscale</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="c1"># if there is a file named &quot;fcolor&quot;, we load it for the color scheme</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fcolor</span><span class="p">):</span>
+        <span class="c1"># load the column=colorscol for color functions</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loadcolor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">fcolor</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Error in loading fcolor files for the color scheme&#39;</span><span class="p">)</span>
+
+        <span class="c1"># print(np.shape(loadcolor))</span>
+        <span class="k">if</span> <span class="n">colorscol</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">loadcolor</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">loadcolor</span><span class="p">[:,</span> <span class="n">colorscol</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">loadcolor</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;load file: &#39;</span> <span class="o">+</span> <span class="n">fcolor</span> <span class="o">+</span> <span class="s1">&#39; for color schemes&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">peratom</span> <span class="ow">or</span> <span class="n">project_atomic</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">asapxyz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Need the xyz so that we know the number of atoms in each frame&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotcolor</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">natomnow</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">asapxyz</span><span class="o">.</span><span class="n">get_natom_list_by_species</span><span class="p">(</span><span class="n">use_atomic_species</span><span class="p">)):</span>
+                    <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">,</span> <span class="n">plotcolor</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">natomnow</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_total_natoms</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">plotcolor</span><span class="p">):</span>
+                <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="n">plotcolor</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Length of the xyz trajectory is not the same as number of colors in the fcolor file&#39;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">n_samples</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fcolor</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;Index&#39;</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">peratom</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="c1"># we use the index as the color scheme</span>
+        <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+        <span class="n">fcolor</span> <span class="o">=</span> <span class="s1">&#39;sample index&#39;</span>
+
+    <span class="k">elif</span> <span class="n">asapxyz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Cannot find the xyz or fcolor files for the color scheme&#39;</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;Index&#39;</span> <span class="ow">or</span> <span class="n">fcolor</span> <span class="o">==</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span>
+            <span class="c1"># we use the index as the color scheme</span>
+            <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">asapxyz</span><span class="o">.</span><span class="n">get_num_frames</span><span class="p">())</span>
+            <span class="n">fcolor</span> <span class="o">=</span> <span class="s1">&#39;sample index&#39;</span>
+            <span class="k">if</span> <span class="n">peratom</span> <span class="ow">or</span> <span class="n">project_atomic</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">natomnow</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">asapxyz</span><span class="o">.</span><span class="n">get_natom_list_by_species</span><span class="p">(</span><span class="n">use_atomic_species</span><span class="p">)):</span>
+                    <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">,</span> <span class="n">plotcolor</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">natomnow</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="n">fcolor</span><span class="p">,</span> <span class="n">extensive</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot find the specified property from the xyz file for the color scheme&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">peratom</span> <span class="ow">or</span> <span class="n">project_atomic</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_atomic_property</span><span class="p">(</span><span class="n">fcolor</span><span class="p">,</span> <span class="n">extensive</span><span class="p">,</span> <span class="p">[],</span> <span class="n">use_atomic_species</span><span class="p">)</span>
+                    <span class="c1">#print(np.shape(plotcolor_atomic))</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot find the specified atomic property from the xyz file for the color scheme&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">color_from_zero</span><span class="p">:</span>
+        <span class="c1"># set the min to zero</span>
+        <span class="n">plotcolor</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plotcolor</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">plotcolor</span><span class="p">)</span>
+        <span class="n">plotcolor_atomic</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">plotcolor</span><span class="p">)</span>
+
+    <span class="n">colorlabel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fcolor</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">peratom</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">project_atomic</span><span class="p">:</span>
+        <span class="c1"># print(np.shape(plotcolor_atomic))</span>
+        <span class="n">colorscale</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">plotcolor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">),</span> <span class="n">colorlabel</span><span class="p">,</span> <span class="n">colorscale</span>
+    <span class="k">elif</span> <span class="n">project_atomic</span><span class="p">:</span>
+        <span class="n">colorscale</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">plotcolor_atomic</span><span class="p">),</span> <span class="p">[],</span> <span class="n">colorlabel</span><span class="p">,</span> <span class="n">colorscale</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">colorscale</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">plotcolor</span><span class="p">,</span> <span class="p">[],</span> <span class="n">colorlabel</span><span class="p">,</span> <span class="n">colorscale</span></div>
+
+
+<div class="viewcode-block" id="COLOR_PALETTE"><a class="viewcode-back" href="../../../asaplib.plot.html#asaplib.plot.plot_colors.COLOR_PALETTE">[docs]</a><span class="k">class</span> <span class="nc">COLOR_PALETTE</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pal</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#FF34FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF4A46&quot;</span><span class="p">,</span> <span class="s2">&quot;#008941&quot;</span><span class="p">,</span> <span class="s2">&quot;#006FA6&quot;</span><span class="p">,</span> <span class="s2">&quot;#A30059&quot;</span><span class="p">,</span> <span class="s2">&quot;#0000A6&quot;</span><span class="p">,</span> <span class="s2">&quot;#63FFAC&quot;</span><span class="p">,</span> <span class="s2">&quot;#B79762&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#004D43&quot;</span><span class="p">,</span> <span class="s2">&quot;#8FB0FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#997D87&quot;</span><span class="p">,</span> <span class="s2">&quot;#5A0007&quot;</span><span class="p">,</span> <span class="s2">&quot;#809693&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#1B4400&quot;</span><span class="p">,</span> <span class="s2">&quot;#4FC601&quot;</span><span class="p">,</span> <span class="s2">&quot;#3B5DFF&quot;</span><span class="p">,</span> <span class="s2">&quot;#4A3B53&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF2F80&quot;</span><span class="p">,</span> <span class="s2">&quot;#61615A&quot;</span><span class="p">,</span> <span class="s2">&quot;#BA0900&quot;</span><span class="p">,</span> <span class="s2">&quot;#6B7900&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#00C2A0&quot;</span><span class="p">,</span> <span class="s2">&quot;#FFAA92&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF90C9&quot;</span><span class="p">,</span> <span class="s2">&quot;#B903AA&quot;</span><span class="p">,</span> <span class="s2">&quot;#D16100&quot;</span><span class="p">,</span> <span class="s2">&quot;#DDEFFF&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#000035&quot;</span><span class="p">,</span> <span class="s2">&quot;#7B4F4B&quot;</span><span class="p">,</span> <span class="s2">&quot;#A1C299&quot;</span><span class="p">,</span> <span class="s2">&quot;#300018&quot;</span><span class="p">,</span> <span class="s2">&quot;#0AA6D8&quot;</span><span class="p">,</span> <span class="s2">&quot;#013349&quot;</span><span class="p">,</span> <span class="s2">&quot;#00846F&quot;</span><span class="p">,</span> <span class="s2">&quot;#372101&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#FFB500&quot;</span><span class="p">,</span> <span class="s2">&quot;#C2FFED&quot;</span><span class="p">,</span> <span class="s2">&quot;#A079BF&quot;</span><span class="p">,</span> <span class="s2">&quot;#CC0744&quot;</span><span class="p">,</span> <span class="s2">&quot;#C0B9B2&quot;</span><span class="p">,</span> <span class="s2">&quot;#C2FF99&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#001E09&quot;</span><span class="p">,</span> <span class="s2">&quot;#00489C&quot;</span><span class="p">,</span> <span class="s2">&quot;#6F0062&quot;</span><span class="p">,</span> <span class="s2">&quot;#0CBD66&quot;</span><span class="p">,</span> <span class="s2">&quot;#EEC3FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#456D75&quot;</span><span class="p">,</span> <span class="s2">&quot;#B77B68&quot;</span><span class="p">,</span> <span class="s2">&quot;#7A87A1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#788D66&quot;</span><span class="p">,</span> <span class="s2">&quot;#885578&quot;</span><span class="p">,</span> <span class="s2">&quot;#FAD09F&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF8A9A&quot;</span><span class="p">,</span> <span class="s2">&quot;#D157A0&quot;</span><span class="p">,</span> <span class="s2">&quot;#BEC459&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#456648&quot;</span><span class="p">,</span> <span class="s2">&quot;#0086ED&quot;</span><span class="p">,</span> <span class="s2">&quot;#886F4C&quot;</span><span class="p">,</span> <span class="s2">&quot;#34362D&quot;</span><span class="p">,</span> <span class="s2">&quot;#B4A8BD&quot;</span><span class="p">,</span> <span class="s2">&quot;#00A6AA&quot;</span><span class="p">,</span> <span class="s2">&quot;#452C2C&quot;</span><span class="p">,</span> <span class="s2">&quot;#636375&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#A3C8C9&quot;</span><span class="p">,</span> <span class="s2">&quot;#FF913F&quot;</span><span class="p">,</span> <span class="s2">&quot;#938A81&quot;</span><span class="p">,</span> <span class="s2">&quot;#575329&quot;</span><span class="p">,</span> <span class="s2">&quot;#00FECF&quot;</span><span class="p">,</span> <span class="s2">&quot;#B05B6F&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#8CD0FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#3B9700&quot;</span><span class="p">,</span> <span class="s2">&quot;#04F757&quot;</span><span class="p">,</span> <span class="s2">&quot;#C8A1A1&quot;</span><span class="p">,</span> <span class="s2">&quot;#1E6E00&quot;</span><span class="p">,</span> <span class="s2">&quot;#7900D7&quot;</span><span class="p">,</span> <span class="s2">&quot;#A77500&quot;</span><span class="p">,</span> <span class="s2">&quot;#6367A9&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#A05837&quot;</span><span class="p">,</span> <span class="s2">&quot;#6B002C&quot;</span><span class="p">,</span> <span class="s2">&quot;#772600&quot;</span><span class="p">,</span> <span class="s2">&quot;#D790FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#9B9700&quot;</span><span class="p">,</span> <span class="s2">&quot;#549E79&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#FFF69F&quot;</span><span class="p">,</span> <span class="s2">&quot;#201625&quot;</span><span class="p">,</span> <span class="s2">&quot;#72418F&quot;</span><span class="p">,</span> <span class="s2">&quot;#BC23FF&quot;</span><span class="p">,</span> <span class="s2">&quot;#99ADC0&quot;</span><span class="p">,</span> <span class="s2">&quot;#3A2465&quot;</span><span class="p">,</span> <span class="s2">&quot;#922329&quot;</span><span class="p">,</span> <span class="s2">&quot;#5B4534&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#FDE8DC&quot;</span><span class="p">,</span> <span class="s2">&quot;#404E55&quot;</span><span class="p">,</span> <span class="s2">&quot;#0089A3&quot;</span><span class="p">,</span> <span class="s2">&quot;#CB7E98&quot;</span><span class="p">,</span> <span class="s2">&quot;#A4E804&quot;</span><span class="p">,</span> <span class="s2">&quot;#324E72&quot;</span><span class="p">,</span> <span class="s2">&quot;#6A3A4C&quot;</span><span class="p">,</span> <span class="s2">&quot;#7A4900&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pal</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#30a2da&quot;</span><span class="p">,</span> <span class="s2">&quot;#fc4f30&quot;</span><span class="p">,</span> <span class="s2">&quot;#e5ae38&quot;</span><span class="p">,</span> <span class="s2">&quot;#6d904f&quot;</span><span class="p">,</span> <span class="s2">&quot;#8b8b8b&quot;</span><span class="p">,</span> <span class="s2">&quot;#006FA6&quot;</span><span class="p">,</span> <span class="s2">&quot;#A30059&quot;</span><span class="p">,</span> <span class="s2">&quot;#af8dc3&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;#922329&quot;</span><span class="p">,</span> <span class="s2">&quot;#1E6E00&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_color</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pal</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>  <span class="c1"># color cycler</span>
+        <span class="k">assert</span> <span class="n">arg</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;???&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pal</span><span class="p">[</span><span class="n">arg</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_color</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

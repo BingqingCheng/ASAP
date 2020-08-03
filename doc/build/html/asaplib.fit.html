@@ -1,0 +1,873 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.fit package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.hypers package" href="asaplib.hypers.html" />
+    <link rel="prev" title="asaplib.descriptors package" href="asaplib.descriptors.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.fit package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.fit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-fit-package">
+<h1>asaplib.fit package<a class="headerlink" href="#asaplib-fit-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.fit.base">
+<span id="asaplib-fit-base-module"></span><h2>asaplib.fit.base module<a class="headerlink" href="#module-asaplib.fit.base" title="Permalink to this headline">¶</a></h2>
+<p>Base class for regressions</p>
+<dl class="py class">
+<dt id="asaplib.fit.base.RegressorBase">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.base.</code><code class="sig-name descname">RegressorBase</code><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.RegressorMixin</span></code></p>
+<p>Base class for regressions
+contains generic methods for computing errors</p>
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>method specific</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.fit_predict">
+<code class="sig-name descname">fit_predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">X_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.fit_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.fit_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the ridge regression model with the design matrix and trainLabel.
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:
+:param X_test:
+:type X_test: array-like, shape=[n_descriptors, n_test_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.fit_predict_error">
+<code class="sig-name descname">fit_predict_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">X_test</span></em>, <em class="sig-param"><span class="n">y_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.fit_predict_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.fit_predict_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the ridge regression model with the design matrix and trainLabel.
+and does prediction on test samples, and compute the error
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:
+:param X_test:
+:type X_test: array-like, shape=[n_descriptors, n_test_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.get_train_test_error">
+<code class="sig-name descname">get_train_test_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">y_train</span></em>, <em class="sig-param"><span class="n">X_test</span></em>, <em class="sig-param"><span class="n">y_test</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">return_pred</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.get_train_test_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.get_train_test_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>train the model, and get the test error</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>method specific</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.predict_error">
+<code class="sig-name descname">predict_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.predict_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.predict_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the score of the predictions compared with the true values
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.base.RegressorBase.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/base.html#RegressorBase.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.base.RegressorBase.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.fit.getscore">
+<span id="asaplib-fit-getscore-module"></span><h2>asaplib.fit.getscore module<a class="headerlink" href="#module-asaplib.fit.getscore" title="Permalink to this headline">¶</a></h2>
+<p>Functions for assessing the quality of the fits</p>
+<dl class="py class">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">LC_SCOREBOARD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">train_sizes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD.add_score">
+<code class="sig-name descname">add_score</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Ntrain</span></em>, <em class="sig-param"><span class="n">score</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD.add_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD.add_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD.dump_all">
+<code class="sig-name descname">dump_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD.dump_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD.dump_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD.fetch">
+<code class="sig-name descname">fetch</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sc_name</span><span class="o">=</span><span class="default_value">'RMSE'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD.fetch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD.fetch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD.fetch_all">
+<code class="sig-name descname">fetch_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD.fetch_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD.fetch_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.getscore.LC_SCOREBOARD.plot_learning_curve">
+<code class="sig-name descname">plot_learning_curve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sc_name</span><span class="o">=</span><span class="default_value">'RMSE'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#LC_SCOREBOARD.plot_learning_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.LC_SCOREBOARD.plot_learning_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the learning curve</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_mae">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_mae</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ypred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_mae"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_mae" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_r2">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_r2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_pred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_r2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_r2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_rmse">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_rmse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ypred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_rmse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_rmse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_score">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_score</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ypred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_spearman">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_spearman</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ypred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_spearman"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_spearman" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.fit.getscore.get_sup">
+<code class="sig-prename descclassname">asaplib.fit.getscore.</code><code class="sig-name descname">get_sup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ypred</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/getscore.html#get_sup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.getscore.get_sup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.fit.krr">
+<span id="asaplib-fit-krr-module"></span><h2>asaplib.fit.krr module<a class="headerlink" href="#module-asaplib.fit.krr" title="Permalink to this headline">¶</a></h2>
+<p>NOTE: These methods operate directly on the kernel matrix!!!
+some functions are adapted from Felix Musil’s ml_tools</p>
+<dl class="py class">
+<dt id="asaplib.fit.krr.KRR">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.krr.</code><code class="sig-name descname">KRR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jitter</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.fit.base.RegressorBase" title="asaplib.fit.base.RegressorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.fit.base.RegressorBase</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">kNM</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the krr model with trainKernel and trainLabel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>kernel.shape is expected as (nPred, nTrain)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.predict_uncertainty">
+<code class="sig-name descname">predict_uncertainty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">delta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.predict_uncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.predict_uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>k.shape is expected as (nPred, nTrain), delta is the variance of y</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRR.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRR.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRR.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.fit.krr.KRRFastCV">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.krr.</code><code class="sig-name descname">KRRFastCV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jitter</span></em>, <em class="sig-param"><span class="n">delta</span></em>, <em class="sig-param"><span class="n">cv</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.fit.base.RegressorBase" title="asaplib.fit.base.RegressorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.fit.base.RegressorBase</span></code></a></p>
+<p>taken from:
+An, S., Liu, W., &amp; Venkatesh, S. (2007).
+Fast cross-validation algorithms for least squares support vector machine and kernel ridge regression.
+Pattern Recognition, 40(8), 2154-2162. <a class="reference external" href="https://doi.org/10.1016/j.patcog.2006.12.015">https://doi.org/10.1016/j.patcog.2006.12.015</a></p>
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">kNM</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fast cv scheme. Destroy kernel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>method specific</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRFastCV.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRFastCV.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRFastCV.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.fit.krr.KRRSparse">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.krr.</code><code class="sig-name descname">KRRSparse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jitter</span></em>, <em class="sig-param"><span class="n">delta</span></em>, <em class="sig-param"><span class="n">sigma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.fit.base.RegressorBase" title="asaplib.fit.base.RegressorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.fit.base.RegressorBase</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kMM</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">kNM</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>N train structures, M sparsified representative structures</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.fit_predict">
+<code class="sig-name descname">fit_predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kMM</span></em>, <em class="sig-param"><span class="n">kNM</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">kNM_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.fit_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.fit_predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the ridge regression model with the design matrix and trainLabel.
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:
+:param X_test:
+:type X_test: array-like, shape=[n_descriptors, n_test_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.fit_predict_error">
+<code class="sig-name descname">fit_predict_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kMM</span></em>, <em class="sig-param"><span class="n">kNM</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">kNM_test</span></em>, <em class="sig-param"><span class="n">y_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.fit_predict_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.fit_predict_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the ridge regression model with the design matrix and trainLabel.
+and does prediction on test samples, and compute the error
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:
+:param X_test:
+:type X_test: array-like, shape=[n_descriptors, n_test_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kNM</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>kNM: the kernel matrix between the representative and the new structures with shape (N,M)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.krr.KRRSparse.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/krr.html#KRRSparse.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.krr.KRRSparse.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.fit.ridgeregression">
+<span id="asaplib-fit-ridgeregression-module"></span><h2>asaplib.fit.ridgeregression module<a class="headerlink" href="#module-asaplib.fit.ridgeregression" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.ridgeregression.</code><code class="sig-name descname">RidgeRegression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">jitter</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.fit.base.RegressorBase" title="asaplib.fit.base.RegressorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.fit.base.RegressorBase</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the ridge regression model with the design matrix and trainLabel.
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>desc.shape is expected as [n_descriptors, n_samples]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.ridgeregression.RidgeRegression.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/ridgeregression.html#RidgeRegression.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.ridgeregression.RidgeRegression.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.fit.sparse_krr_wrapper">
+<span id="asaplib-fit-sparse-krr-wrapper-module"></span><h2>asaplib.fit.sparse_krr_wrapper module<a class="headerlink" href="#module-asaplib.fit.sparse_krr_wrapper" title="Permalink to this headline">¶</a></h2>
+<p>Tools for performing sparse kernel ridge regression of design matrices
+using sparse KRR
+NOTE: this class operate directly on design matrices.
+for methods handingly kmatrix, see ./krr.py</p>
+<dl class="py class">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.fit.sparse_krr_wrapper.</code><code class="sig-name descname">SPARSE_KRR_Wrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em>, <em class="sig-param"><span class="n">krr_obj</span></em>, <em class="sig-param"><span class="n">sparse_mode</span><span class="o">=</span><span class="default_value">'fps'</span></em>, <em class="sig-param"><span class="n">n_sparse</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.fit.base.RegressorBase" title="asaplib.fit.base.RegressorBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.fit.base.RegressorBase</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train the krr model with the design matrix and trainLabel.
+:param X:
+:type X: array-like, shape=[n_descriptors, n_samples]
+:param Input points.:
+:param y:
+:type y: array-like, shape=[n_samples]
+:param Input points.:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>params</strong> – Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>mapping of string to any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.loads">
+<code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>desc.shape is expected as [n_descriptors, n_samples]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**params</strong> (<em>dict</em>) – Estimator parameters.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>self</strong> – Estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/fit/sparse_krr_wrapper.html#SPARSE_KRR_Wrapper.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.fit.sparse_krr_wrapper.SPARSE_KRR_Wrapper.unpack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.fit">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.fit" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.hypers.html" class="btn btn-neutral float-right" title="asaplib.hypers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.descriptors.html" class="btn btn-neutral float-left" title="asaplib.descriptors package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

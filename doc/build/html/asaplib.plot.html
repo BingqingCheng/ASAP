@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.plot package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.reducedim package" href="asaplib.reducedim.html" />
+    <link rel="prev" title="asaplib.kernel package" href="asaplib.kernel.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.plot package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.plot.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-plot-package">
+<h1>asaplib.plot package<a class="headerlink" href="#asaplib-plot-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.plot.plot_colors">
+<span id="asaplib-plot-plot-colors-module"></span><h2>asaplib.plot.plot_colors module<a class="headerlink" href="#module-asaplib.plot.plot_colors" title="Permalink to this headline">¶</a></h2>
+<p>Color functions</p>
+<dl class="py class">
+<dt id="asaplib.plot.plot_colors.COLOR_PALETTE">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plot_colors.</code><code class="sig-name descname">COLOR_PALETTE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">style</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_colors.html#COLOR_PALETTE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_colors.COLOR_PALETTE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_colors.set_color_function">
+<code class="sig-prename descclassname">asaplib.plot.plot_colors.</code><code class="sig-name descname">set_color_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fcolor</span><span class="o">=</span><span class="default_value">'none'</span></em>, <em class="sig-param"><span class="n">asapxyz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colorscol</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">peratom</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">project_atomic</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_atomic_species</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color_from_zero</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">extensive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_colors.html#set_color_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_colors.set_color_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>obtain the essential informations to define the colors of data points
+:param fcolor:
+:type fcolor: str, the name of the file or the tag in the xyz to define the colors
+:param asapxyz:
+:type asapxyz: ASAPXYZ object, (optional)
+:param colorscol:
+:type colorscol: int, (optional). if the color file has more than one column, which column to use
+:param n_samples:
+:type n_samples: int, (optional). The number of data points
+:param peratom:
+:type peratom: bool, return atomic color
+:param project_atomic:
+:type project_atomic: the samples are atomic descriptors
+:param use_atomic_species:
+:type use_atomic_species: int, the atomic number of the selected species
+:param color_from_zero:
+:type color_from_zero: bool, set the min color to zero
+:param extensive:
+:type extensive: bool, normalize the quatity by number of atoms</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.plot.plot_styles">
+<span id="asaplib-plot-plot-styles-module"></span><h2>asaplib.plot.plot_styles module<a class="headerlink" href="#module-asaplib.plot.plot_styles" title="Permalink to this headline">¶</a></h2>
+<p>I adapt some of the suff from:
+Copyright 2017 Alexandre Day</p>
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.add_subplot_axes">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">add_subplot_axes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">rect</span></em>, <em class="sig-param"><span class="n">axisbg</span><span class="o">=</span><span class="default_value">'w'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#add_subplot_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.add_subplot_axes" title="Permalink to this definition">¶</a></dt>
+<dd><p>e.g.
+fig = plt.figure(figsize=(10,10))
+ax = fig.add_subplot(111)
+rect = [0.2,0.2,0.7,0.7]
+ax1 = add_subplot_axes(ax,rect)
+ax1.plot(x,np.sin(x))
+plt.show()</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.plot_cluster_w_label">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">plot_cluster_w_label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">Xcluster</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">savefile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fontsize</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">psize</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">w_label</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">200</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.7</span></em>, <em class="sig-param"><span class="n">edgecolors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cp_style</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">w_legend</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">outlier</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#plot_cluster_w_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.plot_cluster_w_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D clustering plot given x,y coordinates and a label z for
+every data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – Input points.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – label for every point</p></li>
+<li><p><strong>Xcluster</strong> (<em>center of each cluster</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.plot_cluster_w_size">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">plot_cluster_w_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">s</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">w_size</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">w_label</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">circle_size</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.7</span></em>, <em class="sig-param"><span class="n">edgecolors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'coolwarm'</span></em>, <em class="sig-param"><span class="n">vmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vmin</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">psize</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">savefile</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fontsize</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">rasterized</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">remove_tick</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dpi</span><span class="o">=</span><span class="default_value">200</span></em>, <em class="sig-param"><span class="n">outlier</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#plot_cluster_w_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.plot_cluster_w_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D clustering plot given x,y coordinates and a label z for
+every data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – Input points.</p></li>
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – label for every point</p></li>
+<li><p><strong>c</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – color for every point</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.plot_density_map">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">plot_density_map</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">fig</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xlabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ylabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clabel</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xaxis</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">yaxis</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">centers</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">psize</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">out_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'coolwarm'</span></em>, <em class="sig-param"><span class="n">remove_tick</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_perc</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rasterized</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fontsize</span><span class="o">=</span><span class="default_value">15</span></em>, <em class="sig-param"><span class="n">vmax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vmin</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#plot_density_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.plot_density_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D density map given x,y coordinates and an intensity z for
+every data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – Input points.</p></li>
+<li><p><strong>z</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – Density at every point</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.plot_outlier_scatter">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">plot_outlier_scatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">ax</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#plot_outlier_scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.plot_outlier_scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.plot_scatter_w_label">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">plot_scatter_w_label</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">psize</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#plot_scatter_w_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.plot_scatter_w_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D scatter plot given x,y coordinates and a label z for
+every data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong><strong>,</strong><strong>y</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – Input points.</p></li>
+<li><p><strong>z</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – label for every point</p></li>
+<li><p><strong>plot style only looks nice when there're limited type of labels</strong> (<em>This</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.plot.plot_styles.set_nice_font">
+<code class="sig-prename descclassname">asaplib.plot.plot_styles.</code><code class="sig-name descname">set_nice_font</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">usetex</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plot_styles.html#set_nice_font"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plot_styles.set_nice_font" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.plot.plotters">
+<span id="asaplib-plot-plotters-module"></span><h2>asaplib.plot.plotters module<a class="headerlink" href="#module-asaplib.plot.plotters" title="Permalink to this headline">¶</a></h2>
+<p>Wrappers to do plots</p>
+<dl class="py class">
+<dt id="asaplib.plot.plotters.Plot_Function_Annotate">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plotters.</code><code class="sig-name descname">Plot_Function_Annotate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Annotate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Annotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.plot.plotters.Plot_Function_Base" title="asaplib.plot.plotters.Plot_Function_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.plot.plotters.Plot_Function_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plot_Function_Annotate.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">labels</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Annotate.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Annotate.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>annotate samples using tags.
+:param X:
+:type X: array-like, shape=[n_samples,2]
+:param Input points.:
+:param tags:
+:type tags: array-like, str, shape=[n_samples]
+:param tags for each point.:
+:param labels and z are not used for this plot style:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.plot.plotters.Plot_Function_Base">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plotters.</code><code class="sig-name descname">Plot_Function_Base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plot_Function_Base.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">colors</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">tags</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Base.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Base.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plot_Function_Base.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Base.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Base.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.plot.plotters.Plot_Function_Cluster">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plotters.</code><code class="sig-name descname">Plot_Function_Cluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.plot.plotters.Plot_Function_Base" title="asaplib.plot.plotters.Plot_Function_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.plot.plotters.Plot_Function_Base</span></code></a></p>
+<p>Plots a 2D clustering plot given x,y coordinates and a label z for
+every data point.
+Basically we draw a circle centered arround the mean position of the samples
+belonging to each cluster,
+with a size propotional to log(cluster_size)</p>
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plot_Function_Cluster.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Cluster.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Cluster.create" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – </p></li>
+<li><p><strong>points.</strong> (<em>Input</em>) – </p></li>
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – </p></li>
+<li><p><strong>for every point</strong> (<em>label</em>) – </p></li>
+<li><p><strong>and tags are not used for this plot style</strong> (<em>z</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.plot.plotters.Plot_Function_Scatter">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plotters.</code><code class="sig-name descname">Plot_Function_Scatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.plot.plotters.Plot_Function_Base" title="asaplib.plot.plotters.Plot_Function_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.plot.plotters.Plot_Function_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plot_Function_Scatter.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig</span></em>, <em class="sig-param"><span class="n">ax</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">z</span></em>, <em class="sig-param"><span class="n">labels</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plot_Function_Scatter.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plot_Function_Scatter.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D scatter map given x,y coordinates and a color for
+every data point</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – </p></li>
+<li><p><strong>points.</strong> (<em>Input</em>) – </p></li>
+<li><p><strong>z</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – </p></li>
+<li><p><strong>for each point.</strong> (<em>color</em>) – </p></li>
+<li><p><strong>and tags are not used for this plot style</strong> (<em>labels</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.plot.plotters.Plotters">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.plot.plotters.</code><code class="sig-name descname">Plotters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plotters.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p_spec</span></em>, <em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adding the specifications of a new kernel function
+:param p_spec:
+:type p_spec: a dictionary that specify which atomic descriptor to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plotters.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds the objects that actually make the plots
+these objects need to have .create() method to compute</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plotters.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plotters.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.plot.plotters.Plotters.plot">
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">labels</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/plot/plotters.html#Plotters.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.plot.plotters.Plotters.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D density map given 2D coordinates X
+and properties
+and tags
+for every data point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>2</em><em>]</em>) – Input points.</p></li>
+<li><p><strong>colors</strong> (<em>array-like</em><em>, </em><em>float</em><em> or </em><em>integer</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – properties used to color each point</p></li>
+<li><p><strong>labels</strong> (<em>array-like</em><em>, </em><em>float</em><em> or </em><em>integer</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – additional properties for each point</p></li>
+<li><p><strong>tags</strong> (<em>array-like</em><em>, </em><em>str</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em>) – tags used to annotate selected points</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.plot">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.plot" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.reducedim.html" class="btn btn-neutral float-right" title="asaplib.reducedim package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.kernel.html" class="btn btn-neutral float-left" title="asaplib.kernel package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

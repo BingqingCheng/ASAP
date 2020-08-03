@@ -1,0 +1,638 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.descriptors.atomic_descriptors &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.descriptors.atomic_descriptors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.descriptors.atomic_descriptors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods and functions to compute atomic desciptors</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">..io</span> <span class="kn">import</span> <span class="n">NpEncoder</span>
+
+<div class="viewcode-block" id="Atomic_Descriptors"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptors</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec_dict</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Object handing the specification and the computation of atomic descriptors</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        desc_spec_dict: dictionaries that specify which atomic descriptor to use </span>
+<span class="sd">        e.g.</span>
+<span class="sd">        desc_spec_dict = {</span>
+<span class="sd">        &quot;firstsoap&quot;: </span>
+<span class="sd">        {&quot;type&quot;: &#39;SOAP&#39;,&quot;species&quot;: [1, 6, 7, 8], &quot;cutoff&quot;: 2.0, &quot;atom_gaussian_width&quot;: 0.2, &quot;n&quot;: 4, &quot;l&quot;: 4}</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span> <span class="o">=</span> <span class="n">desc_spec_dict</span>
+        <span class="c1"># list of Atomic_Descriptor objections</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engines</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Atomic_Descriptors.add"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        adding the specifications of a new atomic descriptors</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        desc_spec: a dictionary that specify which atomic descriptor to use </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_spec</span></div>
+
+<div class="viewcode-block" id="Atomic_Descriptors.pack"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">NpEncoder</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atomic_Descriptors.get_acronym"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.get_acronym">[docs]</a>    <span class="k">def</span> <span class="nf">get_acronym</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">get_acronym</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span></div>
+
+<div class="viewcode-block" id="Atomic_Descriptors.bind"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        binds the objects that actually compute the descriptors</span>
+<span class="sd">        these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># clear up the objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engines</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="p">[</span><span class="n">element</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">get_acronym</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        call the specific descriptor objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Did not specify the type of the descriptor.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;SOAP&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Atomic_Descriptor_SOAP</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ACSF&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Atomic_Descriptor_ACSF</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LMBTR_K2&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Atomic_Descriptor_LMBTR_K2</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LMBTR_K3&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Atomic_Descriptor_LMBTR_K3</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;FCHL19&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Atomic_Descriptor_FCHL19</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span> 
+
+<div class="viewcode-block" id="Atomic_Descriptors.compute"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the global descriptor vector for a frame from atomic contributions</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frame: ASE atom object. Coordinates of a frame.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        atomic_desc_dict : a dictionary. each entry contains the essential info of the descriptor (acronym) </span>
+<span class="sd">                          and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.</span>
+<span class="sd">                          e.g. {&#39;ad1&#39;:{&#39;acronym&#39;:&#39;soap-1&#39;, &#39;atomic_descriptors&#39;: `a np.array [N_desc*N_atoms]`}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atomic_desc_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">atomic_desc_dict</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">atomic_desc_dict</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">],</span> <span class="n">atomic_desc_dict</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="s1">&#39;atomic_descriptors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">atomic_desc_dict</span></div></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_Base"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_Base</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_atomic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">pass</span>
+<div class="viewcode-block" id="Atomic_Descriptor_Base.is_atomic"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.is_atomic">[docs]</a>    <span class="k">def</span> <span class="nf">is_atomic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_atomic</span></div>
+<div class="viewcode-block" id="Atomic_Descriptor_Base.get_acronym"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.get_acronym">[docs]</a>    <span class="k">def</span> <span class="nf">get_acronym</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># we use an acronym for each descriptor, so it&#39;s easy to find it and refer to it</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span></div>
+<div class="viewcode-block" id="Atomic_Descriptor_Base.create"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="c1"># notice that we return the acronym here!!!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span><span class="p">,</span> <span class="p">[]</span></div></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_SOAP"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_SOAP</span><span class="p">(</span><span class="n">Atomic_Descriptor_Base</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        make a DScribe SOAP object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">dscribe.descriptors</span> <span class="kn">import</span> <span class="n">SOAP</span>
+
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;SOAP&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type is not SOAP or cannot find the type of the descriptor&quot;</span><span class="p">)</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;cutoff&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;atom_gaussian_width&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;l&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_SOAP` object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># we have defaults here</span>
+        <span class="k">if</span> <span class="s1">&#39;rbf&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rbf</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;rbf&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rbf</span> <span class="o">=</span> <span class="s1">&#39;gto&#39;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;crossover&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;crossover&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossover</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;periodic&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">soap</span> <span class="o">=</span> <span class="n">SOAP</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">lmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span>
+                                         <span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">rbf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rbf</span><span class="p">,</span> <span class="n">crossover</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crossover</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+                                         <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">periodic</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using SOAP Descriptors ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make an acronym</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;SOAP-n&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-l&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-c&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-g&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Atomic_Descriptor_SOAP.create"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="c1"># notice that we return the acronym here!!!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">soap</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Atomic_Descriptor_ACSF"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_ACSF</span><span class="p">(</span><span class="n">Atomic_Descriptor_Base</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        make a DScribe ACSF object</span>
+
+<span class="sd">        see: </span>
+<span class="sd">        https://singroup.github.io/dscribe/tutorials/acsf.html</span>
+
+<span class="sd">        # template for an ACSF descriptor</span>
+<span class="sd">        # currenly Dscribe only supports ASCF for finite system!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;ACSF&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type is not ACSF or cannot find the type of the descriptor&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;periodic&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Warning: currently DScribe only supports ACSF for finite systems&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">dscribe.descriptors</span> <span class="kn">import</span> <span class="n">ACSF</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span> <span class="o">=</span> <span class="p">{</span>
+                 <span class="s1">&#39;g2_params&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="s1">&#39;g3_params&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="s1">&#39;g4_params&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="s1">&#39;g5_params&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;cutoff&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_ACF` object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># fill in the values</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">acsf</span> <span class="o">=</span> <span class="n">ACSF</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">,</span> <span class="n">sparse</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using ACSF Descriptors ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make an acronym</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;ACSF-c&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutoff</span><span class="p">)</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g2_params&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">+=</span> <span class="s2">&quot;-g2-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g2_params&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g3_params&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">+=</span> <span class="s2">&quot;-g3-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g3_params&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g4_params&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">+=</span> <span class="s2">&quot;-g4-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g4_params&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g5_params&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">+=</span> <span class="s2">&quot;-g5-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acsf_dict</span><span class="p">[</span><span class="s1">&#39;g5_params&#39;</span><span class="p">]))</span>
+
+<div class="viewcode-block" id="Atomic_Descriptor_ACSF.create"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="c1"># notice that we return the acronym here!!!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">acsf</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_LMBTR"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_LMBTR</span><span class="p">(</span><span class="n">Atomic_Descriptor_Base</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        make a DScribe LMBTR object</span>
+<span class="sd">        (see https://singroup.github.io/dscribe/tutorials/lmbtr.html)&#39;)</span>
+<span class="sd">        Args:</span>
+<span class="sd">            species:</span>
+<span class="sd">            periodic (bool): Determines whether the system is considered to be</span>
+<span class="sd">                periodic.</span>
+<span class="sd">            k2 (dict): Dictionary containing the setup for the k=2 term.</span>
+<span class="sd">                Contains setup for the used geometry function, discretization and</span>
+<span class="sd">                weighting function. For example::</span>
+
+<span class="sd">                    k2 = {</span>
+<span class="sd">                        &quot;geometry&quot;: {&quot;function&quot;: &quot;inverse_distance&quot;},</span>
+<span class="sd">                        &quot;grid&quot;: {&quot;min&quot;: 0.1, &quot;max&quot;: 2, &quot;sigma&quot;: 0.1, &quot;n&quot;: 50},</span>
+<span class="sd">                        &quot;weighting&quot;: {&quot;function&quot;: &quot;exp&quot;, &quot;scale&quot;: 0.75, &quot;cutoff&quot;: 1e-2}</span>
+<span class="sd">                    }</span>
+
+<span class="sd">            k3 (dict): Dictionary containing the setup for the k=3 term.</span>
+<span class="sd">                Contains setup for the used geometry function, discretization and</span>
+<span class="sd">                weighting function. For example::</span>
+
+<span class="sd">                    k3 = {</span>
+<span class="sd">                        &quot;geometry&quot;: {&quot;function&quot;: &quot;angle&quot;},</span>
+<span class="sd">                        &quot;grid&quot;: {&quot;min&quot;: 0, &quot;max&quot;: 180, &quot;sigma&quot;: 5, &quot;n&quot;: 50},</span>
+<span class="sd">                        &quot;weighting&quot; = {&quot;function&quot;: &quot;exp&quot;, &quot;scale&quot;: 0.5, &quot;cutoff&quot;: 1e-3}</span>
+<span class="sd">                    }</span>
+<span class="sd">            normalize_gaussians (bool): Determines whether the gaussians are</span>
+<span class="sd">                normalized to an area of 1. Defaults to True. If False, the</span>
+<span class="sd">                normalization factor is dropped and the gaussians have the form.</span>
+<span class="sd">                :math:`e^{-(x-\mu)^2/2\sigma^2}`</span>
+<span class="sd">            normalization (str): Determines the method for normalizing the</span>
+<span class="sd">                output. The available options are:</span>
+
+<span class="sd">                * &quot;none&quot;: No normalization.</span>
+<span class="sd">                * &quot;l2_each&quot;: Normalize the Euclidean length of each k-term</span>
+<span class="sd">                  individually to unity.</span>
+
+<span class="sd">            flatten (bool): Whether the output should be flattened to a 1D</span>
+<span class="sd">                array. If False, a dictionary of the different tensors is</span>
+<span class="sd">                provided, containing the values under keys: &quot;k1&quot;, &quot;k2&quot;, and</span>
+<span class="sd">                &quot;k3&quot;:</span>
+<span class="sd">            sparse (bool): Whether the output should be a sparse matrix or a</span>
+<span class="sd">                dense numpy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_LMBTR` object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># we have defaults here</span>
+        <span class="k">if</span> <span class="s1">&#39;normalization&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;normalization&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span>  <span class="kc">None</span> <span class="c1"># or &quot;l2_each&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;normalize_gaussians&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalize_gaussians</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;normalize_gaussians&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">normalize_gaussians</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span> <span class="c1"># or False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;periodic&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Atomic_Descriptor_LMBTR.create"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="c1"># notice that we return the acronym here!!!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmbtr</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_LMBTR_K2"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K2">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_LMBTR_K2</span><span class="p">(</span><span class="n">Atomic_Descriptor_LMBTR</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">dscribe.descriptors</span> <span class="kn">import</span> <span class="n">LMBTR</span>
+
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;LMBTR_K2&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type is not LMBTR_K2 or cannot find the type of the descriptor&quot;</span><span class="p">)</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k2</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;k2&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_LMBTR` object&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmbtr</span> <span class="o">=</span> <span class="n">LMBTR</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_gaussians</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize_gaussians</span><span class="p">,</span>
+                            <span class="n">k2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k2</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using LMBTR-K2 Descriptors ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make an acronym</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;LMBTR-K2&quot;</span> <span class="c1"># perhaps add more info here</span></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_LMBTR_K3"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K3">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_LMBTR_K3</span><span class="p">(</span><span class="n">Atomic_Descriptor_LMBTR</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">dscribe.descriptors</span> <span class="kn">import</span> <span class="n">LMBTR</span>
+
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;LMBTR_K3&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type is not LMBTR_K3 or cannot find the type of the descriptor&quot;</span><span class="p">)</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k2</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;k3&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_LMBTR` object&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmbtr</span> <span class="o">=</span> <span class="n">LMBTR</span><span class="p">(</span><span class="n">species</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="n">periodic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">periodic</span><span class="p">,</span> <span class="n">flatten</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_gaussians</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize_gaussians</span><span class="p">,</span>
+                            <span class="n">k3</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k3</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using LMBTR-K3 Descriptors ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make an acronym</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;LMBTR-K3&quot;</span> <span class="c1"># perhaps add more info here</span></div>
+
+<div class="viewcode-block" id="Atomic_Descriptor_FCHL19"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19">[docs]</a><span class="k">class</span> <span class="nc">Atomic_Descriptor_FCHL19</span><span class="p">(</span><span class="n">Atomic_Descriptor_Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the FCHL19 representation (https://doi.org/10.1063/1.5126701).</span>
+<span class="sd">    Requires the developer version of the QML package, see</span>
+<span class="sd">    https://www.qmlcode.org/installation.html for installation instructions.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param nRs2: Number of gaussian basis functions in the two-body terms</span>
+<span class="sd">    :type nRs2: integer</span>
+<span class="sd">    :param nRs3: Number of gaussian basis functions in the three-body radial part</span>
+<span class="sd">    :type nRs3: integer</span>
+<span class="sd">    :param nFourier: Order of Fourier expansion</span>
+<span class="sd">    :type nFourier: integer</span>
+<span class="sd">    :param eta2: Precision in the gaussian basis functions in the two-body terms</span>
+<span class="sd">    :type eta2: float</span>
+<span class="sd">    :param eta3: Precision in the gaussian basis functions in the three-body radial part</span>
+<span class="sd">    :type eta3: float</span>
+<span class="sd">    :param zeta: Precision parameter of basis functions in the three-body angular part</span>
+<span class="sd">    :type zeta: float</span>
+<span class="sd">    :param two_body_decay: exponential decay for the two body function</span>
+<span class="sd">    :type two_body_decay: float</span>
+<span class="sd">    :param three_body_decay: exponential decay for the three body function</span>
+<span class="sd">    :type three_body_decay: float</span>
+<span class="sd">    :param three_body_weight: relative weight of the three body function</span>
+<span class="sd">    :type three_body_weight: float</span>
+<span class="sd">    :is_periodic: Boolean determining Whether the system is periodic.</span>
+<span class="sd">    :type Boolean:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;FCHL19&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type is not FCHL19 or cannot find the type of the descriptor&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;periodic&#39;</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">periodic</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Warning: currently DScribe only supports FCHL19 for finite systems&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: This FCHL19 atomic descriptor is untested, because I (Bingqing) cannot install QML!&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="kn">from</span> <span class="nn">qml.representations</span> <span class="kn">import</span> <span class="n">generate_fchl_acsf</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fchl_acsf_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nRs2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                               <span class="s1">&#39;nRs3&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                               <span class="s1">&#39;nFourier&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="s1">&#39;eta2&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">,</span> 
+                               <span class="s1">&#39;eta3&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                               <span class="s1">&#39;zeta&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="s1">&#39;rcut&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                               <span class="s1">&#39;acut&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                              <span class="s1">&#39;two_body_decay&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> 
+                              <span class="s1">&#39;three_body_decay&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                              <span class="s1">&#39;three_body_weight&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                              <span class="s1">&#39;pad&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;gradients&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+        <span class="c1"># required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">desc_spec</span><span class="p">[</span><span class="s1">&#39;species&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough information to intialize the `Atomic_Descriptor_ACF` object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># fill in the values</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fchl_acsf_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fchl_acsf_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using FCHL19 Descriptors ...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># make an acronym</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s2">&quot;FCHL19-c&quot;</span> <span class="c1"># add more stuff here</span>
+
+    <span class="k">def</span> <span class="nf">_repr_wrapper</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span>
+                 <span class="n">nRs2</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">nRs3</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                 <span class="n">nFourier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">eta2</span><span class="o">=</span><span class="mf">0.32</span><span class="p">,</span> <span class="n">eta3</span><span class="o">=</span><span class="mf">2.7</span><span class="p">,</span>
+                 <span class="n">zeta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">rcut</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">acut</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+                 <span class="n">two_body_decay</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">three_body_decay</span><span class="o">=</span><span class="mf">0.57</span><span class="p">,</span>
+                 <span class="n">three_body_weight</span><span class="o">=</span><span class="mf">13.4</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+
+        <span class="n">nuclear_charges</span><span class="p">,</span> <span class="n">coordinates</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">get_atomic_numbers</span><span class="p">(),</span> <span class="n">frame</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+        <span class="n">rep</span> <span class="o">=</span> <span class="n">generate_fchl_acsf</span><span class="p">(</span><span class="n">nuclear_charges</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span>
+                             <span class="n">nRs2</span><span class="o">=</span><span class="n">nRs2</span><span class="p">,</span> <span class="n">nRs3</span><span class="o">=</span><span class="n">nRs3</span><span class="p">,</span> <span class="n">nFourier</span><span class="o">=</span><span class="n">nFourier</span><span class="p">,</span>
+                             <span class="n">eta2</span><span class="o">=</span><span class="n">eta2</span><span class="p">,</span> <span class="n">eta3</span><span class="o">=</span><span class="n">eta3</span><span class="p">,</span> <span class="n">zeta</span><span class="o">=</span><span class="n">zeta</span><span class="p">,</span>
+                             <span class="n">rcut</span><span class="o">=</span><span class="n">rcut</span><span class="p">,</span> <span class="n">acut</span><span class="o">=</span><span class="n">acut</span><span class="p">,</span>
+                             <span class="n">two_body_decay</span><span class="o">=</span><span class="n">two_body_decay</span><span class="p">,</span> <span class="n">three_body_decay</span><span class="o">=</span><span class="n">three_body_decay</span><span class="p">,</span>
+                             <span class="n">three_body_weight</span><span class="o">=</span><span class="n">three_body_weight</span><span class="p">,</span>
+                             <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gradients</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">rep_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements</span><span class="p">),</span> <span class="n">rep</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nuclear_charges</span><span class="p">):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">elements</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rep_out</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">rep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">rep_out</span> <span class="o">=</span> <span class="n">rep_out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rep_out</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rep_out</span>
+
+<div class="viewcode-block" id="Atomic_Descriptor_FCHL19.create"><a class="viewcode-back" href="../../../asaplib.descriptors.html#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="c1"># notice that we return the acronym here!!!</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span><span class="p">,</span> <span class="n">self_repr_wrapper</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">fchl_acsf_dict</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

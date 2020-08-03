@@ -1,0 +1,402 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.fit.krr &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.fit.krr</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.fit.krr</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">NOTE: These methods operate directly on the kernel matrix!!!</span>
+<span class="sd">some functions are adapted from Felix Musil&#39;s ml_tools</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">RegressorBase</span>
+<span class="kn">from</span> <span class="nn">.getscore</span> <span class="kn">import</span> <span class="n">get_score</span>
+
+<div class="viewcode-block" id="KRR"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR">[docs]</a><span class="k">class</span> <span class="nc">KRR</span><span class="p">(</span><span class="n">RegressorBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jitter</span><span class="p">):</span>
+        <span class="c1"># Weights of the krr model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">jitter</span>  <span class="c1"># noise level^2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coninv</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># inverse of the covariance matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="KRR.fit"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kNM</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&#39;&#39;&#39;Train the krr model with trainKernel and trainLabel.&#39;&#39;&#39;</span>
+
+        <span class="n">reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coninv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">kernel</span> <span class="o">+</span> <span class="n">reg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">kernel</span> <span class="o">+</span> <span class="n">reg</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="KRR.predict"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;kernel.shape is expected as (nPred, nTrain)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The model has not been fitted yet, please fit it and then use predict.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="KRR.predict_uncertainty"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.predict_uncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">predict_uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        k.shape is expected as (nPred, nTrain), delta is the variance of y</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">n_k</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">y_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_k</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_k</span><span class="p">):</span>
+            <span class="n">y_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coninv</span><span class="p">,</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">]))))</span>
+        <span class="k">return</span> <span class="n">y_error</span></div>
+
+<div class="viewcode-block" id="KRR.get_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KRR.set_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.set_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="KRR.pack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="KRR.unpack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.unpack">[docs]</a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span>
+        <span class="n">err_m</span> <span class="o">=</span> <span class="s1">&#39;jitter are not consistent </span><span class="si">{}</span><span class="s1"> != </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">==</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">],</span> <span class="n">err_m</span></div>
+
+<div class="viewcode-block" id="KRR.loads"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRR.loads">[docs]</a>    <span class="k">def</span> <span class="nf">loads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="KRRSparse"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse">[docs]</a><span class="k">class</span> <span class="nc">KRRSparse</span><span class="p">(</span><span class="n">RegressorBase</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jitter</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="c1"># Weights of the krr model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">jitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># variance of the prior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>  <span class="c1"># noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="mf">10e-20</span>
+
+<div class="viewcode-block" id="KRRSparse.fit"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kMM</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kNM</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;N train structures, M sparsified representative structures &#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;kMM: the kernel matrix of the representative structures with shape (M,M)&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;kNM: the kernel matrix between the representative and the train structures with shape (N,M)&#39;&#39;&#39;</span>
+
+        <span class="c1"># if (kMM.shape[0] != kMM.shape[1]):# or kMM.shape[0] != kNM.shape[1] or kNM.shape[0] != y.shape[0]):</span>
+        <span class="c1"># raise ValueError(&#39;Shape of the kernel matrix is not consistent!&#39;)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">kMM</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">kMM</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="n">sparseK</span> <span class="o">=</span> <span class="n">kMM</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kNM</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">kNM</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">sparseY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kNM</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">reg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">kMM</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">sparseK</span> <span class="o">+</span> <span class="n">reg</span><span class="p">,</span> <span class="n">sparseY</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="KRRSparse.predict"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kNM</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;kNM: the kernel matrix between the representative and the new structures with shape (N,M)&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The model has not been fitted yet, please fit it and then use predict.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">kNM</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="KRRSparse.fit_predict"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.fit_predict">[docs]</a>    <span class="k">def</span> <span class="nf">fit_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kMM</span><span class="p">,</span> <span class="n">kNM</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kNM_test</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">kMM</span><span class="p">,</span> <span class="n">kNM</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">kNM_test</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KRRSparse.fit_predict_error"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.fit_predict_error">[docs]</a>    <span class="k">def</span> <span class="nf">fit_predict_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kMM</span><span class="p">,</span> <span class="n">kNM</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kNM_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">kMM</span><span class="p">,</span> <span class="n">kNM</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_error</span><span class="p">(</span><span class="n">kNM_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KRRSparse.get_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KRRSparse.set_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.set_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="KRRSparse.pack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="KRRSparse.unpack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.unpack">[docs]</a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span>
+        <span class="n">err_m</span> <span class="o">=</span> <span class="s1">&#39;jitter are not consistent </span><span class="si">{}</span><span class="s1"> != </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">==</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">],</span> <span class="n">err_m</span></div>
+
+<div class="viewcode-block" id="KRRSparse.loads"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRSparse.loads">[docs]</a>    <span class="k">def</span> <span class="nf">loads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="KRRFastCV"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV">[docs]</a><span class="k">class</span> <span class="nc">KRRFastCV</span><span class="p">(</span><span class="n">RegressorBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    taken from:</span>
+<span class="sd">    An, S., Liu, W., &amp; Venkatesh, S. (2007). </span>
+<span class="sd">    Fast cross-validation algorithms for least squares support vector machine and kernel ridge regression. </span>
+<span class="sd">    Pattern Recognition, 40(8), 2154-2162. https://doi.org/10.1016/j.patcog.2006.12.015</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jitter</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">cv</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">jitter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv</span> <span class="o">=</span> <span class="n">cv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="KRRFastCV.fit"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">kNM</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&#39;&#39;&#39;Fast cv scheme. Destroy kernel.&#39;&#39;&#39;</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">kernel</span><span class="p">)</span>
+        <span class="n">kernel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">diag_indices_from</span><span class="p">(</span><span class="n">kernel</span><span class="p">)]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span>
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">Cii</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">kernel</span><span class="p">):</span>
+            <span class="n">Cii</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">test</span><span class="p">)]</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">Cii</span><span class="p">,</span> <span class="n">alpha</span><span class="p">[</span><span class="n">test</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span><span class="p">[</span><span class="n">test</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test</span><span class="p">]</span> <span class="o">-</span> <span class="n">beta</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">[</span><span class="n">test</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span>  <span class="c1"># beta = y_true - y_pred</span>
+
+        <span class="k">del</span> <span class="n">kernel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.predict"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The model has not been fitted yet, please fit it and then use predict.&quot;</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;kernel.shape is expected as (nPred, nTrain)&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.get_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.set_params"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.set_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.pack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">y_pred</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">pack</span><span class="p">(),</span>
+                     <span class="n">jitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.unpack"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.unpack">[docs]</a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y_pred&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span>
+
+        <span class="n">err_m</span> <span class="o">=</span> <span class="s1">&#39;jitter are not consistent </span><span class="si">{}</span><span class="s1"> != </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jitter</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">==</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">],</span> <span class="n">err_m</span></div>
+
+<div class="viewcode-block" id="KRRFastCV.loads"><a class="viewcode-back" href="../../../asaplib.fit.html#asaplib.fit.krr.KRRFastCV.loads">[docs]</a>    <span class="k">def</span> <span class="nf">loads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;y_pred&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jitter</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;jitter&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

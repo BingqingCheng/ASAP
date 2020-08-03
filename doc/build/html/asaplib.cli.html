@@ -1,0 +1,425 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.cli package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.cluster package" href="asaplib.cluster.html" />
+    <link rel="prev" title="asaplib package" href="asaplib.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.cli package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-cli-package">
+<h1>asaplib.cli package<a class="headerlink" href="#asaplib-cli-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.cli.cmd_asap">
+<span id="asaplib-cli-cmd-asap-module"></span><h2>asaplib.cli.cmd_asap module<a class="headerlink" href="#module-asaplib.cli.cmd_asap" title="Permalink to this headline">¶</a></h2>
+<p>Module containing the top level asap command</p>
+</div>
+<div class="section" id="module-asaplib.cli.cmd_cli_options">
+<span id="asaplib-cli-cmd-cli-options-module"></span><h2>asaplib.cli.cmd_cli_options module<a class="headerlink" href="#module-asaplib.cli.cmd_cli_options" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.atomic_to_global_desc_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">atomic_to_global_desc_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#atomic_to_global_desc_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.atomic_to_global_desc_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for global descriptors constructed based on atomic fingerprints</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.color_setup_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">color_setup_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#color_setup_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.color_setup_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for handing color scales</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.d_reduce_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">d_reduce_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#d_reduce_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.d_reduce_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for dimensionality reduction</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.desc_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">desc_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#desc_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.desc_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for computing descriptors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.dm_input_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">dm_input_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#dm_input_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.dm_input_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>common options for reading a design matrices, used for map, fit, kde, clustering, etc.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.file_input_format_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">file_input_format_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#file_input_format_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.file_input_format_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for I/O files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.file_input_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">file_input_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#file_input_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.file_input_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for I/O files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.file_output_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">file_output_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#file_output_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.file_output_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for I/O files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.fit_setup_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">fit_setup_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#fit_setup_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.fit_setup_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for making 2D maps of the data set</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.kernel_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">kernel_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#kernel_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.kernel_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for compute kernel functions</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.km_input_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">km_input_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#km_input_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.km_input_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>common options for reading a kernel matrices, can be used for map, fit, kde, clustering, etc.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.map_io_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">map_io_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#map_io_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.map_io_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for making 2D maps of the data set</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.map_setup_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">map_setup_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#map_setup_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.map_setup_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for making 2D maps of the data set</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.output_setup_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">output_setup_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#output_setup_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.output_setup_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for output results from clustering/KDE analysis</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.para_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">para_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#para_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.para_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for parallellization</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.sparsification_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">sparsification_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#sparsification_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.sparsification_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for sparsification</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.cmd_cli_options.state_input_options">
+<code class="sig-prename descclassname">asaplib.cli.cmd_cli_options.</code><code class="sig-name descname">state_input_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/cmd_cli_options.html#state_input_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.cmd_cli_options.state_input_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create common options for I/O files</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.cli.func_asap">
+<span id="asaplib-cli-func-asap-module"></span><h2>asaplib.cli.func_asap module<a class="headerlink" href="#module-asaplib.cli.func_asap" title="Permalink to this headline">¶</a></h2>
+<p>functions used in cmd_asap.py</p>
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.cluster_process">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">cluster_process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asapxyz</span></em>, <em class="sig-param"><span class="n">trainer</span></em>, <em class="sig-param"><span class="n">design_matrix</span></em>, <em class="sig-param"><span class="n">cluster_options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#cluster_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.cluster_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>handle clustering operations</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.figure_style_setups">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">figure_style_setups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span></em>, <em class="sig-param"><span class="n">colorlabel</span></em>, <em class="sig-param"><span class="n">colorscale</span></em>, <em class="sig-param"><span class="n">colormap</span></em>, <em class="sig-param"><span class="n">style</span></em>, <em class="sig-param"><span class="n">aspect_ratio</span></em>, <em class="sig-param"><span class="n">adjusttext</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#figure_style_setups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.figure_style_setups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.kde_process">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">kde_process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asapxyz</span></em>, <em class="sig-param"><span class="n">density_model</span></em>, <em class="sig-param"><span class="n">proj</span></em>, <em class="sig-param"><span class="n">kde_options</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#kde_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.kde_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>handle kernel density estimation operations</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.load_asapxyz">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">load_asapxyz</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#load_asapxyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.load_asapxyz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.load_in_file">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">load_in_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_file</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#load_in_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.load_in_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Here goes the routine to compute the descriptors according to the state file(s)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.map_plot">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">map_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fig_spec</span></em>, <em class="sig-param"><span class="n">proj</span></em>, <em class="sig-param"><span class="n">proj_atomic</span></em>, <em class="sig-param"><span class="n">plotcolor</span></em>, <em class="sig-param"><span class="n">plotcolor_atomic</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">annotate</span></em>, <em class="sig-param"><span class="n">axes</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#map_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.map_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make plots</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.map_process">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">map_process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">reduce_dict</span></em>, <em class="sig-param"><span class="n">axes</span></em>, <em class="sig-param"><span class="n">map_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#map_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.map_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>process the dimensionality reduction command</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.map_save">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">map_save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">foutput</span></em>, <em class="sig-param"><span class="n">outmode</span></em>, <em class="sig-param"><span class="n">asapxyz</span></em>, <em class="sig-param"><span class="n">proj</span></em>, <em class="sig-param"><span class="n">proj_atomic</span></em>, <em class="sig-param"><span class="n">map_name</span></em>, <em class="sig-param"><span class="n">species_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#map_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.map_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the low-D projections</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.output_desc">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">output_desc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">asapxyz</span></em>, <em class="sig-param"><span class="n">desc_spec</span></em>, <em class="sig-param"><span class="n">prefix</span></em>, <em class="sig-param"><span class="n">peratom</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">N_processes</span><span class="o">=</span><span class="default_value">8</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#output_desc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.output_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and save the descriptors</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.read_xyz_n_dm">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">read_xyz_n_dm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fxyz</span></em>, <em class="sig-param"><span class="n">design_matrix</span></em>, <em class="sig-param"><span class="n">use_atomic_descriptors</span></em>, <em class="sig-param"><span class="n">only_use_species</span></em>, <em class="sig-param"><span class="n">peratom</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#read_xyz_n_dm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.read_xyz_n_dm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cli.func_asap.set_reducer">
+<code class="sig-prename descclassname">asaplib.cli.func_asap.</code><code class="sig-name descname">set_reducer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reducer_type</span></em>, <em class="sig-param"><span class="n">element_wise</span></em>, <em class="sig-param"><span class="n">zeta</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cli/func_asap.html#set_reducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cli.func_asap.set_reducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>setting up the reducer function that is used to convert atomic descriptors into global descriptors for a structure.
+At the moment only one single reducer function can be used.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.cli">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.cli" title="Permalink to this headline">¶</a></h2>
+<p>Command-line interface sub-package</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.cluster.html" class="btn btn-neutral float-right" title="asaplib.cluster package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.html" class="btn btn-neutral float-left" title="asaplib package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

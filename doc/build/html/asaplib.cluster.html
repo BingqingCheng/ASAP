@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.cluster package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.compressor package" href="asaplib.compressor.html" />
+    <link rel="prev" title="asaplib.cli package" href="asaplib.cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.cluster package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.cluster.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-cluster-package">
+<h1>asaplib.cluster package<a class="headerlink" href="#asaplib-cluster-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.cluster.ml_cluster_base">
+<span id="asaplib-cluster-ml-cluster-base-module"></span><h2>asaplib.cluster.ml_cluster_base module<a class="headerlink" href="#module-asaplib.cluster.ml_cluster_base" title="Permalink to this headline">¶</a></h2>
+<p>Base classes for clustering algorithms.</p>
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_base.ClusterBase">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_base.</code><code class="sig-name descname">ClusterBase</code><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#ClusterBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.ClusterBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.ClusterMixin</span></code></p>
+<p>Data structure to perform clustering and store data associated with the clustering output.</p>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_base.ClusterBase.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#ClusterBase.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.ClusterBase.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – </p></li>
+<li><p><strong>y</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_base.ClusterBase.get_cluster_labels">
+<code class="sig-name descname">get_cluster_labels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#ClusterBase.get_cluster_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.ClusterBase.get_cluster_labels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_base.ClusterBase.get_name">
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#ClusterBase.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.ClusterBase.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_base.ClusterBase.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#ClusterBase.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.ClusterBase.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>deep</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_base.FitClusterBase">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_base.</code><code class="sig-name descname">FitClusterBase</code><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#FitClusterBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.FitClusterBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_base.FitClusterBase.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dmatrix</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_base.html#FitClusterBase.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_base.FitClusterBase.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dmatrix</strong> – </p></li>
+<li><p><strong>rho</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.cluster.ml_cluster_fit">
+<span id="asaplib-cluster-ml-cluster-fit-module"></span><h2>asaplib.cluster.ml_cluster_fit module<a class="headerlink" href="#module-asaplib.cluster.ml_cluster_fit" title="Permalink to this headline">¶</a></h2>
+<p>Density-based Clustering Algorithms</p>
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_fit.</code><code class="sig-name descname">DBCluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trainer</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.cluster.ml_cluster_base.ClusterBase" title="asaplib.cluster.ml_cluster_base.ClusterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.cluster.ml_cluster_base.ClusterBase</span></code></a></p>
+<p>Performing clustering using density based clustering algorithm</p>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dmatrix</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>fit the clustering model, assume input of NxN distance matrix or Nxm coordinates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.get_cluster_labels">
+<code class="sig-name descname">get_cluster_labels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.get_cluster_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.get_cluster_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>return the label of the samples in the list of index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.get_n_cluster">
+<code class="sig-name descname">get_n_cluster</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.get_n_cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.get_n_cluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.get_n_noise">
+<code class="sig-name descname">get_n_noise</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.get_n_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.get_n_noise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>return all the info</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.DBCluster.save_state">
+<code class="sig-name descname">save_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'json'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#DBCluster.save_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.DBCluster.save_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_fit.</code><code class="sig-name descname">LAIO_DB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">distances</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indices</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dens_type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">percent</span><span class="o">=</span><span class="default_value">2.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.cluster.ml_cluster_base.FitClusterBase" title="asaplib.cluster.ml_cluster_base.FitClusterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.cluster.ml_cluster_base.FitClusterBase</span></code></a></p>
+<blockquote>
+<div><p>Clustering by fast search and find of density peaks, Rodriguez and Laio (2014).</p>
+<p><a class="reference external" href="https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf">https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf</a></p>
+<p>$$</p>
+</div></blockquote>
+<dl class="simple">
+<dt>ho_i,=,sum_j{chi(d_{ij}-d_{cut})}$$</dt><dd><p>$$ delta_i,=,min_{j:</p>
+</dd>
+</dl>
+<p>ho_j&gt;
+ho_i}(d_{ij})$$</p>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the center labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array of shape</em><em> (</em><em>Nele</em><em>, </em><em>proj_dim</em><em>) </em><em>where proj_dim is the number of components the kernel matrix has been</em>) – projected to.</p></li>
+<li><p><strong>rho</strong> (<em>densities</em><em>, </em><em>default is None since the DP.py module computes the densities itself.</em>) – </p></li>
+<li><p><strong>Returns</strong> (<em>cluster_labels: numpy array of shape</em><em> (</em><em>Nele</em><em>,</em><em>) </em><em>giving the cluster</em><em> (</em><em>int from 0 to N</em><em>) </em><em>each data point</em>) – </p></li>
+<li><p><strong>to. Halo points are designated as -1.</strong> (<em>belongs</em>) – </p></li>
+<li><p><strong>-------</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB.get_assignation">
+<code class="sig-name descname">get_assignation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB.get_assignation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_assignation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array of shape</em><em> (</em><em>Nele</em><em>, </em><em>proj_dim</em><em>) </em><em>where proj_dim gives the number of dimensions the kernel matrix is</em>) – projected to</p></li>
+<li><p><strong>Returns</strong> (<em>self.halo numpy array of shape</em><em> (</em><em>Nele</em><em>, </em><em>) </em><em>where halo points are designated as -1 and otherwise are</em>) – </p></li>
+<li><p><strong>to their respective cluster centres.</strong> (<em>assigned</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB.get_dc">
+<code class="sig-name descname">get_dc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB.get_dc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_dc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the cutoff distance given the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>The data array of shape</em><em> (</em><em>Nele</em><em>, </em><em>proj_dim</em><em>) </em><em>where N is the number of data points and proj_dim is the number of</em>) – </p></li>
+<li><p><strong>components of the kernel matrix.</strong> (<em>projected</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>self.dc, the cutoff distance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB.get_decision_graph">
+<code class="sig-name descname">get_decision_graph</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">fplot</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB.get_decision_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB.get_decision_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method currently doesn’t produce the decision graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy array of shape</em><em> (</em><em>Nele</em><em>, </em><em>proj_dim</em><em>)</em><em></em>) – </p></li>
+<li><p><strong>fplot</strong> (<em>Boolean indicating whether</em><em> or </em><em>not to plot the decision graph</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.LAIO_DB.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#LAIO_DB.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.LAIO_DB.pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionary containing the cutoff distance, self.dc, for data points to contribute to the local density
+of another data point as well as self.dens_cut, the density threshold for defining a cluster.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_fit.old_LAIO">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_fit.</code><code class="sig-name descname">old_LAIO</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">deltamin</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">rhomin</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#old_LAIO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.old_LAIO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.cluster.ml_cluster_base.FitClusterBase" title="asaplib.cluster.ml_cluster_base.FitClusterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.cluster.ml_cluster_base.FitClusterBase</span></code></a></p>
+<dl>
+<dt>Laio Clustering scheme</dt><dd><p>Clustering by fast search and find of density peaks
+<a class="reference external" href="https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf">https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf</a></p>
+<p>$$</p>
+</dd>
+<dt>ho_i,=,sum_j{chi(d_{ij}-d_{cut})}$$ i.e. the local density of data point x_i</dt><dd><p>$$ delta_i,=,min_{j:</p>
+</dd>
+</dl>
+<p>ho_j&gt;
+ho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density</p>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.old_LAIO.estimate_delta">
+<code class="sig-name descname">estimate_delta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dist</span></em>, <em class="sig-param"><span class="n">rho</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#old_LAIO.estimate_delta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.old_LAIO.estimate_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each data point i, compute the distance (delta_i) between i and j,
+j is the closest data point that has a density higher then i, i.e. rho(j) &gt; rho(i).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dist</strong> (<em>distance matrix of shape</em><em> (</em><em>Nele</em><em>, </em><em>Nele</em><em>)</em>) – </p></li>
+<li><p><strong>rho</strong> (<em>log densities for each data point array of shape</em><em> (</em><em>Nele</em><em>,</em><em>)</em>) – </p></li>
+<li><p><strong>Returns</strong> (<em>delta: numpy array of distances to nearest cluster centre for each datapoint.</em>) – nneight: numpy array giving the index of the nearest cluster centre.</p></li>
+<li><p><strong>-------</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.old_LAIO.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dmatrix</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#old_LAIO.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.old_LAIO.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dmatrix</strong> (<em>The distance matrix of shape</em><em> (</em><em>Nele</em><em>, </em><em>Nele</em><em>)</em>) – </p></li>
+<li><p><strong>rho</strong> (<em>The log densities of the points of shape</em><em> (</em><em>Nele</em><em>,</em><em>)</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.old_LAIO.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#old_LAIO.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.old_LAIO.pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>return all the info</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.cluster.ml_cluster_fit.sklearn_DB">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.cluster.ml_cluster_fit.</code><code class="sig-name descname">sklearn_DB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eps</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_samples</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metrictype</span><span class="o">=</span><span class="default_value">'precomputed'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#sklearn_DB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.sklearn_DB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.cluster.ml_cluster_base.FitClusterBase" title="asaplib.cluster.ml_cluster_base.FitClusterBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.cluster.ml_cluster_base.FitClusterBase</span></code></a></p>
+<p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html">https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html</a>
+eps : float, optional</p>
+<blockquote>
+<div><p>The maximum distance between two samples for one to be considered as in the neighborhood of the other.
+This is not a maximum bound on the distances of points within a cluster.
+This is the most important DBSCAN parameter to choose appropriately for your dataset and distance function.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>min_samples<span class="classifier">int, optional</span></dt><dd><p>The number of samples (or total weight) in a neighborhood for a point to be considered as a core point.
+This includes the point itself.</p>
+</dd>
+<dt>metric<span class="classifier">string, or callable</span></dt><dd><p>The metric to use when calculating distance between instances in a feature array.
+If metric is a string or callable, it must be one of the options allowed by sklearn.metrics.pairwise_distances for its metric parameter.
+If metric is “precomputed”, X is assumed to be a distance matrix and must be square.
+X may be a sparse matrix, in which case only “nonzero” elements may be considered neighbors for DBSCAN.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.sklearn_DB.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dmatrix</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#sklearn_DB.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.sklearn_DB.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dmatrix</strong> – </p></li>
+<li><p><strong>rho</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.cluster.ml_cluster_fit.sklearn_DB.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_fit.html#sklearn_DB.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_fit.sklearn_DB.pack" title="Permalink to this definition">¶</a></dt>
+<dd><p>return all the info</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.cluster.ml_cluster_tools">
+<span id="asaplib-cluster-ml-cluster-tools-module"></span><h2>asaplib.cluster.ml_cluster_tools module<a class="headerlink" href="#module-asaplib.cluster.ml_cluster_tools" title="Permalink to this headline">¶</a></h2>
+<p>TODO: Module-level description</p>
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.array_handling">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">array_handling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">plist</span></em>, <em class="sig-param"><span class="n">attribute</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#array_handling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.array_handling" title="Permalink to this definition">¶</a></dt>
+<dd><p>available attributes:
+mean, sum, min, max, mode, all</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.get_cluster_properties">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">get_cluster_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">properties</span></em>, <em class="sig-param"><span class="n">attribute</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#get_cluster_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.get_cluster_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.get_cluster_size">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">get_cluster_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#get_cluster_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.get_cluster_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.get_cluster_weighted_avg_properties">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">get_cluster_weighted_avg_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">properties</span></em>, <em class="sig-param"><span class="n">weights</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#get_cluster_weighted_avg_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.get_cluster_weighted_avg_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.most_frequent">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">most_frequent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">List</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#most_frequent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.most_frequent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.output_cluster">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">output_cluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">dicttags</span></em>, <em class="sig-param"><span class="n">tags</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#output_cluster"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.output_cluster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.cluster.ml_cluster_tools.output_cluster_sort">
+<code class="sig-prename descclassname">asaplib.cluster.ml_cluster_tools.</code><code class="sig-name descname">output_cluster_sort</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prefix</span></em>, <em class="sig-param"><span class="n">labels</span></em>, <em class="sig-param"><span class="n">dicttags</span></em>, <em class="sig-param"><span class="n">tags</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/cluster/ml_cluster_tools.html#output_cluster_sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.cluster.ml_cluster_tools.output_cluster_sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.cluster">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.cluster" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.compressor.html" class="btn btn-neutral float-right" title="asaplib.compressor package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.cli.html" class="btn btn-neutral float-left" title="asaplib.cli package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

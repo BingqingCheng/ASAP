@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.reducedim.ml_kpca &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.reducedim.ml_kpca</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.reducedim.ml_kpca</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tools for doing kernel PCA on environmental similarity</span>
+<span class="sd">e.g.</span>
+<span class="sd">kNN = np.genfromtxt(prefix+&quot;.k&quot;,skip_header=1)</span>
+<span class="sd">proj = KernelPCA(kpca_d).fit_transform(kNN)</span>
+
+<span class="sd">KernelPCA with precomputed kernel for now only!!!!!!!!!!!!</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">salg</span>
+
+
+<div class="viewcode-block" id="KernelPCA"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA">[docs]</a><span class="k">class</span> <span class="nc">KernelPCA</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;KernelPCA with precomputed kernel for now only</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_components : int, default=2</span>
+<span class="sd">            number of dimensions to project to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># essential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+
+        <span class="c1"># kernel and projection related properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colmean</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_kmat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lambdas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># state properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="KernelPCA.center_square"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.center_square">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">center_square</span><span class="p">(</span><span class="n">kernel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Centering of a kernel matrix, with additional centering info</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kernel : array-like, (shape=MxM)</span>
+<span class="sd">            Kernel matrix</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        colmean : ndarray, (shape=M)</span>
+<span class="sd">            mean of columns from kernel matrix</span>
+<span class="sd">        mean : float</span>
+<span class="sd">            mean of the entire kernel matrix</span>
+<span class="sd">        centered_kernel : ndarray, (shape=MxM)</span>
+<span class="sd">            kernel centered in feature space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">colmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">kernel</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">colmean</span><span class="p">)</span>
+        <span class="n">centered_kernel</span> <span class="o">=</span> <span class="n">kernel</span> <span class="o">-</span> <span class="n">colmean</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">colmean</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">mean</span>
+        <span class="k">return</span> <span class="n">colmean</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">centered_kernel</span></div>
+
+    <span class="k">def</span> <span class="nf">_center_test_kmat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ktest</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Centers a kernel matrix for projection</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ktest : array_like, shape=(L,M)</span>
+<span class="sd">            kernel matricx for the points to project to the lower dimensions</span>
+<span class="sd">            Overwritten!!!</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ktest :</span>
+<span class="sd">            centered kernel matrix</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">test_colmean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ktest</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">ktest</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">colmean</span> <span class="o">-</span> <span class="n">test_colmean</span>
+        <span class="k">return</span> <span class="n">ktest</span>
+
+<div class="viewcode-block" id="KernelPCA.fit"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kmat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit kernel PCA on the precomputed kernel matrix</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Keeps the kernel matrix intact</span>
+<span class="sd">        - can be done only once on a given object, need to reinitialise if trying to run again</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kmat : numpy.ndarray, shape=(M,M)</span>
+<span class="sd">            kerenl matrix between the observations</span>
+<span class="sd">            needs to be square and real, symmetric</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Kernel already fitted before, please reinitialise the object!&#39;</span><span class="p">)</span>
+
+        <span class="c1"># check the shape and symmetry of the kernel matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_kmat</span><span class="p">(</span><span class="n">kmat</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># save kmat and center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colmean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_kmat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_square</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span>
+
+        <span class="c1"># calculation, ordering in descending order and scale by sqrt(lambda)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lambdas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">=</span> <span class="n">salg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_kmat</span><span class="p">,</span> <span class="n">eigvals</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lambdas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambdas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lambdas</span><span class="p">)</span>
+
+        <span class="c1"># the model is fitted then</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="KernelPCA.fit_transform"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kmat</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit kernel PCA on the precomputed kernel matrix &amp; project to lower dimensions</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Keeps the kernel matrix intact</span>
+<span class="sd">        - can be done only once on a given object, need to reinitialise if trying to run again</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kmat : numpy.ndarray, shape=(M,M)</span>
+<span class="sd">            kerenl matrix between the observations</span>
+<span class="sd">            needs to be square and real, symmetric</span>
+<span class="sd">        copy : bool, optional, default=True</span>
+<span class="sd">            copy the kernel matrix or overwrite it, passed to self.transform()</span>
+<span class="sd">            nb. the kernel matrix will be left centered if this is False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_kmat</span><span class="p">,</span> <span class="n">iscentered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="n">copy</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KernelPCA.transform"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ktest</span><span class="p">,</span> <span class="n">iscentered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms to the lower dimensions</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ktest : array_like, shape=(L,M)</span>
+<span class="sd">            kernel matrix of the test vectors with the training vectors</span>
+<span class="sd">        iscentered : bool, optional, default=False</span>
+<span class="sd">            if the kernel is centered already, mainly used for the fit_transform function</span>
+<span class="sd">        copy : bool, optional, default=True</span>
+<span class="sd">            copy the kernel matrix or overwrite it</span>
+<span class="sd">            nb. the kernel matrix will be left centered if this is False</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        projected_vectors: numpy.array, shape=(L,n_components)</span>
+<span class="sd">            projections of the given kernel wrt. the training kernel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The model has not been fitted yet, please fit it and then use transform.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_kmat</span><span class="p">(</span><span class="n">ktest</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">iscentered</span><span class="p">:</span>
+            <span class="n">centered_ktest</span> <span class="o">=</span> <span class="n">ktest</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">centered_ktest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center_test_kmat</span><span class="p">((</span><span class="n">ktest</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">copy</span> <span class="k">else</span> <span class="n">ktest</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">centered_ktest</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_kmat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kmat</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check the kernel matrix</span>
+
+<span class="sd">        checks if the matrix is real valued and its shape: square symmetric if square=True, LxM(self._m) otherwise</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        kmat : numpy.array</span>
+<span class="sd">            kernel matrix to be checked</span>
+<span class="sd">        square : bool, default=True</span>
+<span class="sd">            if the matrix needs to be square and symmetric</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">isreal</span><span class="p">(</span><span class="n">kmat</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">square</span><span class="p">:</span>
+            <span class="c1"># shape (M,M)</span>
+            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">kmat</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">kmat</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># symmetric</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">kmat</span> <span class="o">-</span> <span class="n">kmat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-6</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># shape: (anything,M)</span>
+            <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">kmat</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m</span>
+
+<div class="viewcode-block" id="KernelPCA.fit_vectors"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.fit_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">fit_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vecs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit Kernel PCA from vectors in the large dimension</span>
+
+<span class="sd">        for future, not implemented yet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="KernelPCA.transform_vectors"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.ml_kpca.KernelPCA.transform_vectors">[docs]</a>    <span class="k">def</span> <span class="nf">transform_vectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vecs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit Kernel PCA from vectors in the large dimension &amp; project to lower dimension</span>
+
+<span class="sd">        for future, not implemented yet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

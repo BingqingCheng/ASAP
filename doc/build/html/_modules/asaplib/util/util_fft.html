@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.util.util_fft &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.util.util_fft</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.util.util_fft</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions for performing Fast Fourier transforms</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"># Fourier analysis of x(t) to obtain $x(\omega)$.</span>
+<span class="sd">## $FT(x(t)) = x(\omega)$</span>
+<span class="sd">## $S_x(\omega)=FT(&lt;x(0)x(t)&gt;) = x(\omega) \cdot x(\omega) $</span>
+
+<span class="sd">#  In reality we have a list $\{ x_{1...n}\}$</span>
+<span class="sd">## $A_k = \sum_{m=0}^{n-1} x_m \exp(-2\pi i \dfrac{m k }{n})$</span>
+<span class="sd">## $x(\omega = \dfrac{2\pi}{n\Delta t}k) = \Delta t A_k$ </span>
+
+<span class="sd"># Fourier analysis of v(t) to obtain $v(\omega)$.</span>
+<span class="sd">## $FFT(v(t)) = v(\omega)=i\omega x(\omega)$</span>
+<span class="sd">## $FFT(&lt;x(0)v(t)&gt;) = -x(\omega) \cdot v(\omega) $</span>
+<span class="sd">##  $FFT(&lt;x(0)v(t)&gt;) = i \omega x(\omega) \cdot x(\omega) $</span>
+<span class="sd">## $FFT(&lt;v(0)v(t)&gt;) = v(\omega) \cdot v(\omega) $</span>
+<span class="sd">##  $FFT(&lt;v(0)v(t)&gt;) = -(i \omega)^2 x(\omega) \cdot x(\omega) = \omega^2 x(\omega) \cdot x(\omega)$</span>
+
+<span class="sd">EXAMPLES:</span>
+<span class="sd">testfx = fftranform(txv[:,[0,1]],len(txv)) fftranform(txv[:,[0,1]],len(txv)) </span>
+<span class="sd">testreversefx = ifftranform(testfx) </span>
+
+<span class="sd">testftcxx = rfftcrosscorr(txv[:,[0,1]],txv[:,[0,1]],10000)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="smooth"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.smooth">[docs]</a><span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">box_pts</span><span class="p">):</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">box_pts</span><span class="p">)</span> <span class="o">/</span> <span class="n">box_pts</span>
+    <span class="n">y_smooth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y_smooth</span></div>
+
+
+<div class="viewcode-block" id="fftranform"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.fftranform">[docs]</a><span class="k">def</span> <span class="nf">fftranform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dlen</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># input: a list of real signals {x} with timestep dt</span>
+    <span class="c1"># output: x(omega)</span>
+
+    <span class="c1"># make sure that we have odd number of signals as it makes fft easier</span>
+    <span class="k">if</span> <span class="n">dlen</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dlen</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="c1"># x.append(x[0])</span>
+    <span class="c1"># this is the FFT expansion coeficients assuming inputs are real numbers</span>
+    <span class="c1"># https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.fft.html#module-numpy.fft</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># assume the timestep is constant</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">//</span> <span class="n">dlen</span>
+    <span class="c1"># print dlen</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">dlen</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">xomega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dlen</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex_</span><span class="p">)</span>
+    <span class="n">xomega</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span>
+    <span class="n">xomega</span><span class="p">[</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># print len(Ax)</span>
+        <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Ax</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">window</span>
+    <span class="c1"># return [omega, A(omega)]</span>
+    <span class="sd">&quot;&quot;&quot; when numpy does fft, A[1:n/2] contains the positive-frequency terms, </span>
+<span class="sd">    and A[n/2+1:] contains the negative-frequency terms, </span>
+<span class="sd">    in order of decreasingly negative frequency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">xomega</span></div>
+
+
+<div class="viewcode-block" id="ifftranform"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.ifftranform">[docs]</a><span class="k">def</span> <span class="nf">ifftranform</span><span class="p">(</span><span class="n">xomega</span><span class="p">):</span>
+    <span class="c1"># first retrieve the descrete rFFT coefficients</span>
+    <span class="c1"># note that numpy uses a normalization factor of 1/n here but not during the forward fft</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="n">xomega</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xomega</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xomega</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">omega0</span>
+    <span class="n">Ax</span> <span class="o">=</span> <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">x</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="fftcrosscorr"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.fftcrosscorr">[docs]</a><span class="k">def</span> <span class="nf">fftcrosscorr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dlen</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># make sure that we have odd number of signals as it makes fft easier</span>
+    <span class="k">if</span> <span class="n">dlen</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dlen</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="c1"># x.append(x[0])</span>
+        <span class="c1"># y.append(y[0])</span>
+
+    <span class="c1"># the fft coecofficents of the crosscorrelation function c_xy(t)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># assume the timestep is constant</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">//</span> <span class="n">dlen</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">dlen</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">cxyomega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dlen</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex_</span><span class="p">)</span>
+    <span class="n">cxyomega</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span>
+    <span class="n">cxyomega</span><span class="p">[</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Ay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">dy</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:])</span> <span class="o">*</span> <span class="n">Ay</span><span class="p">[:]</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Ay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">dy</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:])</span> <span class="o">*</span> <span class="n">Ay</span><span class="p">[:]</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="p">(</span><span class="n">window</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cxyomega</span></div>
+
+
+<div class="viewcode-block" id="rfftranform"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.rfftranform">[docs]</a><span class="k">def</span> <span class="nf">rfftranform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dlen</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># input: a list of real signals {x} with timestep dt</span>
+    <span class="c1"># output: x(omega)</span>
+
+    <span class="c1"># this is the FFT expansion coeficients assuming inputs are real numbers</span>
+    <span class="c1"># https://docs.scipy.org/doc/numpy-1.13.0/reference/routines.fft.html#module-numpy.fft</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># assume the timestep is constant</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">//</span> <span class="n">dlen</span>
+    <span class="c1"># print dlen</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">xomega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex_</span><span class="p">)</span>
+    <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># print len(Ax)</span>
+        <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">Ax</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">window</span>
+    <span class="c1"># return [omega, A(omega)]</span>
+    <span class="sd">&quot;&quot;&quot; when numpy does fft, A[1:n/2] contains the positive-frequency terms, </span>
+<span class="sd">    and A[n/2+1:] contains the negative-frequency terms, </span>
+<span class="sd">    in order of decreasingly negative frequency.</span>
+<span class="sd">    Hoever, When the DFT is computed for purely real input, </span>
+<span class="sd">    the output is Hermitian-symmetric, </span>
+<span class="sd">    i.e. the negative frequency terms are just the complex conjugates of the corresponding positive-frequency terms, </span>
+<span class="sd">    and the negative-frequency terms are therefore redundant. </span>
+<span class="sd">    This function does not compute the negative frequency terms, </span>
+<span class="sd">    and the length of the transformed axis of the output is therefore n//2 + 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">xomega</span></div>
+
+
+<div class="viewcode-block" id="irfftranform"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.irfftranform">[docs]</a><span class="k">def</span> <span class="nf">irfftranform</span><span class="p">(</span><span class="n">xomega</span><span class="p">):</span>
+    <span class="c1"># first retrieve the descrete rFFT coefficients</span>
+    <span class="c1"># note that numpy uses a normalization factor of 1/n here but not during the forward fft</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="n">xomega</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">xomega</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">xomega</span><span class="p">)</span> <span class="o">/</span> <span class="n">omega0</span>
+    <span class="n">Ax</span> <span class="o">=</span> <span class="n">xomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">x</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="rfftcrosscorr"><a class="viewcode-back" href="../../../asaplib.util.html#asaplib.util.util_fft.rfftcrosscorr">[docs]</a><span class="k">def</span> <span class="nf">rfftcrosscorr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dlen</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># the fft coecofficents of the crosscorrelation function c_xy(t)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># assume the timestep is constant</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">//</span> <span class="n">dlen</span>
+    <span class="n">omega0</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">/</span> <span class="n">dt</span>
+    <span class="n">cxyomega</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex_</span><span class="p">)</span>
+    <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">omega0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Ay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">dy</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:])</span> <span class="o">*</span> <span class="n">Ay</span><span class="p">[:]</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">window</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dlen</span> <span class="o">+</span> <span class="n">dlen</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">dx</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Ay</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">dy</span><span class="p">[:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">Ax</span><span class="p">[:])</span> <span class="o">*</span> <span class="n">Ay</span><span class="p">[:]</span> <span class="o">/</span> <span class="n">dlen</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">cxyomega</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="p">(</span><span class="n">window</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cxyomega</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

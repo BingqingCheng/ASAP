@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.compressor package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.data package" href="asaplib.data.html" />
+    <link rel="prev" title="asaplib.cluster package" href="asaplib.cluster.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.compressor package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.compressor.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-compressor-package">
+<h1>asaplib.compressor package<a class="headerlink" href="#asaplib-compressor-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.compressor.cur">
+<span id="asaplib-compressor-cur-module"></span><h2>asaplib.compressor.cur module<a class="headerlink" href="#module-asaplib.compressor.cur" title="Permalink to this headline">¶</a></h2>
+<p>CUR matrix decomposition is a low-rank matrix decomposition algorithm that is explicitly expressed in a small number of actual columns and/or actual rows of data matrix.</p>
+<dl class="py function">
+<dt id="asaplib.compressor.cur.CUR_deterministic">
+<code class="sig-prename descclassname">asaplib.compressor.cur.</code><code class="sig-name descname">CUR_deterministic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">n_col</span></em>, <em class="sig-param"><span class="n">error_estimate</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">costs</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/cur.html#CUR_deterministic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.cur.CUR_deterministic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given rank k, find the best column and rows
+X = C U R</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>input a covariance matrix</em>) – </p></li>
+<li><p><strong>n_col</strong> (<em>number of column to keep</em>) – </p></li>
+<li><p><strong>error_estimate</strong> (<em>compute the remaining error of the CUR</em>) – </p></li>
+<li><p><strong>costs</strong> (<em>a list of costs associated with each column</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>a list of selected columns</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.cur.CUR_deterministic_step">
+<code class="sig-prename descclassname">asaplib.compressor.cur.</code><code class="sig-name descname">CUR_deterministic_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cov</span></em>, <em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">costs</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/cur.html#CUR_deterministic_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.cur.CUR_deterministic_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply (deterministic) CUR selection of k rows &amp; columns of the
+given covariance matrix, including an orthogonalization step. Costs can be weighted if desired.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.cur.cur_column_select">
+<code class="sig-prename descclassname">asaplib.compressor.cur.</code><code class="sig-name descname">cur_column_select</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">array</span></em>, <em class="sig-param"><span class="n">num</span></em>, <em class="sig-param"><span class="n">rank</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'sparse'</span></em>, <em class="sig-param"><span class="n">weights</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">calc_error</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/cur.html#cur_column_select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.cur.cur_column_select" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select columns from a matrix according to statstical leverage score.</p>
+<p>Based on:
+[1] Mahoney MW, Drineas P. CUR matrix decompositions for improved data analysis. PNAS. 2009 Jan 20;106(3):697–702.</p>
+<p class="rubric">Notes</p>
+<p>Which mode to use? If the matrix is not square or possibly not hermitian (or even real symmetric) then sparse is
+the only option. For hermitian matrices, the calculation of the eigenvectors with <cite>eigh</cite> may be faster than
+using the sparse svd method. Benchmark is needed for this, especially for descriptor kernels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> (<em>np.array</em>) – Array to compute find columns of (M, N)</p></li>
+<li><p><strong>num</strong> (<em>int</em>) – number of column indices to be returned</p></li>
+<li><p><strong>rank</strong> (<em>int</em><em>, </em><em>optional</em>) – number of singular vectors to calculate for calculation of the statistical leverage scores
+default: minimum of (min(N, M) - 1, num/2) but at least one</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em><em>, </em><em>optional</em>) – Usage of deterministic method or probabilistic.
+Deterministic (True): the top <cite>num</cite> columns are given
+Stochastic (False): use leverage scores as probabilities for choosing num</p></li>
+<li><p><strong>mode</strong> (<em>{&quot;sparse&quot;</em><em>, </em><em>&quot;dense&quot;</em><em>, </em><em>&quot;hermitian&quot;}</em>) – <dl>
+<dt>mode of the singular vector calculation.</dt><dd><ul>
+<li><p><cite>sparse</cite> (default), which is using sparse-SVD, which is expected to be robust and to solve the problem</p></li>
+<li><p><cite>hermitian</cite> offers a speedup for hermitian matrices (ie. real symmetric kernel matrices as well)</p></li>
+<li><p><cite>dense</cite> (not recommended) is using SVD, but calculated all the singular vectors and uses a number of them</p></li>
+</ul>
+<p>according to the rank parameter</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>weights</strong> (<em>np.array</em><em>, </em><em>optional</em>) – Costs for taking each column. shape=(N,)
+The statistical leverage scores are scaled by this array</p></li>
+<li><p><strong>calc_error</strong> (<em>bool</em><em>, </em><em>optional</em>) – calculate the error of the decomposition, default False
+There is a significant cost to the calculation of this, due to a semi-inverse operation needed.
+The error here is the norm of the matrix of difference between the original and the approximation obtained from
+the selected columns. Not necessarily meaningful in every situation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>indices</strong> (<em>np.array</em>) – indices of columns to choose</p></li>
+<li><p><em>cur_error</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.compressor.fps">
+<span id="asaplib-compressor-fps-module"></span><h2>asaplib.compressor.fps module<a class="headerlink" href="#module-asaplib.compressor.fps" title="Permalink to this headline">¶</a></h2>
+<p>Farthest Point Sampling methods for sparsification</p>
+<dl class="py function">
+<dt id="asaplib.compressor.fps.fast_fps">
+<code class="sig-prename descclassname">asaplib.compressor.fps.</code><code class="sig-name descname">fast_fps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">d</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/fps.html#fast_fps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.fps.fast_fps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.fps.fps">
+<code class="sig-prename descclassname">asaplib.compressor.fps.</code><code class="sig-name descname">fps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">d</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/fps.html#fps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.fps.fps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Farthest Point Sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.matrix.</em><em>[</em><em>n_samples</em><em>, </em><em>n_dim</em><em>] </em><em>coordinates of all the samples to be sparsified.</em>) – </p></li>
+<li><p><strong>d</strong> (<em>number of samples to keep</em>) – </p></li>
+<li><p><strong>r</strong> (<em>starting from sample of index r</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>a list of selected samples, remaining error</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.compressor.reweight">
+<span id="asaplib-compressor-reweight-module"></span><h2>asaplib.compressor.reweight module<a class="headerlink" href="#module-asaplib.compressor.reweight" title="Permalink to this headline">¶</a></h2>
+<p>Select samples using a re-weighted distribution
+The original distribution (KDE) of the sample is</p>
+<p>ho = exp(-F)
+and we select the samples using a well-tempered distribution</p>
+<p>ho(lambda) = exp(-F/lambda)</p>
+<dl class="py function">
+<dt id="asaplib.compressor.reweight.reweight">
+<code class="sig-prename descclassname">asaplib.compressor.reweight.</code><code class="sig-name descname">reweight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logkde</span></em>, <em class="sig-param"><span class="n">n_sparse</span></em>, <em class="sig-param"><span class="n">reweight_lambda</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/reweight.html#reweight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.reweight.reweight" title="Permalink to this definition">¶</a></dt>
+<dd><p>logkde: list, type=float. The (log of) kernel density for each sample
+reweight_lambda: float, reweighting factor
+n_sparse: int, number of samples to select</p>
+<p>sbs: list, type=int. A list of selected samples</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.compressor.sparsifier">
+<span id="asaplib-compressor-sparsifier-module"></span><h2>asaplib.compressor.sparsifier module<a class="headerlink" href="#module-asaplib.compressor.sparsifier" title="Permalink to this headline">¶</a></h2>
+<p>sparsifier class</p>
+<dl class="py class">
+<dt id="asaplib.compressor.sparsifier.Sparsifier">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.compressor.sparsifier.</code><code class="sig-name descname">Sparsifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_mode</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/sparsifier.html#Sparsifier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.sparsifier.Sparsifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.compressor.sparsifier.Sparsifier.sparsify">
+<code class="sig-name descname">sparsify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_or_ntotal</span></em>, <em class="sig-param"><span class="n">n_or_ratio</span></em>, <em class="sig-param"><span class="n">sparse_param</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/sparsifier.html#Sparsifier.sparsify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.sparsifier.Sparsifier.sparsify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function handing the sparsification of data
+:param desc_or_ntotal: or simply the total number of samples
+:type desc_or_ntotal: Either a design matrix [n_sample, n_desc],
+:param n_or_ratio:
+:type n_or_ratio: Either the number or the fraction of sparsified points
+:param sparse_param:
+:type sparse_param: additional parameter that may be needed for the specific sparsifier used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>sbs</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>a list of the indexes for the sparsified points</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.compressor.split">
+<span id="asaplib-compressor-split-module"></span><h2>asaplib.compressor.split module<a class="headerlink" href="#module-asaplib.compressor.split" title="Permalink to this headline">¶</a></h2>
+<p>Functions for making splits</p>
+<dl class="py class">
+<dt id="asaplib.compressor.split.KFold">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">KFold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_splits</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">shuffle</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#KFold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.KFold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection._split.KFold</span></code></p>
+<dl class="py method">
+<dt id="asaplib.compressor.split.KFold.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#KFold.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.KFold.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.compressor.split.LCSplit">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">LCSplit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cv</span></em>, <em class="sig-param"><span class="n">n_repeats</span><span class="o">=</span><span class="default_value">[10]</span></em>, <em class="sig-param"><span class="n">train_sizes</span><span class="o">=</span><span class="default_value">[10]</span></em>, <em class="sig-param"><span class="n">test_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">cvargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#LCSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.LCSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.compressor.split.LCSplit.get_n_splits">
+<code class="sig-name descname">get_n_splits</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#LCSplit.get_n_splits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.LCSplit.get_n_splits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of splitting iterations in the cross-validator
+:param X: Always ignored, exists for compatibility.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">np.zeros(n_samples)</span></code> may be used as a placeholder.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>object</em>) – Always ignored, exists for compatibility.
+<code class="docutils literal notranslate"><span class="pre">np.zeros(n_samples)</span></code> may be used as a placeholder.</p></li>
+<li><p><strong>groups</strong> (<em>array-like</em><em>, </em><em>with shape</em><em> (</em><em>n_samples</em><em>,</em><em>)</em><em>, </em><em>optional</em>) – Group labels for the samples used while splitting the dataset into
+train/test set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>n_splits</strong> – Returns the number of splitting iterations in the cross-validator.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.compressor.split.LCSplit.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#LCSplit.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.LCSplit.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.compressor.split.LCSplit.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">groups</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#LCSplit.split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.LCSplit.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates indices to split data into training and test set.
+:param X: Training data, where n_samples is the number of samples</p>
+<blockquote>
+<div><p>and n_features is the number of features.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>of length n_samples</em>) – The target variable for supervised learning problems.</p></li>
+<li><p><strong>groups</strong> (<em>array-like</em><em>, </em><em>with shape</em><em> (</em><em>n_samples</em><em>,</em><em>)</em><em>, </em><em>optional</em>) – Group labels for the samples used while splitting the dataset into
+train/test set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>train</strong> (<em>ndarray</em>) – The training set indices for that split.</p></li>
+<li><p><strong>test</strong> (<em>ndarray</em>) – The testing set indices for that split.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.compressor.split.ShuffleSplit">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">ShuffleSplit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_splits</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">test_size</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">train_size</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#ShuffleSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.ShuffleSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection._split.ShuffleSplit</span></code></p>
+<dl class="py method">
+<dt id="asaplib.compressor.split.ShuffleSplit.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#ShuffleSplit.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.ShuffleSplit.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.split.exponential_split">
+<code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">exponential_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xmin</span></em>, <em class="sig-param"><span class="n">xmax</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#exponential_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.exponential_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain integers that are equally spaced in log space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xmin</strong> (<em>lower bound in original space</em>) – </p></li>
+<li><p><strong>xmax</strong> (<em>upper bound in original space</em>) – </p></li>
+<li><p><strong>n</strong> (<em>integer giving the number of spaces</em><em> (</em><em>default is 5</em><em>)</em>) – </p></li>
+<li><p><strong>Returns</strong> (<em>numpy array of n evenly spaced points in log space</em>) – </p></li>
+<li><p><strong>-------</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.split.kernel_random_split">
+<code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">kernel_random_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">r</span><span class="o">=</span><span class="default_value">0.05</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#kernel_random_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.kernel_random_split" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>,</em><em>n_desc</em><em>]</em><em>, </em><em>kernel matrix</em>) – </p></li>
+<li><p><strong>y</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_samples</em><em>]</em><em>, </em><em>labels</em>) – </p></li>
+<li><p><strong>r</strong> (<em>float</em><em>, </em><em>test ratio</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>X_train, X_test</strong> (<em>train/test kernel matrix</em>)</p></li>
+<li><p><strong>y_train, y_test</strong> (<em>train/test labels</em>)</p></li>
+<li><p><strong>train_list, test_list</strong> (<em>train/test indexes</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.compressor.split.random_split">
+<code class="sig-prename descclassname">asaplib.compressor.split.</code><code class="sig-name descname">random_split</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_sample</span></em>, <em class="sig-param"><span class="n">r</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/compressor/split.html#random_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.compressor.split.random_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain train/test indexes with a test ratio</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_sample</strong> (<em>integer giving the number of samples</em>) – </p></li>
+<li><p><strong>r</strong> (<em>float</em><em>, </em><em>test ratio</em>) – </p></li>
+<li><p><strong>Returns</strong> – </p></li>
+<li><p><strong>-------</strong> – </p></li>
+<li><p><strong>test_list</strong> (<em>train_list</em><em>,</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.compressor">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.compressor" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.data.html" class="btn btn-neutral float-right" title="asaplib.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.cluster.html" class="btn btn-neutral float-left" title="asaplib.cluster package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

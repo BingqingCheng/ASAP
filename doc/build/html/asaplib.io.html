@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.io package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.kde package" href="asaplib.kde.html" />
+    <link rel="prev" title="asaplib.hypers package" href="asaplib.hypers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.io package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.io.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-io-package">
+<h1>asaplib.io package<a class="headerlink" href="#asaplib-io-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.io.cscope">
+<span id="asaplib-io-cscope-module"></span><h2>asaplib.io.cscope module<a class="headerlink" href="#module-asaplib.io.cscope" title="Permalink to this headline">¶</a></h2>
+<p>Adaptors for generating ChemiScope compatible inputs</p>
+<dl class="py function">
+<dt id="asaplib.io.cscope.write_chemiscope_input">
+<code class="sig-prename descclassname">asaplib.io.cscope.</code><code class="sig-name descname">write_chemiscope_input</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">frames</span></em>, <em class="sig-param"><span class="n">meta</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extra</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cutoff</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/cscope.html#write_chemiscope_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.cscope.write_chemiscope_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the json file expected by the default chemiscope visualizer at
+<code class="docutils literal notranslate"><span class="pre">filename</span></code>.
+:param str filename: name of the file to use to save the json data. If it</p>
+<blockquote>
+<div><p>ends with ‘.gz’, a gzip compressed file will be written</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frames</strong> (<em>list</em>) – list of <a class="reference internal" href="#ase-atoms">ase.Atoms</a> objects containing all the
+structures</p></li>
+<li><p><strong>meta</strong> (<em>dict</em>) – optional metadata of the dataset, see below</p></li>
+<li><p><strong>extra</strong> (<em>dict</em>) – optional dictionary of additional properties, see below</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em>) – optional. If present, will be used to generate
+atom-centered environments</p></li>
+</ul>
+</dd>
+</dl>
+<p>The dataset metadata should be given in the <code class="docutils literal notranslate"><span class="pre">meta</span></code> dictionary, the
+possible keys are:
+.. code-block:: python</p>
+<blockquote>
+<div><dl>
+<dt>meta = {</dt><dd><p>‘name’: ‘…’,         # str, dataset name
+‘description’: ‘…’,  # str, dataset description
+‘authors’: [           # list of str, dataset authors, OPTIONAL</p>
+<blockquote>
+<div><p>‘…’,</p>
+</div></blockquote>
+<p>],
+‘references’: [        # list of str, references for this dataset,</p>
+<blockquote>
+<div><p>‘…’,             # OPTIONAL</p>
+</div></blockquote>
+<p>],</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>The written JSON file will contain all the properties defined on the
+<a class="reference internal" href="#ase-atoms">ase.Atoms</a> objects. Values in <code class="docutils literal notranslate"><span class="pre">ase.Atoms.arrays</span></code> are mapped to
+<code class="docutils literal notranslate"><span class="pre">target</span> <span class="pre">=</span> <span class="pre">&quot;atom&quot;</span></code> properties; while values in <code class="docutils literal notranslate"><span class="pre">ase.Atoms.info</span></code> are
+mapped to <code class="docutils literal notranslate"><span class="pre">target</span> <span class="pre">=</span> <span class="pre">&quot;structure&quot;</span></code> properties. The only exception is
+<code class="docutils literal notranslate"><span class="pre">ase.Atoms.arrays[&quot;numbers&quot;]</span></code>, which is always ignored. If you want to
+have the atomic numbers as a property, you should add it to <code class="docutils literal notranslate"><span class="pre">extra</span></code>
+manually.
+Additional properties can be added with the <code class="docutils literal notranslate"><span class="pre">extra</span></code> parameter. This
+parameter should be a dictionary containing one entry for each property.
+Each entry contains a <code class="docutils literal notranslate"><span class="pre">target</span></code> attribute (<code class="docutils literal notranslate"><span class="pre">'atom'</span></code> or <code class="docutils literal notranslate"><span class="pre">'structure'</span></code>)
+and a set of values. <code class="docutils literal notranslate"><span class="pre">values</span></code> can be a Python list of float or string; a
+1D numpy array of numeric values; or a 2D numpy array of numeric values. In
+the later case, multiple properties will be generated along the second axis.
+For example, passing
+.. code-block:: python</p>
+<blockquote>
+<div><dl>
+<dt>extra = {</dt><dd><dl class="simple">
+<dt>‘cheese’: {</dt><dd><p>‘target’: ‘atom’,
+‘values’: np.zeros((300, 4))</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+<p>will generate four properties named <code class="docutils literal notranslate"><span class="pre">cheese[1]</span></code>, <code class="docutils literal notranslate"><span class="pre">cheese[2]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cheese[3]</span></code>,  and <code class="docutils literal notranslate"><span class="pre">cheese[4]</span></code>, each containing 300 values.
+.. <span class="target" id="ase-atoms">ase.Atoms</span>: <a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html">https://wiki.fysik.dtu.dk/ase/ase/atoms.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">NOTE</dt>
+<dd class="field-odd"><p>Adapted from: <a class="reference external" href="https://github.com/cosmo-epfl/chemiscope/blob/master/utils/chemiscope_input.py">https://github.com/cosmo-epfl/chemiscope/blob/master/utils/chemiscope_input.py</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.io.io_cell">
+<span id="asaplib-io-io-cell-module"></span><h2>asaplib.io.io_cell module<a class="headerlink" href="#module-asaplib.io.io_cell" title="Permalink to this headline">¶</a></h2>
+<p>Functions for converting between different simulation cell formats</p>
+<dl class="py function">
+<dt id="asaplib.io.io_cell.abc2h">
+<code class="sig-prename descclassname">asaplib.io.io_cell.</code><code class="sig-name descname">abc2h</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_cell.html#abc2h"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_cell.abc2h" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a lattice vector matrix given a description in terms of the
+lattice vector lengths and the angles in between.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – First cell vector length.</p></li>
+<li><p><strong>b</strong> – Second cell vector length.</p></li>
+<li><p><strong>c</strong> – Third cell vector length.</p></li>
+<li><p><strong>alpha</strong> – Angle between sides b and c in radians.</p></li>
+<li><p><strong>beta</strong> – Angle between sides a and c in radians.</p></li>
+<li><p><strong>gamma</strong> – Angle between sides b and a in radians.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array giving the lattice vector matrix in upper triangular form.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_cell.genh2abc">
+<code class="sig-prename descclassname">asaplib.io.io_cell.</code><code class="sig-name descname">genh2abc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_cell.html#genh2abc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_cell.genh2abc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns a description of the cell in terms of the length of the</dt><dd><p>lattice vectors and the angles between them in radians.</p>
+</dd>
+</dl>
+<p>Takes the representation of the system box in terms of a full matrix
+of row vectors, and returns the representation in terms of the
+lattice vector lengths and the angles between them in radians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>h</strong> – Cell matrix in upper triangular column vector form.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list containing the lattice vector lengths and the angles between them.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_cell.h2abc">
+<code class="sig-prename descclassname">asaplib.io.io_cell.</code><code class="sig-name descname">h2abc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_cell.html#h2abc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_cell.h2abc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns a description of the cell in terms of the length of the</dt><dd><p>lattice vectors and the angles between them in radians.</p>
+</dd>
+</dl>
+<p>Takes the representation of the system box in terms of an upper triangular
+matrix of column vectors, and returns the representation in terms of the
+lattice vector lengths and the angles between them in radians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>h</strong> – Cell matrix in upper triangular column vector form.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list containing the lattice vector lengths and the angles between them.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_cell.h2abc_deg">
+<code class="sig-prename descclassname">asaplib.io.io_cell.</code><code class="sig-name descname">h2abc_deg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_cell.html#h2abc_deg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_cell.h2abc_deg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Returns a description of the cell in terms of the length of the</dt><dd><p>lattice vectors and the angles between them in degrees.</p>
+</dd>
+</dl>
+<p>Takes the representation of the system box in terms of an upper triangular
+matrix of column vectors, and returns the representation in terms of the
+lattice vector lengths and the angles between them in degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>h</strong> – Cell matrix in upper triangular column vector form.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list containing the lattice vector lengths and the angles between them
+in degrees.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_cell.pbcdist">
+<code class="sig-prename descclassname">asaplib.io.io_cell.</code><code class="sig-name descname">pbcdist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q1</span></em>, <em class="sig-param"><span class="n">q2</span></em>, <em class="sig-param"><span class="n">h</span></em>, <em class="sig-param"><span class="n">ih</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_cell.html#pbcdist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_cell.pbcdist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.io.io_parse">
+<span id="asaplib-io-io-parse-module"></span><h2>asaplib.io.io_parse module<a class="headerlink" href="#module-asaplib.io.io_parse" title="Permalink to this headline">¶</a></h2>
+<p>Functions for IO and type conversions</p>
+<dl class="py class">
+<dt id="asaplib.io.io_parse.ConvertStrToList">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">ConvertStrToList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_decls</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_default</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prompt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">confirmation_prompt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">hide_input</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">is_flag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flag_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">multiple</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">count</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allow_from_autoenv</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hidden</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">show_choices</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_envvar</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">attrs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#ConvertStrToList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.ConvertStrToList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">click.core.Option</span></code></p>
+<dl class="py method">
+<dt id="asaplib.io.io_parse.ConvertStrToList.type_cast_value">
+<code class="sig-name descname">type_cast_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ctx</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#ConvertStrToList.type_cast_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.ConvertStrToList.type_cast_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a value this runs it properly through the type system.
+This automatically handles things like <cite>nargs</cite> and <cite>multiple</cite> as
+well as composite types.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.io.io_parse.NpDecoder">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">NpDecoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">object_hook</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parse_float</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parse_int</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parse_constant</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">strict</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">object_pairs_hook</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#NpDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.NpDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.decoder.JSONDecoder</span></code></p>
+<dl class="py method">
+<dt id="asaplib.io.io_parse.NpDecoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#NpDecoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.NpDecoder.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.io.io_parse.NpEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">NpEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">skipkeys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ensure_ascii</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">check_circular</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">allow_nan</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#NpEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.NpEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="py method">
+<dt id="asaplib.io.io_parse.NpEncoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#NpEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.NpEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.io.io_parse.PythonLiteralOption">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">PythonLiteralOption</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param_decls</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">show_default</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">prompt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">confirmation_prompt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">hide_input</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">is_flag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">flag_value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">multiple</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">count</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">allow_from_autoenv</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">help</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hidden</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">show_choices</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">show_envvar</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">attrs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#PythonLiteralOption"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.PythonLiteralOption" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">click.core.Option</span></code></p>
+<dl class="py method">
+<dt id="asaplib.io.io_parse.PythonLiteralOption.type_cast_value">
+<code class="sig-name descname">type_cast_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ctx</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#PythonLiteralOption.type_cast_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.PythonLiteralOption.type_cast_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a value this runs it properly through the type system.
+This automatically handles things like <cite>nargs</cite> and <cite>multiple</cite> as
+well as composite types.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_parse.extract_from_nested_dict">
+<code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">extract_from_nested_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">var</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#extract_from_nested_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.extract_from_nested_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_parse.list2str">
+<code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">list2str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#list2str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.list2str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_parse.randomString">
+<code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">randomString</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stringLength</span><span class="o">=</span><span class="default_value">8</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#randomString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.randomString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.io.io_parse.str2bool">
+<code class="sig-prename descclassname">asaplib.io.io_parse.</code><code class="sig-name descname">str2bool</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/io/io_parse.html#str2bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.io.io_parse.str2bool" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>v</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.io">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.io" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.kde.html" class="btn btn-neutral float-right" title="asaplib.kde package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.hypers.html" class="btn btn-neutral float-left" title="asaplib.hypers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

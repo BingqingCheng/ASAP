@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.reducedim.dim_reducer &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.reducedim.dim_reducer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.reducedim.dim_reducer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Methods and functions to perform dimensionality reduction</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">umap</span>
+<span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="kn">from</span> <span class="nn">.sparse_kpca</span> <span class="kn">import</span> <span class="n">SPARSE_KPCA</span>
+<span class="kn">from</span> <span class="nn">.ml_pca</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">..io</span> <span class="kn">import</span> <span class="n">NpEncoder</span>
+
+
+<div class="viewcode-block" id="Dimension_Reducers"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers">[docs]</a><span class="k">class</span> <span class="nc">Dimension_Reducers</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dreduce_spec_dict</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Object handing the dimensionality reduction of design matrices</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dreduce_spec_dict: dictionaries that specify which dimensionality reduction algorithm to use </span>
+<span class="sd">        we can perform a list of D-reduction sequentially.</span>
+<span class="sd">        e.g.</span>
+<span class="sd">        dreduce_spec_dict = {</span>
+<span class="sd">        &quot;preprocessing&quot;: {&quot;type&quot;: &#39;SCALE&#39;, &#39;parameter&#39;: None},</span>
+<span class="sd">        &quot;reduce2_umap&quot;: {&quot;type&quot;: &#39;UMAP&#39;, &#39;parameter&#39;: {&quot;n_components&quot;: 10, &quot;n_neighbors&quot;: 10, &quot;metric&quot;:&#39;euclidean&#39;}}</span>
+<span class="sd">        }</span>
+<span class="sd">        e.g.</span>
+<span class="sd">        dreduce_spec_dict = {</span>
+<span class="sd">        &quot;reduce1_pca&quot;: {&quot;type&quot;: &#39;PCA&#39;, &#39;parameter&#39;:{&quot;n_components&quot;: 50, &quot;scalecenter&quot;:True}},</span>
+<span class="sd">        &quot;reduce2_tsne&quot;: {&quot;type&quot;: &#39;TSNE&#39;, &#39;parameter&#39;: {&quot;n_components&quot;: 10, &quot;perplexity&quot;:20}}</span>
+<span class="sd">        }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span> <span class="o">=</span> <span class="n">dreduce_spec_dict</span>
+        <span class="c1"># list of Atomic_Descriptor objections</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engines</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1">#self.acronym = &quot;&quot; </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Dimension_Reducers.add"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dreduce_spec</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        adding the specifications of a new dimensionality reducer</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dreduce_spec: a dictionary that specify which dimensionality reducer to use </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">dreduce_spec</span></div>
+
+<div class="viewcode-block" id="Dimension_Reducers.pack"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.pack">[docs]</a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">NpEncoder</span><span class="p">)</span></div>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    def get_acronym(self):</span>
+<span class="sd">        if self.acronym == &quot;&quot;:</span>
+<span class="sd">            for element in self.dreduce_spec_dict.keys():</span>
+<span class="sd">                self.acronym += self.engines[element].get_acronym()</span>
+<span class="sd">        return self.acronym</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Dimension_Reducers.bind"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        binds the objects that actually performs dimension reduction</span>
+<span class="sd">        these objects need to have .fit(desc)/.transform(desc)/.fit_transform(desc) methods to perform reduction on a design matrix desc</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># clear up the objects</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engines</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="p">[</span><span class="n">element</span><span class="p">])</span></div>
+            <span class="c1">#self.dreduce_spec_dict[element][&#39;acronym&#39;] = self.engines[element].get_acronym()</span>
+
+    <span class="k">def</span> <span class="nf">_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dreduce_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        call the specific descriptor objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dreduce_spec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Did not specify the type of the dimensionality reducer.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dreduce_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;SCALE&quot;</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Using standard scaling of the data ...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">StandardScaler</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">dreduce_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PCA&quot;</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Using PCA ...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">PCA</span><span class="p">(</span><span class="o">**</span><span class="n">dreduce_spec</span><span class="p">[</span><span class="s1">&#39;parameter&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">dreduce_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;SPARSE_KPCA&quot;</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Using kernel PCA (sparsified) ...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">SPARSE_KPCA</span><span class="p">(</span><span class="o">**</span><span class="n">dreduce_spec</span><span class="p">[</span><span class="s1">&#39;parameter&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">dreduce_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;UMAP&quot;</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;https://umap-learn.readthedocs.io/en/latest/api.html#umap.umap_.UMAP.fit_transform&quot;&quot;&quot;</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Using UMAP ...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="o">**</span><span class="n">dreduce_spec</span><span class="p">[</span><span class="s1">&#39;parameter&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">dreduce_spec</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;TSNE&quot;</span><span class="p">:</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Using t-sne ...&quot;</span><span class="p">)</span>
+            <span class="sd">&quot;&quot;&quot;https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">TSNE</span><span class="p">(</span><span class="o">**</span><span class="n">dreduce_spec</span><span class="p">[</span><span class="s1">&#39;parameter&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span> 
+
+<div class="viewcode-block" id="Dimension_Reducers.fit"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the global descriptor vector for a frame from atomic contributions</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like, shape=[n_samples,n_dim_high]</span>
+<span class="sd">            Input points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Dimension_Reducers.fit_transform"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the global descriptor vector for a frame from atomic contributions</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like, shape=[n_samples,n_dim_high]</span>
+<span class="sd">            Input points.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x: array-like, shape=[n_samples,n_dim_low]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">X</span></div>
+
+<div class="viewcode-block" id="Dimension_Reducers.transform"><a class="viewcode-back" href="../../../asaplib.reducedim.html#asaplib.reducedim.dim_reducer.Dimension_Reducers.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the global descriptor vector for a frame from atomic contributions</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like, shape=[n_samples,n_dim_high]</span>
+<span class="sd">            Input points.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x: array-like, shape=[n_samples,n_dim_low]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fitted</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Haven&#39;t fit the dimensionality reducer. Use .fit or .fit_transform first&quot;</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dreduce_spec_dict</span><span class="p">[</span><span class="n">element</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;TSNE&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TSNE does not allow out-of-sampling embedding&quot;</span><span class="p">)</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">engines</span><span class="p">[</span><span class="n">element</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">X</span></div></div>
+
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

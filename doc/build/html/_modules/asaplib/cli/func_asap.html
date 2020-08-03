@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.cli.func_asap &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.cli.func_asap</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.cli.func_asap</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">functions used in cmd_asap.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">&quot;&quot;&quot;for loading in_file&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="load_in_file"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.load_in_file">[docs]</a><span class="k">def</span> <span class="nf">load_in_file</span><span class="p">(</span><span class="n">in_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Here goes the routine to compute the descriptors according to the state file(s)&quot;&quot;&quot;</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">in_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">yaml</span> <span class="kn">import</span> <span class="n">full_load</span> <span class="k">as</span> <span class="n">yload</span>
+            <span class="n">state_str</span> <span class="o">=</span> <span class="n">yload</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">json</span>
+            <span class="n">state_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="n">state_str</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="n">state</span></div>
+
+<span class="sd">&quot;&quot;&quot; for load ASAPXYZ &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="load_asapxyz"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.load_asapxyz">[docs]</a><span class="k">def</span> <span class="nf">load_asapxyz</span><span class="p">(</span><span class="n">data_spec</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">asaplib.data</span> <span class="kn">import</span> <span class="n">ASAPXYZ</span>
+    <span class="k">return</span> <span class="n">ASAPXYZ</span><span class="p">(</span><span class="n">data_spec</span><span class="p">[</span><span class="s1">&#39;fxyz&#39;</span><span class="p">],</span> <span class="n">data_spec</span><span class="p">[</span><span class="s1">&#39;stride&#39;</span><span class="p">],</span> <span class="n">data_spec</span><span class="p">[</span><span class="s1">&#39;periodic&#39;</span><span class="p">],</span> <span class="n">data_spec</span><span class="p">[</span><span class="s1">&#39;fxyz_format&#39;</span><span class="p">])</span></div>
+
+<span class="sd">&quot;&quot;&quot;for gen_desc&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="set_reducer"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.set_reducer">[docs]</a><span class="k">def</span> <span class="nf">set_reducer</span><span class="p">(</span><span class="n">reducer_type</span><span class="p">,</span> <span class="n">element_wise</span><span class="p">,</span> <span class="n">zeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    setting up the reducer function that is used to convert atomic descriptors into global descriptors for a structure.</span>
+<span class="sd">    At the moment only one single reducer function can be used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">reducer_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;reducer1&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;reducer_type&#39;</span><span class="p">:</span> <span class="n">reducer_type</span><span class="p">,</span> <span class="c1"># [average], [sum], [moment_average], [moment_sum]</span>
+        <span class="s1">&#39;element_wise&#39;</span><span class="p">:</span> <span class="n">element_wise</span><span class="p">,</span>
+    <span class="p">}}</span>
+    <span class="k">if</span> <span class="n">reducer_type</span> <span class="o">==</span> <span class="s1">&#39;moment_average&#39;</span> <span class="ow">or</span> <span class="n">reducer_type</span> <span class="o">==</span> <span class="s1">&#39;moment_sum&#39;</span><span class="p">:</span>
+        <span class="n">reducer_func</span><span class="p">[</span><span class="s1">&#39;zeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeta</span>
+    <span class="k">return</span> <span class="n">reducer_func</span></div>
+
+<div class="viewcode-block" id="output_desc"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.output_desc">[docs]</a><span class="k">def</span> <span class="nf">output_desc</span><span class="p">(</span><span class="n">asapxyz</span><span class="p">,</span> <span class="n">desc_spec</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">peratom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">N_processes</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute and save the descriptors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">tag</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">desc_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># compute the descripitors</span>
+        <span class="n">asapxyz</span><span class="o">.</span><span class="n">compute_global_descriptors</span><span class="p">(</span><span class="n">desc_spec_dict</span><span class="o">=</span><span class="n">desc</span><span class="p">,</span>
+                                       <span class="n">sbs</span><span class="o">=</span><span class="p">[],</span>
+                                       <span class="n">keep_atomic</span><span class="o">=</span><span class="n">peratom</span><span class="p">,</span>
+                                       <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span>
+                                       <span class="n">n_process</span><span class="o">=</span><span class="n">N_processes</span><span class="p">)</span>
+    <span class="n">asapxyz</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="n">asapxyz</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+<span class="sd">&quot;&quot;&quot; for maps and fits &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="read_xyz_n_dm"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.read_xyz_n_dm">[docs]</a><span class="k">def</span> <span class="nf">read_xyz_n_dm</span><span class="p">(</span><span class="n">fxyz</span><span class="p">,</span> <span class="n">design_matrix</span><span class="p">,</span> <span class="n">use_atomic_descriptors</span><span class="p">,</span> <span class="n">only_use_species</span><span class="p">,</span> <span class="n">peratom</span><span class="p">):</span>
+    <span class="n">dm</span> <span class="o">=</span> <span class="p">[];</span> <span class="n">dm_atomic</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># try to read the xyz file</span>
+    <span class="k">if</span> <span class="n">fxyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fxyz</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">asaplib.data</span> <span class="kn">import</span> <span class="n">ASAPXYZ</span>
+        <span class="n">asapxyz</span> <span class="o">=</span> <span class="n">ASAPXYZ</span><span class="p">(</span><span class="n">fxyz</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_atomic_descriptors</span><span class="p">:</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_atomic_descriptors</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">,</span> <span class="n">only_use_species</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dm</span><span class="p">,</span> <span class="n">dm_atomic</span> <span class="o">=</span> <span class="n">asapxyz</span><span class="o">.</span><span class="n">get_descriptors</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">,</span> <span class="n">peratom</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">asapxyz</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Did not provide the xyz file. We can only output descriptor matrix.&quot;</span><span class="p">)</span>
+    <span class="c1"># we can also load the descriptor matrix from a standalone file</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+            <span class="n">dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loaded the descriptor matrix from file: &quot;</span><span class="p">,</span> <span class="n">design_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot load the descriptor matrix from file&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">asapxyz</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_atomic</span></div>
+
+<span class="sd">&quot;&quot;&quot;for maps&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="figure_style_setups"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.figure_style_setups">[docs]</a><span class="k">def</span> <span class="nf">figure_style_setups</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span>
+                        <span class="n">colorlabel</span><span class="p">,</span> <span class="n">colorscale</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span>
+                        <span class="n">style</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">adjusttext</span><span class="p">):</span>
+    <span class="n">fig_options</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;outfile&#39;</span><span class="p">:</span> <span class="n">prefix</span><span class="p">,</span>
+                    <span class="s1">&#39;show&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">8</span><span class="o">*</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+                    <span class="s1">&#39;cmap&#39;</span><span class="p">:</span> <span class="n">colormap</span><span class="p">,</span>
+                    <span class="s1">&#39;components&#39;</span><span class="p">:{</span>
+                    <span class="s1">&#39;first_p&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;scatter&#39;</span><span class="p">,</span> <span class="s1">&#39;clabel&#39;</span><span class="p">:</span> <span class="n">colorlabel</span><span class="p">,</span> 
+                                <span class="s1">&#39;vmin&#39;</span><span class="p">:</span> <span class="n">colorscale</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;vmax&#39;</span><span class="p">:</span> <span class="n">colorscale</span><span class="p">[</span><span class="mi">1</span><span class="p">]},</span>
+                    <span class="s1">&#39;second_p&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s1">&#39;annotate&#39;</span><span class="p">,</span> <span class="s1">&#39;adtext&#39;</span><span class="p">:</span> <span class="n">adjusttext</span><span class="p">}</span> <span class="p">}</span>
+                   <span class="p">}</span>
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;journal&#39;</span><span class="p">:</span>
+        <span class="n">fig_options</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;xlabel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="s1">&#39;xaxis&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="s1">&#39;yaxis&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                            <span class="s1">&#39;remove_tick&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="s1">&#39;rasterized&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+                            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="o">*</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+                            <span class="p">})</span>
+    <span class="k">return</span> <span class="n">fig_options</span></div>
+
+<div class="viewcode-block" id="map_process"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.map_process">[docs]</a><span class="k">def</span> <span class="nf">map_process</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">reduce_dict</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">map_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    process the dimensionality reduction command</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># project</span>
+    <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">reduce_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">reduce_dict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RAW&#39;</span><span class="p">:</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;design_matrix&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;peratom&#39;</span><span class="p">]:</span>
+            <span class="n">proj_atomic</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;design_matrix_atomic&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proj_atomic</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">asaplib.reducedim</span> <span class="kn">import</span> <span class="n">Dimension_Reducers</span>
+        <span class="n">dreducer</span> <span class="o">=</span> <span class="n">Dimension_Reducers</span><span class="p">(</span><span class="n">reduce_dict</span><span class="p">)</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">dreducer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;design_matrix&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;peratom&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Project atomic design matrix with No. of samples:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;design_matrix_atomic&#39;</span><span class="p">]))</span>
+            <span class="n">proj_atomic</span> <span class="o">=</span> <span class="n">dreducer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;design_matrix_atomic&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">proj_atomic</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># plot</span>
+    <span class="n">fig_spec</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;fig_options&#39;</span><span class="p">]</span>
+    <span class="n">plotcolor</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
+    <span class="n">plotcolor_atomic</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;color_atomic&#39;</span><span class="p">]</span>
+    <span class="n">annotate</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;annotate&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;cluster_labels&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;cluster_labels&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">map_plot</span><span class="p">(</span><span class="n">fig_spec</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">proj_atomic</span><span class="p">,</span> <span class="n">plotcolor</span><span class="p">,</span> <span class="n">plotcolor_atomic</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">annotate</span><span class="p">,</span> <span class="n">axes</span><span class="p">)</span>
+    <span class="c1"># output </span>
+    <span class="n">outfilename</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;fig_options&#39;</span><span class="p">][</span><span class="s1">&#39;outfile&#39;</span><span class="p">]</span>
+    <span class="n">outmode</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;outmode&#39;</span><span class="p">]</span>
+    <span class="n">species_name</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;only_use_species&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;map_options&#39;</span><span class="p">][</span><span class="s1">&#39;project_atomic&#39;</span><span class="p">]:</span>
+        <span class="n">map_save</span><span class="p">(</span><span class="n">outfilename</span><span class="p">,</span> <span class="n">outmode</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;asapxyz&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">map_name</span><span class="p">,</span> <span class="n">species_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">map_save</span><span class="p">(</span><span class="n">outfilename</span><span class="p">,</span> <span class="n">outmode</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;asapxyz&#39;</span><span class="p">],</span> <span class="n">proj</span><span class="p">,</span> <span class="n">proj_atomic</span><span class="p">,</span> <span class="n">map_name</span><span class="p">,</span> <span class="n">species_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="map_plot"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.map_plot">[docs]</a><span class="k">def</span> <span class="nf">map_plot</span><span class="p">(</span><span class="n">fig_spec</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">proj_atomic</span><span class="p">,</span> <span class="n">plotcolor</span><span class="p">,</span> <span class="n">plotcolor_atomic</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">annotate</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make plots</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+    <span class="kn">from</span> <span class="nn">asaplib.plot</span> <span class="kn">import</span> <span class="n">Plotters</span>
+    <span class="n">asap_plot</span> <span class="o">=</span> <span class="n">Plotters</span><span class="p">(</span><span class="n">fig_spec</span><span class="p">)</span>
+    <span class="n">asap_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">proj</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axes</span><span class="p">],</span> <span class="n">plotcolor</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">labels</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">annotate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">proj_atomic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">asap_plot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">proj_atomic</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axes</span><span class="p">],</span> <span class="n">plotcolor_atomic</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],[],[])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="map_save"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.map_save">[docs]</a><span class="k">def</span> <span class="nf">map_save</span><span class="p">(</span><span class="n">foutput</span><span class="p">,</span> <span class="n">outmode</span><span class="p">,</span> <span class="n">asapxyz</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">proj_atomic</span><span class="p">,</span> <span class="n">map_name</span><span class="p">,</span> <span class="n">species_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the low-D projections</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">outmode</span> <span class="o">==</span> <span class="s1">&#39;matrix&#39;</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="k">if</span> <span class="n">proj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">foutput</span> <span class="o">+</span> <span class="s2">&quot;.coord&quot;</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%4.8f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s1">&#39;low D coordinates of samples&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proj_atomic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">foutput</span> <span class="o">+</span> <span class="s2">&quot;-atomic.coord&quot;</span><span class="p">,</span> <span class="n">proj_atomic</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%4.8f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">map_name</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">outmode</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;xyz&#39;</span><span class="p">,</span> <span class="s1">&#39;chemiscope&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">proj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_descriptors</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="n">map_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">proj_atomic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_atomic_descriptors</span><span class="p">(</span><span class="n">proj_atomic</span><span class="p">,</span> <span class="n">map_name</span><span class="p">,</span> <span class="n">species_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">outmode</span> <span class="o">==</span> <span class="s1">&#39;xyz&#39;</span><span class="p">:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">foutput</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If we write atomic projection assume we want to show them</span>
+            <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">3.5</span> <span class="k">if</span> <span class="n">proj_atomic</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">write_chemiscope</span><span class="p">(</span><span class="n">foutput</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+<span class="sd">&quot;&quot;&quot; for clustering &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="cluster_process"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.cluster_process">[docs]</a><span class="k">def</span> <span class="nf">cluster_process</span><span class="p">(</span><span class="n">asapxyz</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">design_matrix</span><span class="p">,</span> <span class="n">cluster_options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;handle clustering operations&quot;&quot;&quot;</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">cluster_options</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span>
+
+    <span class="kn">from</span> <span class="nn">asaplib.cluster</span> <span class="kn">import</span> <span class="n">DBCluster</span>
+    <span class="n">do_clustering</span> <span class="o">=</span> <span class="n">DBCluster</span><span class="p">(</span><span class="n">trainer</span><span class="p">)</span>
+    <span class="n">do_clustering</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">)</span>
+
+    <span class="n">do_clustering</span><span class="o">.</span><span class="n">save_state</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+    <span class="n">labels_db</span> <span class="o">=</span> <span class="n">do_clustering</span><span class="o">.</span><span class="n">get_cluster_labels</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">cluster_options</span><span class="p">[</span><span class="s1">&#39;savexyz&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">asapxyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cluster_options</span><span class="p">[</span><span class="s1">&#39;use_atomic_descriptors&#39;</span><span class="p">]:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_atomic_descriptors</span><span class="p">(</span><span class="n">labels_db</span><span class="p">,</span> <span class="n">prefix</span><span class="o">+</span><span class="s1">&#39;_cluster_label&#39;</span><span class="p">,</span> <span class="n">cluster_options</span><span class="p">[</span><span class="s1">&#39;only_use_species&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_descriptors</span><span class="p">(</span><span class="n">labels_db</span><span class="p">,</span> <span class="n">prefix</span><span class="o">+</span><span class="s1">&#39;_cluster_label&#39;</span><span class="p">)</span>
+        <span class="n">asapxyz</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cluster_options</span><span class="p">[</span><span class="s1">&#39;savetxt&#39;</span><span class="p">]:</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-cluster-label.dat&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels_db</span><span class="p">)),</span> <span class="n">labels_db</span><span class="p">]),</span>
+               <span class="n">header</span><span class="o">=</span><span class="s1">&#39;index cluster_label&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">labels_db</span></div>
+
+<span class="sd">&quot;&quot;&quot; for KDE &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="kde_process"><a class="viewcode-back" href="../../../asaplib.cli.html#asaplib.cli.func_asap.kde_process">[docs]</a><span class="k">def</span> <span class="nf">kde_process</span><span class="p">(</span><span class="n">asapxyz</span><span class="p">,</span> <span class="n">density_model</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">kde_options</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;handle kernel density estimation operations&quot;&quot;&quot;</span>
+    <span class="c1"># fit density model to data</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">density_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;KDE did not work. Try smaller dimension may help.&#39;</span><span class="p">)</span>
+
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">density_model</span><span class="o">.</span><span class="n">evaluate_density</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">kde_options</span><span class="p">[</span><span class="s1">&#39;prefix&#39;</span><span class="p">]</span>
+    <span class="c1"># save the density</span>
+    <span class="k">if</span> <span class="n">kde_options</span><span class="p">[</span><span class="s1">&#39;savetxt&#39;</span><span class="p">]:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-kde.dat&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)),</span> <span class="n">rho</span><span class="p">]),</span>
+               <span class="n">header</span><span class="o">=</span><span class="s1">&#39;index log_of_kernel_density_estimation&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%4.8f</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kde_options</span><span class="p">[</span><span class="s1">&#39;savexyz&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">asapxyz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kde_options</span><span class="p">[</span><span class="s1">&#39;use_atomic_descriptors&#39;</span><span class="p">]:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_atomic_descriptors</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">density_model</span><span class="o">.</span><span class="n">get_acronym</span><span class="p">(),</span> <span class="n">kde_options</span><span class="p">[</span><span class="s1">&#39;only_use_species&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asapxyz</span><span class="o">.</span><span class="n">set_descriptors</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">density_model</span><span class="o">.</span><span class="n">get_acronym</span><span class="p">())</span>
+        <span class="n">asapxyz</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rho</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

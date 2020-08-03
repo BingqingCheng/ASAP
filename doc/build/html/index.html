@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Automatic Selection And Prediction tools for materials and molecules &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Automatic Selection And Prediction tools for materials and molecules</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="automatic-selection-and-prediction-tools-for-materials-and-molecules">
+<h1>Automatic Selection And Prediction tools for materials and molecules<a class="headerlink" href="#automatic-selection-and-prediction-tools-for-materials-and-molecules" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="basic-usage">
+<h1>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h1>
+<p>Type <cite>asap</cite> and use the sub-commands for various tasks.</p>
+<p>To get help string:</p>
+<p><cite>asap –help</cite> .or. <cite>asap subcommand –help</cite> .or. <cite>asap subcommand subcommand –help</cite> depending which level of help you are interested in.</p>
+<ul class="simple">
+<li><p><cite>asap gen_desc</cite>: generate global or atomic descriptors based on the input [ASE](<a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/atoms.html">https://wiki.fysik.dtu.dk/ase/ase/atoms.html</a>)) xyze file.</p></li>
+<li><p><cite>asap map</cite>: make 2D plots using the specified design matrix. Currently PCA <cite>pca</cite>, sparsified kernel PCA <cite>skpca</cite>, UMAP <cite>umap</cite>, and t-SNE <cite>tsne</cite> are implemented.</p></li>
+<li><p><cite>asap cluster</cite>: perform density based clustering. Currently supports DBSCAN <cite>dbscan</cite> and [Fast search of density peaks](<a class="reference external" href="https://science.sciencemag.org/content/344/6191/1492">https://science.sciencemag.org/content/344/6191/1492</a>) <cite>fdb</cite>.</p></li>
+<li><p><cite>asap fit</cite>: fast fit ridge regression <cite>ridge</cite> or sparsified kernel ridge regression model <cite>kernelridge</cite> based on the input design matrix and labels.</p></li>
+<li><p><cite>asap kde</cite>: quick kernel density estimation on the design matrix. Several versions of kde available.</p></li>
+<li><p><cite>asap select</cite>: select a subset of frames using sparsification algorithms.</p></li>
+</ul>
+</div>
+<div class="section" id="quick-basic-example">
+<h1>Quick &amp; basic example<a class="headerlink" href="#quick-basic-example" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>Step 1: generate a design matrix</p></li>
+</ul>
+<p>The first step for a machine-learning analysis or visualization is to generate a “design matrix” made from either global descriptors or atomic descriptors. To do this, we supply <cite>asap gen_desc</cite> with an input file that contains the atomic coordintes. Many formats are supported; anything can be read using [ase.io](<a class="reference external" href="https://wiki.fysik.dtu.dk/ase/ase/io/io.html">https://wiki.fysik.dtu.dk/ase/ase/io/io.html</a>) is supported. You can use a wildcard to specify the list of input files that matches the pattern (e.g. <cite>POSCAR*</cite>, <cite>H*</cite>, or <cite>*.cif</cite>). However, it is most robust if you use an extended xyz file format (units in angstrom, additional info and cell size in the comment line).</p>
+<p>As a quick example, in the folder ./tests/</p>
+<p>to generate SOAP descriptors:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">asap</span> <span class="pre">gen_desc</span> <span class="pre">--fxyz</span> <span class="pre">small_molecules-1000.xyz</span> <span class="pre">soap</span>
+<span class="pre">`</span></code></p>
+<p>for columb matrix:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">asap</span> <span class="pre">gen_desc</span> <span class="pre">-f</span> <span class="pre">small_molecules-1000.xyz</span> <span class="pre">--no-periodic</span> <span class="pre">cm</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p>Step 2: generate a low-dimensional map</p></li>
+</ul>
+<p>After generating the descriptors, one can make a two-dimensional map (<cite>asap map</cite>), or regression model (<cite>asap fit</cite>), or clustering (<cite>asap cluster</cite>), or select a subset of frames (<cite>asap select</cite>), or do a clustering analysis (<cite>asap cluster</cite>), or estimate the probablity of observing each sample (<cite>asap kde</cite>).</p>
+<p>For instance, to make a pca map:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">asap</span> <span class="pre">map</span> <span class="pre">-f</span> <span class="pre">small_molecules-SOAP.xyz</span> <span class="pre">-dm</span> <span class="pre">'[SOAP-n4-l3-c1.9-g0.23]'</span> <span class="pre">-c</span> <span class="pre">dft_formation_energy_per_atom_in_eV</span> <span class="pre">pca</span>
+<span class="pre">`</span></code></p>
+<p>You can specify a list of descriptor vectors to include in the design matrix, e.g. <cite>‘[SOAP-n4-l3-c1.9-g0.23, SOAP-n8-l3-c5.0-g0.3]’</cite></p>
+<p>one can use a wildcard to specify the name of all the descriptors to use for the design matrix, e.g.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">asap</span> <span class="pre">map</span> <span class="pre">-f</span> <span class="pre">small_molecules-SOAP.xyz</span> <span class="pre">-dm</span> <span class="pre">'[SOAP*]'</span> <span class="pre">-c</span> <span class="pre">dft_formation_energy_per_atom_in_eV</span> <span class="pre">pca</span>
+<span class="pre">`</span></code></p>
+<p>or even</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">asap</span> <span class="pre">map</span> <span class="pre">-f</span> <span class="pre">small_molecules-SOAP.xyz</span> <span class="pre">-dm</span> <span class="pre">'[*]'</span> <span class="pre">-c</span> <span class="pre">dft_formation_energy_per_atom_in_eV</span> <span class="pre">pca</span>
+<span class="pre">`</span></code></p>
+<p>#### Step 2+: interactive visualization</p>
+<p>Using <cite>asap map</cite>, a png figure is generated. In addition, the code also output the low-dimensional coordinates of the structures and/or atomic environments. The default output is extended xyz file. One can also specify a different output format using <cite>–output</cite> or <cite>-o</cite> flag. and the available options are <cite>xyz</cite>, <cite>matrix</cite> and <cite>chemiscope</cite>.</p>
+<ul class="simple">
+<li><p>If one select <cite>chemiscope</cite> format, a <cite>*.json.gz</cite> file will be writen, which can be directly used as the input of [chemiscope](<a class="reference external" href="https://github.com/cosmo-epfl/chemiscope">https://github.com/cosmo-epfl/chemiscope</a>)</p></li>
+<li><p>If the output is in <cite>xyz</cite> format, it can be visualized interactively using [projection_viewer](<a class="reference external" href="https://github.com/chkunkel/projection_viewer">https://github.com/chkunkel/projection_viewer</a>).</p></li>
+</ul>
+</div>
+<div class="section" id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="asaplib.html">asaplib package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

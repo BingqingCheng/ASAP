@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.kde package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.kernel package" href="asaplib.kernel.html" />
+    <link rel="prev" title="asaplib.io package" href="asaplib.io.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.kde package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.kde.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-kde-package">
+<h1>asaplib.kde package<a class="headerlink" href="#asaplib-kde-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.kde.density_estimation">
+<span id="asaplib-kde-density-estimation-module"></span><h2>asaplib.kde.density_estimation module<a class="headerlink" href="#module-asaplib.kde.density_estimation" title="Permalink to this headline">¶</a></h2>
+<p>class and methods for performing kernel density estimation</p>
+<dl class="py class">
+<dt id="asaplib.kde.density_estimation.KDE_scipy">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.kde.density_estimation.</code><code class="sig-name descname">KDE_scipy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bw_method</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_scipy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_scipy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.kde.density_estimation.Kernel_Density_Base" title="asaplib.kde.density_estimation.Kernel_Density_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.kde.density_estimation.Kernel_Density_Base</span></code></a></p>
+<p>Kernel Density Estimation with Scipy
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gaussian_kde.html</a></p>
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.KDE_scipy.evaluate_density">
+<code class="sig-name descname">evaluate_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_scipy.evaluate_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_scipy.evaluate_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of data, computes the local density of every point using kernel density estimation</p>
+<p>Data X : array, shape(n_sample,n_feature)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>Log of densities for every point</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array, shape(n_sample)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.KDE_scipy.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_scipy.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_scipy.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>X: dataset, array_like</p>
+<p>Datapoints to estimate from. In case of univariate data this is a 1-D array,
+otherwise a 2-D array with shape (# of data, # of dimension)</p>
+<p>Note that scipy.stats.gaussian_kde take X with shape (# of dimension, # of data)
+This is why we transpose the input X.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.kde.density_estimation.KDE_sklearn">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.kde.density_estimation.</code><code class="sig-name descname">KDE_sklearn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">algorithm</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">kernel</span><span class="o">=</span><span class="default_value">'gaussian'</span></em>, <em class="sig-param"><span class="n">metric</span><span class="o">=</span><span class="default_value">'euclidean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_sklearn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_sklearn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.kde.density_estimation.Kernel_Density_Base" title="asaplib.kde.density_estimation.Kernel_Density_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.kde.density_estimation.Kernel_Density_Base</span></code></a></p>
+<p>Kernel Density Estimation with Sklearn
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html#sklearn.neighbors.KernelDensity">https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KernelDensity.html#sklearn.neighbors.KernelDensity</a>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/density.html#kernel-density-estimation">https://scikit-learn.org/stable/modules/density.html#kernel-density-estimation</a></p>
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.KDE_sklearn.evaluate_density">
+<code class="sig-name descname">evaluate_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_sklearn.evaluate_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_sklearn.evaluate_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of data, computes the local density of every point using kernel density estimation</p>
+<p>Data X : array, shape(n_sample,n_feature)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>Log of densities for every point</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array, shape(n_sample)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.KDE_sklearn.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#KDE_sklearn.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.KDE_sklearn.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>X: dataset, array_like</p>
+<p>Datapoints to estimate from. In case of univariate data this is a 1-D array,
+otherwise a 2-D array with shape (# of data, # of dimension)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.kde.density_estimation.Kernel_Density_Base">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.kde.density_estimation.</code><code class="sig-name descname">Kernel_Density_Base</code><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#Kernel_Density_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.Kernel_Density_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for performing kernel density estimation</p>
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.Kernel_Density_Base.evaluate_density">
+<code class="sig-name descname">evaluate_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#Kernel_Density_Base.evaluate_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.Kernel_Density_Base.evaluate_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of data, computes the local density of every point using kernel density estimation</p>
+<p>Data X : array, shape(n_sample,n_feature)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>Log of densities for every point</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array, shape(n_sample)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.Kernel_Density_Base.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#Kernel_Density_Base.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.Kernel_Density_Base.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit kernel model to X</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.Kernel_Density_Base.fit_evaluate_density">
+<code class="sig-name descname">fit_evaluate_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#Kernel_Density_Base.fit_evaluate_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.Kernel_Density_Base.fit_evaluate_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation.Kernel_Density_Base.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation.html#Kernel_Density_Base.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation.Kernel_Density_Base.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.kde.density_estimation_internal">
+<span id="asaplib-kde-density-estimation-internal-module"></span><h2>asaplib.kde.density_estimation_internal module<a class="headerlink" href="#module-asaplib.kde.density_estimation_internal" title="Permalink to this headline">¶</a></h2>
+<p>I adapted the code from:
+<a class="reference external" href="https://github.com/alexandreday/fast_density_clustering.git">https://github.com/alexandreday/fast_density_clustering.git</a>
+Copyright 2017 Alexandre Day</p>
+<dl class="py class">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.kde.density_estimation_internal.</code><code class="sig-name descname">KDE_internal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nh_size</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">test_ratio_size</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">xtol</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">atol</span><span class="o">=</span><span class="default_value">5e-06</span></em>, <em class="sig-param"><span class="n">rtol</span><span class="o">=</span><span class="default_value">5e-05</span></em>, <em class="sig-param"><span class="n">extreme_dist</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">nn_dist</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">kernel</span><span class="o">=</span><span class="default_value">'gaussian'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.kde.density_estimation.Kernel_Density_Base" title="asaplib.kde.density_estimation.Kernel_Density_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.kde.density_estimation.Kernel_Density_Base</span></code></a></p>
+<p>Kernel density estimation (KDE) for accurate local density estimation.
+This is achieved by using maximum-likelihood estimation of the generative kernel density model
+which is regularized using cross-validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bandwidth</strong> (<em>float</em><em>, </em><em>optional</em>) – bandwidth for the kernel density estimation. If not specified, will be determined automatically using
+maximum likelihood on a test-set.</p></li>
+<li><p><strong>nh_size</strong> (<em>int</em><em>, </em><em>optional</em><em> (</em><em>default = 'auto'</em><em>)</em>) – number of points in a typical neighborhood… only relevant for evaluating
+a crude estimate of the bandwidth.’auto’ means that the nh_size is scaled with number of samples. We
+use nh_size = 100 for 10000 samples. The minimum neighborhood size is set to 4.</p></li>
+<li><p><strong>test_ratio_size</strong> (<em>float</em><em>, </em><em>optional</em>) – Ratio size of the test set used when performing maximum likehood estimation.
+In order to have smooth density estimations (prevent overfitting), it is recommended to
+use a large test_ratio_size (closer to 1.0) rather than a small one.</p></li>
+<li><p><strong>atol</strong> (<em>float</em><em>, </em><em>optional</em><em> (</em><em>default = 0.000005</em><em>)</em>) – kernel density estimate precision parameter. determines the precision used for kde.
+smaller values leads to slower execution but better precision</p></li>
+<li><p><strong>rtol</strong> (<em>float</em><em>, </em><em>optional</em><em> (</em><em>default = 0.00005</em><em>)</em>) – kernel density estimate precision parameter. determines the precision used for kde.
+smaller values leads to slower execution but better precision</p></li>
+<li><p><strong>xtol</strong> (<em>float</em><em>, </em><em>optional</em><em> (</em><em>default = 0.01</em><em>)</em>) – precision parameter for optimizing the bandwidth using maximum likelihood on a test set</p></li>
+<li><p><strong>test_ratio_size</strong> – ratio of the test size for determining the bandwidth.</p></li>
+<li><p><strong>kernel</strong> (<em>str</em><em>, </em><em>optional</em><em> (</em><em>default='gaussian'</em><em>)</em>) – Type of Kernel to use for density estimates. Other options are {‘epanechnikov’|’linear’,’tophat’}.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal.bandwidth_estimate">
+<code class="sig-name descname">bandwidth_estimate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_train</span></em>, <em class="sig-param"><span class="n">X_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal.bandwidth_estimate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal.bandwidth_estimate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gives a rough estimate of the optimal bandwidth (based on the notion of some effective neigborhood)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>bandwidth estimate, minimum possible value</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple, shape(2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal.evaluate_density">
+<code class="sig-name descname">evaluate_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal.evaluate_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal.evaluate_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of data, computes the local density of every point using kernel density estimation</p>
+<p>Data X : array, shape(n_sample,n_feature)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>Log of densities for every point</strong> (<em>array, shape(n_sample)</em>)</p></li>
+<li><p><em>Return</em> – kde.score_samples(X)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal.find_optimal_bandwidth">
+<code class="sig-name descname">find_optimal_bandwidth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal.find_optimal_bandwidth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal.find_optimal_bandwidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs maximum likelihood estimation on a test set of the density model fitted on a training set</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit kernel model to X</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.kde.density_estimation_internal.KDE_internal.log_likelihood_test_set">
+<code class="sig-name descname">log_likelihood_test_set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">bandwidth</span></em>, <em class="sig-param"><span class="n">X_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#KDE_internal.log_likelihood_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.KDE_internal.log_likelihood_test_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the kde model on the training set given some bandwidth and evaluates the negative log-likelihood of the test set</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.kde.density_estimation_internal.round_float">
+<code class="sig-prename descclassname">asaplib.kde.density_estimation_internal.</code><code class="sig-name descname">round_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/kde/density_estimation_internal.html#round_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.kde.density_estimation_internal.round_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rounds a float to it’s first significant digit</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.kde">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.kde" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.kernel.html" class="btn btn-neutral float-right" title="asaplib.kernel package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.io.html" class="btn btn-neutral float-left" title="asaplib.io package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

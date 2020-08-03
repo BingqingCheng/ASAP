@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.kde.density_estimation_internal &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.kde.density_estimation_internal</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.kde.density_estimation_internal</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">I adapted the code from:</span>
+<span class="sd">https://github.com/alexandreday/fast_density_clustering.git</span>
+<span class="sd">Copyright 2017 Alexandre Day</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KernelDensity</span><span class="p">,</span> <span class="n">NearestNeighbors</span>
+
+<span class="kn">from</span> <span class="nn">.density_estimation</span> <span class="kn">import</span> <span class="n">Kernel_Density_Base</span>
+
+<div class="viewcode-block" id="KDE_internal"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal">[docs]</a><span class="k">class</span> <span class="nc">KDE_internal</span><span class="p">(</span><span class="n">Kernel_Density_Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Kernel density estimation (KDE) for accurate local density estimation.</span>
+<span class="sd">    This is achieved by using maximum-likelihood estimation of the generative kernel density model</span>
+<span class="sd">    which is regularized using cross-validation.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bandwidth: float, optional</span>
+<span class="sd">        bandwidth for the kernel density estimation. If not specified, will be determined automatically using</span>
+<span class="sd">        maximum likelihood on a test-set.</span>
+
+<span class="sd">    nh_size : int, optional (default = &#39;auto&#39;)</span>
+<span class="sd">        number of points in a typical neighborhood... only relevant for evaluating</span>
+<span class="sd">        a crude estimate of the bandwidth.&#39;auto&#39; means that the nh_size is scaled with number of samples. We </span>
+<span class="sd">        use nh_size = 100 for 10000 samples. The minimum neighborhood size is set to 4.</span>
+
+<span class="sd">    test_ratio_size: float, optional (default = 0.8)</span>
+<span class="sd">        Ratio size of the test set used when performing maximum likehood estimation.</span>
+<span class="sd">        In order to have smooth density estimations (prevent overfitting), it is recommended to</span>
+<span class="sd">        use a large test_ratio_size (closer to 1.0) rather than a small one.</span>
+
+<span class="sd">    atol: float, optional (default = 0.000005)</span>
+<span class="sd">        kernel density estimate precision parameter. determines the precision used for kde.</span>
+<span class="sd">        smaller values leads to slower execution but better precision</span>
+<span class="sd">    </span>
+<span class="sd">    rtol: float, optional (default = 0.00005)</span>
+<span class="sd">        kernel density estimate precision parameter. determines the precision used for kde.</span>
+<span class="sd">        smaller values leads to slower execution but better precision</span>
+<span class="sd">    </span>
+<span class="sd">    xtol: float, optional (default = 0.01)</span>
+<span class="sd">        precision parameter for optimizing the bandwidth using maximum likelihood on a test set</span>
+
+<span class="sd">    test_ratio_size: float, optional</span>
+<span class="sd">        ratio of the test size for determining the bandwidth.</span>
+
+<span class="sd">    kernel: str, optional (default=&#39;gaussian&#39;)</span>
+<span class="sd">        Type of Kernel to use for density estimates. Other options are {&#39;epanechnikov&#39;|&#39;linear&#39;,&#39;tophat&#39;}.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nh_size</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">test_ratio_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                 <span class="n">xtol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.000005</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">,</span> <span class="n">extreme_dist</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">nn_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nh_size</span> <span class="o">=</span> <span class="n">nh_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_ratio_size</span> <span class="o">=</span> <span class="n">test_ratio_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xtol</span> <span class="o">=</span> <span class="n">xtol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="n">atol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">rtol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extreme_dist</span> <span class="o">=</span> <span class="n">extreme_dist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nn_dist</span> <span class="o">=</span> <span class="n">nn_dist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span>  <span class="c1"># epanechnikov other option</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">acronym</span> <span class="o">=</span> <span class="s1">&#39;kde_internal&#39;</span>
+
+<div class="viewcode-block" id="KDE_internal.fit"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;Fit kernel model to X&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nh_size</span> <span class="ow">is</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nh_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="mi">25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="mi">4</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Careful, you are trying to do density estimation for data in a D &gt; 8 dimensional space</span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="s1">&#39; ... you are warned !&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_optimal_bandwidth</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kde</span> <span class="o">=</span> <span class="n">KernelDensity</span><span class="p">(</span>
+                <span class="n">bandwidth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;kd_tree&#39;</span><span class="p">,</span>
+                <span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span>
+                <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span>
+                <span class="n">breadth_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">leaf_size</span><span class="o">=</span><span class="mi">40</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="KDE_internal.evaluate_density"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal.evaluate_density">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_density</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given an array of data, computes the local density of every point using kernel density estimation</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        ------</span>
+<span class="sd">        Data X : array, shape(n_sample,n_feature)</span>
+
+<span class="sd">        Return</span>
+<span class="sd">        ------</span>
+<span class="sd">        Log of densities for every point: array, shape(n_sample)</span>
+<span class="sd">        Return:</span>
+<span class="sd">            kde.score_samples(X)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="KDE_internal.bandwidth_estimate"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal.bandwidth_estimate">[docs]</a>    <span class="k">def</span> <span class="nf">bandwidth_estimate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gives a rough estimate of the optimal bandwidth (based on the notion of some effective neigborhood)</span>
+<span class="sd">        </span>
+<span class="sd">        Return</span>
+<span class="sd">        ---------</span>
+<span class="sd">        bandwidth estimate, minimum possible value : tuple, shape(2)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn_dist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nn</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nh_size</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;kd_tree&#39;</span><span class="p">)</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+            <span class="n">nn_dist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">n_neighbors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nh_size</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nn_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nn_dist</span>
+
+        <span class="n">dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Computation of minimum bound</span>
+        <span class="c1"># This can be computed by taking the limit h -&gt; 0 and making a saddle-point approx.</span>
+        <span class="n">mean_nn2_dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nn_dist</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">nn_dist</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">h_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_nn2_dist</span> <span class="o">/</span> <span class="n">dim</span><span class="p">)</span>
+
+        <span class="n">idx_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)),</span> <span class="n">size</span><span class="o">=</span><span class="nb">min</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)]),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">idx_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)),</span> <span class="n">size</span><span class="o">=</span><span class="nb">min</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)]),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">max_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">idx_1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_2</span><span class="p">)])</span>
+
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="n">idx_1</span><span class="p">[:</span><span class="n">max_size</span><span class="p">]]</span> <span class="o">-</span> <span class="n">X_test</span><span class="p">[</span><span class="n">idx_2</span><span class="p">[:</span><span class="n">max_size</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">h_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tmp</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">)</span> <span class="o">/</span> <span class="n">dim</span><span class="p">)</span>
+        <span class="n">h_est</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">h_min</span>
+        <span class="k">return</span> <span class="n">h_est</span><span class="p">,</span> <span class="n">h_min</span><span class="p">,</span> <span class="n">h_max</span></div>
+
+<div class="viewcode-block" id="KDE_internal.find_optimal_bandwidth"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal.find_optimal_bandwidth">[docs]</a>    <span class="k">def</span> <span class="nf">find_optimal_bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs maximum likelihood estimation on a test set of the density model fitted on a training set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fminbound</span>
+        <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_ratio_size</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,)</span>
+
+        <span class="n">hest</span><span class="p">,</span> <span class="n">hmin</span><span class="p">,</span> <span class="n">hmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth_estimate</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[kde] Minimum bound = </span><span class="si">%.4f</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> Rough estimate of h = </span><span class="si">%.4f</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> Maximum bound = </span><span class="si">%.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hmin</span><span class="p">,</span> <span class="n">hest</span><span class="p">,</span> <span class="n">hmax</span><span class="p">))</span>
+
+        <span class="c1"># We are trying to find reasonable tight bounds (hmin, 4.0*hest) to bracket the error function minima</span>
+        <span class="c1"># Would be nice to have some hard accurate bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xtol</span> <span class="o">=</span> <span class="n">round_float</span><span class="p">(</span><span class="n">hmin</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[kde] Bandwidth tolerance (xtol) set to precision of minimum bound : </span><span class="si">%.5f</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xtol</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span> <span class="o">=</span> <span class="n">KernelDensity</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;kd_tree&#39;</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="n">leaf_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+        <span class="c1"># hmax is the upper bound, however, heuristically it appears to always be way above the actual bandwidth. hmax*0.2 seems much better but still conservative</span>
+        <span class="n">h_optimal</span><span class="p">,</span> <span class="n">score_opt</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">niter</span> <span class="o">=</span> <span class="n">fminbound</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_likelihood_test_set</span><span class="p">,</span> <span class="n">hmin</span><span class="p">,</span> <span class="n">hmax</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">maxfun</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                                   <span class="n">xtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xtol</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[kde] Found log-likelihood maximum in </span><span class="si">%i</span><span class="s2"> evaluations, h = </span><span class="si">%.5f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">h_optimal</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extreme_dist</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># These bounds should always be satisfied ...</span>
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h_optimal</span> <span class="o">-</span> <span class="n">hmax</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="s2">&quot;Upper boundary reached for bandwidth&quot;</span>
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">h_optimal</span> <span class="o">-</span> <span class="n">hmin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="s2">&quot;Lower boundary reached for bandwidth&quot;</span>
+
+        <span class="k">return</span> <span class="n">h_optimal</span></div>
+
+    <span class="c1"># @profile</span>
+<div class="viewcode-block" id="KDE_internal.log_likelihood_test_set"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.KDE_internal.log_likelihood_test_set">[docs]</a>    <span class="k">def</span> <span class="nf">log_likelihood_test_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">,</span> <span class="n">X_test</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit the kde model on the training set given some bandwidth and evaluates the negative log-likelihood of the test set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="o">.</span><span class="n">bandwidth</span> <span class="o">=</span> <span class="n">bandwidth</span>
+        <span class="c1"># l_test = len(X_test)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">kde</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span>
+                               <span class="p">:</span><span class="mi">2000</span><span class="p">])</span>  <span class="c1"># X_test[np.random.choice(np.arange(0, l_test), size=min([int(0.5*l_test), 1000]), replace=False)]) # this should be accurate enough !</span></div></div>
+
+
+<div class="viewcode-block" id="round_float"><a class="viewcode-back" href="../../../asaplib.kde.html#asaplib.kde.density_estimation_internal.round_float">[docs]</a><span class="k">def</span> <span class="nf">round_float</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rounds a float to it&#39;s first significant digit&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+                <span class="k">break</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">[:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

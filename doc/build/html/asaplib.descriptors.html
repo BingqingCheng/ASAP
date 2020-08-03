@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.descriptors package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.fit package" href="asaplib.fit.html" />
+    <link rel="prev" title="asaplib.data package" href="asaplib.data.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.descriptors package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.descriptors.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-descriptors-package">
+<h1>asaplib.descriptors package<a class="headerlink" href="#asaplib-descriptors-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.descriptors.atomic_descriptors">
+<span id="asaplib-descriptors-atomic-descriptors-module"></span><h2>asaplib.descriptors.atomic_descriptors module<a class="headerlink" href="#module-asaplib.descriptors.atomic_descriptors" title="Permalink to this headline">¶</a></h2>
+<p>Methods and functions to compute atomic desciptors</p>
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_ACSF</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_ACSF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_ACSF.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_ACSF.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_Base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_Base.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_Base.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.is_atomic">
+<code class="sig-name descname">is_atomic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_Base.is_atomic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base.is_atomic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_FCHL19</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_FCHL19"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base</span></code></a></p>
+<p>Generate the FCHL19 representation (<a class="reference external" href="https://doi.org/10.1063/1.5126701">https://doi.org/10.1063/1.5126701</a>).
+Requires the developer version of the QML package, see
+<a class="reference external" href="https://www.qmlcode.org/installation.html">https://www.qmlcode.org/installation.html</a> for installation instructions.</p>
+<p>:param :
+:type : param nRs2: Number of gaussian basis functions in the two-body terms
+:param :
+:type : type nRs2: integer
+:param :
+:type : param nRs3: Number of gaussian basis functions in the three-body radial part
+:param :
+:type : type nRs3: integer
+:param :
+:type : param nFourier: Order of Fourier expansion
+:param :
+:type : type nFourier: integer
+:param :
+:type : param eta2: Precision in the gaussian basis functions in the two-body terms
+:param :
+:type : type eta2: float
+:param :
+:type : param eta3: Precision in the gaussian basis functions in the three-body radial part
+:param :
+:type : type eta3: float
+:param :
+:type : param zeta: Precision parameter of basis functions in the three-body angular part
+:param :
+:type : type zeta: float
+:param :
+:type : param two_body_decay: exponential decay for the two body function
+:param :
+:type : type two_body_decay: float
+:param :
+:type : param three_body_decay: exponential decay for the three body function
+:param :
+:type : type three_body_decay: float
+:param :
+:type : param three_body_weight: relative weight of the three body function
+:param :
+:type : type three_body_weight: float
+:param :
+:type : is_periodic: Boolean determining Whether the system is periodic.
+:param :
+:type : type Boolean:</p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_FCHL19.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_FCHL19.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_LMBTR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_LMBTR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_LMBTR.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K2">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_LMBTR_K2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_LMBTR_K2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K3">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_LMBTR_K3</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_LMBTR_K3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR_K3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_LMBTR</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptor_SOAP</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_SOAP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base" title="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptor_SOAP.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptor_SOAP.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_descriptors.</code><code class="sig-name descname">Atomic_Descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em>, <em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adding the specifications of a new atomic descriptors
+:param desc_spec:
+:type desc_spec: a dictionary that specify which atomic descriptor to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds the objects that actually compute the descriptors
+these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.compute">
+<code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param frame:
+:type frame: ASE atom object. Coordinates of a frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>atomic_desc_dict</strong> – and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+e.g. {‘ad1’:{‘acronym’:’soap-1’, ‘atomic_descriptors’: <cite>a np.array [N_desc*N_atoms]</cite>}}</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>a dictionary. each entry contains the essential info of the descriptor (acronym)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_descriptors.html#Atomic_Descriptors.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_descriptors.Atomic_Descriptors.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.descriptors.atomic_to_global">
+<span id="asaplib-descriptors-atomic-to-global-module"></span><h2>asaplib.descriptors.atomic_to_global module<a class="headerlink" href="#module-asaplib.descriptors.atomic_to_global" title="Permalink to this headline">¶</a></h2>
+<p>Methods and functions to compute global descriptors of a frame from its atomic desciptors</p>
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Average">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base" title="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base</span></code></a></p>
+<p>this is the vanilla situation. We just take the average soap for all atoms</p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Average.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Average.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Average.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc:
+:type atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+:param atomic_numbers:
+:type atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>acronym</strong> (<em>self.acronym</em>)</p></li>
+<li><p><strong>desc</strong> (<em>a np.array [N_desc]. Global descriptors for a frame.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Base.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc:
+:type atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+:param atomic_numbers:
+:type atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>acronym</strong> (<em>self.acronym</em>)</p></li>
+<li><p><strong>desc</strong> (<em>a np.array [N_desc]. Global descriptors for a frame.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Base.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em>, <em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Descriptors.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adding the specifications of a new Atomic_2_Global_Descriptor
+:param k_spec:
+:type k_spec: a dictionary that specify which Atomic_2_Global_Descriptor descriptor to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Descriptors.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds the objects that actually compute the descriptors
+these objects need to have .create(atomic_desc) method to compute the global descriptors from atomic ones</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.compute">
+<code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc_dict</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Descriptors.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc_dict:      and a np.array [N_desc*N_atoms]. Global descriptors for a frame.</p>
+<blockquote>
+<div><p>see Atomic_Descriptors.compute() in .atomic_descriptors.py</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>atomic_numbers</strong> (<em>np.matrix.</em><em> [</em><em>N_atoms</em><em>]</em><em> Atomic numbers for atoms in the frame.</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>desc_dict</strong> –        and a np.array [N_desc]. Global descriptors for a frame.
+e.g. {‘d1’:{ ‘acronym’: ‘XXX’, ‘descriptors’: <cite>a np.array [N_desc]</cite>}}</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>a dictionary. each entry contains the essential info of the descriptor, i.e. acronym</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Descriptors.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Descriptors.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Average">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Moment_Average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Moment_Average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base" title="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base</span></code></a></p>
+<p>get the global descriptor from atomic ones
+by averaging over the atomic descriptors of z th power</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>zeta</strong> (<em>take the zeta th power</em>) – </p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Average.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Moment_Average.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Average.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc:
+:type atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+:param atomic_numbers:
+:type atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>acronym</strong> (<em>self.acronym</em>)</p></li>
+<li><p><strong>desc</strong> (<em>a np.array [N_desc]. Global descriptors for a frame.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Sum">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Moment_Sum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Moment_Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base" title="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base</span></code></a></p>
+<p>get the global descriptor from atomic ones
+by averaging over the atomic descriptors of z th power</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>zeta</strong> (<em>take the zeta th power</em>) – </p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Sum.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Moment_Sum.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Moment_Sum.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc:
+:type atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+:param atomic_numbers:
+:type atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>acronym</strong> (<em>self.acronym</em>)</p></li>
+<li><p><strong>desc</strong> (<em>a np.array [N_desc]. Global descriptors for a frame.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Sum">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Atomic_2_Global_Sum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Sum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base" title="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.atomic_to_global.Atomic_2_Global_Base</span></code></a></p>
+<p>We just take the sum soap for all atoms</p>
+<dl class="py method">
+<dt id="asaplib.descriptors.atomic_to_global.Atomic_2_Global_Sum.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Atomic_2_Global_Sum.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Atomic_2_Global_Sum.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param atomic_desc:
+:type atomic_desc: a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+:param atomic_numbers:
+:type atomic_numbers: np.matrix. [N_atoms]. Atomic numbers for atoms in the frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>acronym</strong> (<em>self.acronym</em>)</p></li>
+<li><p><strong>desc</strong> (<em>a np.array [N_desc]. Global descriptors for a frame.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="asaplib.descriptors.atomic_to_global.Descriptor_By_Species">
+<code class="sig-prename descclassname">asaplib.descriptors.atomic_to_global.</code><code class="sig-name descname">Descriptor_By_Species</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span></em>, <em class="sig-param"><span class="n">atomic_numbers</span></em>, <em class="sig-param"><span class="n">global_species</span></em>, <em class="sig-param"><span class="n">average_over_natom</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/atomic_to_global.html#Descriptor_By_Species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.atomic_to_global.Descriptor_By_Species" title="Permalink to this definition">¶</a></dt>
+<dd><p>first compute the average/sum descriptors for each species,
+then concatenate them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atomic_desc</strong> (<em>np.matrix.</em><em> [</em><em>N_atoms</em><em>, </em><em>N_desc</em><em>]</em><em> Atomic descriptors for a frame.</em>) – </p></li>
+<li><p><strong>atomic_numbers</strong> (<em>np.matrix.</em><em> [</em><em>N_atoms</em><em>]</em><em> Atomic numbers for atoms in the frame.</em>) – </p></li>
+<li><p><strong>global_species</strong> (<em>a list of all atomic species in all frames</em>) – </p></li>
+<li><p><strong>average_over_natom</strong> (<em>normalized by number of the atoms of the same species</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>desc</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.matrix [N_desc*len(global_species)] Global descriptors for a frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.descriptors.global_descriptors">
+<span id="asaplib-descriptors-global-descriptors-module"></span><h2>asaplib.descriptors.global_descriptors module<a class="headerlink" href="#module-asaplib.descriptors.global_descriptors" title="Permalink to this headline">¶</a></h2>
+<p>Methods and functions to compute global desciptors</p>
+<dl class="py class">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Base">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.global_descriptors.</code><code class="sig-name descname">Global_Descriptor_Base</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Base.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Base.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Base.get_acronym">
+<code class="sig-name descname">get_acronym</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Base.get_acronym"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base.get_acronym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Base.is_atomic">
+<code class="sig-name descname">is_atomic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Base.is_atomic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base.is_atomic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_CM">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.global_descriptors.</code><code class="sig-name descname">Global_Descriptor_CM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_CM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_CM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base" title="asaplib.descriptors.global_descriptors.Global_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.global_descriptors.Global_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_CM.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_CM.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_CM.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the CM descriptor vector for a frame
+:param frame:
+:type frame: ASE atom object. Coordinates of a frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>desc_dict</strong> (<em>a dictionary. each entry contains the essential info of the descriptor, i.e. acronym</em>) –        and a np.array [N_desc]. Global descriptors for a frame.
+e.g. {‘d1’:{ ‘acronym’: ‘CM-<a href="#id1"><span class="problematic" id="id2">*</span></a>’, ‘descriptors’: <cite>a np.array [N_desc]</cite>}}</p></li>
+<li><p><strong>atomic_desc_dict</strong> (<em>{}</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Morgan">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.global_descriptors.</code><code class="sig-name descname">Global_Descriptor_Morgan</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Morgan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Morgan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base" title="asaplib.descriptors.global_descriptors.Global_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.global_descriptors.Global_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_Morgan.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_Morgan.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Morgan.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.global_descriptors.</code><code class="sig-name descname">Global_Descriptor_from_Atomic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_from_Atomic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_Base" title="asaplib.descriptors.global_descriptors.Global_Descriptor_Base"><code class="xref py py-class docutils literal notranslate"><span class="pre">asaplib.descriptors.global_descriptors.Global_Descriptor_Base</span></code></a></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic.create">
+<code class="sig-name descname">create</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_from_Atomic.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param frame:
+:type frame: ASE atom object. Coordinates of a frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>desc_dict</strong> (<em>a dictionary. each entry contains the essential info of the descriptor, i.e. acronym</em>) –        and a np.array [N_desc]. Global descriptors for a frame.
+e.g. {‘d1’:{ ‘acronym’: ‘XXX’, ‘descriptors’: <cite>a np.array [N_desc]</cite>}}</p></li>
+<li><p><strong>atomic_desc_dict</strong> (<em>a dictionary. each entry contains the essential info of the descriptor (acronym)</em>) – and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+e.g. {‘ad1’:{‘acronym’:’soap-1’, ‘atomic_descriptors’: <cite>a np.array [N_desc*N_atoms]</cite>}}</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptor_from_Atomic.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptor_from_Atomic.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptors">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.descriptors.global_descriptors.</code><code class="sig-name descname">Global_Descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptors.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec</span></em>, <em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptors.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptors.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adding the specifications of a new atomic descriptors
+:param desc_spec:
+:type desc_spec: a dictionary that specify which atomic descriptor to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptors.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptors.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptors.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds the objects that actually compute the descriptors
+these objects need to have .create(frame) method to compute the descriptors of frame (a xyz object)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptors.compute">
+<code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptors.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptors.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector and atomic descriptor matrix (if any) for a frame
+:param frame:
+:type frame: ASE atom object. Coordinates of a frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>desc_dict</strong> (<em>a dictionary. each entry contains the essential info of the descriptor, i.e. acronym</em>) –        and a np.array [N_desc]. Global descriptors for a frame.
+e.g. {‘d1’:{ ‘acronym’: ‘XXX’, ‘descriptors’: <cite>a np.array [N_desc]</cite>}}</p></li>
+<li><p><strong>atomic_desc_dict</strong> (<em>a dictionary. each entry contains the essential info of the descriptor (acronym)</em>) – and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
+e.g. {‘ad1’:{‘acronym’:’soap-1’, ‘atomic_descriptors’: <cite>a np.array [N_desc*N_atoms]</cite>}}</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.descriptors.global_descriptors.Global_Descriptors.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/descriptors/global_descriptors.html#Global_Descriptors.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.descriptors.global_descriptors.Global_Descriptors.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.descriptors">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.descriptors" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.fit.html" class="btn btn-neutral float-right" title="asaplib.fit package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.data.html" class="btn btn-neutral float-left" title="asaplib.data package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

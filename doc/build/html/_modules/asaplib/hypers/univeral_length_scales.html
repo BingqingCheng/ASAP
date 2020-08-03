@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.hypers.univeral_length_scales &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.hypers.univeral_length_scales</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.hypers.univeral_length_scales</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="system_pair_bond_lengths"><a class="viewcode-back" href="../../../asaplib.hypers.html#asaplib.hypers.univeral_length_scales.system_pair_bond_lengths">[docs]</a><span></span><span class="k">def</span> <span class="nf">system_pair_bond_lengths</span><span class="p">(</span><span class="n">Zs</span><span class="p">,</span> <span class="n">length_scales</span><span class="p">):</span>
+    <span class="c1"># shortest bond in this composition</span>
+    <span class="n">shortest_bond</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">length_scales</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Z</span><span class="p">)][</span><span class="s2">&quot;min_bond_len&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">Z</span> <span class="ow">in</span> <span class="n">Zs</span><span class="p">])</span>
+
+    <span class="c1"># longest bond in this composition</span>
+    <span class="n">longest_bond</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">length_scales</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">Z</span><span class="p">)][</span><span class="s2">&quot;bond_len&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">Z</span> <span class="ow">in</span> <span class="n">Zs</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">shortest_bond</span><span class="p">,</span> <span class="n">longest_bond</span></div>
+
+
+<div class="viewcode-block" id="round_sigfigs"><a class="viewcode-back" href="../../../asaplib.hypers.html#asaplib.hypers.univeral_length_scales.round_sigfigs">[docs]</a><span class="k">def</span> <span class="nf">round_sigfigs</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">n_sig_figs</span><span class="p">):</span>
+    <span class="c1"># https://stackoverflow.com/questions/3410976/how-to-round-a-number-to-significant-figures-in-python</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{:g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;{:.</span><span class="si">{p}</span><span class="s1">g}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">n_sig_figs</span><span class="p">)))</span></div>
+
+
+<span class="n">uni_length_scales</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.75</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;11&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">35</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;12&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;13&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;14&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;16&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;17&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;19&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">71</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;20&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">41</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;21&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;22&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">17</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;23&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;24&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;26&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;27&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;28&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;29&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;30&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;31&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;32&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;33&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;34&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;35&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">29</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;37&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">81</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;38&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">54</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;39&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">7.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;40&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;41&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;42&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;43&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;44&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;45&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;46&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;47&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;48&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;49&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">27</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">8.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;50&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;51&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">29</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;52&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;53&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">39</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;56&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;57&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;58&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">27</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;59&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;6&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">5.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;60&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">35</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;61&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;62&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;64&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;65&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;66&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;69&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;7&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">9.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;70&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">39</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;72&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;73&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;74&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;75&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;76&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;77&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;78&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;79&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;8&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;80&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">28</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;81&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;82&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.9</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">31</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;83&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;84&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;89&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">46</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;9&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                           <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                           <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;90&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.6</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.7</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]},</span>
+                     <span class="s2">&quot;91&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;min_bond_len&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;other links&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                            <span class="s2">&quot;vol_per_atom&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;NB VASP auto_length_scale&quot;</span><span class="p">]}}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

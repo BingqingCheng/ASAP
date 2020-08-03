@@ -1,0 +1,653 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.data package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.descriptors package" href="asaplib.descriptors.html" />
+    <link rel="prev" title="asaplib.compressor package" href="asaplib.compressor.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.reducedim.html">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.data package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.data.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-data-package">
+<h1>asaplib.data package<a class="headerlink" href="#asaplib-data-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.data.design_matrix">
+<span id="asaplib-data-design-matrix-module"></span><h2>asaplib.data.design_matrix module<a class="headerlink" href="#module-asaplib.data.design_matrix" title="Permalink to this headline">¶</a></h2>
+<p>Class for storing and handling design matrices</p>
+<dl class="py class">
+<dt id="asaplib.data.design_matrix.Design_Matrix">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.data.design_matrix.</code><code class="sig-name descname">Design_Matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">y</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">whiten</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">test_ratio</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">z</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tags</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.data.design_matrix.Design_Matrix.compute_fit">
+<code class="sig-name descname">compute_fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learner</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">store_results</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">plot</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix.compute_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix.compute_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the design matrix X and the values y using a learner</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>learner</strong> (<em>object. a learner object</em><em>, </em><em>e.g. RidgeRegression</em>) – needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods</p></li>
+<li><p><strong>tag</strong> (<em>str. The name of this learner</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.design_matrix.Design_Matrix.compute_learning_curve">
+<code class="sig-name descname">compute_learning_curve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learner</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lc_points</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">lc_repeats</span><span class="o">=</span><span class="default_value">8</span></em>, <em class="sig-param"><span class="n">randomseed</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix.compute_learning_curve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix.compute_learning_curve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the learning curve using a learner</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lc_points</strong> (<em>int</em><em>, </em><em>the number of points on the learning curve</em>) – </p></li>
+<li><p><strong>lc_repeats</strong> (<em>the number of sub-samples to take when compute the learning curve</em>) – </p></li>
+<li><p><strong>learner</strong> (<em>object. a learner object</em><em>, </em><em>e.g. RidgeRegression</em>) – needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods</p></li>
+<li><p><strong>tag</strong> (<em>str. The name of this learner</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.design_matrix.Design_Matrix.get_sparsified_matrix">
+<code class="sig-name descname">get_sparsified_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix.get_sparsified_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix.get_sparsified_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.design_matrix.Design_Matrix.save_state">
+<code class="sig-name descname">save_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'yaml'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix.save_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix.save_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.design_matrix.Design_Matrix.sparsify">
+<code class="sig-name descname">sparsify</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_sparse</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sparse_mode</span><span class="o">=</span><span class="default_value">'fps'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/design_matrix.html#Design_Matrix.sparsify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.design_matrix.Design_Matrix.sparsify" title="Permalink to this definition">¶</a></dt>
+<dd><p>select representative data points using the design matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_sparse</strong> (<em>number of representative points</em>) – n_sparse == None means 5% of the data
+n_sparse &lt; 0 means no sparsification</p></li>
+<li><p><strong>sparse_mode</strong> (<em>str. Methods to use for sparsification</em><em> [</em><em>cur</em><em>]</em><em>, </em><em>[</em><em>fps</em><em>]</em><em>, </em><em>[</em><em>random</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.data.xyz">
+<span id="asaplib-data-xyz-module"></span><h2>asaplib.data.xyz module<a class="headerlink" href="#module-asaplib.data.xyz" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="asaplib.data.xyz.ASAPXYZ">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.data.xyz.</code><code class="sig-name descname">ASAPXYZ</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fxyz</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stride</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">periodic</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">fileformat</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.compute_atomic_descriptors">
+<code class="sig-name descname">compute_atomic_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_process</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.compute_atomic_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.compute_atomic_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the atomic descriptors for selected frames
+:param desc_spec:
+:type desc_spec: a list of dictionaries, contrains infos on the descriptors to use
+:param e.g.:
+:param atomic_desc_dict = {:
+:param “firstsoap”:
+:param {“type”:
+:type {“type”: ‘SOAP’,”species”: [1, 6, 7, 8], “cutoff”: 2.0, “atom_gaussian_width”: 0.2, “n”: 4, “l”: 4}
+:param }:
+:param sbs:
+:type sbs: array, integer</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.compute_global_descriptors">
+<code class="sig-name descname">compute_global_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">keep_atomic</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">tag</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_process</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.compute_global_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.compute_global_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the atomic descriptors for selected frames
+:param desc_spec_dict:
+:type desc_spec_dict: dictionaries that specify which global descriptor to use.
+:param e.g.:
+:param {‘global_desc1’:
+:param {“type”:
+:type {“type”: ‘CM’}}
+:param e.g.:
+:param {‘global_desc2’:
+:type {‘global_desc2’: {‘atomic_descriptor’: atomic_desc_dict, ‘reducer_function’: reducer_dict}}
+:param and:
+:param atomic_desc_dict = {:
+:param “firstsoap”:
+:param {“type”:
+:type {“type”: ‘SOAP’,”species”: [1, 6, 7, 8], “cutoff”: 2.0, “atom_gaussian_width”: 0.2, “n”: 4, “l”: 4}
+:param }:
+:param and:
+:param reducer_dict = {‘first_reducer’: ‘zeta’: zeta,</p>
+<blockquote>
+<div><p>‘species’: species,
+‘element_wise’: element_wise}}</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.fetch_computed_descriptors">
+<code class="sig-name descname">fetch_computed_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_dict_keys</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.fetch_computed_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.fetch_computed_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch the computed descriptors for selected frames
+:param desc_spec_keys:
+:type desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+:param sbs:
+:type sbs: array, integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>desc</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.matrix [n_frame, n_desc]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_atomic_descriptors">
+<code class="sig-name descname">get_atomic_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_name_list</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">species_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_atomic_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_atomic_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract the descriptor array from each frame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>desc_name_list</strong> (<em>a list of strings</em><em>, </em><em>the name of the .info</em><em>[</em><em>] </em><em>in the extended xyz file</em>) – </p></li>
+<li><p><strong>species_name</strong> (<em>int</em><em>, </em><em>the atomic number of the species selected.</em>) – Only the desciptors of atoms of the specified specied will be returned.
+species_name=None means all atoms are selected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>atomic_desc</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_atomic_property">
+<code class="sig-name descname">get_atomic_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extensive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">species_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_atomic_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_atomic_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract the property array from each atom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_key</strong> (<em>string_like</em><em>, </em><em>the name of the property in the extended xyz file</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+<li><p><strong>specie</strong> (<em>int</em><em>, </em><em>the atomic number of the species selected.</em>) – Only the properties of atoms of the specified specied will be returned.
+species_name=None means all atoms are selected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>y_all</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array [N_atoms]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_descriptors">
+<code class="sig-name descname">get_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_name_list</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">use_atomic_desc</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">species_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract the descriptor array from each frame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>desc_name_list</strong> (<em>a list of strings</em><em>, </em><em>the name of the .info</em><em>[</em><em>] </em><em>in the extended xyz file</em>) – </p></li>
+<li><p><strong>use_atomic_desc</strong> (<em>bool</em><em>, </em><em>return the descriptors for each atom</em><em>, </em><em>read from the xyz file</em>) – </p></li>
+<li><p><strong>species_name</strong> (<em>int</em><em>, </em><em>the atomic number of the species selected.</em>) – Only the desciptors of atoms of the specified specied will be returned.
+species_name=None means all atoms are selected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>desc</strong> (<em>np.matrix</em>)</p></li>
+<li><p><strong>atomic_desc</strong> (<em>np.matrix</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_global_species">
+<code class="sig-name descname">get_global_species</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_global_species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_global_species" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_natom_list">
+<code class="sig-name descname">get_natom_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_natom_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_natom_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_natom_list_by_species">
+<code class="sig-name descname">get_natom_list_by_species</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">species_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_natom_list_by_species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_natom_list_by_species" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_num_frames">
+<code class="sig-name descname">get_num_frames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_num_frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_num_frames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_property">
+<code class="sig-name descname">get_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">extensive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>extract specified property from selected frames</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_key</strong> (<em>string_like</em><em>, </em><em>the name of the property in the extended xyz file</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>y_all</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array [N_samples]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_total_natoms">
+<code class="sig-name descname">get_total_natoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_total_natoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_total_natoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.get_xyz">
+<code class="sig-name descname">get_xyz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.get_xyz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.get_xyz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.load_properties">
+<code class="sig-name descname">load_properties</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value">'infer'</span></em>, <em class="sig-param"><span class="n">prefix</span><span class="o">=</span><span class="default_value">'X'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.load_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.load_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load properties from a CSV file</p>
+<p>Read in the CSV file and save the columns to the <cite>info</cite> dictionary of the
+frames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>(</em><em>str</em><em>) </em><em>Name of the CSV file.</em>) – </p></li>
+<li><p><strong>header</strong> (<em>Row number of the header. Defaults to use the first row unless explicit</em>) – names for the columns are given</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.remove_atomic_descriptors">
+<code class="sig-name descname">remove_atomic_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_name_list</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.remove_atomic_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.remove_atomic_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove the desciptors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.remove_descriptors">
+<code class="sig-name descname">remove_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_name_list</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.remove_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.remove_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove the desciptors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.save_descriptor_acronym_state">
+<code class="sig-name descname">save_descriptor_acronym_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'yaml'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.save_descriptor_acronym_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.save_descriptor_acronym_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.save_state">
+<code class="sig-name descname">save_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'yaml'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.save_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.save_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.set_atomic_descriptors">
+<code class="sig-name descname">set_atomic_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atomic_desc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">atomic_desc_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">species_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.set_atomic_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.set_atomic_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the descriptor array to the atom object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc</strong> (<em>np.matrix</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_atoms</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.set_descriptors">
+<code class="sig-name descname">set_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">desc_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.set_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.set_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the descriptor array to the atom object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc</strong> (<em>np.matrix</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_frames</em><em>]</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.standardize">
+<code class="sig-name descname">standardize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">symprec</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.standardize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.standardize" title="Permalink to this definition">¶</a></dt>
+<dd><p>reduce to primitive cell</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.symmetrise">
+<code class="sig-name descname">symmetrise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">symprec</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.symmetrise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.symmetrise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">save_acronym</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">wrap_output</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the selected frames or all the frames to a xyz file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.write_atomic_descriptor_matrix">
+<code class="sig-name descname">write_atomic_descriptor_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">desc_name</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.write_atomic_descriptor_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.write_atomic_descriptor_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the selected descriptor matrix in a matrix format to file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – </p></li>
+<li><p><strong>desc_name</strong> (<em>str. Name of the properties/descriptors to write</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+<li><p><strong>comment</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.write_chemiscope">
+<code class="sig-name descname">write_chemiscope</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save_acronym</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">cutoff</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wrap_output</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.write_chemiscope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.write_chemiscope" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the selected frames or all the frames to ChemiScope JSON</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+<li><p><strong>cutoff</strong> (<em>generate cutoff for atomic environments</em><em>, </em><em>set to None to disable atomic environments</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.write_computed_descriptors">
+<code class="sig-name descname">write_computed_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">desc_dict_keys</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.write_computed_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.write_computed_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the computed descriptors for selected frames
+:param desc_spec_keys:
+:type desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+:param sbs:
+:type sbs: array, integer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>desc</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.matrix [n_frame, n_desc]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.data.xyz.ASAPXYZ.write_descriptor_matrix">
+<code class="sig-name descname">write_descriptor_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">desc_name_list</span></em>, <em class="sig-param"><span class="n">sbs</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">comment</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/data/xyz.html#ASAPXYZ.write_descriptor_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.data.xyz.ASAPXYZ.write_descriptor_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>write the selected descriptor matrix in a matrix format to file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – </p></li>
+<li><p><strong>desc_name_list</strong> (<em>a list of str. Name of the properties/descriptors to write</em>) – </p></li>
+<li><p><strong>sbs</strong> (<em>array</em><em>, </em><em>integer</em>) – </p></li>
+<li><p><strong>comment</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.data" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.descriptors.html" class="btn btn-neutral float-right" title="asaplib.descriptors package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.compressor.html" class="btn btn-neutral float-left" title="asaplib.compressor package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.reducedim package &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="asaplib.util package" href="asaplib.util.html" />
+    <link rel="prev" title="asaplib.plot package" href="asaplib.plot.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules in ASAP</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="asaplib.html">asaplib package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="asaplib.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cli.html">asaplib.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.cluster.html">asaplib.cluster package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.compressor.html">asaplib.compressor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.data.html">asaplib.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.descriptors.html">asaplib.descriptors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.fit.html">asaplib.fit package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.hypers.html">asaplib.hypers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.io.html">asaplib.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kde.html">asaplib.kde package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.kernel.html">asaplib.kernel package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.plot.html">asaplib.plot package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">asaplib.reducedim package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="asaplib.util.html">asaplib.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="asaplib.html#module-asaplib">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">Modules in ASAP</a> &raquo;</li>
+        
+          <li><a href="asaplib.html">asaplib package</a> &raquo;</li>
+        
+      <li>asaplib.reducedim package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/asaplib.reducedim.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="asaplib-reducedim-package">
+<h1>asaplib.reducedim package<a class="headerlink" href="#asaplib-reducedim-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asaplib.reducedim.dim_reducer">
+<span id="asaplib-reducedim-dim-reducer-module"></span><h2>asaplib.reducedim.dim_reducer module<a class="headerlink" href="#module-asaplib.reducedim.dim_reducer" title="Permalink to this headline">¶</a></h2>
+<p>Methods and functions to perform dimensionality reduction</p>
+<dl class="py class">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.reducedim.dim_reducer.</code><code class="sig-name descname">Dimension_Reducers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dreduce_spec_dict</span><span class="o">=</span><span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.add">
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dreduce_spec</span></em>, <em class="sig-param"><span class="n">tag</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>adding the specifications of a new dimensionality reducer
+:param dreduce_spec:
+:type dreduce_spec: a dictionary that specify which dimensionality reducer to use</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.bind">
+<code class="sig-name descname">bind</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.bind" title="Permalink to this definition">¶</a></dt>
+<dd><p>binds the objects that actually performs dimension reduction
+these objects need to have .fit(desc)/.transform(desc)/.fit_transform(desc) methods to perform reduction on a design matrix desc</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param X: Input points.
+:type X: array-like, shape=[n_samples,n_dim_high]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param X: Input points.
+:type X: array-like, shape=[n_samples,n_dim_high]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>x</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array-like, shape=[n_samples,n_dim_low]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.pack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.dim_reducer.Dimension_Reducers.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/dim_reducer.html#Dimension_Reducers.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.dim_reducer.Dimension_Reducers.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the global descriptor vector for a frame from atomic contributions
+:param X: Input points.
+:type X: array-like, shape=[n_samples,n_dim_high]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>x</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array-like, shape=[n_samples,n_dim_low]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.reducedim.ml_kpca">
+<span id="asaplib-reducedim-ml-kpca-module"></span><h2>asaplib.reducedim.ml_kpca module<a class="headerlink" href="#module-asaplib.reducedim.ml_kpca" title="Permalink to this headline">¶</a></h2>
+<p>Tools for doing kernel PCA on environmental similarity
+e.g.
+kNN = np.genfromtxt(prefix+”.k”,skip_header=1)
+proj = KernelPCA(kpca_d).fit_transform(kNN)</p>
+<p>KernelPCA with precomputed kernel for now only!!!!!!!!!!!!</p>
+<dl class="py class">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.reducedim.ml_kpca.</code><code class="sig-name descname">KernelPCA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.center_square">
+<em class="property">static </em><code class="sig-name descname">center_square</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.center_square"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.center_square" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centering of a kernel matrix, with additional centering info</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kernel</strong> (<em>array-like</em><em>, </em><em>(</em><em>shape=MxM</em><em>)</em>) – Kernel matrix</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>colmean</strong> (<em>ndarray, (shape=M)</em>) – mean of columns from kernel matrix</p></li>
+<li><p><strong>mean</strong> (<em>float</em>) – mean of the entire kernel matrix</p></li>
+<li><p><strong>centered_kernel</strong> (<em>ndarray, (shape=MxM)</em>) – kernel centered in feature space</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kmat</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit kernel PCA on the precomputed kernel matrix</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Keeps the kernel matrix intact</p></li>
+<li><p>can be done only once on a given object, need to reinitialise if trying to run again</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>kmat</strong> (<em>numpy.ndarray</em><em>, </em><em>shape=</em><em>(</em><em>M</em><em>,</em><em>M</em><em>)</em>) – kerenl matrix between the observations
+needs to be square and real, symmetric</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kmat</span></em>, <em class="sig-param"><span class="n">copy</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit kernel PCA on the precomputed kernel matrix &amp; project to lower dimensions</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Keeps the kernel matrix intact</p></li>
+<li><p>can be done only once on a given object, need to reinitialise if trying to run again</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kmat</strong> (<em>numpy.ndarray</em><em>, </em><em>shape=</em><em>(</em><em>M</em><em>,</em><em>M</em><em>)</em>) – kerenl matrix between the observations
+needs to be square and real, symmetric</p></li>
+<li><p><strong>copy</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>) – copy the kernel matrix or overwrite it, passed to self.transform()
+nb. the kernel matrix will be left centered if this is False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.fit_vectors">
+<code class="sig-name descname">fit_vectors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vecs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.fit_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.fit_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit Kernel PCA from vectors in the large dimension</p>
+<p>for future, not implemented yet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ktest</span></em>, <em class="sig-param"><span class="n">iscentered</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">copy</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms to the lower dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ktest</strong> (<em>array_like</em><em>, </em><em>shape=</em><em>(</em><em>L</em><em>,</em><em>M</em><em>)</em>) – kernel matrix of the test vectors with the training vectors</p></li>
+<li><p><strong>iscentered</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=False</em>) – if the kernel is centered already, mainly used for the fit_transform function</p></li>
+<li><p><strong>copy</strong> (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>) – copy the kernel matrix or overwrite it
+nb. the kernel matrix will be left centered if this is False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projected_vectors</strong> – projections of the given kernel wrt. the training kernel</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array, shape=(L,n_components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_kpca.KernelPCA.transform_vectors">
+<code class="sig-name descname">transform_vectors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vecs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_kpca.html#KernelPCA.transform_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_kpca.KernelPCA.transform_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit Kernel PCA from vectors in the large dimension &amp; project to lower dimension</p>
+<p>for future, not implemented yet</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.reducedim.ml_pca">
+<span id="asaplib-reducedim-ml-pca-module"></span><h2>asaplib.reducedim.ml_pca module<a class="headerlink" href="#module-asaplib.reducedim.ml_pca" title="Permalink to this headline">¶</a></h2>
+<p>tools for doing PCA
+e.g.
+desc = np.genfromtxt(prefix+”.desc”)
+proj = PCA(pca_d).fit_transform(desc)</p>
+<dl class="py class">
+<dt id="asaplib.reducedim.ml_pca.PCA">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.reducedim.ml_pca.</code><code class="sig-name descname">PCA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">scalecenter</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_pca.PCA.centering">
+<code class="sig-name descname">centering</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA.centering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA.centering" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_pca.PCA.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit PCA on the precomputed descriptor matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>desc</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – </p></li>
+<li><p><strong>matrix</strong> (<em>design</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_pca.PCA.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit PCA on the design matrix &amp; project to lower dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc_test</strong> (<em>array_like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – design matrix of the new samples</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projected_vectors</strong> – projections of the design matrix on low dimension</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array, shape=(L,n_components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_pca.PCA.scalecenter_matrix">
+<code class="sig-name descname">scalecenter_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA.scalecenter_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA.scalecenter_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scaling and Centering of a design matrix, with additional centering info</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – design matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.ml_pca.PCA.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/ml_pca.html#PCA.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.ml_pca.PCA.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms to the lower dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc_test</strong> (<em>array_like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – design matrix of the new samples</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projected_vectors</strong> – projections of the design matrix on low dimension</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array, shape=(L,n_components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.reducedim.sparse_kpca">
+<span id="asaplib-reducedim-sparse-kpca-module"></span><h2>asaplib.reducedim.sparse_kpca module<a class="headerlink" href="#module-asaplib.reducedim.sparse_kpca" title="Permalink to this headline">¶</a></h2>
+<p>Tools for performing dimensionality reduction of design matrices
+using sparse KPCA</p>
+<dl class="py class">
+<dt id="asaplib.reducedim.sparse_kpca.SPARSE_KPCA">
+<em class="property">class </em><code class="sig-prename descclassname">asaplib.reducedim.sparse_kpca.</code><code class="sig-name descname">SPARSE_KPCA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_components</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">kernel</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">sparse_mode</span><span class="o">=</span><span class="default_value">'fps'</span></em>, <em class="sig-param"><span class="n">n_sparse</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/sparse_kpca.html#SPARSE_KPCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.sparse_kpca.SPARSE_KPCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="asaplib.reducedim.sparse_kpca.SPARSE_KPCA.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/sparse_kpca.html#SPARSE_KPCA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.sparse_kpca.SPARSE_KPCA.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit KPCA on the precomputed descriptor matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>desc</strong> (<em>array-like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – </p></li>
+<li><p><strong>matrix</strong> (<em>design</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.sparse_kpca.SPARSE_KPCA.fit_transform">
+<code class="sig-name descname">fit_transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/sparse_kpca.html#SPARSE_KPCA.fit_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.sparse_kpca.SPARSE_KPCA.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit PCA on the design matrix &amp; project to lower dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc</strong> (<em>array_like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – design matrix of the new samples</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projected_vectors</strong> – projections of the design matrix on low dimension</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array, shape=(L,n_components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="asaplib.reducedim.sparse_kpca.SPARSE_KPCA.transform">
+<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">desc_test</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/asaplib/reducedim/sparse_kpca.html#SPARSE_KPCA.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asaplib.reducedim.sparse_kpca.SPARSE_KPCA.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms to the lower dimensions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>desc_test</strong> (<em>array_like</em><em>, </em><em>shape=</em><em>[</em><em>n_descriptors</em><em>, </em><em>n_samples</em><em>]</em>) – design matrix of the new samples</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projected_vectors</strong> – projections of the design matrix on low dimension</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array, shape=(L,n_components)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asaplib.reducedim">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asaplib.reducedim" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="asaplib.util.html" class="btn btn-neutral float-right" title="asaplib.util package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="asaplib.plot.html" class="btn btn-neutral float-left" title="asaplib.plot package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

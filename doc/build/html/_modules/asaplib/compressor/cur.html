@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>asaplib.compressor.cur &mdash; asapdoc 0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> asapdoc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules in ASAP</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">asapdoc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>asaplib.compressor.cur</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for asaplib.compressor.cur</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">CUR matrix decomposition is a low-rank matrix decomposition algorithm that is explicitly expressed in a small number of actual columns and/or actual rows of data matrix.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">spalg</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">svd</span><span class="p">,</span> <span class="n">eigh</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">pinv</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">svds</span>
+
+
+<div class="viewcode-block" id="CUR_deterministic"><a class="viewcode-back" href="../../../asaplib.compressor.html#asaplib.compressor.cur.CUR_deterministic">[docs]</a><span class="k">def</span> <span class="nf">CUR_deterministic</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_col</span><span class="p">,</span> <span class="n">error_estimate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given rank k, find the best column and rows</span>
+<span class="sd">    X = C U R</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X: input a covariance matrix </span>
+<span class="sd">    n_col: number of column to keep</span>
+<span class="sd">    error_estimate: compute the remaining error of the CUR</span>
+<span class="sd">    costs: a list of costs associated with each column</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    a list of selected columns</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">RX</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">rsel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_col</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">rerror</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_col</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_col</span><span class="p">):</span>
+        <span class="n">rval</span><span class="p">,</span> <span class="n">RX</span> <span class="o">=</span> <span class="n">CUR_deterministic_step</span><span class="p">(</span><span class="n">RX</span><span class="p">,</span> <span class="n">n_col</span> <span class="o">-</span> <span class="n">i</span><span class="p">,</span> <span class="n">costs</span><span class="p">)</span>
+        <span class="n">rsel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">rval</span>
+        <span class="k">if</span> <span class="n">error_estimate</span><span class="p">:</span>
+            <span class="n">rerror</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">RX</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">rsel</span><span class="p">,</span> <span class="n">rerror</span></div>
+
+
+<div class="viewcode-block" id="CUR_deterministic_step"><a class="viewcode-back" href="../../../asaplib.compressor.html#asaplib.compressor.cur.CUR_deterministic_step">[docs]</a><span class="k">def</span> <span class="nf">CUR_deterministic_step</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">costs</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Apply (deterministic) CUR selection of k rows &amp; columns of the</span>
+<span class="sd">    given covariance matrix, including an orthogonalization step. Costs can be weighted if desired. &quot;&quot;&quot;</span>
+
+    <span class="n">evc</span><span class="p">,</span> <span class="n">evec</span> <span class="o">=</span> <span class="n">spalg</span><span class="o">.</span><span class="n">eigs</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="c1"># compute the weights and select the one with maximum weight</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">evec</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">costs</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">vsel</span> <span class="o">=</span> <span class="n">cov</span><span class="p">[</span><span class="n">sel</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">sel</span><span class="p">])</span>
+    <span class="n">rcov</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;selected: &quot;</span><span class="p">,</span> <span class="n">sel</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rcov</span><span class="p">)):</span>
+        <span class="c1"># Diagonalize the covariance matrix wrt the chosen column</span>
+        <span class="n">rcov</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">vsel</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">cov</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">A1</span><span class="p">,</span> <span class="n">vsel</span><span class="o">.</span><span class="n">A1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sel</span><span class="p">,</span> <span class="n">rcov</span></div>
+
+
+<div class="viewcode-block" id="cur_column_select"><a class="viewcode-back" href="../../../asaplib.compressor.html#asaplib.compressor.cur.cur_column_select">[docs]</a><span class="k">def</span> <span class="nf">cur_column_select</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;sparse&quot;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">calc_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Select columns from a matrix according to statstical leverage score.</span>
+
+<span class="sd">    Based on:</span>
+<span class="sd">    [1] Mahoney MW, Drineas P. CUR matrix decompositions for improved data analysis. PNAS. 2009 Jan 20;106(3):697–702.</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Which mode to use? If the matrix is not square or possibly not hermitian (or even real symmetric) then sparse is</span>
+<span class="sd">    the only option. For hermitian matrices, the calculation of the eigenvectors with `eigh` may be faster than</span>
+<span class="sd">    using the sparse svd method. Benchmark is needed for this, especially for descriptor kernels.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array : np.array</span>
+<span class="sd">        Array to compute find columns of (M, N)</span>
+<span class="sd">    num : int</span>
+<span class="sd">        number of column indices to be returned</span>
+
+<span class="sd">    rank : int, optional</span>
+<span class="sd">        number of singular vectors to calculate for calculation of the statistical leverage scores</span>
+<span class="sd">        default: minimum of (min(N, M) - 1, num/2) but at least one</span>
+
+<span class="sd">    deterministic : bool, optional</span>
+<span class="sd">        Usage of deterministic method or probabilistic.</span>
+<span class="sd">        Deterministic (True): the top `num` columns are given</span>
+<span class="sd">        Stochastic (False): use leverage scores as probabilities for choosing num</span>
+
+<span class="sd">    mode : {&quot;sparse&quot;, &quot;dense&quot;, &quot;hermitian&quot;}</span>
+<span class="sd">        mode of the singular vector calculation.</span>
+<span class="sd">            - `sparse` (default), which is using sparse-SVD, which is expected to be robust and to solve the problem</span>
+<span class="sd">            - `hermitian` offers a speedup for hermitian matrices (ie. real symmetric kernel matrices as well)</span>
+<span class="sd">            - `dense` (not recommended) is using SVD, but calculated all the singular vectors and uses a number of them</span>
+<span class="sd">            according to the rank parameter</span>
+
+<span class="sd">    weights : np.array, optional</span>
+<span class="sd">        Costs for taking each column. shape=(N,)</span>
+<span class="sd">        The statistical leverage scores are scaled by this array</span>
+
+<span class="sd">    calc_error : bool, optional</span>
+<span class="sd">        calculate the error of the decomposition, default False</span>
+<span class="sd">        There is a significant cost to the calculation of this, due to a semi-inverse operation needed.</span>
+<span class="sd">        The error here is the norm of the matrix of difference between the original and the approximation obtained from</span>
+<span class="sd">        the selected columns. Not necessarily meaningful in every situation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    indices : np.array</span>
+<span class="sd">        indices of columns to choose</span>
+<span class="sd">    cur_error :</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># this is set heuristically</span>
+        <span class="n">rank</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+
+    <span class="c1"># compute singular vectors -- the rest is not relevant from this calculation</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;sparse&quot;</span><span class="p">:</span>
+        <span class="c1"># left_singular_vectors, _, right_singular_vectors = svds(array, k)  # for error calculation</span>
+        <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">right_singular_vectors</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;dense&quot;</span><span class="p">:</span>
+        <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">right_singular_vectors</span> <span class="o">=</span> <span class="n">svd</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="n">right_singular_vectors</span> <span class="o">=</span> <span class="n">right_singular_vectors</span><span class="p">[</span><span class="o">-</span><span class="n">rank</span><span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;hermitian&quot;</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">right_singular_vectors</span> <span class="o">=</span> <span class="n">eigh</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">eigvals</span><span class="o">=</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">rank</span><span class="p">,</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;mode </span><span class="si">{}</span><span class="s1"> is not valid for this calculation, use either of: &quot;sparse&quot;, &quot;dense&quot;, &quot;hermitian&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+
+    <span class="c1"># compute statistical leverage scores and scale by weight if given</span>
+    <span class="n">pi_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">right_singular_vectors</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">rank</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># 1D vector of length equal to the number of columns</span>
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">array</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">weights</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">pi_j</span> <span class="o">*=</span> <span class="n">weights</span>
+        <span class="n">pi_j</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pi_j</span><span class="p">)</span>  <span class="c1"># normalise again</span>
+
+    <span class="k">if</span> <span class="n">deterministic</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">pi_j</span><span class="p">)[</span><span class="o">-</span><span class="n">num</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">size</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pi_j</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">calc_error</span><span class="p">:</span>
+        <span class="c1"># error of the representation, ||array -  C dot C+ dot array||</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">array</span><span class="p">[:,</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="n">c_pinv</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">cur_error</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">array</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c_pinv</span><span class="p">),</span> <span class="n">array</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">cur_error</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">indices</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Bingqing Cheng
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
