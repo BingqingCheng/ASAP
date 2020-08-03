@@ -145,7 +145,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
 
         self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
-                                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
+                                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average='off',
                                          periodic=self.periodic)
 
         print("Using SOAP Descriptors ...")
