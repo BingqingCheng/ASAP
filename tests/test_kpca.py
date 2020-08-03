@@ -39,7 +39,7 @@ class TestKPCA(object):
         at_train = ase.io.read(fn, '0')
         at_test = ase.io.read(fn, '1')
 
-        soap_desc = SOAP(species=['H', 'O'], rcut=4., nmax=6, lmax=6, sigma=0.3, periodic=True)
+        soap_desc = SOAP(species=['H', 'O'], rcut=4., nmax=6, lmax=6, sigma=0.3, periodic=True,average='off')
         desc_train = soap_desc.create(at_train)
         desc_test = soap_desc.create(at_test)
 
