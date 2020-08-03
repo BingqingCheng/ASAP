@@ -5,6 +5,8 @@
 # ASAP 
 Automatic Selection And Prediction tools for materials and molecules
 
+### [documentation](https://bingqingcheng.github.io/index.html) (in progress)
+
 ### Basic usage
 
 Type `asap` and use the sub-commands for various tasks.
