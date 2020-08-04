@@ -182,13 +182,12 @@ class ASAPXYZ:
         desc_spec: a list of dictionaries
                  contrains infos on the descriptors to use
         e.g.
-         ```
-        atomic_desc_dict = {
-        "firstsoap": 
-        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
-        }
-        ```
+        .. code-block:: python
 
+            atomic_desc_dict = {
+            "firstsoap": 
+            {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}}
+        
         sbs: array, integer
              the index of the subset of structures to compute
         """
@@ -231,30 +230,35 @@ class ASAPXYZ:
         desc_spec_dict: dictionaries that specify which global descriptor to use.
 
         e.g.
-        ```
-        {'global_desc1': 
-        {"type": 'CM'}}
-        ```
+        .. code-block:: python
 
-        e.g.
-        ```
-        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'reducer_function': reducer_dict}}
-        ```
-        and
-        ```
-        atomic_desc_dict = {
-        "firstsoap": 
-        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
-        }
-        ```
+            {'global_desc1': 
+                          {"type": 'CM'}}
 
-        and
-        ```
-        reducer_dict = {'first_reducer': {'reducer_type': reducer_type,  
-                          'zeta': zeta,
-                          'species': species,
-                          'element_wise': element_wise}}
-        ```
+            # or
+
+            {'global_desc2': 
+                          {'atomic_descriptor': 
+                                       atomic_desc_dict, 
+                           'reducer_function': 
+                                       reducer_dict
+                          }}
+        
+            atomic_desc_dict = {
+                              "firstsoap": 
+                                       {"type": 'SOAP',
+                                       "species": [1, 6, 7, 8], 
+                                       "cutoff": 2.0, 
+                                       "atom_gaussian_width": 0.2, 
+                                       "n": 4, 
+                                       "l": 4}}
+        
+            reducer_dict = {'first_reducer': 
+                                     {'reducer_type': reducer_type,  
+                                     'zeta': zeta,
+                                     'species': species,
+                                     'element_wise': element_wise}}
+        
         sbs: array, integer
              list of the indexes of the subset
         """
