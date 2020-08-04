@@ -15,14 +15,21 @@ def CUR_deterministic(X, n_col, error_estimate=True, costs=1):
 
     Parameters
     ----------
-    X: input a covariance matrix 
-    n_col: number of column to keep
-    error_estimate: compute the remaining error of the CUR
-    costs: a list of costs associated with each column
+    X: np.matrix
+       input a covariance matrix 
+    n_col: int
+       number of column to keep
+    error_estimate: bool, optional
+       compute the remaining error of the CUR
+    costs: float, optional
+        a list of costs associated with each column
 
     Returns
     -------
-    a list of selected columns
+    indices : np.array
+        indices of columns to choose
+    cur_error : np.array
+        the error of the decomposition
     """
 
     RX = X.copy()
