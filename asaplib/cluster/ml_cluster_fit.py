@@ -120,25 +120,30 @@ class LAIO_DB(FitClusterBase):
 
     https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
 
-    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$
-    $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$
+    :math: \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}
+    :math: \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})
     """
     def __init__(self, distances=None, indices=None, dens_type=None, dc=None, percent=2.0):
 
         """
         Parameters
         ----------
-        distances: numpy array of distances between data points and their neighbours of shape (Nele, n_neigh_comp)
+        distances: numpy array 
+        array of distances between data points and their neighbours of shape (Nele, n_neigh_comp)
         where Nele is the number of data points and n_neigh_comp is the number of neighbours to consider.
 
-        indices: numpy array of shape (Nele, n_neigh_comp) where row i gives the indices of the neighbours for data point i
+        indices: numpy array 
+               array of shape (Nele, n_neigh_comp) where row i gives the indices of the neighbours for data point i
 
-        dens_type: The type of density to compute. Can be 'exp' (exponential) or None (linear)
+        dens_type: str
+                 The type of density to compute. Can be 'exp' (exponential) or None (linear)
 
-        dc: float giving the cutoff distance beyond which data points don't contribute to the local density computation
+        dc: float 
+        giving the cutoff distance beyond which data points don't contribute to the local density computation
         of another datapoint.
 
-        percent: Criterion for choosing dc, int from 0-100, typically chosen such that the average number of neighbours
+        percent: int
+        Criterion for choosing dc, int from 0-100, typically chosen such that the average number of neighbours
         is 1-2% of the total number of points in the dataset. Default is 2%.
         """
 
@@ -188,12 +193,14 @@ class LAIO_DB(FitClusterBase):
 
         Parameters
         ----------
-        data: The data array of shape (Nele, proj_dim) where N is the number of data points and proj_dim is the number of
+        data: np.matrix 
+        The data array of shape (Nele, proj_dim) where N is the number of data points and proj_dim is the number of
         projected components of the kernel matrix.
 
         Returns
         -------
-        self.dc, the cutoff distance
+        self.dc: float
+             the cutoff distance
         """
 
         Nele = data.shape[0]
@@ -391,22 +398,24 @@ class old_LAIO(FitClusterBase):
     Clustering by fast search and find of density peaks
     https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
 
-    $$ \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}$$ i.e. the local density of data point x_i
-    $$ \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})$$ i.e. the minimum distance to a neighbour with higher density
+    :math: \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}
+         i.e. the local density of data point x_i
+    :math: \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})
+         i.e. the minimum distance to a neighbour with higher density
+
+
+    A summary of laio clustering algorithm:
+    1. First do a kernel density estimation (rho_i) for each data point i
+    2. For each data point i, compute the distance (delta_i) between i and j,
+       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
+    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)
+    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:
+       i) rho({cl}) > rhomin
+       ii) delta({cl}) > delta_min
+       one needs to set the two parameters rhomin and delta_min.
+    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.
+ one needs to set two parameters:
     """
-
-#    A summary of laio clustering algorithm:
-#    1. First do a kernel density estimation (rho_i) for each data point i
-#    2. For each data point i, compute the distance (delta_i) between i and j,
-#       j is the closet data point that has a density higher then i, i.e. rho(j) > rho(i).
-#    3. Plot the decision graph, which is a scatter plot of (rho_i, delta_i)
-#    4. Select cluster centers ({cl}), which are the outliers in the decision graph that fulfills:
-#       i) rho({cl}) > rhomin
-#       ii) delta({cl}) > delta_min
-#       one needs to set the two parameters rhomin and delta_min.
-#    5. After the cluster centers are determined, data points are assigned to the nearest cluster center.
-# one needs to set two parameters:
-
     _pairwise = True
 
     def __init__(self, deltamin=-1, rhomin=-1):
