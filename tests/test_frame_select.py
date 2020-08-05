@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
 import os
+
 import numpy as np
 
-from asaplib.data import ASAPXYZ
 from asaplib.compressor import Sparsifier
+from asaplib.data import ASAPXYZ
+
 
 def main():
     """
@@ -34,8 +36,8 @@ def main():
     # for both algo we read in the descriptor matrix
     desc, _ = asapxyz.get_descriptors(fmat)
     print("shape of the descriptor matrix: ", np.shape(desc), "number of descriptors: ", np.shape(desc[0]))
-   
-    for algorithm in ['random', 'cur', 'fps']: 
+
+    for algorithm in ['random', 'cur', 'fps']:
         sparsifier = Sparsifier(algorithm)
         sbs = sparsifier.sparsify(desc, nkeep)
         # save
@@ -45,9 +47,11 @@ def main():
         np.savetxt(prefix + "-" + algorithm + "-n-" + str(nkeep) + '.index', selection, fmt='%d')
         asapxyz.write(prefix + "-" + algorithm + "-n-" + str(nkeep), sbs)
 
+
 def test_gen(tmpdir):
     """Test the generation using pytest"""
     main()
+
 
 if __name__ == '__main__':
     main()

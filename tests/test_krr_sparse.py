@@ -1,9 +1,11 @@
 import os
+
 import numpy as np
 from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ, Design_Matrix
-from asaplib.fit import SPARSE_KRR_Wrapper, KRRSparse 
+from asaplib.fit import SPARSE_KRR_Wrapper, KRRSparse
+
 
 def main():
     """
@@ -27,12 +29,12 @@ def main():
     asapxyz = ASAPXYZ(fxyz)
     desc, _ = asapxyz.get_descriptors(fmat, False)
     y_all = asapxyz.get_property(fy)
-    #print(desc)
+    # print(desc)
 
     dm = Design_Matrix(X=desc, y=y_all, whiten=True, test_ratio=test_ratio)
 
     # kernel, jitter, delta, sigma, sparse_mode="fps", n_sparse=None
-    k_spec = {'k0':{"type": "linear"}} #{ 'k1': {"type": "polynomial", "d": power}}
+    k_spec = {'k0': {"type": "linear"}}  # { 'k1': {"type": "polynomial", "d": power}}
 
     # if sigma is not set...
     sigma = 0.001 * np.std(y_all)
@@ -44,15 +46,17 @@ def main():
 
     # learning curve
     if lc_points > 1:
-        dm.compute_learning_curve(skrr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42, verbose=False)
+        dm.compute_learning_curve(skrr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42,
+                                  verbose=False)
 
     dm.save_state(prefix)
     plt.show()
+
 
 def test_gen(tmpdir):
     """Test the generation using pytest"""
     main()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     main()
