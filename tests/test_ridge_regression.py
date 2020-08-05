@@ -1,9 +1,11 @@
 import os
+
 import numpy as np
 from matplotlib import pyplot as plt
 
 from asaplib.data import ASAPXYZ, Design_Matrix
 from asaplib.fit import RidgeRegression
+
 
 def main():
     """
@@ -27,7 +29,7 @@ def main():
     asapxyz = ASAPXYZ(fxyz)
     desc, _ = asapxyz.get_descriptors(fmat, False)
     y_all = asapxyz.get_property(fy)
-    #print(desc)
+    # print(desc)
 
     dm = Design_Matrix(X=desc, y=y_all, whiten=True, test_ratio=test_ratio)
 
@@ -41,15 +43,17 @@ def main():
 
     # learning curve
     if lc_points > 1:
-        dm.compute_learning_curve(rr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42, verbose=False)
+        dm.compute_learning_curve(rr, 'ridge_regression', lc_points=lc_points, lc_repeats=lc_repeats, randomseed=42,
+                                  verbose=False)
 
     dm.save_state(prefix)
     plt.show()
+
 
 def test_gen(tmpdir):
     """Test the generation using pytest"""
     main()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     main()
