@@ -11,13 +11,17 @@ def fps(x, d=0, r=None):
 
     Parameters
     ----------
-    x: np.matrix.[n_samples, n_dim] coordinates of all the samples to be sparsified.
-    d: number of samples to keep
-    r: starting from sample of index r
+    x: np.matrix
+       [n_samples, n_dim] coordinates of all the samples to be sparsified.
+    d: int
+       number of samples to keep
+    r: int
+       starting from sample of index r
 
     Returns
     -------
-    a list of selected samples, remaining error
+    sample_index: list
+        a list of selected samples, remaining error
 
     """
 
@@ -71,13 +75,16 @@ def fast_fps(x, d=0, r=None):
 
         yx[i] = x[inew]
 
-        # now gets the distance between this point and all the points selected up to now (could be eliminated by caching!)
-        syd = np.sqrt(np.abs(n2[iy[:i]] + n2[inew] - 2 * np.dot(yx[:i], x[inew])))
+        # now gets the distance between this point and all the points selected
+        # up to now (could be eliminated by caching!)
+        syd = np.sqrt(np.abs(n2[iy[:i]] + n2[inew] -
+                             2 * np.dot(yx[:i], x[inew])))
         sdnew = np.sqrt(dnew)
 
         # list of active voronoi (we check which of the voronoi cells contain points
         # that might contain points closer than dmax)
-        iactive = np.where(rvor[:i] > dnew + syd[:i] * (syd[:i] - 2 * sdnew))[0]
+        iactive = np.where(rvor[:i] > dnew + syd[:i]
+                           * (syd[:i] - 2 * sdnew))[0]
 
         rvor[iactive] = 0
         for j in xrange(n):

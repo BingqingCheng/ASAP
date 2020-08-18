@@ -1,3 +1,6 @@
+"""
+ASAPXYZ class for handing atomic coordinate input and compute/output
+"""
 import os
 import glob
 import json
@@ -14,16 +17,20 @@ from ..io import randomString,  NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
 
 class ASAPXYZ:
-    def __init__(self, fxyz=None, stride=1, periodic=True, fileformat=None):
-        """extended xyz class
+    """extended xyz class
 
-        Parameters
-        ----------
-        fxyz: string_like, the path to the extended xyz file
-        fmat: string_like, the name of the descriptors in the extended xyz file
-        use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
-        stride: int, the stride when reading the xyz file
-        """
+    Parameters
+    ----------
+    fxyz: string_like
+         the path to the extended xyz file
+    fmat: string_like
+           the name of the descriptors in the extended xyz file
+    use_atomic_desc: bool
+            return the descriptors for each atom, read from the xyz file
+    stride: int
+           the stride when reading the xyz file
+    """
+    def __init__(self, fxyz=None, stride=1, periodic=True, fileformat=None):
         # compile a list of matching xyz files
         # in fact they don't strictly need to be xyz format, anything that can be read by ASE is fine
         # a list of possible file formats: https://wiki.fysik.dtu.dk/ase/ase/io/io.html
@@ -159,7 +166,8 @@ class ASAPXYZ:
         add some system specific information to the list to descriptor specifications
         Parameters
         ----------
-        desc_spec_dict: dictionaries that specify which global descriptor to use.
+        desc_spec_dict: dictionaries 
+                        dict that specify which global descriptor to use.
         """
         for element in desc_spec_dict.keys():
             desc_spec_dict[element]['species'] = self.global_species
@@ -171,14 +179,17 @@ class ASAPXYZ:
         compute the atomic descriptors for selected frames
         Parameters
         ----------
-        desc_spec: a list of dictionaries, contrains infos on the descriptors to use
+        desc_spec: a list of dictionaries
+                 contrains infos on the descriptors to use
         e.g.
-        atomic_desc_dict = {
-        "firstsoap": 
-        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
-        }
+        .. code-block:: python
 
+            atomic_desc_dict = {
+            "firstsoap": 
+            {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}}
+        
         sbs: array, integer
+             the index of the subset of structures to compute
         """
 
         if len(sbs) == 0:
@@ -219,23 +230,37 @@ class ASAPXYZ:
         desc_spec_dict: dictionaries that specify which global descriptor to use.
 
         e.g.
-        {'global_desc1': 
-        {"type": 'CM'}}
+        .. code-block:: python
 
-        e.g.
-        {'global_desc2': {'atomic_descriptor': atomic_desc_dict, 'reducer_function': reducer_dict}}
-        and
-        atomic_desc_dict = {
-        "firstsoap": 
-        {"type": 'SOAP',"species": [1, 6, 7, 8], "cutoff": 2.0, "atom_gaussian_width": 0.2, "n": 4, "l": 4}
-        }
-        and
-        reducer_dict = {'first_reducer': {'reducer_type': reducer_type,  
-                          'zeta': zeta,
-                          'species': species,
-                          'element_wise': element_wise}}
+            {'global_desc1': 
+                          {"type": 'CM'}}
 
+            # or
+
+            {'global_desc2': 
+                          {'atomic_descriptor': 
+                                       atomic_desc_dict, 
+                           'reducer_function': 
+                                       reducer_dict
+                          }}
+        
+            atomic_desc_dict = {
+                              "firstsoap": 
+                                       {"type": 'SOAP',
+                                       "species": [1, 6, 7, 8], 
+                                       "cutoff": 2.0, 
+                                       "atom_gaussian_width": 0.2, 
+                                       "n": 4, 
+                                       "l": 4}}
+        
+            reducer_dict = {'first_reducer': 
+                                     {'reducer_type': reducer_type,  
+                                     'zeta': zeta,
+                                     'species': species,
+                                     'element_wise': element_wise}}
+        
         sbs: array, integer
+             list of the indexes of the subset
         """
 
         if len(sbs) == 0:
@@ -275,7 +300,8 @@ class ASAPXYZ:
         Fetch the computed descriptors for selected frames
         Parameters
         ----------
-        desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+        desc_spec_keys: a list (str-like) of keys 
+                    for which computed descriptors to fetch.
         sbs: array, integer
 
         Returns
@@ -405,8 +431,10 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        desc_name_list: a list of strings, the name of the .info[] in the extended xyz file
-        species_name: int, the atomic number of the species selected.
+        desc_name_list: a list of strings
+                     the name of the .info[] in the extended xyz file
+        species_name: int
+                        the atomic number of the species selected.
                         Only the desciptors of atoms of the specified specied will be returned.
                     species_name=None means all atoms are selected.
                          
@@ -446,7 +474,8 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        y_key: string_like, the name of the property in the extended xyz file
+        y_key: string_like
+               the name of the property in the extended xyz file
         sbs: array, integer
 
         Returns
@@ -495,9 +524,11 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        y_key: string_like, the name of the property in the extended xyz file
+        y_key: string_like
+             the name of the property in the extended xyz file
         sbs: array, integer
-        specie: int, the atomic number of the species selected.
+        specie: int
+                 the atomic number of the species selected.
                       Only the properties of atoms of the specified specied will be returned.
                       species_name=None means all atoms are selected.
         Returns
@@ -632,8 +663,10 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        filename: (str) Name of the CSV file.
-        header: Row number of the header. Defaults to use the first row unless explicit
+        filename: str 
+                Name of the CSV file.
+        header: int
+            Row number of the header. Defaults to use the first row unless explicit
           names for the columns are given
         """
         data = pd.read_csv(filename, header=header, prefix=prefix, **kwargs)
@@ -707,7 +740,8 @@ class ASAPXYZ:
         Parameters
         ----------
         filename: str
-        desc_name_list: a list of str. Name of the properties/descriptors to write
+        desc_name_list: a list of str. 
+                Name of the properties/descriptors to write
         sbs: array, integer
         comment: str
         """
@@ -727,7 +761,8 @@ class ASAPXYZ:
         Parameters
         ----------
         filename: str
-        desc_name: str. Name of the properties/descriptors to write
+        desc_name: str. 
+                Name of the properties/descriptors to write
         sbs: array, integer
         comment: str
         """

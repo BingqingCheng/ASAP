@@ -18,12 +18,17 @@ def exponential_split(xmin, xmax, n=5):
 
     Parameters
     ----------
-    xmin: lower bound in original space
-    xmax: upper bound in original space
-    n: integer giving the number of spaces (default is 5)
+    xmin: float
+          lower bound in original space
+    xmax: float
+          upper bound in original space
+    n: int
+       integer giving the number of spaces (default is 5)
 
-    Returns: numpy array of n evenly spaced points in log space
+    Returns:
     -------
+    X: np.array
+       list of n evenly spaced points in log space
     """
 
     X = np.zeros(n, dtype=int)
@@ -41,12 +46,17 @@ def random_split(n_sample, r, seed=0):
 
     Parameters
     ----------
-    n_sample: integer giving the number of samples
-    r: float, test ratio
+    n_sample: int
+              giving the number of samples
+    r: float
+       test ratio
 
     Returns: 
     -------
-    train_list, test_list: train/test indexes
+    train_list: list
+                train indexes
+    test_list: list
+               test indexes
     """
 
     if r==0.0:
@@ -70,15 +80,21 @@ def kernel_random_split(X, y, r=0.05, seed=0):
 
     Parameters
     ----------
-    X: array-like, shape=[n_samples,n_desc], kernel matrix
-    y: array-like, shape=[n_samples], labels
-    r: float, test ratio
+    X: array-like, shape=[n_samples,n_desc]
+       kernel matrix
+    y: array-like, shape=[n_samples]
+       labels
+    r: float
+       test ratio
 
     Returns
     -------
-    X_train, X_test: train/test kernel matrix
-    y_train, y_test: train/test labels
-    train_list, test_list: train/test indexes
+    X_train, X_test: np.matrix
+                 train/test kernel matrix
+    y_train, y_test: np.array
+                 train/test labels
+    train_list, test_list: list
+                 train/test indexes
     """
 
     np.random.seed(seed)
@@ -131,7 +147,6 @@ class ShuffleSplit(_ShuffleSplit):
         return params
 
 
-#class LCSplit(with_metaclass(ABCMeta)):
 class LCSplit():
     def __init__(self, cv, n_repeats=[10], train_sizes=[10], test_size=None, random_state=None, **cvargs):
         if not isinstance(n_repeats, collections.Iterable) or not isinstance(train_sizes, collections.Iterable):

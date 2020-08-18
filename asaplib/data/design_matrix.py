@@ -12,21 +12,21 @@ from ..compressor import Sparsifier
 from ..fit import LC_SCOREBOARD
 
 class Design_Matrix:
-    def __init__(self, X=[], y=[], whiten=True, test_ratio=0, random_seed=42, z=[], tags=[]):
-        """extended design matrix class
+    """extended design matrix class
 
-        Parameters
-        ----------
-        X : array-like, shape=[n_samples,n_desc]
-        Input points.
-        y : array-like, shape=[n_samples]
-        label for every point
-        testratio: float, ratio of the test fraction
-        z : array-like, shape=[n_samples]
-        additional label for every point
-        tags: array-like, strings, shape=[n_samples]
-        additional tags for each data point
-        """
+    Parameters
+    ----------
+    X : array-like, shape=[n_samples,n_desc]
+    Input points.
+    y : array-like, shape=[n_samples]
+    label for every point
+    testratio: float, ratio of the test fraction
+    z : array-like, shape=[n_samples]
+    additional label for every point
+    tags: array-like, strings, shape=[n_samples]
+    additional tags for each data point
+    """
+    def __init__(self, X=[], y=[], whiten=True, test_ratio=0, random_seed=42, z=[], tags=[]):
         # sanity checks
         if len(y) > 0 and len(X) != len(y):
             raise ValueError('Length of the labels y is not the same as the design matrix X')
@@ -64,7 +64,7 @@ class Design_Matrix:
         self.lc_by_learner = {} # learning curves
 
     def _whiten(self, X, scale = True, addbias = True):
-        # scale & center
+        """ scale & center """
         if scale:
             from sklearn.preprocessing import StandardScaler
             scaler = StandardScaler()
@@ -78,6 +78,7 @@ class Design_Matrix:
             return X
 
     def save_state(self, filename, mode='yaml'):
+        """output json or yaml file"""
         if mode == 'yaml':
             with open(filename+'-fit-errors.yaml', 'w') as yd:
                 ydump(self.fit_error_by_learner, yd, sort_keys=True)
@@ -95,10 +96,12 @@ class Design_Matrix:
 
         Parameters
         ----------
-        n_sparse: number of representative points
+        n_sparse: int
+                  number of representative points
                   n_sparse == None means 5% of the data
                   n_sparse < 0 means no sparsification
-        sparse_mode: str. Methods to use for sparsification [cur], [fps], [random]
+        sparse_mode: str
+                  Methods to use for sparsification [cur], [fps], [random]
         """
         
         # set default value of n_sparse
@@ -122,9 +125,11 @@ class Design_Matrix:
 
         Parameters
         ----------
-        learner: object. a learner object, e.g. RidgeRegression
+        learner: a learner object
+                 e.g. RidgeRegression
                  needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods
-        tag: str. The name of this learner
+        tag: str
+              The name of this learner
         """
         # sanity checks
         if len(self.y_train) < 1 or len(self.X_train) != len(self.y_train):
@@ -156,11 +161,15 @@ class Design_Matrix:
 
         Parameters
         ----------
-        lc_points: int, the number of points on the learning curve
-        lc_repeats: the number of sub-samples to take when compute the learning curve
-        learner: object. a learner object, e.g. RidgeRegression
+        lc_points: int
+                   the number of points on the learning curve
+        lc_repeats: int
+                the number of sub-samples to take when compute the learning curve
+        learner: a learner object
+                 e.g. RidgeRegression
                  needs to have .fit(), .predict(), .get_train_test_error(), .fit_predict_error() methods
-        tag: str. The name of this learner
+        tag: str
+                The name of this learner
         """
         if tag is None: tag = randomString(6)
 

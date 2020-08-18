@@ -1,5 +1,5 @@
 """
-TODO: Module-level description
+Tools to analyze clustering results
 """
 
 from collections import Counter
