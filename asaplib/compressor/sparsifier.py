@@ -10,7 +10,8 @@ class Sparsifier:
         Object handing the sparsification of data
         Parameters
         ----------
-        sparse_mode: str. Type of the sparse mode
+        sparse_mode: str
+                     Type of the sparse mode
         """
         self._possible_modes = ['fps', 'cur', 'random', 'sequential']
         if sparse_mode.lower() not in self._possible_modes:
@@ -29,14 +30,18 @@ class Sparsifier:
         Function handing the sparsification of data
         Parameters
         ----------
-        desc_or_ntotal: Either a design matrix [n_sample, n_desc],
+        desc_or_ntotal: np.matrix or int
+                        Either a design matrix [n_sample, n_desc],
                         or simply the total number of samples
-        n_or_ratio: Either the number or the fraction of sparsified points
-        sparse_param: additional parameter that may be needed for the specific sparsifier used
+        n_or_ratio: int or float 
+                  Either the number or the fraction of sparsified points
+        sparse_param: int
+                additional parameter that may be needed for the specific sparsifier used
 
         Returns
         ----------
-        sbs: a list of the indexes for the sparsified points
+        sbs: list
+        a list of the indexes for the sparsified points
         """
         if isinstance(desc_or_ntotal, int):
             n_total = desc_or_ntotal

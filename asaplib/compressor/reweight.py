@@ -1,9 +1,10 @@
 """
 Select samples using a re-weighted distribution
+
 The original distribution (KDE) of the sample is
-\rho = exp(-F)
+:math: \rho = exp(-F)
 and we select the samples using a well-tempered distribution
-\rho(\lambda) = exp(-F/\lambda)  
+:math: \rho(\lambda) = exp(-F/\lambda)  
 """
 
 import numpy as np
@@ -13,13 +14,17 @@ def reweight(logkde, n_sparse, reweight_lambda):
     """
     Parameters:
     ------------
-    logkde: list, type=float. The (log of) kernel density for each sample
-    reweight_lambda: float, reweighting factor
-    n_sparse: int, number of samples to select
+    logkde: list, type=float
+            The (log of) kernel density for each sample
+    reweight_lambda: float
+              reweighting factor
+    n_sparse: int
+              number of samples to select
     
     Return:
     ------------
-    sbs: list, type=int. A list of selected samples
+    sbs: list, type=int
+         A list of selected samples
     """
     nframes = len(logkde)
 
