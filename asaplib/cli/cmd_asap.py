@@ -509,8 +509,11 @@ def map(ctx, fxyz, design_matrix, prefix, output, extra_properties,
                              'keepraw': keepraw
                            }
     if annotate != 'none':
-        import numpy as np
-        ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
+        try:
+            ctx.obj['map_options']['annotate'] = ctx.obj['asapxyz'].get_property(annotate)
+        except:
+            import numpy as np
+            ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
     ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, colormap, style, aspect_ratio, adjusttext)
 
