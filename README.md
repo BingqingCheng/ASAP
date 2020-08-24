@@ -7,7 +7,7 @@ Automatic Selection And Prediction tools for materials and molecules
 
 ### [Documentation](https://bingqingcheng.github.io/index.html) (in progress)
 
-### Mapping Materials and Molecules [Paper link](https://pubs.acs.org/doi/full/10.1021/acs.accounts.0c00403)
+### Mapping Materials and Molecules [(Paper link)](https://pubs.acs.org/doi/full/10.1021/acs.accounts.0c00403)
 
 Cheng B, Griffiths RR, Wengert S, Kunkel C, Stenczel T, Zhu B, Deringer VL, Bernstein N, Margraf JT, Reuter K, Csanyi G. Mapping Materials and Molecules. Accounts of Chemical Research. 2020 Aug 14:12697-705.
 
