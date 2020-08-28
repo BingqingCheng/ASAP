@@ -1,0 +1,27 @@
+descriptors:
+  cmd-desc:
+    soap1:
+      acronym: atomic-to-global-ohythg
+      atomic_descriptor:
+        soap1:
+          acronym: SOAP-n4-l3-c3.2-g0.4
+          atom_gaussian_width: 0.4
+          crossover: false
+          cutoff: 3.2
+          l: 3
+          n: 4
+          periodic: true
+          rbf: gto
+          species: &id001
+          - 8
+          - 22
+          type: SOAP
+      max_atoms: 48
+      periodic: true
+      reducer_function:
+        reducer1:
+          acronym: ''
+          element_wise: false
+          reducer_type: average
+          species: *id001
+      species: *id001
