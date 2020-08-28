@@ -1,9 +1,12 @@
 """
 Methods and functions to compute atomic desciptors
 """
-import numpy as np
 import json
+
+import numpy as np
+
 from ..io import NpEncoder
+
 
 class Atomic_Descriptors:
     def __init__(self, desc_spec_dict={}):
@@ -71,7 +74,7 @@ class Atomic_Descriptors:
         if desc_spec["type"] == "FCHL19":
             return Atomic_Descriptor_FCHL19(desc_spec)
         else:
-            raise NotImplementedError 
+            raise NotImplementedError
 
     def compute(self, frame):
         """
@@ -89,22 +92,28 @@ class Atomic_Descriptors:
         atomic_desc_dict = {}
         for element in self.desc_spec_dict.keys():
             atomic_desc_dict[element] = {}
-            atomic_desc_dict[element]['acronym'], atomic_desc_dict[element]['atomic_descriptors'] = self.engines[element].create(frame)
+            atomic_desc_dict[element]['acronym'], atomic_desc_dict[element]['atomic_descriptors'] = self.engines[
+                element].create(frame)
         return atomic_desc_dict
+
 
 class Atomic_Descriptor_Base:
     def __init__(self, desc_spec):
         self._is_atomic = True
         self.acronym = ""
         pass
+
     def is_atomic(self):
         return self._is_atomic
+
     def get_acronym(self):
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
         return self.acronym
+
     def create(self, frame):
         # notice that we return the acronym here!!!
         return self.acronym, []
+
 
 class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -143,10 +152,9 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         else:
             self.periodic = True
 
-
         self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
-                                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
-                                         periodic=self.periodic)
+                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average=False,
+                         periodic=self.periodic)
 
         print("Using SOAP Descriptors ...")
 
@@ -181,10 +189,10 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
         from dscribe.descriptors import ACSF
 
         self.acsf_dict = {
-                 'g2_params': None,
-                 'g3_params': None,
-                 'g4_params': None,
-                 'g5_params': None}
+            'g2_params': None,
+            'g3_params': None,
+            'g4_params': None,
+            'g5_params': None}
 
         # required
         try:
@@ -201,12 +209,12 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
                 else:
                     self.acsf_dict[k] = v
 
-        self.acsf = ACSF(species=self.species, rcut=self.cutoff, **self.acsf_dict, sparse = False)
+        self.acsf = ACSF(species=self.species, rcut=self.cutoff, **self.acsf_dict, sparse=False)
 
         print("Using ACSF Descriptors ...")
 
         # make an acronym
-        self.acronym = "ACSF-c" + str(self.cutoff) 
+        self.acronym = "ACSF-c" + str(self.cutoff)
         if self.acsf_dict['g2_params'] is not None: self.acronym += "-g2-" + str(len(self.acsf_dict['g2_params']))
         if self.acsf_dict['g3_params'] is not None: self.acronym += "-g3-" + str(len(self.acsf_dict['g3_params']))
         if self.acsf_dict['g4_params'] is not None: self.acronym += "-g4-" + str(len(self.acsf_dict['g4_params']))
@@ -215,6 +223,7 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
     def create(self, frame):
         # notice that we return the acronym here!!!
         return self.acronym, self.acsf.create(frame, n_jobs=1)
+
 
 class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -273,12 +282,12 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
         if 'normalization' in desc_spec.keys():
             self.normalization = desc_spec['normalization']
         else:
-            self.normalization =  None # or "l2_each"
+            self.normalization = None  # or "l2_each"
 
         if 'normalize_gaussians' in desc_spec.keys():
             self.normalize_gaussians = desc_spec['normalize_gaussians']
         else:
-            self.normalize_gaussians = "True" # or False
+            self.normalize_gaussians = "True"  # or False
 
         if 'periodic' in desc_spec.keys():
             self.periodic = bool(desc_spec['periodic'])
@@ -288,6 +297,7 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
     def create(self, frame):
         # notice that we return the acronym here!!!
         return self.acronym, self.lmbtr.create(frame, n_jobs=1)
+
 
 class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
     def __init__(self, desc_spec):
@@ -305,13 +315,15 @@ class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
         except:
             raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
 
-        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
-                            k2=self.k2)
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True,
+                           normalize_gaussians=self.normalize_gaussians,
+                           k2=self.k2)
 
         print("Using LMBTR-K2 Descriptors ...")
 
         # make an acronym
-        self.acronym = "LMBTR-K2" # perhaps add more info here
+        self.acronym = "LMBTR-K2"  # perhaps add more info here
+
 
 class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
     def __init__(self, desc_spec):
@@ -329,13 +341,15 @@ class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
         except:
             raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
 
-        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True, normalize_gaussians=self.normalize_gaussians,
-                            k3=self.k3)
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True,
+                           normalize_gaussians=self.normalize_gaussians,
+                           k3=self.k3)
 
         print("Using LMBTR-K3 Descriptors ...")
 
         # make an acronym
-        self.acronym = "LMBTR-K3" # perhaps add more info here
+        self.acronym = "LMBTR-K3"  # perhaps add more info here
+
 
 class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
     """
@@ -367,6 +381,7 @@ class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
     :is_periodic: Boolean determining Whether the system is periodic.
     :type Boolean:
     """
+
     def __init__(self, desc_spec):
 
         if "type" not in desc_spec.keys() or desc_spec["type"] != "FCHL19":
@@ -379,20 +394,19 @@ class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
 
         print("Warning: This FCHL19 atomic descriptor is untested, because I (Bingqing) cannot install QML!")
         raise NotImplementedError
-        from qml.representations import generate_fchl_acsf
 
-        self.fchl_acsf_dict = {'nRs2': None, 
-                               'nRs3': None, 
+        self.fchl_acsf_dict = {'nRs2': None,
+                               'nRs3': None,
                                'nFourier': None,
-                               'eta2': None , 
-                               'eta3': None, 
+                               'eta2': None,
+                               'eta3': None,
                                'zeta': None,
-                               'rcut': None, 
+                               'rcut': None,
                                'acut': None,
-                              'two_body_decay': None, 
-                              'three_body_decay': None,
-                              'three_body_weight': None,
-                              'pad': False, 'gradients': False}
+                               'two_body_decay': None,
+                               'three_body_decay': None,
+                               'three_body_weight': None,
+                               'pad': False, 'gradients': False}
 
         # required
         try:
@@ -408,24 +422,23 @@ class Atomic_Descriptor_FCHL19(Atomic_Descriptor_Base):
         print("Using FCHL19 Descriptors ...")
 
         # make an acronym
-        self.acronym = "FCHL19-c" # add more stuff here
+        self.acronym = "FCHL19-c"  # add more stuff here
 
     def _repr_wrapper(frame, elements,
-                 nRs2=24, nRs3=20,
-                 nFourier=1, eta2=0.32, eta3=2.7,
-                 zeta=np.pi, rcut=8.0, acut=8.0,
-                 two_body_decay=1.8, three_body_decay=0.57,
-                 three_body_weight=13.4, stride=1):
-
+                      nRs2=24, nRs3=20,
+                      nFourier=1, eta2=0.32, eta3=2.7,
+                      zeta=np.pi, rcut=8.0, acut=8.0,
+                      two_body_decay=1.8, three_body_decay=0.57,
+                      three_body_weight=13.4, stride=1):
 
         nuclear_charges, coordinates = frame.get_atomic_numbers(), frame.get_positions()
         rep = generate_fchl_acsf(nuclear_charges, coordinates, elements,
-                             nRs2=nRs2, nRs3=nRs3, nFourier=nFourier,
-                             eta2=eta2, eta3=eta3, zeta=zeta,
-                             rcut=rcut, acut=acut,
-                             two_body_decay=two_body_decay, three_body_decay=three_body_decay,
-                             three_body_weight=three_body_weight,
-                             pad=False, gradients=False)
+                                 nRs2=nRs2, nRs3=nRs3, nFourier=nFourier,
+                                 eta2=eta2, eta3=eta3, zeta=zeta,
+                                 rcut=rcut, acut=acut,
+                                 two_body_decay=two_body_decay, three_body_decay=three_body_decay,
+                                 three_body_weight=three_body_weight,
+                                 pad=False, gradients=False)
         rep_out = np.zeros((rep.shape[0], len(elements), rep.shape[1]))
 
         for i, z in enumerate(nuclear_charges):

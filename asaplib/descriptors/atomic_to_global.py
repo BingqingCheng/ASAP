@@ -2,9 +2,12 @@
 Methods and functions to compute global descriptors of a frame from its atomic desciptors
 """
 
-import numpy as np
 import json
-from ..io import NpEncoder, list2str
+
+import numpy as np
+
+from ..io import NpEncoder
+
 
 class Atomic_2_Global_Descriptors:
     def __init__(self, k_spec_dict):
@@ -64,7 +67,7 @@ class Atomic_2_Global_Descriptors:
         if k_spec["reducer_type"] == "moment_sum":
             return Atomic_2_Global_Moment_Sum(k_spec)
         else:
-            raise NotImplementedError 
+            raise NotImplementedError
 
     def compute(self, atomic_desc_dict, atomic_numbers):
         """
@@ -85,13 +88,16 @@ class Atomic_2_Global_Descriptors:
         desc_dict = {}
         for atomic_desc_element in atomic_desc_dict.keys():
             atomic_desc_now = atomic_desc_dict[atomic_desc_element]['atomic_descriptors']
-            desc_dict[atomic_desc_element]  = {}
+            desc_dict[atomic_desc_element] = {}
             for element in self.k_spec_dict.keys():
                 desc_dict[atomic_desc_element][element] = {}
-                k_acronym, desc_dict[atomic_desc_element][element]['descriptors'] = self.engines[element].create(atomic_desc_now, atomic_numbers)
+                k_acronym, desc_dict[atomic_desc_element][element]['descriptors'] = self.engines[element].create(
+                    atomic_desc_now, atomic_numbers)
                 # we use a combination of the acronym of the descriptor and of the reducer function
-                desc_dict[atomic_desc_element][element]['acronym'] = atomic_desc_dict[atomic_desc_element]['acronym'] + k_acronym
+                desc_dict[atomic_desc_element][element]['acronym'] = atomic_desc_dict[atomic_desc_element][
+                                                                         'acronym'] + k_acronym
         return desc_dict
+
 
 class Atomic_2_Global_Base:
     def __init__(self, k_spec):
@@ -131,10 +137,11 @@ class Atomic_2_Global_Base:
 
 class Atomic_2_Global_Average(Atomic_2_Global_Base):
     """this is the vanilla situation. We just take the average soap for all atoms"""
+
     def __init__(self, k_spec):
 
         super().__init__(k_spec)
- 
+
         if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "average":
             raise ValueError("reducer type is not average or cannot find the type")
 
@@ -149,8 +156,9 @@ class Atomic_2_Global_Average(Atomic_2_Global_Base):
 
 class Atomic_2_Global_Sum(Atomic_2_Global_Base):
     """ We just take the sum soap for all atoms"""
+
     def __init__(self, k_spec):
-        
+
         super().__init__(k_spec)
 
         if "reducer_type" not in k_spec.keys() or k_spec["reducer_type"] != "sum":
@@ -165,6 +173,7 @@ class Atomic_2_Global_Sum(Atomic_2_Global_Base):
         else:
             return self.acronym, np.sum(atomic_desc, axis=0)
 
+
 class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
     """ 
     get the global descriptor from atomic ones 
@@ -174,8 +183,8 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
     ----------
     zeta: take the zeta th power
     """
-    def __init__(self, k_spec):
 
+    def __init__(self, k_spec):
 
         super().__init__(k_spec)
 
@@ -188,13 +197,15 @@ class Atomic_2_Global_Moment_Average(Atomic_2_Global_Base):
             raise ValueError("cannot initialize the zeta value")
 
         print("Using Atomic_2_Global_Moment_Average reducer ...")
-        self.acronym += "-z-"+str(self.zeta)
+        self.acronym += "-z-" + str(self.zeta)
 
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
-            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species, True)
+            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species,
+                                                       True)
         else:
             return self.acronym, np.mean(np.power(atomic_desc, self.zeta), axis=0)
+
 
 class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
     """ 
@@ -205,8 +216,8 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
     ----------
     zeta: take the zeta th power
     """
-    def __init__(self, k_spec):
 
+    def __init__(self, k_spec):
 
         super().__init__(k_spec)
 
@@ -219,13 +230,15 @@ class Atomic_2_Global_Moment_Sum(Atomic_2_Global_Base):
             raise ValueError("cannot initialize the zeta list")
 
         print("Using Atomic_2_Global_Moment_Sum reducer ...")
-        self.acronym += "-z-"+str(self.zeta)+"-sum"
+        self.acronym += "-z-" + str(self.zeta) + "-sum"
 
     def create(self, atomic_desc, atomic_numbers=[]):
         if self.element_wise:
-            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species, False)
+            return self.acronym, Descriptor_By_Species(np.power(atomic_desc, self.zeta), atomic_numbers, self.species,
+                                                       False)
         else:
             return self.acronym, np.sum(np.power(atomic_desc, self.zeta), axis=0)
+
 
 def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_over_natom=True):
     """ 
@@ -245,7 +258,7 @@ def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_o
     """
     desc_by_species = {}
     for species in global_species:
-        atomic_desc_by_species = [atomic_desc[i] for i,at in enumerate(atomic_numbers) if at==species]
+        atomic_desc_by_species = [atomic_desc[i] for i, at in enumerate(atomic_numbers) if at == species]
         if average_over_natom and len(atomic_desc_by_species) > 0:
             # normalize by the number of atoms
             desc_by_species[species] = np.mean(atomic_desc_by_species, axis=0)
@@ -253,10 +266,10 @@ def Descriptor_By_Species(atomic_desc, atomic_numbers, global_species, average_o
             desc_by_species[species] = np.sum(atomic_desc_by_species, axis=0)
         else:
             desc_by_species[species] = 0
-        #print(np.shape(atomic_desc),len(atomic_desc))
+        # print(np.shape(atomic_desc),len(atomic_desc))
 
     desc_len = np.shape(atomic_desc)[1]
-    desc = np.zeros(desc_len*len(global_species),dtype=float)
+    desc = np.zeros(desc_len * len(global_species), dtype=float)
     for i, species in enumerate(global_species):
-        desc[i*desc_len:(i+1)*desc_len] = desc_by_species[species]
+        desc[i * desc_len:(i + 1) * desc_len] = desc_by_species[species]
     return np.asarray(desc)

@@ -7,6 +7,7 @@ from ..io import NpEncoder, randomString
 from .atomic_to_global import Atomic_2_Global_Descriptors
 from .atomic_descriptors import Atomic_Descriptors
 
+
 class Global_Descriptors:
     def __init__(self, desc_spec_dict={}):
         """
@@ -19,7 +20,7 @@ class Global_Descriptors:
         desc_spec_dict: dictionaries that specify which global descriptor to use.
         We have two options here
         1. Some descriptors are already global in nature, e.g. the Coulomb Matrix, Morgan fingerprints, etc.
-           So we can secify them as, e.g.
+           So we can specify them as, e.g.
         {'global_desc2': 
         {"type": 'CM', "max_atoms" 30
         }}
@@ -82,7 +83,7 @@ class Global_Descriptors:
         elif desc_spec["type"] == "MORGAN":
             return Global_Descriptor_Morgan(desc_spec)
         else:
-            raise NotImplementedError 
+            raise NotImplementedError
 
     def compute(self, frame):
         """
@@ -100,28 +101,33 @@ class Global_Descriptors:
                           and a np.array [N_desc*N_atoms]. Atomic descriptors for a frame.
                           e.g. {'ad1':{'acronym':'soap-1', 'atomic_descriptors': `a np.array [N_desc*N_atoms]`}}
         """
-        global_desc_dict = {} 
+        global_desc_dict = {}
         atomic_desc_dict = {}
         for element in self.desc_spec_dict.keys():
             global_desc_dict[element], atomic_desc_dict[element] = self.engines[element].create(frame)
-            #global_desc_dict_new, atomic_desc_dict_new = self.engines[element].create(frame)
-            #global_desc_dict.update(global_desc_dict_new)
-            #atomic_desc_dict.update(atomic_desc_dict_new)
+            # global_desc_dict_new, atomic_desc_dict_new = self.engines[element].create(frame)
+            # global_desc_dict.update(global_desc_dict_new)
+            # atomic_desc_dict.update(atomic_desc_dict_new)
         return global_desc_dict, atomic_desc_dict
+
 
 class Global_Descriptor_Base:
     def __init__(self, desc_spec):
         self._is_atomic = False
         self.acronym = ""
         pass
+
     def is_atomic(self):
         return self._is_atomic
+
     def get_acronym(self):
         # we use an acronym for each descriptor, so it's easy to find it and refer to it
         return self.acronym
+
     def create(self, frame):
         # return the dictionaries for global descriptors and atomic descriptors (if any)
         return {'acronym': self.acronym, 'descriptors': []}, {}
+
 
 class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -151,7 +157,6 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         if "atomic_descriptor" not in desc_spec.keys() or "reducer_function" not in desc_spec.keys():
             raise ValueError("Need to specify both atomic descriptors and reducer functions to used")
 
-
         self.atomic_desc_spec = desc_spec['atomic_descriptor']
         self.reducer_spec = desc_spec['reducer_function']
 
@@ -170,13 +175,13 @@ class Global_Descriptor_from_Atomic(Global_Descriptor_Base):
         self.atomic_desc = Atomic_Descriptors(self.atomic_desc_spec)
         # initialize a Atomic_2_Global_Descriptors object
         self.atomic_2_global = Atomic_2_Global_Descriptors(self.reducer_spec)
-        
-        #print("Using Atomic_2_Global_Descriptors ...")
 
-        self.acronym = "atomic-to-global-"+randomString(6)
+        # print("Using Atomic_2_Global_Descriptors ...")
+
+        self.acronym = "atomic-to-global-" + randomString(6)
 
     def pack(self):
-        return {'atomic_descriptor': self.atomic_desc.pack(), 'reducer_function': atomic_2_global.pack() }
+        return {'atomic_descriptor': self.atomic_desc.pack(), 'reducer_function': atomic_2_global.pack()}
 
     def create(self, frame):
         """
@@ -220,7 +225,6 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
         if 'periodic' in desc_spec.keys() and desc_spec['periodic'] == True:
             raise ValueError("Coulomb Matrix cannot be used for periodic systems")
 
-
         self.cm = CoulombMatrix(self.max_atoms)
         print("Using CoulombMatrix ...")
         # make an acronym
@@ -244,11 +248,11 @@ class Global_Descriptor_CM(Global_Descriptor_Base):
             raise ValueError('the size of the system is larger than the max_atoms of the CM descriptor')
         # notice that we return an empty dictionary for "atomic descriptors"
         return {'acronym': self.acronym, 'descriptors': self.cm.create(frame, n_jobs=1)}, {}
-        
-        
+
+
 class Global_Descriptor_Morgan(Global_Descriptor_Base):
     def __init__(self, desc_spec):
-    
+
         if "type" not in desc_spec.keys() or desc_spec["type"] != "MORGAN":
             raise ValueError("Type is not MORGAN or cannot find the type of the descriptor")
 
@@ -257,7 +261,7 @@ class Global_Descriptor_Morgan(Global_Descriptor_Base):
             self.length = desc_spec["length"]
         else:
             self.length = 1024
-            
+
         if "radius" in desc_spec.keys():
             self.radius = desc_spec["radius"]
         else:
@@ -269,10 +273,10 @@ class Global_Descriptor_Morgan(Global_Descriptor_Base):
         print("Using Morgan Fingerprints ...")
         # make an acronym
         self.acronym = "MORGAN"
-        
+
     def _get_smiles(self, frame):
         if "smiles" in frame.info:
-            #print(frame.info['smiles'])
+            # print(frame.info['smiles'])
             return frame.info['smiles']
         elif "SMILES" in frame.info:
             return frame.info['SMILES']
@@ -284,7 +288,7 @@ class Global_Descriptor_Morgan(Global_Descriptor_Base):
         Returns
         -------
         """
-        
+
         from rdkit.Chem import MolFromSmiles
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 
@@ -292,5 +296,5 @@ class Global_Descriptor_Morgan(Global_Descriptor_Base):
         mol = MolFromSmiles(smiles)
         fps = GetMorganFingerprintAsBitVect(mol, radius=self.radius, nBits=self.length)
         fps = np.array(fps, dtype='float64')
-            
+
         return {'acronym': self.acronym, 'descriptors': fps}

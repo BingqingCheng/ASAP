@@ -398,9 +398,9 @@ class old_LAIO(FitClusterBase):
     Clustering by fast search and find of density peaks
     https://science.sciencemag.org/content/sci/344/6191/1492.full.pdf
 
-    :math: \rho_i\,=\,\sum_j{\chi(d_{ij}-d_{cut})}
+    :math: \\rho_i\,=\,\\sum_j{\\chi(d_{ij}-d_{cut})}
          i.e. the local density of data point x_i
-    :math: \delta_i\,=\,\min_{j:\rho_j>\rho_i}(d_{ij})
+    :math: \\delta_i\,=\,\\min_{j:\\rho_j>\\rho_i}(d_{ij})
          i.e. the minimum distance to a neighbour with higher density
 
 

@@ -1,8 +1,7 @@
-Modules in ASAP
-====
+asaplib
+=======
 
 .. toctree::
    :maxdepth: 4
 
    asaplib
-   setup

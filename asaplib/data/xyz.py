@@ -13,8 +13,9 @@ from tqdm.auto import tqdm
 from joblib import Parallel, delayed
 import pandas as pd
 
-from ..io import randomString,  NpEncoder
+from ..io import randomString, NpEncoder
 from ..descriptors import Atomic_Descriptors, Global_Descriptors
+
 
 class ASAPXYZ:
     """extended xyz class
@@ -30,6 +31,7 @@ class ASAPXYZ:
     stride: int
            the stride when reading the xyz file
     """
+
     def __init__(self, fxyz=None, stride=1, periodic=True, fileformat=None):
         # compile a list of matching xyz files
         # in fact they don't strictly need to be xyz format, anything that can be read by ASE is fine
@@ -51,15 +53,15 @@ class ASAPXYZ:
         # store the xyz file
         self.frames = None
         self.nframes = 0
-        self.natom_list = [] # number of atoms for each frame
-        self.total_natoms = 0 # total number of atoms for all frames
-        self.global_species = [] # list of elements contains in all frames
+        self.natom_list = []  # number of atoms for each frame
+        self.total_natoms = 0  # total number of atoms for all frames
+        self.global_species = []  # list of elements contains in all frames
 
         # record the state of the computation, e.g. which descriptors have been computed
-        self.computed_desc_dict = {'data' : {'fxyz': fxyz} }
-        self.computed_desc_dict = {'descriptors' : {} }
+        self.computed_desc_dict = {'data': {'fxyz': fxyz}}
+        self.computed_desc_dict = {'descriptors': {}}
         # the conversion between tag of the descriptors and their acronyms
-        self.tag_to_acronym = {'global':{}, 'atomic':{}}
+        self.tag_to_acronym = {'global': {}, 'atomic': {}}
 
         # we make a dictionary to store the computed descriptors
         self.global_desc = {}
@@ -72,7 +74,7 @@ class ASAPXYZ:
                 self.frames = []
                 for f in self.fxyz:
                     self.frames += read(f, slice(0, None, self.stride), **self.fileformat)
-            else: 
+            else:
                 self.frames = read(self.fxyz, slice(0, None, self.stride), **self.fileformat)
         except:
             raise ValueError('Exception occurred when loading the input file')
@@ -96,7 +98,7 @@ class ASAPXYZ:
         print('load xyz file: ', self.fxyz,
               ', a total of ', str(self.nframes), 'frames',
               ', a total of ', str(self.total_natoms), 'atoms',
-              ', with elements: ', self.global_species,'.')
+              ', with elements: ', self.global_species, '.')
 
     def get_xyz(self):
         return self.frames
@@ -117,25 +119,25 @@ class ASAPXYZ:
         if species_name is None:
             return self.natom_list
         elif species_name in self.global_species:
-            return [ a.get_atomic_numbers().tolist().count(species_name) for a in self.frames]
+            return [a.get_atomic_numbers().tolist().count(species_name) for a in self.frames]
         else:
             raise ValueError("Cannot find the specified chemical species in the data set.")
 
     def save_state(self, filename, mode='yaml'):
-         if mode == 'yaml':
-             with open(filename+'-state.yaml', 'w') as yd:
-                 ydump(self.computed_desc_dict, yd, sort_keys=True, Dumper=Dumper)
-         else:
-             with open(filename+'-state.json', 'w') as jd:
-                 json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
+        if mode == 'yaml':
+            with open(filename + '-state.yaml', 'w') as yd:
+                ydump(self.computed_desc_dict, yd, sort_keys=True, Dumper=Dumper)
+        else:
+            with open(filename + '-state.json', 'w') as jd:
+                json.dump(self.computed_desc_dict, jd, sort_keys=True, cls=NpEncoder)
 
     def save_descriptor_acronym_state(self, filename, mode='yaml'):
 
         if mode == 'yaml':
-            with open(filename+'-descriptor-acronyms.yaml', 'w') as yd:
+            with open(filename + '-descriptor-acronyms.yaml', 'w') as yd:
                 ydump(self.tag_to_acronym, yd, sort_keys=True)
         else:
-            with open(filename+'-descriptor-acronyms.json', 'w') as jd:
+            with open(filename + '-descriptor-acronyms.json', 'w') as jd:
                 json.dump(self.tag_to_acronym, jd, sort_keys=True, cls=NpEncoder)
 
     def symmetrise(self, sbs=[], symprec=1e-2):
@@ -156,10 +158,11 @@ class ASAPXYZ:
         for i in sbs:
             frame = self.frames[i]
             lattice, scaled_positions, numbers = spglib.standardize_cell(frame,
-                                                                     to_primitive=1,
-                                                                     no_idealize=1,
-                                                                     symprec=symprec)
-            self.frames[i] = Atoms(numbers=numbers, cell=lattice, scaled_positions=scaled_positions, pbc=frame.get_pbc())
+                                                                         to_primitive=1,
+                                                                         no_idealize=1,
+                                                                         symprec=symprec)
+            self.frames[i] = Atoms(numbers=numbers, cell=lattice, scaled_positions=scaled_positions,
+                                   pbc=frame.get_pbc())
 
     def _add_info_to_desc_spec(self, desc_spec_dict):
         """
@@ -174,7 +177,7 @@ class ASAPXYZ:
             desc_spec_dict[element]['periodic'] = self.periodic
             desc_spec_dict[element]['max_atoms'] = self.max_atoms
 
-    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None, n_process = 1):
+    def compute_atomic_descriptors(self, desc_spec_dict={}, sbs=[], tag=None, n_process=1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -220,9 +223,9 @@ class ASAPXYZ:
             raise ValueError("Please set the number of processes to be a positive integer.")
 
         # we mark down that this descriptor has been computed
-        self.computed_desc_dict[tag] =  atomic_desc.desc_spec_dict
+        self.computed_desc_dict[tag] = atomic_desc.desc_spec_dict
 
-    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic = False, tag = None, n_process = 1):
+    def compute_global_descriptors(self, desc_spec_dict={}, sbs=[], keep_atomic=False, tag=None, n_process=1):
         """
         compute the atomic descriptors for selected frames
         Parameters
@@ -318,12 +321,12 @@ class ASAPXYZ:
         desc_array = np.array([])
         for e in desc_dict_keys:
             try:
-                desc_array = np.append(desc_array,self.global_desc[i][e]['descriptors'])
+                desc_array = np.append(desc_array, self.global_desc[i][e]['descriptors'])
             except:
                 # if we use atomic to global descriptor, this is a nested dictionary
                 for e2 in self.global_desc[i][e].keys():
                     for e3 in self.global_desc[i][e][e2].keys():
-                        desc_array = np.append(desc_array,self.global_desc[i][e][e2][e3]['descriptors'])
+                        desc_array = np.append(desc_array, self.global_desc[i][e][e2][e3]['descriptors'])
         return desc_array
 
     def _write_computed_descriptors_to_xyz(self, desc_dict_now, frame):
@@ -331,7 +334,7 @@ class ASAPXYZ:
         we recorded the computed descriptors to the xyz object
         we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
         """
-        for e in desc_dict_now.keys():            
+        for e in desc_dict_now.keys():
             try:
                 frame.info[desc_dict_now[e]['acronym']] = desc_dict_now[e]['descriptors']
                 self.tag_to_acronym['global'][e] = desc_dict_now[e]['acronym']
@@ -352,7 +355,8 @@ class ASAPXYZ:
         for e in atomic_desc_dict_now.keys():
             self.tag_to_acronym['atomic'][e] = {}
             for e2 in atomic_desc_dict_now[e].keys():
-                frame.new_array(atomic_desc_dict_now[e][e2]['acronym'], atomic_desc_dict_now[e][e2]['atomic_descriptors'])
+                frame.new_array(atomic_desc_dict_now[e][e2]['acronym'],
+                                atomic_desc_dict_now[e][e2]['atomic_descriptors'])
                 self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
 
     def _desc_name_with_wild_card(self, desc_name_list, atomic_desc=False):
@@ -361,28 +365,28 @@ class ASAPXYZ:
         """
         new_desc_name = []
         for desc_name in desc_name_list:
-            #print("desc_name", desc_name)
+            # print("desc_name", desc_name)
             if desc_name == '*':
                 import re
-                possible_desc_prefix = [ 'SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM', 'pca', 'skpca', 'umap', 'tsne']
+                possible_desc_prefix = ['SOAP', 'ACSF', 'LMBTR', 'FCHL19', 'CM', 'pca', 'skpca', 'umap', 'tsne']
                 for pre in possible_desc_prefix:
                     if atomic_desc:
                         for key in self.frames[0].arrays.keys():
-                            if re.search(pre+'.+', key):
+                            if re.search(pre + '.+', key):
                                 new_desc_name.append(key)
                     else:
                         for key in self.frames[0].info.keys():
-                            if re.search(pre+'.+', key):
+                            if re.search(pre + '.+', key):
                                 new_desc_name.append(key)
             elif '*' in desc_name:
                 import re
                 if atomic_desc:
                     for key in self.frames[0].arrays.keys():
-                        if re.search(desc_name.replace('*','.+'), key):
+                        if re.search(desc_name.replace('*', '.+'), key):
                             new_desc_name.append(key)
                 else:
                     for key in self.frames[0].info.keys():
-                        if re.search(desc_name.replace('*','.+'), key):
+                        if re.search(desc_name.replace('*', '.+'), key):
                             new_desc_name.append(key)
             else:
                 new_desc_name.append(desc_name)
@@ -393,9 +397,12 @@ class ASAPXYZ:
 
         Parameters
         ----------
-        desc_name_list: a list of strings, the name of the .info[] in the extended xyz file
-        use_atomic_desc: bool, return the descriptors for each atom, read from the xyz file
-        species_name: int, the atomic number of the species selected.
+        desc_name_list: a list of strings
+                        the name of the .info[] in the extended xyz file
+        use_atomic_desc: bool
+                         return the descriptors for each atom, read from the xyz file
+        species_name: int
+                      the atomic number of the species selected.
                       Only the desciptors of atoms of the specified specied will be returned.
                       species_name=None means all atoms are selected.
                       
@@ -407,16 +414,17 @@ class ASAPXYZ:
         desc = []
         atomic_desc = []
 
-        if isinstance(desc_name_list,str):
+        if isinstance(desc_name_list, str):
             desc_name_list = [desc_name_list]
 
         desc_name_list = self._desc_name_with_wild_card(desc_name_list)
         print("Find the following descriptor names that match the specifications: ", desc_name_list)
- 
+
         # load from xyz file
         try:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-            desc = np.column_stack(np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
+            desc = np.column_stack(
+                np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
             print("Use global descriptor matrix with shape: ", np.shape(desc))
             # get the atomic descriptors with the same name
             if use_atomic_desc:
@@ -445,18 +453,21 @@ class ASAPXYZ:
 
         atomic_desc = []
 
-        if isinstance(desc_name_list,str):
+        if isinstance(desc_name_list, str):
             desc_name_list = [desc_name_list]
 
         desc_name_list = self._desc_name_with_wild_card(desc_name_list, True)
         print("Find the following atomic descriptor names that match the specifications: ", desc_name_list)
-    
+
         # load from xyz file
         try:
             if species_name is None:
-                atomic_desc = np.column_stack(np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
+                atomic_desc = np.column_stack(
+                    np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
             elif species_name in self.global_species:
-                atomic_desc = np.column_stack(np.concatenate([self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for desc_name in desc_name_list)
+                atomic_desc = np.column_stack(np.concatenate(
+                    [self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for
+                                              desc_name in desc_name_list)
             else:
                 raise ValueError("Cannot find the specified chemical species in the data set.")
             print("Use atomic descriptor matrix with shape: ", np.shape(atomic_desc))
@@ -464,9 +475,9 @@ class ASAPXYZ:
             print("Cannot find the specified atomic descriptors from xyz")
 
         return atomic_desc
-           
+
     def _get_atomic_descriptors_by_species(self, frame, desc_name, species_name=None):
-        species_index = [ i for i, s in enumerate(frame.get_atomic_numbers()) if s == species_name]
+        species_index = [i for i, s in enumerate(frame.get_atomic_numbers()) if s == species_name]
         return frame.get_array(desc_name)[species_index]
 
     def get_property(self, y_key=None, extensive=False, sbs=[]):
@@ -541,7 +552,7 @@ class ASAPXYZ:
 
         y_all = []
         try:
-            #y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]]) # this doesn't work ?!
+            # y_all = np.concatenate([a.get_array(y_key) for a in self.frames[sbs]]) # this doesn't work ?!
             for i in sbs:
                 frame = self.frames[i]
                 if species_name is None:
@@ -555,7 +566,8 @@ class ASAPXYZ:
                 for index, y in enumerate(self.get_property(y_key, extensive, sbs)):
                     y_all = np.append(y_all, y * np.ones(self.natom_list[index]))
                 print("Cannot find the atomic properties, use the per-frame property instead")
-            except: raise ValueError('Cannot load the property vector')
+            except:
+                raise ValueError('Cannot load the property vector')
         if len(np.shape(y_all)) > 1:
             raise ValueError('The property from the xyz file has more than one column')
         return y_all
@@ -610,7 +622,7 @@ class ASAPXYZ:
             else:
                 n_desc = np.shape(atomic_desc)[1]
             for i, frame in enumerate(self.frames):
-                array_now = np.zeros((self.natom_list[i],n_desc), dtype=float)
+                array_now = np.zeros((self.natom_list[i], n_desc), dtype=float)
                 for j, s in enumerate(frame.get_atomic_numbers()):
                     if s == species_name:
                         array_now[j] = atomic_desc[atom_index]
@@ -618,12 +630,12 @@ class ASAPXYZ:
                     else:
                         array_now[j] = np.nan
                 frame.new_array(atomic_desc_name, np.array(array_now))
-            
+
     def remove_descriptors(self, desc_name_list=[]):
         """
         remove the desciptors
         """
-        if isinstance(desc_name_list,str):
+        if isinstance(desc_name_list, str):
             desc_name_list = [desc_name_list]
 
         desc_name_list = self._desc_name_with_wild_card(desc_name_list)
@@ -635,13 +647,13 @@ class ASAPXYZ:
                     del frame.info[dn]
                 else:
                     pass
-                    #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+                    # print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
     def remove_atomic_descriptors(self, desc_name_list=[]):
         """
         remove the desciptors
         """
-        if isinstance(desc_name_list,str):
+        if isinstance(desc_name_list, str):
             desc_name_list = [desc_name_list]
         desc_name_list = self._desc_name_with_wild_card(desc_name_list, True)
         print("removing the atomic descriptors from output xyz with the names: ", desc_name_list)
@@ -652,7 +664,7 @@ class ASAPXYZ:
                     del frame.arrays[dn]
                 else:
                     pass
-                    #print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
+                    # print("Warning: Cannot parse desc_name "+str(dn)+" when remove_descriptors.")
 
     def load_properties(self, filename, header='infer', prefix='X', **kwargs):
         """
@@ -688,7 +700,7 @@ class ASAPXYZ:
             sbs = range(self.nframes)
 
         # prepare for the output
-        if os.path.isfile(str(filename) + ".xyz"): 
+        if os.path.isfile(str(filename) + ".xyz"):
             os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
 
         for i in sbs:
@@ -709,7 +721,8 @@ class ASAPXYZ:
         ----------
         filename: str
         sbs: array, integer
-        cutoff: generate cutoff for atomic environments, set to None to disable atomic environments
+        cutoff: float
+                generate cutoff for atomic environments, set to None to disable atomic environments
         """
 
         from asaplib.io.cscope import write_chemiscope_input
@@ -718,7 +731,7 @@ class ASAPXYZ:
             sbs = range(self.nframes)
 
         # prepare for the output
-        if os.path.isfile(str(filename) + ".xyz"): 
+        if os.path.isfile(str(filename) + ".xyz"):
             os.rename(str(filename) + ".xyz", "bck." + str(filename) + ".xyz")
 
         for i in sbs:
@@ -750,7 +763,7 @@ class ASAPXYZ:
 
         desc, _ = self.get_descriptors(desc_name_list, False, sbs)
 
-        if os.path.isfile(str(filename) + ".desc"): 
+        if os.path.isfile(str(filename) + ".desc"):
             os.rename(str(filename) + ".desc", "bck." + str(filename) + ".desc")
         np.savetxt(str(filename) + ".desc", desc, fmt='%4.8f', header=comment)
 
@@ -761,7 +774,7 @@ class ASAPXYZ:
         Parameters
         ----------
         filename: str
-        desc_name: str. 
+        desc_name: str
                 Name of the properties/descriptors to write
         sbs: array, integer
         comment: str
@@ -772,7 +785,7 @@ class ASAPXYZ:
 
         _, atomic_desc = self.get_descriptors(desc_name, True, sbs)
 
-        if os.path.isfile(str(filename) + ".atomic-desc"): 
+        if os.path.isfile(str(filename) + ".atomic-desc"):
             os.rename(str(filename) + ".atomic-desc", "bck." + str(filename) + "atomic-desc")
         np.savetxt(str(filename) + ".atomic-desc", desc, fmt='%4.8f', header=comment)
 
@@ -781,7 +794,8 @@ class ASAPXYZ:
         write the computed descriptors for selected frames
         Parameters
         ----------
-        desc_spec_keys: a list (str-like) of keys for which computed descriptors to fetch.
+        desc_spec_keys: list
+              a list (str-like) of keys for which computed descriptors to fetch.
         sbs: array, integer
 
         Returns
@@ -790,4 +804,5 @@ class ASAPXYZ:
         """
         if len(sbs) == 0:
             sbs = range(self.nframes)
-        np.savetxt(str(filename) + ".desc", self.fetch_computed_descriptors(desc_dict_keys, sbs), fmt='%4.8f', header=comment)
+        np.savetxt(str(filename) + ".desc", self.fetch_computed_descriptors(desc_dict_keys, sbs), fmt='%4.8f',
+                   header=comment)
