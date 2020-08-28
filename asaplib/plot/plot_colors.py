@@ -13,15 +13,23 @@ def set_color_function(fcolor='none', asapxyz=None, colorscol=0, n_samples=0,
     """ obtain the essential informations to define the colors of data points
     Parameters
     ----------
-    fcolor: str, the name of the file or the tag in the xyz to define the colors
+    fcolor: str
+             the name of the file or the tag in the xyz to define the colors
     asapxyz: ASAPXYZ object, (optional)
-    colorscol: int, (optional). if the color file has more than one column, which column to use
-    n_samples: int, (optional). The number of data points
-    peratom: bool, return atomic color
-    project_atomic: the samples are atomic descriptors
-    use_atomic_species: int, the atomic number of the selected species
-    color_from_zero: bool, set the min color to zero
-    extensive: bool, normalize the quatity by number of atoms
+    colorscol: int, (optional). 
+              if the color file has more than one column, which column to use
+    n_samples: int, (optional). 
+              The number of data points
+    peratom: bool
+              return atomic color
+    project_atomic: bool
+              the samples are atomic descriptors
+    use_atomic_species: int
+              the atomic number of the selected species
+    color_from_zero: bool
+              set the min color to zero
+    extensive: bool
+              normalize the quatity by number of atoms
     """
 
     plotcolor = []
