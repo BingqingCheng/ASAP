@@ -8,6 +8,16 @@ from matplotlib import pyplot as plt
 from .plot_styles import *
 
 class Plotters:
+    """
+    Object handing the making of plots.
+    Notice that we make all the plots on the same graph.
+    A good way of using this is to
+    1. make a scatter plot
+    2. add clustering results (if any)
+    3. add tags to annotate important points
+
+    """
+
     def __init__(self, fig_spec_dict={}):
         """
         Object handing the making of plots
@@ -93,7 +103,8 @@ class Plotters:
         adding the specifications of a new kernel function
         Parameters
         ----------
-        p_spec: a dictionary that specify which atomic descriptor to use 
+        p_spec: dictionary
+                specify which atomic descriptor to use 
         """
         self.p_spec_dict[tag] = p_spec
 

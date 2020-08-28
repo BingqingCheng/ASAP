@@ -3,9 +3,11 @@ functions used in cmd_asap.py
 """
 
 """for loading in_file"""
+
+
 def load_in_file(in_file):
     """Here goes the routine to compute the descriptors according to the state file(s)"""
-    
+
     with open(in_file, 'r') as stream:
         try:
             from yaml import full_load as yload
@@ -14,31 +16,38 @@ def load_in_file(in_file):
             import json
             state_str = json.load(stream)
     state = {}
-    for k,s in state_str.items():
+    for k, s in state_str.items():
         if isinstance(s, str):
             state[k] = json.loads(s)
         else:
             state[k] = s
     return state
 
+
 """ for load ASAPXYZ """
+
+
 def load_asapxyz(data_spec):
     from asaplib.data import ASAPXYZ
     return ASAPXYZ(data_spec['fxyz'], data_spec['stride'], data_spec['periodic'], data_spec['fxyz_format'])
 
+
 """for gen_desc"""
+
+
 def set_reducer(reducer_type, element_wise, zeta):
     """
     setting up the reducer function that is used to convert atomic descriptors into global descriptors for a structure.
     At the moment only one single reducer function can be used.
     """
     reducer_func = {'reducer1': {
-        'reducer_type': reducer_type, # [average], [sum], [moment_average], [moment_sum]
+        'reducer_type': reducer_type,  # [average], [sum], [moment_average], [moment_sum]
         'element_wise': element_wise,
     }}
     if reducer_type == 'moment_average' or reducer_type == 'moment_sum':
         reducer_func['zeta'] = zeta
     return reducer_func
+
 
 def output_desc(asapxyz, desc_spec, prefix, peratom=False, N_processes=8):
     """
@@ -47,16 +56,20 @@ def output_desc(asapxyz, desc_spec, prefix, peratom=False, N_processes=8):
     for tag, desc in desc_spec.items():
         # compute the descripitors
         asapxyz.compute_global_descriptors(desc_spec_dict=desc,
-                                       sbs=[],
-                                       keep_atomic=peratom,
-                                       tag=tag,
-                                       n_process=N_processes)
+                                           sbs=[],
+                                           keep_atomic=peratom,
+                                           tag=tag,
+                                           n_process=N_processes)
     asapxyz.write(prefix)
     asapxyz.save_state(prefix)
 
+
 """ for maps and fits """
+
+
 def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species, peratom):
-    dm = []; dm_atomic = []
+    dm = []
+    dm_atomic = []
     # try to read the xyz file
     if fxyz is not None and fxyz != 'none':
         from asaplib.data import ASAPXYZ
@@ -79,30 +92,33 @@ def read_xyz_n_dm(fxyz, design_matrix, use_atomic_descriptors, only_use_species,
             raise ValueError('Cannot load the descriptor matrix from file')
     return asapxyz, dm, dm_atomic
 
+
 """for maps"""
+
 
 def figure_style_setups(prefix,
                         colorlabel, colorscale, colormap,
                         style, aspect_ratio, adjusttext):
-    fig_options = { 'outfile': prefix,
-                    'show': False,
-                    'title': None,
-                    'size': [8*aspect_ratio, 8],
-                    'cmap': colormap,
-                    'components':{
-                    'first_p': {'type': 'scatter', 'clabel': colorlabel, 
-                                'vmin': colorscale[0], 'vmax': colorscale[1]},
-                    'second_p': {"type": 'annotate', 'adtext': adjusttext} }
+    fig_options = {'outfile': prefix,
+                   'show': False,
+                   'title': None,
+                   'size': [8 * aspect_ratio, 8],
+                   'cmap': colormap,
+                   'components': {
+                       'first_p': {'type': 'scatter', 'clabel': colorlabel,
+                                   'vmin': colorscale[0], 'vmax': colorscale[1]},
+                       'second_p': {"type": 'annotate', 'adtext': adjusttext}}
                    }
     if style == 'journal':
         fig_options.update({'xlabel': None, 'ylabel': None,
-                            'xaxis': False,  'yaxis': False,
+                            'xaxis': False, 'yaxis': False,
                             'remove_tick': True,
                             'rasterized': True,
                             'fontsize': 12,
-                            'size': [4*aspect_ratio, 4]
+                            'size': [4 * aspect_ratio, 4]
                             })
     return fig_options
+
 
 def map_process(obj, reduce_dict, axes, map_name):
     """
@@ -143,6 +159,7 @@ def map_process(obj, reduce_dict, axes, map_name):
     else:
         map_save(outfilename, outmode, obj['asapxyz'], proj, proj_atomic, map_name, species_name)
 
+
 def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, annotate, axes):
     """
     Make plots
@@ -152,8 +169,9 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, a
     asap_plot = Plotters(fig_spec)
     asap_plot.plot(proj[::-1, axes], plotcolor[::-1], labels[::-1], annotate)
     if proj_atomic is not None:
-        asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1],[],[])
+        asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1], [], [])
     plt.show()
+
 
 def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_name):
     """
@@ -179,7 +197,10 @@ def map_save(foutput, outmode, asapxyz, proj, proj_atomic, map_name, species_nam
     else:
         pass
 
+
 """ for clustering """
+
+
 def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
     """handle clustering operations"""
     prefix = cluster_options['prefix']
@@ -193,18 +214,21 @@ def cluster_process(asapxyz, trainer, design_matrix, cluster_options):
     labels_db = do_clustering.get_cluster_labels()
     if cluster_options['savexyz'] and asapxyz is not None:
         if cluster_options['use_atomic_descriptors']:
-            asapxyz.set_atomic_descriptors(labels_db, prefix+'_cluster_label', cluster_options['only_use_species'])
+            asapxyz.set_atomic_descriptors(labels_db, prefix + '_cluster_label', cluster_options['only_use_species'])
         else:
-            asapxyz.set_descriptors(labels_db, prefix+'_cluster_label')
+            asapxyz.set_descriptors(labels_db, prefix + '_cluster_label')
         asapxyz.write(prefix)
     if cluster_options['savetxt']:
-        import numpy as np 
+        import numpy as np
         np.savetxt(prefix + "-cluster-label.dat", np.transpose([np.arange(len(labels_db)), labels_db]),
-               header='index cluster_label', fmt='%d %d')
+                   header='index cluster_label', fmt='%d %d')
 
     return labels_db
 
+
 """ for KDE """
+
+
 def kde_process(asapxyz, density_model, proj, kde_options):
     """handle kernel density estimation operations"""
     # fit density model to data
@@ -218,7 +242,7 @@ def kde_process(asapxyz, density_model, proj, kde_options):
     # save the density
     if kde_options['savetxt']:
         np.savetxt(prefix + "-kde.dat", np.transpose([np.arange(len(rho)), rho]),
-               header='index log_of_kernel_density_estimation', fmt='%d %4.8f')
+                   header='index log_of_kernel_density_estimation', fmt='%d %4.8f')
     if kde_options['savexyz'] and asapxyz is not None:
         if kde_options['use_atomic_descriptors']:
             asapxyz.set_atomic_descriptors(rho, density_model.get_acronym(), kde_options['only_use_species'])
