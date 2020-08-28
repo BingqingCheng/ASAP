@@ -46,6 +46,11 @@ Please refer to the documentation of each module for available functionalities.
    install.rst
    example.rst
    gen_desc.rst
+   map.rst
+   fit.rst
+   kde.rst
+   cluster.rst
+   select.rst
    howto_asaplib.rst
    tutorials.rst
    advance.rst
