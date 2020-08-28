@@ -49,7 +49,7 @@ def asap(ctx):
 @click.option('--nkeep', '-n', type=int,
               help='The number (int) or the ratio (float) of samples to keep.',
               show_default=False, default=1)
-@click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
+@click.option('--design_matrix', '-dm', cls=ConvertStrToList, default='[*]',
               help='Location of descriptor matrix file or name of the tags in ase xyz file\
                  the type is a list  \'[dm1, dm2]\', \
                 as we can put together simutanously several design matrix.')
@@ -474,7 +474,8 @@ def plot_pca(ctx, scale, dimension, axes,
     if annotate != 'none':
         ctx.obj['map_options']['annotate'] = np.loadtxt(annotate, dtype="str")[:]
 
-    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, style, aspect_ratio, adjusttext)
+    ctx.obj['fig_options'] = figure_style_setups(prefix, colorlabel, colorscale, 'gnuplot', style, aspect_ratio,
+                                                 adjusttext)
     map_name = "kde-pca-d-" + str(dimension)
     reduce_dict = {'pca': {
         'type': 'PCA',

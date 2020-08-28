@@ -42,7 +42,7 @@ def file_output_options(f):
 
 def dm_input_options(f):
     """common options for reading a design matrices, used for map, fit, kde, clustering, etc."""
-    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default=[],
+    f = click.option('--design_matrix', '-dm', cls=ConvertStrToList, default='[*]',
                      help='Location of descriptor matrix file or name of the tags in ase xyz file\
                            the type is a list  \'[dm1, dm2]\', as we can put together simutanously several design matrix.')(
         f)
