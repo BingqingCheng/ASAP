@@ -5,9 +5,9 @@ Installation
 
 ``asap`` supports ``python 3``
 
-Installation:
 
-* If you want a direct installation.
+Direct installation
+-------------------
 
 .. code-block:: sh
 
@@ -15,7 +15,9 @@ Installation:
 
 .. note:: This command should automatically install any depedencies.
 
-* If you wish to use a new conda environment
+
+Install in a conda environment
+----------------------------------
 
 .. code-block:: sh
 
@@ -24,7 +26,8 @@ Installation:
     python3 setup.py install
 
 
-**List of requirements:**
+List of requirements
+---------------------
 
 * numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click
 

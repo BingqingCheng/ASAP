@@ -4,10 +4,10 @@
    contain the root ``toctree`` directive.
 
 Automatic Selection And Prediction tools for materials and molecules
-===================================
+====================================================================
 
 Basic usage of the command line tool
-**************
+************************************
 
 Type ``asap`` and use the sub-commands for various tasks.
 
@@ -28,7 +28,7 @@ Type ``asap`` and use the sub-commands for various tasks.
 
 
 Using the PYTHON library
-****************
+************************
 
 In ``python3``, one can import ``asap`` as a libaray using
 
@@ -46,10 +46,10 @@ Please refer to the documentation of each module for available functionalities.
    install.rst
    example.rst
    gen_desc.rst
+   howto_asaplib.rst
    tutorials.rst
    advance.rst
    modules.rst
-
 
 Indices and tables
 ==================

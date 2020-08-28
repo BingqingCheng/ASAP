@@ -13,7 +13,7 @@ This tutorial style paper covers:
 
 * Snippets of ``asap`` commands that were used to analyze the examples and make figures. 
 
-.. todo::  Tutorials to be added. 
+.. note::  Tutorials to be added. 
 
 .. toctree::
    :maxdepth: 1

@@ -6,7 +6,8 @@
 Quick & basic example
 ===================================
 
-**Step 1: generate a design matrix**
+Step 1: generate a design matrix
+----------------------------------
 
 The first step for a machine-learning analysis or visualization is to generate a "design matrix" made from either global descriptors or atomic descriptors. To do this, we supply ``asap gen_desc`` with an input file that contains the atomic coordintes. Many formats are supported; anything can be read using [ase.io](https://wiki.fysik.dtu.dk/ase/ase/io/io.html) is supported. You can use a wildcard to specify the list of input files that matches the pattern (e.g. ``POSCAR*``, ``H*``, or ``*.cif``). However, it is most robust if you use an extended xyz file format (units in angstrom, additional info and cell size in the comment line).
 
@@ -24,7 +25,8 @@ for columb matrix:
 
     asap gen_desc -f small_molecules-1000.xyz --no-periodic cm
 
-**Step 2: generate a low-dimensional map**
+Step 2: generate a low-dimensional map
+--------------------------------------
 
 After generating the descriptors, one can make a two-dimensional map (``asap map``), or regression model (``asap fit``), or clustering (``asap cluster``), or select a subset of frames (``asap select``), or do a clustering analysis (``asap cluster``), or estimate the probablity of observing each sample (``asap kde``).
 
@@ -48,7 +50,8 @@ or even
 
     asap map -f small_molecules-SOAP.xyz -dm '[*]' -c dft_formation_energy_per_atom_in_eV pca
 
-**Step 2+: interactive visualization**
+Step 2+: interactive visualization
+----------------------------------
 
 Using ``asap map``, a png figure is generated. In addition, the code also output the low-dimensional coordinates of the structures and/or atomic environments. The default output is extended xyz file. One can also specify a different output format using ``--output`` or ``-o`` flag. and the available options are ``xyz``, ``matrix`` and ``chemiscope``. 
 
