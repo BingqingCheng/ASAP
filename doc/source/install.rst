@@ -3,23 +3,37 @@
 Installation
 *******************************
 
-python 3
+``asap`` supports ``python 3``
 
 Installation:
 
-```bash
-python3 setup.py install --user
-```
+* If you want a direct installation.
 
-*This should automatically install any depedencies.*
+.. code-block:: sh
 
-List of requirements:
+    python3 setup.py install --user
 
-+ numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click
+.. note:: This command should automatically install any depedencies.
+
+* If you wish to use a new conda environment
+
+.. code-block:: sh
+
+    conda create -n myenv python=3.6
+    conda activate myenv
+    python3 setup.py install
+
+
+**List of requirements:**
+
+* numpy scipy scikit-learn json ase dscribe umap-learn PyYAML click
 
 Add-Ons:
-+ (for finding symmetries of crystals) spglib 
-+ (for annotation without overlaps) adjustText
-+ The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
+
+* (for finding symmetries of crystals) spglib 
+
+* (for annotation without overlaps) adjustText
+
+* The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
 
 

@@ -1,4 +1,4 @@
-asaplib
+modules of asaplib
 =======
 
 .. toctree::
