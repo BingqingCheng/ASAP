@@ -112,48 +112,8 @@ Add-Ons:
 + (for annotation without overlaps) adjustText
 + The FCHL19 representation requires code from the development brach of the QML package. Instructions on how to install the QML package can be found on https://www.qmlcode.org/installation.html.
 
-### How to add your own atomic or global descriptors
-
-* To add a new atomic descriptor, add a new `Atomic_Descriptor` class in the asaplib/descriptors/atomic_descriptors.py. As long as it has a `__init__()` and a `create()` method, it should be competitable with the ASAP code. The `create()` method takes an ASE Atoms object as input (see: [ASE](https://wiki.fysik.dtu.dk/ase/ase/atoms.html))
-
-We have a template class for this
-```python
-class Atomic_Descriptor_Base:
-    def __init__(self, desc_spec):
-        self._is_atomic = True
-        self.acronym = ""
-        pass
-    def is_atomic(self):
-        return self._is_atomic
-    def get_acronym(self):
-        # we use an acronym for each descriptor, so it's easy to find it and refer to it
-        return self.acronym
-    def create(self, frame):
-        # notice that we return the acronym here!!!
-        return self.acronym, []
-```
-
-* To add a new global descriptor, add a new `Global_Descriptor` class in the asaplib/descriptors/global_descriptors.py. As long as it has a `__init__()` and a `create()` method, it is fine. The `create()` method also takes the Atoms object as input.
-
-The template is similar with the atomic one:
-```python
-class Global_Descriptor_Base:
-    def __init__(self, desc_spec):
-        self._is_atomic = False
-        self.acronym = ""
-        pass
-    def is_atomic(self):
-        return self._is_atomic
-    def get_acronym(self):
-        # we use an acronym for each descriptor, so it's easy to find it and refer to it
-        return self.acronym
-    def create(self, frame):
-        # return the dictionaries for global descriptors and atomic descriptors (if any)
-        return {'acronym': self.acronym, 'descriptors': []}, {}
-```
-
 ### Additional tools
-In the directory ./scripts/ and ./tools/ you can find a selection of other python tools.
+In the directory ./scripts/ you can find a selection of other python tools.
 
 ### Tab completion
 Tab completion can be enabled by sourcing the `asap_completion.sh` script in the ./scripts/ directory. 
