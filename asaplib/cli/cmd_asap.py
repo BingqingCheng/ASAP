@@ -49,7 +49,7 @@ def asap(ctx):
 @click.option('--nkeep', '-n', type=int,
               help='The number (int) or the ratio (float) of samples to keep.',
               show_default=False, default=1)
-@click.option('--design_matrix', '-dm', cls=ConvertStrToList, default='[*]',
+@click.option('--design_matrix', '-dm', cls=ConvertStrToList, default='[]',
               help='Location of descriptor matrix file or name of the tags in ase xyz file\
                  the type is a list  \'[dm1, dm2]\', \
                 as we can put together simutanously several design matrix.')

@@ -107,13 +107,19 @@ class Atomic_Descriptor_Base:
         return self._is_atomic
 
     def get_acronym(self):
-        # we use an acronym for each descriptor, so it's easy to find it and refer to it
+        """ 
+        we use an acronym for each descriptor, so it's easy to find it and refer to it
+        """
         return self.acronym
 
     def create(self, frame):
-        # notice that we return the acronym here!!!
+        """
+        notice that we return the acronym here!!!
+        """
         return self.acronym, []
 
+    def _get_pbc(self, frame):
+        return any(frame.get_pbc())
 
 class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
     def __init__(self, desc_spec):
@@ -152,16 +158,17 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
         else:
             self.periodic = True
 
-        self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
-                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average='off',
-                         periodic=self.periodic)
-
         print("Using SOAP Descriptors ...")
 
         # make an acronym
         self.acronym = "SOAP-n" + str(self.n) + "-l" + str(self.l) + "-c" + str(self.cutoff) + "-g" + str(self.g)
 
     def create(self, frame):
+        from dscribe.descriptors import SOAP
+        self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
+                         sigma=self.g, rbf=self.rbf, crossover=self.crossover, average='off',
+                         periodic=self._get_pbc(frame))
+
         # notice that we return the acronym here!!!
         return self.acronym, self.soap.create(frame, n_jobs=1)
 
