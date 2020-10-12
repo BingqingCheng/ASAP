@@ -75,7 +75,7 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
     if cutoff is None:
         cutoff = max(float(round_sigfigs(longest_bond * 1.3 * float(scalerange), 2)),2.0)
     rmin = shortest_bond
-    N = min(int(sharpness*(cutoff-rmin)/0.5), 5)
+    N = int(sharpness*(cutoff-rmin)/0.5)
     if verbose:
         print("Considering cutoff and rmin", cutoff, rmin)
 
@@ -125,7 +125,7 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
                                 print("symfunction_short %s 3 %s %s %.4f -1.000 %.3f %.3f" %(fel, sel, tel, eta, zeta, cutoff))
                             
     acsf_js = { 'acsf-'+str(cutoff):{'type': 'ACSF',
-    'cutoff': 2.0,
+    'cutoff': cutoff,
     'g2_params': _2_body_params,
     'g4_params': _3_body_params }}
 
