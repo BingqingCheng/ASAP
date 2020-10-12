@@ -37,7 +37,7 @@ class LC_SCOREBOARD():
             avg_scores.append(avg)
             avg_scores_error.append(np.sqrt(var))
             Ntrains.append(int(Ntrain))
-        return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1)
+        return np.stack((Ntrains, avg_scores, avg_scores_error), axis=-1).tolist()
 
     def plot_learning_curve(self, sc_name='RMSE'):
         """plot the learning curve"""

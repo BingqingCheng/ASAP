@@ -75,7 +75,7 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
     if cutoff is None:
         cutoff = max(float(round_sigfigs(longest_bond * 1.3 * float(scalerange), 2)),2.0)
     rmin = shortest_bond
-    N = min(int(sharpness*(cutoff-rmin)/0.5), 5)
+    N = int(sharpness*(cutoff-rmin)/0.5)
     if verbose:
         print("Considering cutoff and rmin", cutoff, rmin)
 
@@ -84,40 +84,48 @@ def gen_default_acsf_hyperparameters(Zs, scalerange=1.0, sharpness=1.0, verbose=
     eta_array = 1./shift_array**2.
 
     _2_body_params = []
-    for fel in Zs:
-        for sel in Zs:
-            if verbose: print("# symfunctions for type %s 2 %s" %(fel, sel))
-            for eta in eta_array:
-                # G2 with no shift
-                if 3*np.sqrt(1/eta) > rmin:
-                    _2_body_params.append([float(round_sigfigs(eta, 2)), 0.])
-                    if verbose: print("symfunction_short %s 2 %s %.4f 0.000 %.3f" %(fel, sel, eta, cutoff))
-            for i in range(len(shift_array)-1):
-                # G2 with shift
-                eta = 1./((shift_array[N-i] - shift_array[N-i-1])**2)
-                if shift_array[N-i] + 3*np.sqrt(1/eta) > rmin:
-                    _2_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(shift_array[N-i],2))])
-                    if verbose: print("symfunction_short %s 2 %s %.4f %.3f %.3f" %(fel, sel, eta, shift_array[N-i], cutoff))
+    for eta in eta_array:
+        # G2 with no shift
+        if 3*np.sqrt(1/eta) > rmin:
+            _2_body_params.append([float(round_sigfigs(eta, 2)), 0.])
+            if verbose:
+                for fel in Zs:
+                    for sel in Zs: 
+                        print("symfunction_short %s 2 %s %.4f 0.000 %.3f" %(fel, sel, eta, cutoff))
+    for i in range(len(shift_array)-1):
+        # G2 with shift
+        eta = 1./((shift_array[N-i] - shift_array[N-i-1])**2)
+        if shift_array[N-i] + 3*np.sqrt(1/eta) > rmin:
+            _2_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(shift_array[N-i],2))])
+            if verbose: 
+                for fel in Zs:
+                    for sel in Zs:
+                        print("symfunction_short %s 2 %s %.4f %.3f %.3f" %(fel, sel, eta, shift_array[N-i], cutoff))
 
     eta_array = np.logspace(-3,0,N//2)
     zeta_array = [1.000, 4.000, 16.000]
     
     _3_body_params = []
-    for fel in Zs:
-        ang_Zs = list(Zs)
-        for sel in Zs:
-            for tel in ang_Zs:
-                if verbose: print("# symfunctions for type %s 3 %s %s" %(fel, sel, tel))
-                for eta in eta_array:
-                    for zeta in zeta_array:
-                        if 3*np.sqrt(1/eta) > rmin:
-                            if verbose: print("symfunction_short %s 3 %s %s %.4f  1.000 %.3f %.3f" %(fel, sel, tel, eta, zeta, cutoff))
-                            if verbose: print("symfunction_short %s 3 %s %s %.4f -1.000 %.3f %.3f" %(fel, sel, tel, eta, zeta, cutoff))
-                            _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), 1])
-                            _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), -1])
+    for eta in eta_array:
+        for zeta in zeta_array:
+            if 3*np.sqrt(1/eta) > rmin:
+                _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), 1])
+                _3_body_params.append([float(round_sigfigs(eta,2)), float(round_sigfigs(zeta,2)), -1])
+
+    if verbose:
+        for fel in Zs:
+            ang_Zs = list(Zs)
+            for sel in Zs:
+                for tel in ang_Zs:
+                    print("# symfunctions for type %s 3 %s %s" %(fel, sel, tel))
+                    for eta in eta_array:
+                        for zeta in zeta_array:
+                            if 3*np.sqrt(1/eta) > rmin:
+                                print("symfunction_short %s 3 %s %s %.4f  1.000 %.3f %.3f" %(fel, sel, tel, eta, zeta, cutoff))
+                                print("symfunction_short %s 3 %s %s %.4f -1.000 %.3f %.3f" %(fel, sel, tel, eta, zeta, cutoff))
                             
     acsf_js = { 'acsf-'+str(cutoff):{'type': 'ACSF',
-    'cutoff': 2.0,
+    'cutoff': cutoff,
     'g2_params': _2_body_params,
     'g4_params': _3_body_params }}
 
