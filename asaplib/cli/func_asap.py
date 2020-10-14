@@ -167,9 +167,9 @@ def map_plot(fig_spec, proj, proj_atomic, plotcolor, plotcolor_atomic, labels, a
     from matplotlib import pyplot as plt
     from asaplib.plot import Plotters
     asap_plot = Plotters(fig_spec)
-    asap_plot.plot(proj[::-1, axes], plotcolor[::-1], labels[::-1], annotate)
+    asap_plot.plot(proj[:, axes], plotcolor[:], labels[:], annotate[:])
     if proj_atomic is not None:
-        asap_plot.plot(proj_atomic[::-1, axes], plotcolor_atomic[::-1], [], [])
+        asap_plot.plot(proj_atomic[:, axes], plotcolor_atomic[:], [], [])
     plt.show()
 
 
