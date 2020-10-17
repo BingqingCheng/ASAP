@@ -105,9 +105,6 @@ class Global_Descriptors:
         atomic_desc_dict = {}
         for element in self.desc_spec_dict.keys():
             global_desc_dict[element], atomic_desc_dict[element] = self.engines[element].create(frame)
-            # global_desc_dict_new, atomic_desc_dict_new = self.engines[element].create(frame)
-            # global_desc_dict.update(global_desc_dict_new)
-            # atomic_desc_dict.update(atomic_desc_dict_new)
         return global_desc_dict, atomic_desc_dict
 
 

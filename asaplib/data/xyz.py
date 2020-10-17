@@ -205,15 +205,12 @@ class ASAPXYZ:
         # business!
         atomic_desc = Atomic_Descriptors(desc_spec_dict)
 
-        for i in sbs:
-            frame = self.frames[sbs]
-            self.atomic_desc[i].update(atomic_desc.create(frame))
         # serial computation
         if n_process == 1:
             for i in tqdm(sbs):
                 frame = self.frames[i]
                 # compute atomic descriptor
-                self.atomic_desc[i].update(atomic_desc.create(frame))
+                self.atomic_desc[i].update(atomic_desc.compute(frame))
         # parallel computation
         elif n_process >= 2:
             results = Parallel(n_jobs=n_process, verbose=1)(delayed(atomic_desc.compute)(self.frames[i]) for i in sbs)
@@ -284,14 +281,16 @@ class ASAPXYZ:
                 desc_dict_now, atomic_desc_dict_now = global_desc.compute(frame)
                 self.global_desc[i].update(desc_dict_now)
                 if keep_atomic:
-                    self.atomic_desc[i].update(atomic_desc_dict_now)
+                    for _, v in atomic_desc_dict_now.items():
+                        self.atomic_desc[i].update(v)
         # parallel computation
         elif n_process >= 2:
             results = Parallel(n_jobs=n_process, verbose=1)(delayed(global_desc.compute)(self.frames[i]) for i in sbs)
             for i, (desc_dict_now, atomic_desc_dict_now) in enumerate(results):
                 self.global_desc[i].update(desc_dict_now)
                 if keep_atomic:
-                    self.atomic_desc[i].update(atomic_desc_dict_now)
+                    for _, v in atomic_desc_dict_now.items():
+                        self.atomic_desc[i].update(v)
         else:
             raise ValueError("Please set the number of processes to be a positive integer.")
 
@@ -313,11 +312,28 @@ class ASAPXYZ:
         """
         if len(sbs) == 0:
             sbs = list(range(self.nframes))
-        return np.row_stack([self._parse_computed_descriptors_singleframe(desc_dict_keys, i) for i in sbs])
+        return np.vstack([self._parse_computed_descriptors_singleframe(desc_dict_keys, i) for i in sbs])
+
+    def fetch_computed_atomic_descriptors(self, desc_dict_keys=[], sbs=[]):
+        """
+        Fetch the computed atomic descriptors for selected frames
+        Parameters
+        ----------
+        desc_spec_keys: a list (str-like) of keys
+                    for which computed descriptors to fetch.
+        sbs: array, integer
+
+        Returns
+        -------
+        desc: np.matrix [n_atoms, n_desc]
+        """
+        if len(sbs) == 0:
+            sbs = list(range(self.nframes))
+        return np.vstack([self._parse_computed_atomic_descriptors_singleframe(desc_dict_keys, i) for i in sbs])
 
     def _parse_computed_descriptors_singleframe(self, desc_dict_keys=[], i=0):
         """return the global descriptor computed for frame i"""
-        # TODO: use the nested dictionaty search `extract_from_nested_dict` in ..io
+        # TODO: use the nested dictionary search `extract_from_nested_dict` in ..io
         desc_array = np.array([])
         for e in desc_dict_keys:
             try:
@@ -328,6 +344,10 @@ class ASAPXYZ:
                     for e3 in self.global_desc[i][e][e2].keys():
                         desc_array = np.append(desc_array, self.global_desc[i][e][e2][e3]['descriptors'])
         return desc_array
+
+    def _parse_computed_atomic_descriptors_singleframe(self, desc_dict_keys=[], i=0):
+        """return the atomic descriptor computed for frame i"""
+        return np.hstack( self.atomic_desc[i][e]['atomic_descriptors'] for e in desc_dict_keys)
 
     def _write_computed_descriptors_to_xyz(self, desc_dict_now, frame):
         """  
@@ -353,11 +373,9 @@ class ASAPXYZ:
         we use acronym to record the entry in the extended xyz file, so it's much easier to ready by human
         """
         for e in atomic_desc_dict_now.keys():
-            self.tag_to_acronym['atomic'][e] = {}
-            for e2 in atomic_desc_dict_now[e].keys():
-                frame.new_array(atomic_desc_dict_now[e][e2]['acronym'],
-                                atomic_desc_dict_now[e][e2]['atomic_descriptors'])
-                self.tag_to_acronym['atomic'][e][e2] = atomic_desc_dict_now[e][e2]['acronym']
+            frame.new_array(atomic_desc_dict_now[e]['acronym'],
+                            atomic_desc_dict_now[e]['atomic_descriptors'])
+            self.tag_to_acronym['atomic'][e] = atomic_desc_dict_now[e]['acronym']
 
     def _desc_name_with_wild_card(self, desc_name_list, atomic_desc=False):
         """
@@ -423,8 +441,8 @@ class ASAPXYZ:
         # load from xyz file
         try:
             # retrieve the descriptor vectors --- both of these throw a ValueError if any are missing or are of wrong shape
-            desc = np.column_stack(
-                np.row_stack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
+            desc = np.hstack(
+                np.vstack([a.info[desc_name] for a in self.frames]) for desc_name in desc_name_list)
             print("Use global descriptor matrix with shape: ", np.shape(desc))
             # get the atomic descriptors with the same name
             if use_atomic_desc:
@@ -462,10 +480,10 @@ class ASAPXYZ:
         # load from xyz file
         try:
             if species_name is None:
-                atomic_desc = np.column_stack(
+                atomic_desc = np.vstack(
                     np.concatenate([a.get_array(desc_name) for a in self.frames]) for desc_name in desc_name_list)
             elif species_name in self.global_species:
-                atomic_desc = np.column_stack(np.concatenate(
+                atomic_desc = np.hstack(np.concatenate(
                     [self._get_atomic_descriptors_by_species(a, desc_name, species_name) for a in self.frames]) for
                                               desc_name in desc_name_list)
             else:
