@@ -17,7 +17,7 @@ load structures
 .. code:: ipython3
 
     from asaplib.data import ASAPXYZ
-    asapxyz = ASAPXYZ('P-20GPa/result-complete/combined.xyz')
+    asapxyz = ASAPXYZ('P-20GPa/result-complete/combined.xyz', periodic=True) # periodic=False otherwise 
 
     # load the tags (optional, you can use these to annotate the structures)
     tags = np.loadtxt("P-20GPa/result-complete/ranking-complete", dtype="str")
@@ -52,12 +52,26 @@ compute SOAP descriptors
 
 .. code:: ipython3
 
-    # compute
+    # compute atomic descriptors only
+    asapxyz.compute_atomic_descriptors(desc_spec_dict=soap_spec,
+                                        sbs=[],
+                                        tag='tio2-atomic',
+                                        n_process=1)
+
+.. code:: ipython3
+
+    # if you want to retrieve the atomic descriptors computed earlier
+    dm_atomic = asapxyz.fetch_computed_atomic_descriptors(['soap1'])
+
+.. code:: ipython3
+
+    # compute descriptors for the whole structures
     asapxyz.compute_global_descriptors(desc_spec_dict=desc_spec,
                                         sbs=[],
-                                        keep_atomic=False,
+                                        keep_atomic=False, # set to True to keep the atomic descriptors
                                         tag='tio2',
                                         n_process=4)
+    # can use asapxyz.fetch_computed_atomic_descriptors(['soap1']) if keep_atomic=True
 
 
 Build a kernel Matrix
@@ -71,7 +85,7 @@ Build a kernel Matrix
                                          "n_sparse": -1, # no sparsification
                                     "kernel": {"first_kernel": {"type": 'linear'}}}}
 
-kernal PCA on environmental similarity
+kernel PCA on environmental similarity
 --------------------------------------
 
 .. code:: ipython3
