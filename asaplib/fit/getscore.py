@@ -4,6 +4,7 @@ Functions for assessing the quality of the fits
 
 import numpy as np
 from scipy.stats import spearmanr
+from scipy.stats import pearsonr
 
 class LC_SCOREBOARD():
     def __init__(self, train_sizes):
@@ -83,14 +84,19 @@ def get_sup(ypred, y):
 
 def get_spearman(ypred, y):
     corr, _ = spearmanr(ypred, y)
-    return corr.tolist()
+    return corr
+
+def get_pearson(ypred, y):
+    corr, _ = pearsonr(ypred, y)
+    return corr
 
 score_func = dict(
     MAE=get_mae,
     RMSE=get_rmse,
     SUP=get_sup,
     R2=get_r2,
-    CORR=get_spearman
+    SpearmanR=get_spearman,
+    PearsonR=get_pearson
 )
 
 
