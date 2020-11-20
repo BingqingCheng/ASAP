@@ -11,8 +11,10 @@ class LC_SCOREBOARD():
         self.scores = {size: [] for size in train_sizes}
 
     def add_score(self, Ntrain, score):
-        self.scores[Ntrain].append(score)
-
+        if Ntrain in self.scores:
+            self.scores[Ntrain].append(score)
+        else:
+            self.scores[Ntrain] = [score]
     def dump_all(self):
         return self.scores
 

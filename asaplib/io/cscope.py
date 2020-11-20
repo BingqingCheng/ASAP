@@ -7,7 +7,7 @@ import numpy as np
 import json
 import gzip
 
-IGNORED_ASE_ARRAYS = ['positions', 'numbers']
+IGNORED_ASE_ARRAYS = ['positions', 'numbers', 'stress']
 
 
 def _typetransform(data):
@@ -19,7 +19,10 @@ def _typetransform(data):
         return list(map(lambda u: u.decode('utf8'), data))
     else:
         try:
-            return [float(value) for value in data]
+            if isinstance(data[0], float):
+                return [float(value) for value in data]
+            else:
+                return [float(value[0]) for value in data]
         except ValueError:
             raise Exception('unsupported type in value')
 
