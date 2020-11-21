@@ -22,7 +22,8 @@ def _typetransform(data):
             if isinstance(data[0], float):
                 return [float(value) for value in data]
             else:
-                return [float(value[0]) for value in data]
+                # 2D
+                return [float(np.asarray(value).ravel()[0]) for value in data]
         except ValueError:
             raise Exception('unsupported type in value')
 
