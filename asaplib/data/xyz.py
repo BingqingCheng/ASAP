@@ -88,7 +88,7 @@ class ASAPXYZ:
             all_species.extend(frame.get_atomic_numbers())
             if not self.periodic or not np.sum(frame.get_cell()) > 0:
                 frame.set_pbc([False, False, False])
-            else:
+            elif self.periodic:
                 # niggli_reduce
                 niggli_reduce(frame)
             # we also initialize the descriptor dictionary for each frame
