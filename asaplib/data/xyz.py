@@ -9,6 +9,7 @@ from yaml import Dumper
 import numpy as np
 from ase import Atoms
 from ase.io import read, write
+from ase.build import niggli_reduce
 from tqdm.auto import tqdm
 from joblib import Parallel, delayed
 import pandas as pd
@@ -82,6 +83,8 @@ class ASAPXYZ:
         self.nframes = len(self.frames)
         all_species = []
         for i, frame in enumerate(self.frames):
+            # niggli_reduce
+            niggli_reduce(frame)
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
             all_species.extend(frame.get_atomic_numbers())
