@@ -35,7 +35,7 @@ def show_cell(lattice, positions, numbers):
         print("%2d %10.5f %10.5f %10.5f" % ((s,) + tuple(p)))
 
 
-def main(fxyz, prefix, verbose):
+def main(fxyz, prefix, verbose, precision):
     # read frames
     if fxyz != 'none':
         frames = read(fxyz, ':')
@@ -45,15 +45,17 @@ def main(fxyz, prefix, verbose):
     standardized_frames = []
 
     for frame in frames:
-        print(spglib.get_spacegroup(frame, symprec=1e-1))  # spglib.get_symmetry(frame, symprec=1e-1))
+        space_now = spglib.get_spacegroup(frame, symprec=precision)  # spglib.get_symmetry(frame, symprec=1e-1))
+        print(space_now)
         lattice, scaled_positions, numbers = spglib.standardize_cell(frame,
                                                                      to_primitive=1,
                                                                      no_idealize=1,
-                                                                     symprec=1e-2)
+                                                                     symprec=precision)
         if verbose:
             show_cell(lattice, scaled_positions, numbers)
         # output
         frtemp = atom(numbers=numbers, cell=lattice, scaled_positions=scaled_positions, pbc=frame.get_pbc())
+        frtemp.info['space_group'] = space_now
         standardized_frames.append(frtemp)
 
     write(prefix + '-standardized.xyz', standardized_frames)
@@ -64,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('-fxyz', type=str, required=True, help='Location of xyz file')
     parser.add_argument('--prefix', type=str, default='output', help='Filename prefix')
     parser.add_argument('--verbose', type=bool, default=False, help='Screen output cell information [True/False]')
+    parser.add_argument('--precision', type=float, default=1e-1, help='Precision used for space group finding')
     args = parser.parse_args()
 
-    main(args.fxyz, args.prefix, args.verbose)
+    main(args.fxyz, args.prefix, args.verbose, args.precision)
