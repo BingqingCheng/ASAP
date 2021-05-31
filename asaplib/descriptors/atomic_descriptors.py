@@ -190,8 +190,8 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
 
         if 'periodic' in desc_spec.keys():
             self.periodic = bool(desc_spec['periodic'])
-        if self.periodic == True:
-            raise ValueError("Warning: currently DScribe only supports ACSF for finite systems")
+        # if self.periodic == True:
+        #     raise ValueError("Warning: currently DScribe only supports ACSF for finite systems")
 
         from dscribe.descriptors import ACSF
 
