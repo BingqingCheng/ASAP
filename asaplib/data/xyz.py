@@ -589,8 +589,9 @@ class ASAPXYZ:
                     raise ValueError("Cannot find the specified chemical species in the data set.")
         except:
             try:
+                natom_used = self.get_natom_list_by_species(species_name)
                 for index, y in enumerate(self.get_property(y_key, extensive, sbs)):
-                    y_all = np.append(y_all, y * np.ones(self.natom_list[index]))
+                    y_all = np.append(y_all, y * np.ones(natom_used[index]))
                 print("Cannot find the atomic properties, use the per-frame property instead")
             except:
                 raise ValueError('Cannot load the property vector')
