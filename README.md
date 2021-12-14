@@ -98,6 +98,12 @@ python 3
 Installation:
 
 ```bash
+pip install asaplib
+```
+
+or
+
+```bash
 python3 setup.py install --user
 ```
 
