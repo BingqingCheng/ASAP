@@ -37,7 +37,7 @@ def main(fxyz, prefix):
                           'k2': {
                               "geometry": {"function": "distance"},
                               "grid": {"min": 0, "max": 2, "n": 10, "sigma": 0.1},
-                              "weighting": {"function": "exponential", "scale": 0.5, "cutoff": 1e-3}},
+                              "weighting": {"function": "exp", "scale": 0.5, "cutoff": 1e-3}},
                           'periodic': False,
                           'normalization': "l2_each"}}
 
