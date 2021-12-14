@@ -139,7 +139,8 @@ class KFold(_KFold):
 
 class ShuffleSplit(_ShuffleSplit):
     def __init__(self, n_splits=10, test_size="default", train_size=None, random_state=None):
-        super(ShuffleSplit, self).__init__(n_splits, test_size, train_size, random_state)
+        #super(ShuffleSplit, self).__init__(n_splits, test_size, train_size, random_state)
+        super(ShuffleSplit, self).__init__(n_splits=n_splits, test_size=test_size, train_size=train_size, random_state=random_state)
 
     def get_params(self):
         params = dict(n_splits=self.n_splits, test_size=self.test_size,
