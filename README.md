@@ -101,10 +101,10 @@ Installation:
 pip install asaplib
 ```
 
-or
+or (after git clone https://github.com/BingqingCheng/ASAP)
 
 ```bash
-python3 setup.py install --user
+pip install .
 ```
 
 *This should automatically install any depedencies.*

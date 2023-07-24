@@ -20,23 +20,11 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'dscrib==1.2.2', 'click>=7.0', 'numpy', 'scipy', 'scikit-learn',
+        'dscribe==1.2.2', 'click>=7.0', 'numpy', 'scipy', 'scikit-learn',
         'ase', 'umap-learn', 'PyYAML', 'tqdm', 'pandas'
     ],
     extras_require={'testing': ['pytest>=5.0']},
-    python_requires='>=3.6',
-    # scripts=['scripts/clustering.py',
-    #          'scripts/frame_select.py',
-    #          'scripts/gen_soap_descriptors.py',
-    #          'scripts/kernel_density_estimation.py',
-    #          'scripts/kpca.py',
-    #          'scripts/kpca_sparse.py',
-    #          'scripts/krr.py',
-    #          'scripts/pca.py',
-    #          'scripts/kpca_for_projection_viewer.py',
-    #          'scripts/ridge_regression.py',
-    #          'scripts/tsne.py',
-    #          'scripts/umap_reducer.py']
+    python_requires='>=3.7',
     entry_points="""
     [console_scripts]
     asap=asaplib.cli.cmd_asap:asap
