@@ -5,6 +5,8 @@
 # ASAP 
 Automatic Selection And Prediction tools for materials and molecules
 
+[![DOI](https://zenodo.org/badge/201763628.svg)](https://zenodo.org/badge/latestdoi/201763628)
+
 ### [Documentation](https://bingqingcheng.github.io/index.html) (in progress)
 
 ### Mapping Materials and Molecules [(Paper link)](https://pubs.acs.org/doi/full/10.1021/acs.accounts.0c00403)
