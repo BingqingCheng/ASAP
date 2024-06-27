@@ -86,9 +86,9 @@ class ASAPXYZ:
             # record the total number of atoms
             self.natom_list.append(len(frame.get_positions()))
             all_species.extend(frame.get_atomic_numbers())
-            if frame.get_pbc()[0] and frame.get_pbc()[1] and frame.get_pbc()[2]:
+            #if frame.get_pbc()[0] and frame.get_pbc()[1] and frame.get_pbc()[2]:
                 # niggli_reduce
-                niggli_reduce(frame)
+                # niggli_reduce(frame)
             if not self.periodic or not np.sum(frame.get_cell()) > 0:
                 frame.set_pbc([False, False, False])
             # we also initialize the descriptor dictionary for each frame

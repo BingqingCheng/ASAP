@@ -165,7 +165,7 @@ class Atomic_Descriptor_SOAP(Atomic_Descriptor_Base):
 
     def create(self, frame):
         from dscribe.descriptors import SOAP
-        self.soap = SOAP(species=self.species, rcut=self.cutoff, nmax=self.n, lmax=self.l,
+        self.soap = SOAP(species=self.species, r_cut=self.cutoff, n_max=self.n, l_max=self.l,
                          sigma=self.g, rbf=self.rbf, crossover=self.crossover, average='off',
                          periodic=self._get_pbc(frame))
 
@@ -216,7 +216,7 @@ class Atomic_Descriptor_ACSF(Atomic_Descriptor_Base):
                 else:
                     self.acsf_dict[k] = v
 
-        self.acsf = ACSF(species=self.species, rcut=self.cutoff, **self.acsf_dict, sparse=False)
+        self.acsf = ACSF(species=self.species, r_cut=self.cutoff, **self.acsf_dict, sparse=False)
 
         print("Using ACSF Descriptors ...")
 
@@ -271,10 +271,6 @@ class Atomic_Descriptor_LMBTR(Atomic_Descriptor_Base):
                 * "l2_each": Normalize the Euclidean length of each k-term
                   individually to unity.
 
-            flatten (bool): Whether the output should be flattened to a 1D
-                array. If False, a dictionary of the different tensors is
-                provided, containing the values under keys: "k1", "k2", and
-                "k3":
             sparse (bool): Whether the output should be a sparse matrix or a
                 dense numpy array.
         """
@@ -322,7 +318,7 @@ class Atomic_Descriptor_LMBTR_K2(Atomic_Descriptor_LMBTR):
         except:
             raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
 
-        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True,
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic,
                            normalize_gaussians=self.normalize_gaussians,
                            k2=self.k2)
 
@@ -348,7 +344,7 @@ class Atomic_Descriptor_LMBTR_K3(Atomic_Descriptor_LMBTR):
         except:
             raise ValueError("Not enough information to intialize the `Atomic_Descriptor_LMBTR` object")
 
-        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic, flatten=True,
+        self.lmbtr = LMBTR(species=self.species, periodic=self.periodic,
                            normalize_gaussians=self.normalize_gaussians,
                            k3=self.k3)
 
